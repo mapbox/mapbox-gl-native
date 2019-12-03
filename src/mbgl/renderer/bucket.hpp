@@ -32,10 +32,10 @@ public:
     // Feature geometries are also used to populate the feature index.
     // Obtaining these is a costly operation, so we do it only once, and
     // pass-by-const-ref the geometries as a second parameter.
-    virtual void addFeature(const GeometryTileFeature&,
-                            const GeometryCollection&,
-                            const ImagePositions&,
-                            const PatternLayerMap&) {};
+    virtual void addFeature(const GeometryTileFeature&, const GeometryCollection&, const ImagePositions&,
+                            const PatternLayerMap&, std::size_t){};
+
+    virtual void update(const FeatureStates&, const GeometryTileLayer&, const std::string&, const ImagePositions&) {}
 
     // As long as this bucket has a Prepare render pass, this function is getting called. Typically,
     // this only happens once when the bucket is being rendered for the first time.
@@ -61,7 +61,8 @@ public:
     }
     // Places this bucket to the given placement.
     virtual void place(Placement&, const BucketPlacementParameters&, std::set<uint32_t>&) {}
-    virtual void updateVertices(Placement&, bool /*updateOpacities*/, const TransformState&, const RenderTile&, std::set<uint32_t>&) {}
+    virtual void updateVertices(
+        const Placement&, bool /*updateOpacities*/, const TransformState&, const RenderTile&, std::set<uint32_t>&) {}
 
 protected:
     Bucket() = default;

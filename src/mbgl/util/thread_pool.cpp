@@ -6,53 +6,44 @@
 
 namespace mbgl {
 
-ThreadPool::ThreadPool(std::size_t count) {
-    threads.reserve(count);
+ThreadedSchedulerBase::~ThreadedSchedulerBase() = default;
 
-    for (std::size_t i = 0; i < count; ++i) {
-        threads.emplace_back([this, i]() {
-            platform::setCurrentThreadName(std::string{ "Worker " } + util::toString(i + 1));
-            platform::attachThread();
-
-            while (true) {
-                std::unique_lock<std::mutex> lock(mutex);
-
-                cv.wait(lock, [this] {
-                    return !queue.empty() || terminate;
-                });
-
-                if (terminate) {
-                    platform::detachThread();
-                    return;
-                }
-
-                auto mailbox = queue.front();
-                queue.pop();
-                lock.unlock();
-
-                Mailbox::maybeReceive(mailbox);
-            }
-        });
-    }
-}
-
-ThreadPool::~ThreadPool() {
+void ThreadedSchedulerBase::terminate() {
     {
         std::lock_guard<std::mutex> lock(mutex);
-        terminate = true;
+        terminated = true;
     }
-
     cv.notify_all();
-
-    for (auto& thread : threads) {
-        thread.join();
-    }
 }
 
-void ThreadPool::schedule(std::weak_ptr<Mailbox> mailbox) {
+std::thread ThreadedSchedulerBase::makeSchedulerThread(size_t index) {
+    return std::thread([this, index]() {
+        platform::setCurrentThreadName(std::string{"Worker "} + util::toString(index + 1));
+        platform::attachThread();
+
+        while (true) {
+            std::unique_lock<std::mutex> lock(mutex);
+
+            cv.wait(lock, [this] { return !queue.empty() || terminated; });
+
+            if (terminated) {
+                platform::detachThread();
+                return;
+            }
+
+            auto function = std::move(queue.front());
+            queue.pop();
+            lock.unlock();
+            if (function) function();
+        }
+    });
+}
+
+void ThreadedSchedulerBase::schedule(std::function<void()> fn) {
+    assert(fn);
     {
         std::lock_guard<std::mutex> lock(mutex);
-        queue.push(mailbox);
+        queue.push(std::move(fn));
     }
 
     cv.notify_one();

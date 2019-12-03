@@ -95,11 +95,15 @@ public:
 
     void resetDatabase(jni::JNIEnv&, const jni::Object<FileSourceCallback>& callback_);
 
+    void packDatabase(jni::JNIEnv&, const jni::Object<FileSourceCallback>& callback_);
+
     void invalidateAmbientCache(jni::JNIEnv&, const jni::Object<FileSourceCallback>& callback_);
 
     void clearAmbientCache(jni::JNIEnv&, const jni::Object<FileSourceCallback>& callback_);
 
     void setMaximumAmbientCacheSize(jni::JNIEnv&, const jni::jlong size, const jni::Object<FileSourceCallback>& callback_);
+
+    void runPackDatabaseAutomatically(jni::JNIEnv&, jboolean autopack);
 
 private:
     std::shared_ptr<mbgl::DefaultFileSource> fileSource;

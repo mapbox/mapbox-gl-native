@@ -19,14 +19,13 @@ namespace style {
 
 // static
 const LayerTypeInfo* BackgroundLayer::Impl::staticTypeInfo() noexcept {
-    const static LayerTypeInfo typeInfo
-        {"background",
-          LayerTypeInfo::Source::NotRequired,
-          LayerTypeInfo::Pass3D::NotRequired,
-          LayerTypeInfo::Layout::NotRequired,
-          LayerTypeInfo::FadingTiles::NotRequired,
-          LayerTypeInfo::CrossTileIndex::NotRequired
-        };
+    const static LayerTypeInfo typeInfo{"background",
+                                        LayerTypeInfo::Source::NotRequired,
+                                        LayerTypeInfo::Pass3D::NotRequired,
+                                        LayerTypeInfo::Layout::NotRequired,
+                                        LayerTypeInfo::FadingTiles::NotRequired,
+                                        LayerTypeInfo::CrossTileIndex::NotRequired,
+                                        LayerTypeInfo::TileKind::NotRequired};
     return &typeInfo;
 }
 
@@ -65,7 +64,7 @@ void BackgroundLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringB
 // Paint properties
 
 PropertyValue<Color> BackgroundLayer::getDefaultBackgroundColor() {
-    return { Color::black() };
+    return {Color::black()};
 }
 
 const PropertyValue<Color>& BackgroundLayer::getBackgroundColor() const {
@@ -92,7 +91,7 @@ TransitionOptions BackgroundLayer::getBackgroundColorTransition() const {
 }
 
 PropertyValue<float> BackgroundLayer::getDefaultBackgroundOpacity() {
-    return { 1 };
+    return {1};
 }
 
 const PropertyValue<float>& BackgroundLayer::getBackgroundOpacity() const {
@@ -118,15 +117,15 @@ TransitionOptions BackgroundLayer::getBackgroundOpacityTransition() const {
     return impl().paint.template get<BackgroundOpacity>().options;
 }
 
-PropertyValue<std::string> BackgroundLayer::getDefaultBackgroundPattern() {
-    return { "" };
+PropertyValue<expression::Image> BackgroundLayer::getDefaultBackgroundPattern() {
+    return {{}};
 }
 
-const PropertyValue<std::string>& BackgroundLayer::getBackgroundPattern() const {
+const PropertyValue<expression::Image>& BackgroundLayer::getBackgroundPattern() const {
     return impl().paint.template get<BackgroundPattern>().value;
 }
 
-void BackgroundLayer::setBackgroundPattern(const PropertyValue<std::string>& value) {
+void BackgroundLayer::setBackgroundPattern(const PropertyValue<expression::Image>& value) {
     if (value == getBackgroundPattern())
         return;
     auto impl_ = mutableImpl();
@@ -147,101 +146,116 @@ TransitionOptions BackgroundLayer::getBackgroundPatternTransition() const {
 
 using namespace conversion;
 
-optional<Error> BackgroundLayer::setPaintProperty(const std::string& name, const Convertible& value) {
-    enum class Property {
-        BackgroundColor,
-        BackgroundOpacity,
-        BackgroundPattern,
-        BackgroundColorTransition,
-        BackgroundOpacityTransition,
-        BackgroundPatternTransition,
-    };
+namespace {
 
-    MAPBOX_ETERNAL_CONSTEXPR const auto properties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>({
-        { "background-color", mbgl::underlying_type(Property::BackgroundColor) },
-        { "background-opacity", mbgl::underlying_type(Property::BackgroundOpacity) },
-        { "background-pattern", mbgl::underlying_type(Property::BackgroundPattern) },
-        { "background-color-transition", mbgl::underlying_type(Property::BackgroundColorTransition) },
-        { "background-opacity-transition", mbgl::underlying_type(Property::BackgroundOpacityTransition) },
-        { "background-pattern-transition", mbgl::underlying_type(Property::BackgroundPatternTransition) }
-    });
+enum class Property : uint8_t {
+    BackgroundColor,
+    BackgroundOpacity,
+    BackgroundPattern,
+    BackgroundColorTransition,
+    BackgroundOpacityTransition,
+    BackgroundPatternTransition,
+};
 
-    const auto it = properties.find(name.c_str());
-    if (it == properties.end()) {
-        return Error { "layer doesn't support this property" };
+template <typename T>
+constexpr uint8_t toUint8(T t) noexcept {
+    return uint8_t(mbgl::underlying_type(t));
+}
+
+MAPBOX_ETERNAL_CONSTEXPR const auto layerProperties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>(
+    {{"background-color", toUint8(Property::BackgroundColor)},
+     {"background-opacity", toUint8(Property::BackgroundOpacity)},
+     {"background-pattern", toUint8(Property::BackgroundPattern)},
+     {"background-color-transition", toUint8(Property::BackgroundColorTransition)},
+     {"background-opacity-transition", toUint8(Property::BackgroundOpacityTransition)},
+     {"background-pattern-transition", toUint8(Property::BackgroundPatternTransition)}});
+} // namespace
+
+optional<Error> BackgroundLayer::setProperty(const std::string& name, const Convertible& value) {
+    const auto it = layerProperties.find(name.c_str());
+    if (it == layerProperties.end()) {
+        if (name == "visibility") return setVisibility(value);
+        return Error{"layer doesn't support this property"};
     }
 
     auto property = static_cast<Property>(it->second);
 
-        
     if (property == Property::BackgroundColor) {
         Error error;
-        optional<PropertyValue<Color>> typedValue = convert<PropertyValue<Color>>(value, error, false, false);
+        const auto& typedValue = convert<PropertyValue<Color>>(value, error, false, false);
         if (!typedValue) {
             return error;
         }
-        
+
         setBackgroundColor(*typedValue);
         return nullopt;
-        
     }
-    
     if (property == Property::BackgroundOpacity) {
         Error error;
-        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, false, false);
+        const auto& typedValue = convert<PropertyValue<float>>(value, error, false, false);
         if (!typedValue) {
             return error;
         }
-        
+
         setBackgroundOpacity(*typedValue);
         return nullopt;
-        
     }
-    
     if (property == Property::BackgroundPattern) {
         Error error;
-        optional<PropertyValue<std::string>> typedValue = convert<PropertyValue<std::string>>(value, error, false, false);
+        const auto& typedValue = convert<PropertyValue<expression::Image>>(value, error, false, false);
         if (!typedValue) {
             return error;
         }
-        
+
         setBackgroundPattern(*typedValue);
         return nullopt;
-        
     }
-    
 
     Error error;
     optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
     if (!transition) {
         return error;
     }
-    
+
     if (property == Property::BackgroundColorTransition) {
         setBackgroundColorTransition(*transition);
         return nullopt;
     }
-    
+
     if (property == Property::BackgroundOpacityTransition) {
         setBackgroundOpacityTransition(*transition);
         return nullopt;
     }
-    
+
     if (property == Property::BackgroundPatternTransition) {
         setBackgroundPatternTransition(*transition);
         return nullopt;
     }
-    
 
-    return Error { "layer doesn't support this property" };
+    return Error{"layer doesn't support this property"};
 }
 
-optional<Error> BackgroundLayer::setLayoutProperty(const std::string& name, const Convertible& value) {
-    if (name == "visibility") {
-        return Layer::setVisibility(value);
+StyleProperty BackgroundLayer::getProperty(const std::string& name) const {
+    const auto it = layerProperties.find(name.c_str());
+    if (it == layerProperties.end()) {
+        return {};
     }
 
-    return Error { "layer doesn't support this property" };
+    switch (static_cast<Property>(it->second)) {
+        case Property::BackgroundColor:
+            return makeStyleProperty(getBackgroundColor());
+        case Property::BackgroundOpacity:
+            return makeStyleProperty(getBackgroundOpacity());
+        case Property::BackgroundPattern:
+            return makeStyleProperty(getBackgroundPattern());
+        case Property::BackgroundColorTransition:
+            return makeStyleProperty(getBackgroundColorTransition());
+        case Property::BackgroundOpacityTransition:
+            return makeStyleProperty(getBackgroundOpacityTransition());
+        case Property::BackgroundPatternTransition:
+            return makeStyleProperty(getBackgroundPatternTransition());
+    }
+    return {};
 }
 
 Mutable<Layer::Impl> BackgroundLayer::mutableBaseImpl() const {

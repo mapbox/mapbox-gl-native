@@ -307,6 +307,50 @@ public class OfflineManager {
   }
 
   /**
+   * Packs the existing database file into a minimal amount of disk space.
+   * <p>
+   * This operation has a performance impact as it will vacuum the database,
+   * forcing it to move pages on the filesystem.
+   * <p>
+   * When the operation is complete or encounters an error, the given callback will be
+   * executed on the database thread; it is the responsibility of the SDK bindings
+   * to re-execute a user-provided callback on the main thread.
+   * </p>
+   *
+   * @param callback the callback to be invoked when the database was reset or when the operation erred.
+   */
+  public void packDatabase(@Nullable final FileSourceCallback callback) {
+    fileSource.activate();
+    nativePackDatabase(new FileSourceCallback() {
+      @Override
+      public void onSuccess() {
+        handler.post(new Runnable() {
+          @Override
+          public void run() {
+            fileSource.deactivate();
+            if (callback != null) {
+              callback.onSuccess();
+            }
+          }
+        });
+      }
+
+      @Override
+      public void onError(@NonNull final String message) {
+        handler.post(new Runnable() {
+          @Override
+          public void run() {
+            fileSource.deactivate();
+            if (callback != null) {
+              callback.onError(message);
+            }
+          }
+        });
+      }
+    });
+  }
+
+  /**
    * Forces re-validation of the ambient cache.
    * <p>
    * Forces Mapbox GL Native to revalidate resources stored in the ambient
@@ -355,9 +399,10 @@ public class OfflineManager {
   /**
    * Erase resources from the ambient cache, freeing storage space.
    * <p>
-   * Erases the ambient cache, freeing resources. This operation can be
-   * potentially slow because it will trigger a VACUUM on SQLite,
-   * forcing the database to move pages on the filesystem.
+   * Erases the ambient cache, freeing resources.
+   * <p>
+   * Note that this operation can be potentially slow if packing the database
+   * occurs automatically ({@link OfflineManager#runPackDatabaseAutomatically(boolean)}).
    * </p>
    * <p>
    * Resources overlapping with offline regions will not be affected
@@ -620,13 +665,31 @@ public class OfflineManager {
    * <p>
    * Once this limit is reached, {@link OfflineRegion.OfflineRegionObserver#mapboxTileCountLimitExceeded(long)}
    * fires every additional attempt to download additional tiles until already downloaded tiles are removed
-   * by calling {@link OfflineRegion#deleteOfflineRegion(OfflineRegion.OfflineRegionDeleteCallback)}.
+   * by calling {@link OfflineRegion#delete(OfflineRegion.OfflineRegionDeleteCallback)}.
    * </p>
    *
    * @param limit the maximum number of tiles allowed to be downloaded
    */
   @Keep
   public native void setOfflineMapboxTileCountLimit(long limit);
+
+  /**
+   * Sets whether database file packing occurs automatically.
+   * By default, the automatic database file packing is enabled.
+   * <p>
+   * If packing is enabled, database file packing occurs automatically
+   * after an offline region is deleted by calling
+   * {@link OfflineRegion#delete(OfflineRegion.OfflineRegionDeleteCallback)}
+   * or the ambient cache is cleared by calling {@link OfflineManager#clearAmbientCache()}.
+   *
+   * If packing is disabled, disk space will not be freed after
+   * resources are removed unless {@link OfflineManager#packDatabase()} is explicitly called.
+   * </p>
+   *
+   * @param autopack flag setting the automatic database file packing.
+   */
+  @Keep
+  public native void runPackDatabaseAutomatically(boolean autopack);
 
   @Keep
   private native void initialize(FileSource fileSource);
@@ -647,6 +710,9 @@ public class OfflineManager {
 
   @Keep
   private native void nativeResetDatabase(@Nullable FileSourceCallback callback);
+
+  @Keep
+  private native void nativePackDatabase(@Nullable FileSourceCallback callback);
 
   @Keep
   private native void nativeInvalidateAmbientCache(@Nullable FileSourceCallback callback);

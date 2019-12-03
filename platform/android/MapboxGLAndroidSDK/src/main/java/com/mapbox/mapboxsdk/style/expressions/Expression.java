@@ -4888,4 +4888,47 @@ public class Expression {
     }
     return objects;
   }
+
+  /**
+   * Returns image expression for use in '*-pattern' and 'icon-image' layer properties. Compared to
+   * string literals that can be used to represent an image, image expression allows to determine an
+   * image's availability at runtime, thus, can be used in conditional <a href="https://docs.mapbox.com/mapbox-gl-js/style-spec/#expressions-coalesce">coalesce operator</a>.
+   *
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * SymbolLayer symbolLayer = new SymbolLayer("layer-id", "source-id");
+   * symbolLayer.setProperties(
+   *     iconImage(image(get("key-to-feature")))
+   * );
+   * }
+   * </pre>
+   *
+   * <p>
+   * Example usage with coalesce operator:
+   * </p>
+   * <pre>
+   * {@code
+   * SymbolLayer symbolLayer = new SymbolLayer("layer-id", "source-id");
+   * symbolLayer.setProperties(
+   *     iconImage(
+   *         coalesce(
+   *             image(literal("maki-11")),
+   *             image(literal("bicycle-15")),
+   *             image(literal("default-icon"))
+   *         )
+   *     )
+   * );
+   * }
+   * </pre>
+   *
+   * @param input expression input
+   * @return expression
+   * @see <a href="https://docs.mapbox.com/mapbox-gl-js/style-spec/#expressions-types-image">Image expression</a>
+   */
+  public static Expression image(@NonNull Expression input) {
+    return new Expression("image", input);
+  }
 }

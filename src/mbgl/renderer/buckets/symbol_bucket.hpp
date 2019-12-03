@@ -61,14 +61,16 @@ public:
                  const std::vector<SymbolInstance>&&,
                  const float tilePixelRatio,
                  bool allowVerticalPlacement,
-                 std::vector<style::TextWritingModeType> placementModes);
+                 std::vector<style::TextWritingModeType> placementModes,
+                 bool iconsInText);
     ~SymbolBucket() override;
 
     void upload(gfx::UploadPass&) override;
     bool hasData() const override;
     std::pair<uint32_t, bool> registerAtCrossTileIndex(CrossTileSymbolLayerIndex&, const OverscaledTileID&, uint32_t& maxCrossTileID) override;
     void place(Placement&, const BucketPlacementParameters&, std::set<uint32_t>&) override;
-    void updateVertices(Placement&, bool updateOpacities, const TransformState&, const RenderTile&, std::set<uint32_t>&) override;
+    void updateVertices(
+        const Placement&, bool updateOpacities, const TransformState&, const RenderTile&, std::set<uint32_t>&) override;
     bool hasTextData() const;
     bool hasIconData() const;
     bool hasSdfIconData() const;
@@ -94,6 +96,7 @@ public:
     bool placementChangesUploaded : 1;
     bool dynamicUploaded : 1;
     bool sortUploaded : 1;
+    bool iconsInText : 1;
     // Set and used by placement.
     mutable bool justReloaded : 1;
     bool hasVariablePlacement : 1;
@@ -176,7 +179,7 @@ public:
     const std::vector<style::TextWritingModeType> placementModes;
     mutable optional<bool> hasFormatSectionOverrides_;
 
-    std::shared_ptr<std::vector<size_t>> featureSortOrder;
+    FeatureSortOrder featureSortOrder;
 };
 
 } // namespace mbgl

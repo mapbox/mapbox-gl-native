@@ -135,10 +135,15 @@ private:
 - (void)invalidate {
     MGLLogInfo(@"Invalidating pack.");
     MGLAssert(_state != MGLOfflinePackStateInvalid, @"Cannot invalidate an already invalid offline pack.");
+    MGLAssert(self.mbglOfflineRegion, @"Should have a valid region");
 
-    self.state = MGLOfflinePackStateInvalid;
-    _mbglFileSource->setOfflineRegionObserver(*self.mbglOfflineRegion, nullptr);
-    self.mbglOfflineRegion = nil;
+    @synchronized (self) {
+        self.state = MGLOfflinePackStateInvalid;
+        if (self.mbglOfflineRegion) {
+            _mbglFileSource->setOfflineRegionObserver(*self.mbglOfflineRegion, nullptr);
+        }
+        self.mbglOfflineRegion = nil;
+    }
 }
 
 - (void)setState:(MGLOfflinePackState)state {

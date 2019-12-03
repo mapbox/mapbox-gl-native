@@ -1,3 +1,5 @@
+// clang-format off
+
 // This file is generated. Edit scripts/generate-style-code.js, then run `make style-code`.
 
 #pragma once
@@ -51,7 +53,7 @@ struct CircleStrokeWidth : DataDrivenPaintProperty<float, attributes::stroke_wid
 };
 
 struct CircleTranslate : PaintProperty<std::array<float, 2>> {
-    static std::array<float, 2> defaultValue() { return {{ 0, 0 }}; }
+    static std::array<float, 2> defaultValue() { return {{0, 0}}; }
 };
 
 struct CircleTranslateAnchor : PaintProperty<TranslateAnchorType> {
@@ -89,3 +91,5 @@ public:
 
 } // namespace style
 } // namespace mbgl
+
+// clang-format on

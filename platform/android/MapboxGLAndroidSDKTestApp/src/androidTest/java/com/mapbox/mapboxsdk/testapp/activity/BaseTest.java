@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.CallSuper;
 import android.support.annotation.UiThread;
 import android.support.test.rule.ActivityTestRule;
+import android.support.test.rule.GrantPermissionRule;
 
 import com.mapbox.mapboxsdk.AppCenter;
 import com.mapbox.mapboxsdk.Mapbox;
@@ -34,6 +35,10 @@ public abstract class BaseTest extends AppCenter {
 
   @Rule
   public TestName testName = new TestName();
+
+  @Rule
+  public GrantPermissionRule grantLocationPermissionRule = GrantPermissionRule
+          .grant(android.Manifest.permission.ACCESS_FINE_LOCATION);
 
   protected MapboxMap mapboxMap;
   protected MapView mapView;
@@ -75,7 +80,12 @@ public abstract class BaseTest extends AppCenter {
     try {
       rule.runOnUiThread(() -> {
         mapView = rule.getActivity().findViewById(R.id.mapView);
-        mapView.getMapAsync(this::initMap);
+        if (mapView != null) {
+          mapView.getMapAsync(this::initMap);
+        } else {
+          Timber.w("Skipping map load test since mapView is not found.");
+          latch.countDown();
+        }
       });
     } catch (Throwable throwable) {
       throwable.printStackTrace();

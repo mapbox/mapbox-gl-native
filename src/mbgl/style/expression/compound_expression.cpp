@@ -105,7 +105,7 @@ private:
         for (std::size_t i = 0; i < sizeof...(Params); ++i) {
             const EvaluationResult evaluatedArg = args.at(i)->evaluate(evaluationParameters);
             if (!evaluatedArg) return evaluatedArg.error();
-            evaluated[i] = std::move(*evaluatedArg);
+            evaluated[i] = *evaluatedArg;
         }
         const R value = evaluate(*fromExpressionValue<std::decay_t<Params>>(evaluated[I])...);
         if (!value) return value.error();
@@ -165,7 +165,7 @@ private:
         for (std::size_t i = 0; i < sizeof...(Params); ++i) {
             const EvaluationResult evaluatedArg = args.at(i)->evaluate(evaluationParameters);
             if (!evaluatedArg) return evaluatedArg.error();
-            evaluated[i] = std::move(*evaluatedArg);
+            evaluated[i] = *evaluatedArg;
         }
         const R value = evaluate(evaluationParameters, *fromExpressionValue<std::decay_t<Params>>(evaluated[I])...);
         if (!value) return value.error();
@@ -675,6 +675,21 @@ const auto& errorCompoundExpression() {
     return signature;
 }
 
+const auto& featureStateCompoundExpression() {
+    static auto signature = detail::makeSignature(
+        "feature-state", [](const EvaluationContext& params, const std::string& key) -> Result<Value> {
+            mbgl::Value state;
+            if (params.featureState != nullptr) {
+                auto it = params.featureState->find(key);
+                if (it != params.featureState->end()) {
+                    state = mbgl::Value(it->second);
+                }
+            }
+            return toExpressionValue(state);
+        });
+    return signature;
+}
+
 // Legacy Filters
 const auto& filterEqualsCompoundExpression() {
     static auto signature = detail::makeSignature("filter-==", [](const EvaluationContext& params, const std::string& key, const Value &lhs) -> Result<bool> {
@@ -872,81 +887,83 @@ const auto& filterInCompoundExpression() {
 }
 
 using ParseCompoundFunction = const std::unique_ptr<detail::SignatureBase>& (*)();
-MAPBOX_ETERNAL_CONSTEXPR const auto compoundExpressionRegistry = mapbox::eternal::hash_map<mapbox::eternal::string, ParseCompoundFunction>({
-    { "e", eCompoundExpression },
-    { "pi", piCompoundExpression },
-    { "ln2", ln2CompoundExpression },
-    { "typeof", typeofCompoundExpression },
-    { "to-rgba", toRgbaCompoundExpression },
-    { "rgba", rgbaCompoundExpression },
-    { "rgb", rgbCompoundExpression },
-    { "zoom", zoomCompoundExpression },
-    { "heatmap-density", heatmapDensityCompoundExpression },
-    { "line-progress", lineProgressCompoundExpression },
-    { "accumulated", accumulatedCompoundExpression },
-    { "has", hasContextCompoundExpression },
-    { "has", hasObjectCompoundExpression },
-    { "get", getContextCompoundExpression },
-    { "get", getObjectCompoundExpression },
-    { "properties", propertiesCompoundExpression },
-    { "geometry-type", geometryTypeCompoundExpression },
-    { "id", idCompoundExpression },
-    { "+", plusCompoundExpression },
-    { "-", minusCompoundExpression },
-    { "-", negateCompoundExpression },
-    { "*", multiplyCompoundExpression },
-    { "/", divideCompoundExpression },
-    { "%", modCompoundExpression },
-    { "^", powCompoundExpression },
-    { "sqrt", sqrtCompoundExpression },
-    { "log10", log10CompoundExpression },
-    { "ln", lnCompoundExpression },
-    { "log2", log2CompoundExpression },
-    { "sin", sinCompoundExpression },
-    { "cos", cosCompoundExpression },
-    { "tan", tanCompoundExpression },
-    { "asin", asinCompoundExpression },
-    { "acos", acosCompoundExpression },
-    { "atan", atanCompoundExpression },
-    { "min", minCompoundExpression },
-    { "max", maxCompoundExpression },
-    { "round", roundCompoundExpression },
-    { "floor", floorCompoundExpression },
-    { "ceil", ceilCompoundExpression },
-    { "abs", absCompoundExpression },
-    { "!", notCompoundExpression },
-    { "is-supported-script", isSupportedScriptCompoundExpression },
-    { "upcase", upcaseCompoundExpression },
-    { "downcase", downcaseCompoundExpression },
-    { "concat", concatCompoundExpression },
-    { "resolved-locale", resolvedLocaleCompoundExpression },
-    { "error", errorCompoundExpression },
-    // Legacy Filters
-    { "filter-==", filterEqualsCompoundExpression },
-    { "filter-id-==", filterIdEqualsCompoundExpression },
-    { "filter-type-==", filterTypeEqualsCompoundExpression },
-    { "filter-<", filterLessThanNumberCompoundExpression },
-    { "filter-<", filterLessThanStringCompoundExpression },
-    { "filter-id-<", filterIdLessThanNumberCompoundExpression },
-    { "filter-id-<", filterIdLessThanStringCompoundExpression },
-    { "filter->", filterMoreThanNumberCompoundExpression },
-    { "filter->", filterMoreThanStringCompoundExpression },
-    { "filter-id->", filterIdMoreThanNumberCompoundExpression },
-    { "filter-id->", filterIdMoreThanStringCompoundExpression },
-    { "filter-<=", filterLessOrEqualThanNumberCompoundExpression },
-    { "filter-<=", filterLessOrEqualThanStringCompoundExpression },
-    { "filter-id-<=", filterIdLessOrEqualThanNumberCompoundExpression },
-    { "filter-id-<=", filterIdLessOrEqualThanStringCompoundExpression },
-    { "filter->=", filterGreaterOrEqualThanNumberCompoundExpression },
-    { "filter->=", filterGreaterOrEqualThanStringCompoundExpression },
-    { "filter-id->=", filterIdGreaterOrEqualThanNumberCompoundExpression },
-    { "filter-id->=", filterIdGreaterOrEqualThanStringCompoundExpression },
-    { "filter-has", filterHasCompoundExpression },
-    { "filter-has-id", filterHasIdCompoundExpression },
-    { "filter-type-in", filterTypeInCompoundExpression },
-    { "filter-id-in", filterIdInCompoundExpression },
-    { "filter-in", filterInCompoundExpression },
-});
+MAPBOX_ETERNAL_CONSTEXPR const auto compoundExpressionRegistry =
+    mapbox::eternal::hash_map<mapbox::eternal::string, ParseCompoundFunction>({
+        {"e", eCompoundExpression},
+        {"pi", piCompoundExpression},
+        {"ln2", ln2CompoundExpression},
+        {"typeof", typeofCompoundExpression},
+        {"to-rgba", toRgbaCompoundExpression},
+        {"rgba", rgbaCompoundExpression},
+        {"rgb", rgbCompoundExpression},
+        {"zoom", zoomCompoundExpression},
+        {"heatmap-density", heatmapDensityCompoundExpression},
+        {"line-progress", lineProgressCompoundExpression},
+        {"accumulated", accumulatedCompoundExpression},
+        {"has", hasContextCompoundExpression},
+        {"has", hasObjectCompoundExpression},
+        {"get", getContextCompoundExpression},
+        {"get", getObjectCompoundExpression},
+        {"properties", propertiesCompoundExpression},
+        {"geometry-type", geometryTypeCompoundExpression},
+        {"id", idCompoundExpression},
+        {"+", plusCompoundExpression},
+        {"-", minusCompoundExpression},
+        {"-", negateCompoundExpression},
+        {"*", multiplyCompoundExpression},
+        {"/", divideCompoundExpression},
+        {"%", modCompoundExpression},
+        {"^", powCompoundExpression},
+        {"sqrt", sqrtCompoundExpression},
+        {"log10", log10CompoundExpression},
+        {"ln", lnCompoundExpression},
+        {"log2", log2CompoundExpression},
+        {"sin", sinCompoundExpression},
+        {"cos", cosCompoundExpression},
+        {"tan", tanCompoundExpression},
+        {"asin", asinCompoundExpression},
+        {"acos", acosCompoundExpression},
+        {"atan", atanCompoundExpression},
+        {"min", minCompoundExpression},
+        {"max", maxCompoundExpression},
+        {"round", roundCompoundExpression},
+        {"floor", floorCompoundExpression},
+        {"ceil", ceilCompoundExpression},
+        {"abs", absCompoundExpression},
+        {"!", notCompoundExpression},
+        {"is-supported-script", isSupportedScriptCompoundExpression},
+        {"upcase", upcaseCompoundExpression},
+        {"downcase", downcaseCompoundExpression},
+        {"concat", concatCompoundExpression},
+        {"resolved-locale", resolvedLocaleCompoundExpression},
+        {"error", errorCompoundExpression},
+        {"feature-state", featureStateCompoundExpression},
+        // Legacy Filters
+        {"filter-==", filterEqualsCompoundExpression},
+        {"filter-id-==", filterIdEqualsCompoundExpression},
+        {"filter-type-==", filterTypeEqualsCompoundExpression},
+        {"filter-<", filterLessThanNumberCompoundExpression},
+        {"filter-<", filterLessThanStringCompoundExpression},
+        {"filter-id-<", filterIdLessThanNumberCompoundExpression},
+        {"filter-id-<", filterIdLessThanStringCompoundExpression},
+        {"filter->", filterMoreThanNumberCompoundExpression},
+        {"filter->", filterMoreThanStringCompoundExpression},
+        {"filter-id->", filterIdMoreThanNumberCompoundExpression},
+        {"filter-id->", filterIdMoreThanStringCompoundExpression},
+        {"filter-<=", filterLessOrEqualThanNumberCompoundExpression},
+        {"filter-<=", filterLessOrEqualThanStringCompoundExpression},
+        {"filter-id-<=", filterIdLessOrEqualThanNumberCompoundExpression},
+        {"filter-id-<=", filterIdLessOrEqualThanStringCompoundExpression},
+        {"filter->=", filterGreaterOrEqualThanNumberCompoundExpression},
+        {"filter->=", filterGreaterOrEqualThanStringCompoundExpression},
+        {"filter-id->=", filterIdGreaterOrEqualThanNumberCompoundExpression},
+        {"filter-id->=", filterIdGreaterOrEqualThanStringCompoundExpression},
+        {"filter-has", filterHasCompoundExpression},
+        {"filter-has-id", filterHasIdCompoundExpression},
+        {"filter-type-in", filterTypeInCompoundExpression},
+        {"filter-id-in", filterIdInCompoundExpression},
+        {"filter-in", filterInCompoundExpression},
+    });
 
 using namespace mbgl::style::conversion;
 

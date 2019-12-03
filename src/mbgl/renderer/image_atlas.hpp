@@ -20,6 +20,7 @@ class ImagePosition {
 public:
     ImagePosition(const mapbox::Bin&, const style::Image::Impl&, uint32_t version = 0);
 
+    static constexpr const uint16_t padding = 1u;
     float pixelRatio;
     Rect<uint16_t> textureRect;
     uint32_t version;
@@ -49,6 +50,13 @@ public:
             textureRect.w / pixelRatio,
             textureRect.h / pixelRatio,
         }};
+    }
+
+    Rect<uint16_t> paddedTextureRect() const {
+        return {static_cast<uint16_t>(textureRect.x - padding),
+                static_cast<uint16_t>(textureRect.y - padding),
+                static_cast<uint16_t>(textureRect.w + padding * 2),
+                static_cast<uint16_t>(textureRect.h + padding * 2)};
     }
 };
 

@@ -176,13 +176,23 @@ void GeometryTile::setError(std::exception_ptr err) {
     observer->onTileError(*this, err);
 }
 
-void GeometryTile::setData(std::unique_ptr<const GeometryTileData> data_, bool resetLayers) {
+void GeometryTile::setData(std::unique_ptr<const GeometryTileData> data_) {
     // Mark the tile as pending again if it was complete before to prevent signaling a complete
     // state despite pending parse operations.
     pending = true;
 
     ++correlationID;
-    worker.self().invoke(&GeometryTileWorker::setData, std::move(data_), resetLayers, correlationID);
+    worker.self().invoke(
+        &GeometryTileWorker::setData, std::move(data_), imageManager.getAvailableImages(), correlationID);
+}
+
+void GeometryTile::reset() {
+    // Mark the tile as pending again if it was complete before to prevent signaling a complete
+    // state despite pending parse operations.
+    pending = true;
+
+    ++correlationID;
+    worker.self().invoke(&GeometryTileWorker::reset, correlationID);
 }
 
 std::unique_ptr<TileRenderData> GeometryTile::createRenderData() {
@@ -212,7 +222,8 @@ void GeometryTile::setLayers(const std::vector<Immutable<LayerProperties>>& laye
     }
 
     ++correlationID;
-    worker.self().invoke(&GeometryTileWorker::setLayers, std::move(impls), correlationID);
+    worker.self().invoke(
+        &GeometryTileWorker::setLayers, std::move(impls), imageManager.getAvailableImages(), correlationID);
 }
 
 void GeometryTile::setShowCollisionBoxes(const bool showCollisionBoxes_) {
@@ -302,14 +313,11 @@ float GeometryTile::getQueryPadding(const std::unordered_map<std::string, const 
     return queryPadding;
 }
 
-void GeometryTile::queryRenderedFeatures(
-    std::unordered_map<std::string, std::vector<Feature>>& result,
-    const GeometryCoordinates& queryGeometry,
-    const TransformState& transformState,
-    const std::unordered_map<std::string, const RenderLayer*>& layers,
-    const RenderedQueryOptions& options,
-    const mat4& projMatrix) {
-
+void GeometryTile::queryRenderedFeatures(std::unordered_map<std::string, std::vector<Feature>>& result,
+                                         const GeometryCoordinates& queryGeometry, const TransformState& transformState,
+                                         const std::unordered_map<std::string, const RenderLayer*>& layers,
+                                         const RenderedQueryOptions& options, const mat4& projMatrix,
+                                         const SourceFeatureState& featureState) {
     if (!getData()) return;
 
     const float queryPadding = getQueryPadding(layers);
@@ -318,16 +326,10 @@ void GeometryTile::queryRenderedFeatures(
     transformState.matrixFor(posMatrix, id.toUnwrapped());
     matrix::multiply(posMatrix, projMatrix, posMatrix);
 
-    layoutResult->featureIndex->query(result,
-                              queryGeometry,
-                              transformState,
-                              posMatrix,
-                              util::tileSize * id.overscaleFactor(),
-                              std::pow(2, transformState.getZoom() - id.overscaledZ),
-                              options,
-                              id.toUnwrapped(),
-                              layers,
-                              queryPadding * transformState.maxPitchScaleFactor());
+    layoutResult->featureIndex->query(result, queryGeometry, transformState, posMatrix,
+                                      util::tileSize * id.overscaleFactor(),
+                                      std::pow(2, transformState.getZoom() - id.overscaledZ), options, id.toUnwrapped(),
+                                      layers, queryPadding * transformState.maxPitchScaleFactor(), featureState);
 }
 
 void GeometryTile::querySourceFeatures(
@@ -384,6 +386,35 @@ void GeometryTile::performedFadePlacement() {
         fadeState = FadeState::NeedsSecondPlacement;
     } else if (fadeState == FadeState::NeedsSecondPlacement) {
         fadeState = FadeState::CanRemove;
+    }
+}
+
+void GeometryTile::setFeatureState(const LayerFeatureStates& states) {
+    auto layers = getData();
+    if ((layers == nullptr) || states.empty() || !layoutResult) {
+        return;
+    }
+
+    auto& layerIdToLayerRenderData = layoutResult->layerRenderData;
+    for (auto& layer : layerIdToLayerRenderData) {
+        const auto& layerID = layer.first;
+        const auto sourceLayer = layers->getLayer(layerID);
+        if (sourceLayer) {
+            const auto& sourceLayerID = sourceLayer->getName();
+            auto entry = states.find(sourceLayerID);
+            if (entry == states.end()) {
+                continue;
+            }
+            const auto& featureStates = entry->second;
+            if (featureStates.empty()) {
+                continue;
+            }
+
+            auto bucket = layer.second.bucket;
+            if (bucket && bucket->hasData()) {
+                bucket->update(featureStates, *sourceLayer, layerID, layoutResult->iconAtlas.patternPositions);
+            }
+        }
     }
 }
 

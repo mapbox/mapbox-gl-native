@@ -8,6 +8,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.ColorInt;
+import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
@@ -70,6 +71,7 @@ public class MapboxMapOptions implements Parcelable {
   private boolean quickZoomGesturesEnabled = true;
 
   private boolean prefetchesTiles = true;
+  private int prefetchZoomDelta = 4;
   private boolean zMediaOverlay = false;
 
   private boolean localIdeographFontFamilyEnabled = true;
@@ -134,6 +136,7 @@ public class MapboxMapOptions implements Parcelable {
     textureMode = in.readByte() != 0;
     translucentTextureSurface = in.readByte() != 0;
     prefetchesTiles = in.readByte() != 0;
+    prefetchZoomDelta = in.readInt();
     zMediaOverlay = in.readByte() != 0;
     localIdeographFontFamilyEnabled = in.readByte() != 0;
     localIdeographFontFamily = in.readString();
@@ -257,6 +260,8 @@ public class MapboxMapOptions implements Parcelable {
         typedArray.getBoolean(R.styleable.mapbox_MapView_mapbox_renderTextureTranslucentSurface, false));
       mapboxMapOptions.setPrefetchesTiles(
         typedArray.getBoolean(R.styleable.mapbox_MapView_mapbox_enableTilePrefetch, true));
+      mapboxMapOptions.setPrefetchZoomDelta(
+              typedArray.getInt(R.styleable.mapbox_MapView_mapbox_prefetchZoomDelta, 4));
       mapboxMapOptions.renderSurfaceOnTop(
         typedArray.getBoolean(R.styleable.mapbox_MapView_mapbox_enableZMediaOverlay, false));
 
@@ -633,10 +638,29 @@ public class MapboxMapOptions implements Parcelable {
    *
    * @param enable true to enable
    * @return This
+   * @deprecated Use {@link #setPrefetchZoomDelta(int)} instead.
    */
+  @Deprecated
   @NonNull
   public MapboxMapOptions setPrefetchesTiles(boolean enable) {
     this.prefetchesTiles = enable;
+    return this;
+  }
+
+  /**
+   * Set the tile pre-fetching zoom delta. Pre-fetching makes sure that a low-resolution
+   * tile at the (current_zoom_level - delta) is rendered as soon as possible at the
+   * expense of a little bandwidth.
+   * Note: This operation will override the MapboxMapOptions#setPrefetchesTiles(boolean)
+   *       Setting zoom delta to 0 will disable pre-fetching.
+   * Default zoom delta is 4.
+   *
+   * @param delta zoom delta
+   * @return This
+   */
+  @NonNull
+  public MapboxMapOptions setPrefetchZoomDelta(@IntRange(from = 0) int delta) {
+    this.prefetchZoomDelta = delta;
     return this;
   }
 
@@ -721,9 +745,21 @@ public class MapboxMapOptions implements Parcelable {
    * Check whether tile pre-fetching is enabled.
    *
    * @return true if enabled
+   * @deprecated Use {@link #getPrefetchZoomDelta()} instead.
    */
+  @Deprecated
   public boolean getPrefetchesTiles() {
     return prefetchesTiles;
+  }
+
+  /**
+   * Check current pre-fetching zoom delta.
+   *
+   * @return current zoom delta.
+   */
+  @IntRange(from = 0)
+  public int getPrefetchZoomDelta() {
+    return prefetchZoomDelta;
   }
 
   /**
@@ -1081,6 +1117,7 @@ public class MapboxMapOptions implements Parcelable {
     dest.writeByte((byte) (textureMode ? 1 : 0));
     dest.writeByte((byte) (translucentTextureSurface ? 1 : 0));
     dest.writeByte((byte) (prefetchesTiles ? 1 : 0));
+    dest.writeInt(prefetchZoomDelta);
     dest.writeByte((byte) (zMediaOverlay ? 1 : 0));
     dest.writeByte((byte) (localIdeographFontFamilyEnabled ? 1 : 0));
     dest.writeString(localIdeographFontFamily);
@@ -1175,6 +1212,9 @@ public class MapboxMapOptions implements Parcelable {
     if (prefetchesTiles != options.prefetchesTiles) {
       return false;
     }
+    if (prefetchZoomDelta != options.prefetchZoomDelta) {
+      return false;
+    }
     if (zMediaOverlay != options.zMediaOverlay) {
       return false;
     }
@@ -1231,6 +1271,7 @@ public class MapboxMapOptions implements Parcelable {
     result = 31 * result + (textureMode ? 1 : 0);
     result = 31 * result + (translucentTextureSurface ? 1 : 0);
     result = 31 * result + (prefetchesTiles ? 1 : 0);
+    result = 31 * result + prefetchZoomDelta;
     result = 31 * result + (zMediaOverlay ? 1 : 0);
     result = 31 * result + (localIdeographFontFamilyEnabled ? 1 : 0);
     result = 31 * result + (localIdeographFontFamily != null ? localIdeographFontFamily.hashCode() : 0);

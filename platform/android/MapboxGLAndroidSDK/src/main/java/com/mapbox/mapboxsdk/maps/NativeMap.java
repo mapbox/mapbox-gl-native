@@ -6,6 +6,7 @@ import android.graphics.RectF;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.Geometry;
 import com.mapbox.mapboxsdk.annotations.Marker;
@@ -213,6 +214,11 @@ interface NativeMap {
   void setPrefetchTiles(boolean enable);
 
   boolean getPrefetchTiles();
+
+  void setPrefetchZoomDelta(@IntRange(from = 0) int delta);
+
+  @IntRange(from = 0)
+  int getPrefetchZoomDelta();
 
   void setGestureInProgress(boolean inProgress);
 

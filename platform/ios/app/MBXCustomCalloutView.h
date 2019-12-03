@@ -1,5 +1,4 @@
-#import <UIKit/UIKit.h>
-#import <Mapbox/Mapbox.h>
+@import Mapbox;
 
 /**
  * Basic custom callout view to demonstrate how to

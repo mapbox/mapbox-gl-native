@@ -103,3 +103,25 @@ TEST(Style, RemoveSourceInUse) {
 
     EXPECT_EQ(log->count(logMessage), 1u);
 }
+
+TEST(Style, SourceImplsOrder) {
+    util::RunLoop loop;
+    StubFileSource fileSource;
+    Style::Impl style{fileSource, 1.0};
+
+    style.addSource(std::make_unique<VectorSource>("c", "mapbox://mapbox.mapbox-terrain-v2"));
+    style.addSource(std::make_unique<VectorSource>("b", "mapbox://mapbox.mapbox-terrain-v2"));
+    style.addSource(std::make_unique<VectorSource>("a", "mapbox://mapbox.mapbox-terrain-v2"));
+
+    auto sources = style.getSources();
+    ASSERT_EQ(3u, sources.size());
+    EXPECT_EQ("c", sources[0]->getID());
+    EXPECT_EQ("b", sources[1]->getID());
+    EXPECT_EQ("a", sources[2]->getID());
+
+    const auto& sourceImpls = *style.getSourceImpls();
+    ASSERT_EQ(3u, sourceImpls.size());
+    EXPECT_EQ("a", sourceImpls[0]->id);
+    EXPECT_EQ("b", sourceImpls[1]->id);
+    EXPECT_EQ("c", sourceImpls[2]->id);
+}

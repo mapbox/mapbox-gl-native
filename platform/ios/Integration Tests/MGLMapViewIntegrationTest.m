@@ -7,30 +7,40 @@
 
 @implementation MGLMapViewIntegrationTest
 
-- (void)invokeTest {
-    NSString *selector = NSStringFromSelector(self.invocation.selector);
-    BOOL isPendingTest = [selector hasSuffix:@"PENDING"];
++ (XCTestSuite*)defaultTestSuite {
     
-    if (isPendingTest) {
-        NSString *runPendingTests = [[NSProcessInfo processInfo] environment][@"MAPBOX_RUN_PENDING_TESTS"];
-        if (![runPendingTests boolValue]) {
-            printf("warning: '%s' is a pending test - skipping\n", selector.UTF8String);
-            return;
-        }
-    }
-
-    [super invokeTest];
-}
-
-- (NSString*)validAccessToken {
+    XCTestSuite *defaultTestSuite = [super defaultTestSuite];
+    
+    NSArray *tests = defaultTestSuite.tests;
+ 
+    XCTestSuite *newTestSuite = [XCTestSuite testSuiteWithName:defaultTestSuite.name];
+    
+    BOOL runPendingTests = [[[NSProcessInfo processInfo] environment][@"MAPBOX_RUN_PENDING_TESTS"] boolValue];
     NSString *accessToken = [[NSProcessInfo processInfo] environment][@"MAPBOX_ACCESS_TOKEN"];
-    if (!accessToken) {
-        printf("warning: MAPBOX_ACCESS_TOKEN env var is required for this test - skipping.\n");
-        return nil;
-    }
+        
+    for (XCTest *test in tests) {
+        
+        // Check for pending tests
+        if ([test.name containsString:@"PENDING"] ||
+            [test.name containsString:@"🙁"]) {
+            if (!runPendingTests) {
+                printf("warning: '%s' is a pending test - skipping\n", test.name.UTF8String);
+                continue;
+            }
+        }
+        
+        // Check for tests that require a valid access token
+        if ([test.name containsString:@"🔒"]) {
+            if (!accessToken) {
+                printf("warning: MAPBOX_ACCESS_TOKEN env var is required for test '%s' - skipping.\n", test.name.UTF8String);
+                continue;
+            }
+        }
 
-    [MGLAccountManager setAccessToken:accessToken];
-    return accessToken;
+        [newTestSuite addTest:test];
+    }
+    
+    return newTestSuite;
 }
 
 - (MGLMapView *)mapViewForTestWithFrame:(CGRect)rect styleURL:(NSURL *)styleURL {
@@ -40,7 +50,18 @@
 - (void)setUp {
     [super setUp];
 
-    [MGLAccountManager setAccessToken:@"pk.feedcafedeadbeefbadebede"];
+    NSString *accessToken;
+    
+    if ([self.name containsString:@"🔒"]) {
+        accessToken = [[NSProcessInfo processInfo] environment][@"MAPBOX_ACCESS_TOKEN"];
+        
+        if (!accessToken) {
+            printf("warning: MAPBOX_ACCESS_TOKEN env var is required for test '%s' - trying anyway.\n", self.name.UTF8String);
+        }
+    }
+
+    [MGLAccountManager setAccessToken:accessToken ?: @"pk.feedcafedeadbeefbadebede"];
+    
     NSURL *styleURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"one-liner" withExtension:@"json"];
 
     self.mapView = [self mapViewForTestWithFrame:UIScreen.mainScreen.bounds styleURL:styleURL];
@@ -135,6 +156,7 @@
     XCTAssertNil(self.styleLoadingExpectation);
     self.styleLoadingExpectation = [self expectationWithDescription:@"Map view should finish loading style."];
     [self waitForExpectations:@[self.styleLoadingExpectation] timeout:timeout];
+    self.styleLoadingExpectation = nil;
 }
 
 - (void)waitForMapViewToBeRenderedWithTimeout:(NSTimeInterval)timeout {

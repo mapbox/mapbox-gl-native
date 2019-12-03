@@ -1,0 +1,7 @@
+{
+    "base_test_path":"../mapbox-gl-js/test/integration",
+    "expectation_paths":["expected/"],
+    "ignore_paths":["../platform/node/test/ignores.json", "../render-test/mac-ignores.json", "../render-test/tests/should-fail.json"],
+    "vendor_path":"../vendor",
+    "asset_path": "../mapbox-gl-js/test/integration"
+}

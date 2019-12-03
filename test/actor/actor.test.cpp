@@ -90,6 +90,7 @@ TEST(Actor, DestructionBlocksOnSend) {
         std::promise<void> promise;
         std::future<void> future;
         std::atomic<bool> waited;
+        mapbox::base::WeakPtrFactory<Scheduler> weakFactory{this};
 
         TestScheduler(std::promise<void> promise_, std::future<void> future_)
             : promise(std::move(promise_)),
@@ -101,12 +102,13 @@ TEST(Actor, DestructionBlocksOnSend) {
             EXPECT_TRUE(waited.load());
         }
 
-        void schedule(std::weak_ptr<Mailbox>) final {
+        void schedule(std::function<void()>) final {
             promise.set_value();
             future.wait();
             std::this_thread::sleep_for(1ms);
             waited = true;
         }
+        mapbox::base::WeakPtr<Scheduler> makeWeakPtr() override { return weakFactory.makeWeakPtr(); }
     };
 
     struct Test {
@@ -154,7 +156,7 @@ TEST(Actor, DestructionAllowedInReceiveOnSameThread) {
     };
 
     std::promise<void> callbackFiredPromise;
-    auto retainer = Scheduler::GetBackground();
+    std::shared_ptr<Scheduler> retainer = Scheduler::GetBackground();
     auto test = std::make_unique<Actor<Test>>(retainer);
 
     // Callback (triggered while mutex is locked in Mailbox::receive())

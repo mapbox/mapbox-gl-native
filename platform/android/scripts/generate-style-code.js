@@ -72,6 +72,7 @@ global.propertyType = function propertyType(property) {
       case 'formatted':
         return 'Formatted';
       case 'string':
+      case 'resolvedImage':
         return 'String';
       case 'enum':
         return 'String';
@@ -93,6 +94,7 @@ global.propertyJavaType = function propertyType(property) {
        case 'formatted':
          return 'Formatted';
        case 'string':
+       case 'resolvedImage':
          return 'String';
        case 'enum':
          return 'String';
@@ -141,6 +143,7 @@ global.propertyNativeType = function (property) {
     return 'float';
   case 'formatted':
   case 'string':
+  case 'resolvedImage': // TODO: replace once we implement image expressions
     return 'std::string';
   case 'enum':
     if(property['light-property']){
@@ -176,8 +179,9 @@ global.defaultExpressionJava = function(property) {
         return 'number';
       case 'formatted':
         return 'format';
+      case 'resolvedImage':
+        return "image";
       case 'string':
-        return "string";
       case 'enum':
         return "string";
       case 'color':
@@ -203,6 +207,7 @@ global.defaultValueJava = function(property) {
       case 'formatted':
         return 'new Formatted(new FormattedSection("default"))'
       case 'string':
+      case 'resolvedImage':
         return '"' + property['default'] + '"';
       case 'enum':
         return snakeCaseUpper(property.name) + "_" + snakeCaseUpper(Object.keys(property.values)[0]);
@@ -335,6 +340,7 @@ global.evaluatedType = function (property) {
     return 'float';
   case 'formatted':
   case 'string':
+  case 'image':
     return 'std::string';
   case 'enum':
     return (isLightProperty(property) ? 'Light' : '') + `${camelize(property.name)}Type`;

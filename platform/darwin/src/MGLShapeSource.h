@@ -42,6 +42,38 @@ FOUNDATION_EXTERN MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionClus
 FOUNDATION_EXTERN MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionClusterRadius;
 
 /**
+ An `NSDictionary` object where the key is an `NSString`. The dictionary key will
+ be the feature attribute key. The resulting attribute value is
+ aggregated from the clustered points. The dictionary value is an `NSArray`
+ consisting of two `NSExpression` objects.
+
+ The first object determines how the attribute values are accumulated from the
+ cluster points. It is an `NSExpression` with an expression function that accepts
+ two or more arguments, such as `sum` or `max`. The arguments should be
+ `featureAccumulated` and the previously defined feature attribute key. The
+ resulting value is assigned to the specified attribute key.
+
+ The second `NSExpression` in the array determines which
+ attribute values are accessed from individual features within a cluster.
+
+ ```swift
+ let firstExpression = NSExpression(format: "sum:({$featureAccumulated, sumValue})")
+ let secondExpression = NSExpression(forKeyPath: "magnitude")
+ let clusterPropertiesDictionary = ["sumValue" : [firstExpression, secondExpression]]
+ 
+ let options : [MGLShapeSourceOption : Any] = [.clustered : true,
+                                            .clusterProperties: clusterPropertiesDictionary]
+ ```
+
+ This option corresponds to the
+ <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources-geojson-clusterProperties"><code>clusterProperties</code></a>
+ source property in the Mapbox Style Specification.
+
+ This option only affects point features within an `MGLShapeSource` object; it
+ is ignored when creating an `MGLComputedShapeSource` object.
+ */
+FOUNDATION_EXTERN MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionClusterProperties;
+/**
  An `NSNumber` object containing an integer; specifies the maximum zoom level at
  which to cluster points if clustering is enabled. Defaults to one zoom level
  less than the value of `MGLShapeSourceOptionMaximumZoomLevel` so that, at the

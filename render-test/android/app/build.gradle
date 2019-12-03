@@ -1,0 +1,53 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 28
+
+    defaultConfig {
+        applicationId = 'com.mapbox.mapboxsdk.maps.render_test_runner'
+        minSdkVersion 14
+        targetSdkVersion 28
+        def abi = 'all'
+        if (project.hasProperty('mapbox.abis')) {
+            abi = project.getProperty('mapbox.abis')
+        }
+        ndk {
+            if (abi != 'all') {
+                abiFilters abi.split(' ')
+            } else {
+                abiFilters 'armeabi-v7a', 'x86', 'arm64-v8a', 'x86_64'
+            }
+        }
+        externalNativeBuild {
+            cmake {
+                arguments '-DANDROID_CCACHE=ccache'
+                arguments '-DANDROID_STL=c++_static'
+                targets 'mbgl-render-test-runner'
+            }
+        }
+        android {
+            testBuildType 'release'
+        }
+
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+    }
+    externalNativeBuild {
+        cmake {
+            version '3.10.2'
+            path '../../../next/CMakeLists.txt'
+        }
+    }
+    buildTypes {
+        release {
+            signingConfig signingConfigs.debug
+        }
+    }
+}
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.0.2'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0-beta01'
+    androidTestImplementation 'androidx.test:rules:1.2.0-beta01'
+}

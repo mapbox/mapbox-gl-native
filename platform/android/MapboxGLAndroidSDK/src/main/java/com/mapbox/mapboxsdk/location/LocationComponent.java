@@ -726,6 +726,10 @@ public final class LocationComponent {
    * If you are not using any of {@link CameraMode} modes,
    * use one of {@link MapboxMap#moveCamera(CameraUpdate)},
    * {@link MapboxMap#easeCamera(CameraUpdate)} or {@link MapboxMap#animateCamera(CameraUpdate)} instead.
+   * <p>
+   * If the camera is transitioning when the zoom change is requested, the call is going to be ignored.
+   * Use {@link CameraTransitionListener} to chain the animations, or provide the zoom as a camera change argument.
+   * </p>
    *
    * @param zoomLevel         The desired zoom level.
    * @param animationDuration The zoom animation duration.
@@ -741,6 +745,10 @@ public final class LocationComponent {
         "LocationComponent#zoomWhileTracking method can only be used",
         " when a camera mode other than CameraMode#NONE is engaged."));
       return;
+    } else if (locationCameraController.isTransitioning()) {
+      Logger.e(TAG,
+        "LocationComponent#zoomWhileTracking method call is ignored because the camera mode is transitioning");
+      return;
     }
     locationAnimatorCoordinator.feedNewZoomLevel(zoomLevel, mapboxMap.getCameraPosition(), animationDuration, callback);
   }
@@ -751,6 +759,10 @@ public final class LocationComponent {
    * If you are not using any of {@link CameraMode} modes,
    * use one of {@link MapboxMap#moveCamera(CameraUpdate)},
    * {@link MapboxMap#easeCamera(CameraUpdate)} or {@link MapboxMap#animateCamera(CameraUpdate)} instead.
+   * <p>
+   * If the camera is transitioning when the zoom change is requested, the call is going to be ignored.
+   * Use {@link CameraTransitionListener} to chain the animations, or provide the zoom as a camera change argument.
+   * </p>
    *
    * @param zoomLevel         The desired zoom level.
    * @param animationDuration The zoom animation duration.
@@ -766,6 +778,10 @@ public final class LocationComponent {
    * If you are not using any of {@link CameraMode} modes,
    * use one of {@link MapboxMap#moveCamera(CameraUpdate)},
    * {@link MapboxMap#easeCamera(CameraUpdate)} or {@link MapboxMap#animateCamera(CameraUpdate)} instead.
+   * <p>
+   * If the camera is transitioning when the zoom change is requested, the call is going to be ignored.
+   * Use {@link CameraTransitionListener} to chain the animations, or provide the zoom as a camera change argument.
+   * </p>
    *
    * @param zoomLevel The desired zoom level.
    */
@@ -788,6 +804,10 @@ public final class LocationComponent {
    * If you are not using any of {@link CameraMode} modes,
    * use one of {@link MapboxMap#moveCamera(CameraUpdate)},
    * {@link MapboxMap#easeCamera(CameraUpdate)} or {@link MapboxMap#animateCamera(CameraUpdate)} instead.
+   * <p>
+   * If the camera is transitioning when the tilt change is requested, the call is going to be ignored.
+   * Use {@link CameraTransitionListener} to chain the animations, or provide the tilt as a camera change argument.
+   * </p>
    *
    * @param tilt              The desired camera tilt.
    * @param animationDuration The tilt animation duration.
@@ -803,6 +823,10 @@ public final class LocationComponent {
         "LocationComponent#tiltWhileTracking method can only be used",
         " when a camera mode other than CameraMode#NONE is engaged."));
       return;
+    } else if (locationCameraController.isTransitioning()) {
+      Logger.e(TAG,
+        "LocationComponent#tiltWhileTracking method call is ignored because the camera mode is transitioning");
+      return;
     }
     locationAnimatorCoordinator.feedNewTilt(tilt, mapboxMap.getCameraPosition(), animationDuration, callback);
   }
@@ -813,6 +837,10 @@ public final class LocationComponent {
    * If you are not using any of {@link CameraMode} modes,
    * use one of {@link MapboxMap#moveCamera(CameraUpdate)},
    * {@link MapboxMap#easeCamera(CameraUpdate)} or {@link MapboxMap#animateCamera(CameraUpdate)} instead.
+   * <p>
+   * If the camera is transitioning when the tilt change is requested, the call is going to be ignored.
+   * Use {@link CameraTransitionListener} to chain the animations, or provide the tilt as a camera change argument.
+   * </p>
    *
    * @param tilt              The desired camera tilt.
    * @param animationDuration The tilt animation duration.
@@ -828,6 +856,10 @@ public final class LocationComponent {
    * If you are not using any of {@link CameraMode} modes,
    * use one of {@link MapboxMap#moveCamera(CameraUpdate)},
    * {@link MapboxMap#easeCamera(CameraUpdate)} or {@link MapboxMap#animateCamera(CameraUpdate)} instead.
+   * <p>
+   * If the camera is transitioning when the tilt change is requested, the call is going to be ignored.
+   * Use {@link CameraTransitionListener} to chain the animations, or provide the tilt as a camera change argument.
+   * </p>
    *
    * @param tilt The desired camera tilt.
    */

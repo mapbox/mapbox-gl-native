@@ -11,9 +11,9 @@ TEST(TaggedString, Trim) {
     EXPECT_EQ(basic.rawText(), u"trim that and not this");
     
     TaggedString twoSections;
-    twoSections.addSection(u" \t\ntrim that", 1.5f, {});
-    twoSections.addSection(u" and not this  \n\t", 0.5f, {});
-    
+    twoSections.addTextSection(u" \t\ntrim that", 1.5f, {});
+    twoSections.addTextSection(u" and not this  \n\t", 0.5f, {});
+
     twoSections.trim();
     EXPECT_EQ(twoSections.rawText(), u"trim that and not this");
     
@@ -24,4 +24,21 @@ TEST(TaggedString, Trim) {
     TaggedString noTrim(u"no trim!", SectionOptions(1.0f, {}));
     noTrim.trim();
     EXPECT_EQ(noTrim.rawText(), u"no trim!");
+}
+
+TEST(TaggedString, ImageSections) {
+    TaggedString string;
+    string.addImageSection("image_name");
+    EXPECT_EQ(string.rawText(), u"\uE000");
+    EXPECT_TRUE(string.getSection(0).imageID);
+    EXPECT_EQ(*string.getSection(0).imageID, "image_name");
+
+    TaggedString maxSections;
+    for (std::size_t i = 0; i < 6401; ++i) {
+        maxSections.addImageSection(util::toString(i));
+    }
+
+    EXPECT_EQ(maxSections.getSections().size(), 6400u);
+    EXPECT_EQ(maxSections.getCharCodeAt(0), u'\uE000');
+    EXPECT_EQ(maxSections.getCharCodeAt(6399), u'\uF8FF');
 }

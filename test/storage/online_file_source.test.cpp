@@ -98,7 +98,7 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(ConnectionError)) {
         static int wait = 0;
         const auto duration = std::chrono::duration<const double>(Clock::now() - start).count();
         EXPECT_LT(wait - 0.01, duration) << "Backoff timer didn't wait 1 second";
-        EXPECT_GT(wait + 0.2, duration) << "Backoff timer fired too late";
+        EXPECT_GT(wait + 0.3, duration) << "Backoff timer fired too late";
         ASSERT_NE(nullptr, res.error);
         EXPECT_EQ(Response::Error::Reason::Connection, res.error->reason);
         ASSERT_FALSE(res.data.get());

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mbgl/text/glyph_range.hpp>
+#include <mbgl/util/bitmask_operations.hpp>
 #include <mbgl/util/font_stack.hpp>
 #include <mbgl/util/rect.hpp>
 #include <mbgl/util/traits.hpp>
@@ -59,38 +60,67 @@ using GlyphMap = std::map<FontStackHash, Glyphs>;
 
 class PositionedGlyph {
 public:
-    explicit PositionedGlyph(GlyphID glyph_, float x_, float y_, bool vertical_, FontStackHash font_, float scale_, std::size_t sectionIndex_ = 0)
-        : glyph(glyph_), x(x_), y(y_), vertical(vertical_), font(font_), scale(scale_), sectionIndex(sectionIndex_)
-    {}
+    explicit PositionedGlyph(GlyphID glyph_,
+                             float x_,
+                             float y_,
+                             bool vertical_,
+                             FontStackHash font_,
+                             float scale_,
+                             Rect<uint16_t> rect_,
+                             GlyphMetrics metrics_,
+                             optional<std::string> imageID_,
+                             std::size_t sectionIndex_ = 0)
+        : glyph(glyph_),
+          x(x_),
+          y(y_),
+          vertical(vertical_),
+          font(font_),
+          scale(scale_),
+          rect(std::move(rect_)),
+          metrics(std::move(metrics_)),
+          imageID(std::move(imageID_)),
+          sectionIndex(sectionIndex_) {}
 
     GlyphID glyph = 0;
     float x = 0;
     float y = 0;
     bool vertical = false;
-    
     FontStackHash font = 0;
     float scale = 0.0;
+    Rect<uint16_t> rect;
+    GlyphMetrics metrics;
+    optional<std::string> imageID;
     // Maps positioned glyph to TaggedString section
     std::size_t sectionIndex;
 };
 
 enum class WritingModeType : uint8_t;
 
+struct PositionedLine {
+    std::vector<PositionedGlyph> positionedGlyphs;
+    float lineOffset = 0.0;
+};
+
 class Shaping {
     public:
     Shaping() = default;
-    explicit Shaping(float x, float y, WritingModeType writingMode_, std::size_t lineCount_)
-        : top(y), bottom(y), left(x), right(x), writingMode(writingMode_), lineCount(lineCount_) {}
-    std::vector<PositionedGlyph> positionedGlyphs;
+    explicit Shaping(float x, float y, WritingModeType writingMode_)
+        : top(y), bottom(y), left(x), right(x), writingMode(writingMode_) {}
+    std::vector<PositionedLine> positionedLines;
     float top = 0;
     float bottom = 0;
     float left = 0;
     float right = 0;
     WritingModeType writingMode;
-    std::size_t lineCount = 0u;
-    explicit operator bool() const { return !positionedGlyphs.empty(); }
+    explicit operator bool() const {
+        return std::any_of(positionedLines.begin(), positionedLines.end(), [](const auto& line) {
+            return !line.positionedGlyphs.empty();
+        });
+    }
     // The y offset *should* be part of the font metadata.
     static constexpr int32_t yOffset = -17;
+    bool verticalizable = false;
+    bool iconsInText = false;
 };
 
 enum class WritingModeType : uint8_t {
@@ -98,26 +128,6 @@ enum class WritingModeType : uint8_t {
     Horizontal = 1 << 0,
     Vertical = 1 << 1,
 };
-
-MBGL_CONSTEXPR WritingModeType operator|(WritingModeType a, WritingModeType b) {
-    return WritingModeType(mbgl::underlying_type(a) | mbgl::underlying_type(b));
-}
-
-MBGL_CONSTEXPR WritingModeType& operator|=(WritingModeType& a, WritingModeType b) {
-    return (a = a | b);
-}
-
-MBGL_CONSTEXPR bool operator&(WritingModeType lhs, WritingModeType rhs) {
-    return mbgl::underlying_type(lhs) & mbgl::underlying_type(rhs);
-}
-
-MBGL_CONSTEXPR WritingModeType& operator&=(WritingModeType& lhs, WritingModeType rhs) {
-    return (lhs = WritingModeType(mbgl::underlying_type(lhs) & mbgl::underlying_type(rhs)));
-}
-
-MBGL_CONSTEXPR WritingModeType operator~(WritingModeType value) {
-    return WritingModeType(~mbgl::underlying_type(value));
-}
 
 using GlyphDependencies = std::map<FontStack, GlyphIDs>;
 using GlyphRangeDependencies = std::map<FontStack, std::unordered_set<GlyphRange>>;

@@ -13,10 +13,9 @@ QMapboxGLScheduler::~QMapboxGLScheduler()
     MBGL_VERIFY_THREAD(tid);
 }
 
-void QMapboxGLScheduler::schedule(std::weak_ptr<mbgl::Mailbox> mailbox)
-{
+void QMapboxGLScheduler::schedule(std::function<void()> function) {
     std::lock_guard<std::mutex> lock(m_taskQueueMutex);
-    m_taskQueue.push(mailbox);
+    m_taskQueue.push(std::move(function));
 
     // Need to force the main thread to wake
     // up this thread and process the events.
@@ -25,14 +24,15 @@ void QMapboxGLScheduler::schedule(std::weak_ptr<mbgl::Mailbox> mailbox)
 
 void QMapboxGLScheduler::processEvents()
 {
-    std::queue<std::weak_ptr<mbgl::Mailbox>> taskQueue;
+    std::queue<std::function<void()>> taskQueue;
     {
         std::unique_lock<std::mutex> lock(m_taskQueueMutex);
         std::swap(taskQueue, m_taskQueue);
     }
 
     while (!taskQueue.empty()) {
-        mbgl::Mailbox::maybeReceive(taskQueue.front());
+        auto& function = taskQueue.front();
+        if (function) function();
         taskQueue.pop();
     }
 }

@@ -45,10 +45,10 @@ TEST(API, RecycleMapUpdateImages) {
     // default marker
 
     loadStyle("default_marker", "test/fixtures/sprites/default_marker.png");
-    test::checkImage("test/fixtures/recycle_map/default_marker", frontend.render(*map), 0.0006, 0.1);
+    test::checkImage("test/fixtures/recycle_map/default_marker", frontend.render(*map).image, 0.0006, 0.1);
 
     // flipped marker
 
     loadStyle("flipped_marker", "test/fixtures/sprites/flipped_marker.png");
-    test::checkImage("test/fixtures/recycle_map/flipped_marker", frontend.render(*map), 0.0006, 0.1);
+    test::checkImage("test/fixtures/recycle_map/flipped_marker", frontend.render(*map).image, 0.0006, 0.1);
 }

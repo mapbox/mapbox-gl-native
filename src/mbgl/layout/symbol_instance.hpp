@@ -4,8 +4,7 @@
 #include <mbgl/text/glyph_atlas.hpp>
 #include <mbgl/text/collision_feature.hpp>
 #include <mbgl/style/layers/symbol_layer_properties.hpp>
-#include <mbgl/util/traits.hpp>
-#include <mbgl/util/util.hpp>
+#include <mbgl/util/bitmask_operations.hpp>
 
 namespace mbgl {
 
@@ -22,16 +21,19 @@ struct ShapedTextOrientations {
     bool singleLine = false;
 };
 
+enum class SymbolContent : uint8_t { None = 0, Text = 1 << 0, IconRGBA = 1 << 1, IconSDF = 1 << 2 };
+
 struct SymbolInstanceSharedData {
     SymbolInstanceSharedData(GeometryCoordinates line,
-                            const ShapedTextOrientations& shapedTextOrientations,
-                            const optional<PositionedIcon>& shapedIcon,
-                            const optional<PositionedIcon>& verticallyShapedIcon,
-                            const style::SymbolLayoutProperties::Evaluated& layout,
-                            const style::SymbolPlacementType textPlacement,
-                            const std::array<float, 2>& textOffset,
-                            const GlyphPositions& positions,
-                            bool allowVerticalPlacement);
+                             const ShapedTextOrientations& shapedTextOrientations,
+                             const optional<PositionedIcon>& shapedIcon,
+                             const optional<PositionedIcon>& verticallyShapedIcon,
+                             const style::SymbolLayoutProperties::Evaluated& layout,
+                             const style::SymbolPlacementType textPlacement,
+                             const std::array<float, 2>& textOffset,
+                             const ImageMap& imageMap,
+                             SymbolContent iconType,
+                             bool allowVerticalPlacement);
     bool empty() const;
     GeometryCoordinates line;
     // Note: When singleLine == true, only `rightJustifiedGlyphQuads` is populated.
@@ -42,25 +44,6 @@ struct SymbolInstanceSharedData {
     optional<SymbolQuad> iconQuad;
     optional<SymbolQuad> verticalIconQuad;
 };
-
-enum class SymbolContent : uint8_t {
-    None = 0,
-    Text = 1 << 0,
-    IconRGBA = 1 << 1,
-    IconSDF = 1 << 2
-};
-
-MBGL_CONSTEXPR SymbolContent operator|(SymbolContent a, SymbolContent b) {
-    return SymbolContent(mbgl::underlying_type(a) | mbgl::underlying_type(b));
-}
-
-MBGL_CONSTEXPR SymbolContent& operator|=(SymbolContent& a, SymbolContent b) {
-    return (a = a | b);
-}
-
-MBGL_CONSTEXPR SymbolContent operator&(SymbolContent a, SymbolContent b) {
-    return SymbolContent(mbgl::underlying_type(a) & mbgl::underlying_type(b));
-}
 
 class SymbolInstance {
 public:

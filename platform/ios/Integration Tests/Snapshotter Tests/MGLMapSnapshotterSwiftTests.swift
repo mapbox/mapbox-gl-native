@@ -15,12 +15,9 @@ class MGLMapSnapshotterSwiftTests: MGLMapViewIntegrationTest {
         return options
     }
 
-    func testCapturingSnapshotterInSnapshotCompletion() {
+    func testCapturingSnapshotterInSnapshotCompletion🔒() {
         // See the Obj-C testDeallocatingSnapshotterDuringSnapshot
         // This Swift test, is essentially the same except for capturing the snapshotter
-        guard validAccessToken() != nil else {
-            return
-        }
 
         let timeout: TimeInterval = 10.0
         let expectation = self.expectation(description: "snapshot")
@@ -58,5 +55,23 @@ class MGLMapSnapshotterSwiftTests: MGLMapViewIntegrationTest {
         }
 
         wait(for: [expectation], timeout: timeout)
+    }
+    
+    func testSnapshotOverlaySwiftErgonomics🔒() {
+        let options     = MGLMapSnapshotterSwiftTests.snapshotterOptions(size: mapView.bounds.size)
+        let snapshotter = MGLMapSnapshotter(options: options)
+        let expectation = self.expectation(description: "snapshot")
+        expectation.expectedFulfillmentCount = 2
+        
+        snapshotter.start(overlayHandler: { (overlay) in
+            guard let _ = overlay.context.makeImage() else {
+                XCTFail()
+                return
+            }
+            expectation.fulfill()
+        }) { (_, _) in
+            expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: 10)
     }
 }

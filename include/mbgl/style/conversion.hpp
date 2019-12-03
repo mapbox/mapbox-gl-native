@@ -17,8 +17,11 @@ class ConversionTraits;
 
 class Convertible;
 
-template <class T, class Enable = void>
+template <typename T, typename Enable = void>
 struct Converter;
+
+template <typename T, typename Enable = void>
+struct ValueFactory;
 
 } // namespace conversion
 } // namespace style

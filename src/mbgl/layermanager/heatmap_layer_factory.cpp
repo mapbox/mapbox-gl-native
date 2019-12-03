@@ -30,7 +30,7 @@ std::unique_ptr<Bucket> HeatmapLayerFactory::createBucket(const BucketParameters
 
 std::unique_ptr<RenderLayer> HeatmapLayerFactory::createRenderLayer(Immutable<style::Layer::Impl> impl) noexcept {
     assert(impl->getTypeInfo() == getTypeInfo());
-    return std::make_unique<RenderHeatmapLayer>(staticImmutableCast<style::HeatmapLayer::Impl>(std::move(impl)));
+    return std::make_unique<RenderHeatmapLayer>(staticImmutableCast<style::HeatmapLayer::Impl>(impl));
 }
 
 } // namespace mbgl

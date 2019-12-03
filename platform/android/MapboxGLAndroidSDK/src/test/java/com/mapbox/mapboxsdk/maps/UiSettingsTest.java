@@ -5,6 +5,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
+import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.maps.widgets.CompassView;
 
 import org.junit.Before;
@@ -17,6 +18,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
 
 public class UiSettingsTest {
 
@@ -411,5 +413,21 @@ public class UiSettingsTest {
     uiSettings.setZoomRate(0.83f);
     assertEquals("Zoom rate should be 0.83f", 0.83f,
       uiSettings.getZoomRate(), 0);
+  }
+
+  @Test
+  public void testUpdateWhenCompassViewNotHidden() {
+    CameraPosition cameraPosition = new CameraPosition.Builder(CameraPosition.DEFAULT).bearing(24.0f).build();
+    when(compassView.isHidden()).thenReturn(false);
+    uiSettings.update(cameraPosition);
+    verify(compassView).update(-24.0f);
+  }
+
+  @Test
+  public void testUpdateWhenCompassViewHidden() {
+    CameraPosition cameraPosition = new CameraPosition.Builder(CameraPosition.DEFAULT).bearing(24.0f).build();
+    when(compassView.isHidden()).thenReturn(true);
+    uiSettings.update(cameraPosition);
+    verify(compassView).update(-24.0f);
   }
 }

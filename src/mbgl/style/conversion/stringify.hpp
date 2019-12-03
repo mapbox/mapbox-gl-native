@@ -142,6 +142,11 @@ void stringify(Writer& writer, const expression::Formatted& v) {
 }
 
 template <class Writer>
+void stringify(Writer& writer, const expression::Image& v) {
+    stringify(writer, expression::ValueConverter<mbgl::Value>::fromExpressionValue(v));
+}
+
+template <class Writer>
 void stringify(Writer& writer, const Undefined&) {
     assert(false); // Should be omitted entirely instead.
     writer.Null();

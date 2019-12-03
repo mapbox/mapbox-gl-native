@@ -287,6 +287,17 @@ MGL_EXPORT
 - (IBAction)reloadStyle:(nullable id)sender;
 
 /**
+ A boolean value that indicates if whether the map view should automatically
+ adjust its content insets.
+ 
+ When this property is set to `YES` the map automatically updates its
+ `contentInset` property to account for any area not covered by navigation bars,
+ tab bars, toolbars, and other ancestors that obscure the map view.
+ 
+ */
+@property (assign) BOOL automaticallyAdjustsContentInset;
+
+/**
  A Boolean value indicating whether the map may display scale information.
 
  The scale bar may not be shown at all zoom levels. The scale bar becomes visible
@@ -1308,10 +1319,13 @@ MGL_EXPORT
  view’s frame. Otherwise, those properties are inset, excluding part of the
  frame from the viewport. For instance, if the only the top edge is inset, the
  map center is effectively shifted downward.
-
+ 
  When the map view’s superview is an instance of `UIViewController` whose
  `automaticallyAdjustsScrollViewInsets` property is `YES`, the value of this
  property may be overridden at any time.
+ 
+ The usage of `automaticallyAdjustsScrollViewInsets` has been deprecated
+ use the map view’s property `MGLMapView.automaticallyAdjustsContentInset`instead.
 
  Changing the value of this property updates the map view immediately. If you
  want to animate the change, use the `-setContentInset:animated:completionHandler:`
@@ -1332,6 +1346,9 @@ MGL_EXPORT
  When the map view’s superview is an instance of `UIViewController` whose
  `automaticallyAdjustsScrollViewInsets` property is `YES`, the value of this
  property may be overridden at any time.
+ 
+ The usage of `automaticallyAdjustsScrollViewInsets` has been deprecated
+ use the map view’s property `MGLMapView.automaticallyAdjustsContentInset`instead.
  
  To specify a completion handler to execute after the animation finishes, use
  the `-setContentInset:animated:completionHandler:` method.
@@ -1357,6 +1374,9 @@ MGL_EXPORT
  When the map view’s superview is an instance of `UIViewController` whose
  `automaticallyAdjustsScrollViewInsets` property is `YES`, the value of this
  property may be overridden at any time.
+ 
+ The usage of `automaticallyAdjustsScrollViewInsets` has been deprecated
+ use the map view’s property `MGLMapView.automaticallyAdjustsContentInset`instead.
 
  @param contentInset The new values to inset the content by.
  @param animated Specify `YES` if you want the map view to animate the change to

@@ -1,7 +1,7 @@
 #include <mbgl/style/expression/dsl.hpp>
-#include <mbgl/style/expression/match.hpp>
 #include <mbgl/style/expression/format_expression.hpp>
-#include <mbgl/style/style_impl.hpp>
+#include <mbgl/style/expression/image.hpp>
+#include <mbgl/style/expression/match.hpp>
 #include <mbgl/style/layers/background_layer.hpp>
 #include <mbgl/style/layers/background_layer_impl.hpp>
 #include <mbgl/style/layers/circle_layer.hpp>
@@ -16,12 +16,13 @@
 #include <mbgl/style/layers/raster_layer_impl.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
-#include <mbgl/test/util.hpp>
-#include <mbgl/test/stub_layer_observer.hpp>
+#include <mbgl/style/style_impl.hpp>
 #include <mbgl/test/stub_file_source.hpp>
+#include <mbgl/test/stub_layer_observer.hpp>
+#include <mbgl/test/util.hpp>
 #include <mbgl/util/color.hpp>
-#include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/io.hpp>
+#include <mbgl/util/run_loop.hpp>
 
 #include <memory>
 
@@ -37,7 +38,7 @@ const auto color = Color { 1, 0, 0, 1 };
 const auto opacity = 1.0f;
 const auto radius = 1.0f;
 const auto blur = 1.0f;
-const auto pattern = std::string { "foo" };
+const auto pattern = PropertyValue<expression::Image>{"foo"};
 const auto antialias = false;
 const auto translate = std::array<float, 2> {{ 0, 0 }};
 const auto translateAnchor = TranslateAnchorType::Map;
@@ -299,6 +300,24 @@ TEST(Layer, DuplicateLayer) {
     }
 }
 
+TEST(Layer, IncompatibleLayer) {
+    util::RunLoop loop;
+
+    // Setup style
+    StubFileSource fileSource;
+    Style::Impl style{fileSource, 1.0};
+    style.loadJSON(util::read_file("test/fixtures/resources/style-unused-sources.json"));
+
+    // Try to add duplicate
+    try {
+        style.addLayer(std::make_unique<RasterLayer>("raster", "unusedsource"));
+        FAIL() << "Should not have been allowed to add an incompatible layer to the source";
+    } catch (const std::runtime_error& e) {
+        // Expected
+        ASSERT_STREQ("Layer 'raster' is not compatible with source 'unusedsource'", e.what());
+    }
+}
+
 namespace {
 
 template<template<typename> class PropertyValueType, typename LayoutType>
@@ -324,7 +343,8 @@ void testHasOverrides(LayoutType& layout) {
     EXPECT_FALSE(MockOverrides::hasOverrides(layout.template get<TextField>()));
 
     // Expression, overridden text-color.
-    FormatExpressionSection section(literal(""), nullopt, nullopt, toColor(literal("red")));
+    FormatExpressionSection section(literal(""));
+    section.setTextSectionOptions(nullopt, nullopt, toColor(literal("red")));
     auto formatExprOverride = std::make_unique<FormatExpression>(std::vector<FormatExpressionSection>{section});
     PropertyExpression<Formatted> propExprOverride(std::move(formatExprOverride));
     layout.template get<TextField>() = PropertyValueType<Formatted>(std::move(propExprOverride));
@@ -332,7 +352,9 @@ void testHasOverrides(LayoutType& layout) {
 
     // Nested expressions, overridden text-color.
     auto formattedExpr1 = format("first paragraph");
-    std::vector<FormatExpressionSection> sections{ { literal("second paragraph"), nullopt, nullopt, toColor(literal("blue")) } };
+    FormatExpressionSection secondParagraph(literal("second paragraph"));
+    secondParagraph.setTextSectionOptions(nullopt, nullopt, toColor(literal("blue")));
+    std::vector<FormatExpressionSection> sections{{std::move(secondParagraph)}};
     auto formattedExpr2 = std::make_unique<FormatExpression>(std::move(sections));
     std::unordered_map<std::string, std::shared_ptr<Expression>> branches{ { "1st", std::move(formattedExpr1) },
                                                                            { "2nd", std::move(formattedExpr2) } };

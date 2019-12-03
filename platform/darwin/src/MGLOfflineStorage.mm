@@ -91,7 +91,7 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
     MGLLogDebug(@"Setting delegate: %@", newValue);
     _delegate = newValue;
     if ([self.delegate respondsToSelector:@selector(offlineStorage:URLForResourceOfKind:withURL:)]) {
-        _mbglResourceTransform = std::make_unique<mbgl::Actor<mbgl::ResourceTransform>>(*mbgl::Scheduler::GetCurrent(), [offlineStorage = self](auto kind_, const std::string&& url_) -> std::string {
+        _mbglResourceTransform = std::make_unique<mbgl::Actor<mbgl::ResourceTransform>>(*mbgl::Scheduler::GetCurrent(), [offlineStorage = self](auto kind_, const std::string& url_) -> std::string {
             NSURL* url =
             [NSURL URLWithString:[[NSString alloc] initWithBytes:url_.data()
                                                           length:url_.length()
@@ -345,6 +345,9 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
                                                NSLocalizedDescriptionKey: description,
                                                NSLocalizedFailureReasonErrorKey: @(mbgl::util::toString(result.error()).c_str())
                                                }];
+#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+            [[MMEEventsManager sharedManager] reportError:error];
+#endif
         } else {
             auto& regions = result.value();
             packs = [NSMutableArray arrayWithCapacity:regions.size()];
@@ -404,6 +407,9 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
             error = [NSError errorWithDomain:MGLErrorDomain code:MGLErrorCodeModifyingOfflineStorageFailed userInfo:errorDescription ? @{
                 NSLocalizedDescriptionKey: errorDescription,
             } : nil];
+#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+            [[MMEEventsManager sharedManager] reportError:error];
+#endif
         }
         if (completion) {
             MGLOfflinePack *pack = mbglOfflineRegion ? [[MGLOfflinePack alloc] initWithMBGLRegion:new mbgl::OfflineRegion(std::move(mbglOfflineRegion.value()))] : nil;
@@ -426,17 +432,24 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
 
 - (void)_removePack:(MGLOfflinePack *)pack withCompletionHandler:(MGLOfflinePackRemovalCompletionHandler)completion {
     mbgl::OfflineRegion *mbglOfflineRegion = pack.mbglOfflineRegion;
+
     [pack invalidate];
+
     if (!mbglOfflineRegion) {
+        MGLAssert(pack.state == MGLOfflinePackStateInvalid, @"State should be invalid");
         completion(nil);
         return;
     }
+    
     _mbglFileSource->deleteOfflineRegion(std::move(*mbglOfflineRegion), [&, completion](std::exception_ptr exception) {
         NSError *error;
         if (exception) {
             error = [NSError errorWithDomain:MGLErrorDomain code:MGLErrorCodeModifyingOfflineStorageFailed userInfo:@{
                 NSLocalizedDescriptionKey: @(mbgl::util::toString(exception).c_str()),
             }];
+#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+            [[MMEEventsManager sharedManager] reportError:error];
+#endif
         }
         if (completion) {
             dispatch_async(dispatch_get_main_queue(), [&, completion, error](void) {
@@ -460,6 +473,9 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
             error = [NSError errorWithDomain:MGLErrorDomain code:MGLErrorCodeModifyingOfflineStorageFailed userInfo:@{
                 NSLocalizedDescriptionKey: @(mbgl::util::toString(exception).c_str()),
             }];
+#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+            [[MMEEventsManager sharedManager] reportError:error];
+#endif
         }
     });
     if (completion) {
@@ -487,6 +503,9 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
             error = [NSError errorWithDomain:MGLErrorDomain code:MGLErrorCodeUnknown userInfo:@{
                 NSLocalizedDescriptionKey: @(mbgl::util::toString(result.error()).c_str()),
             }];
+#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+            [[MMEEventsManager sharedManager] reportError:error];
+#endif
         } else {
             auto& regions = result.value();
             packs = [NSMutableArray arrayWithCapacity:regions.size()];
@@ -518,6 +537,9 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
                 error = [NSError errorWithDomain:MGLErrorDomain code:MGLErrorCodeModifyingOfflineStorageFailed userInfo:@{
                     NSLocalizedDescriptionKey: @(mbgl::util::toString(exception).c_str()),
                 }];
+#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+                [[MMEEventsManager sharedManager] reportError:error];
+#endif
             }
             dispatch_sync(dispatch_get_main_queue(), ^ {
                 completion(error);
@@ -535,6 +557,9 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
                 error = [NSError errorWithDomain:MGLErrorDomain code:MGLErrorCodeModifyingOfflineStorageFailed userInfo:@{
                     NSLocalizedDescriptionKey: @(mbgl::util::toString(exception).c_str()),
                 }];
+#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+                [[MMEEventsManager sharedManager] reportError:error];
+#endif
             }
             dispatch_async(dispatch_get_main_queue(), ^ {
                 completion(error);
@@ -551,6 +576,9 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
                 error = [NSError errorWithDomain:MGLErrorDomain code:MGLErrorCodeModifyingOfflineStorageFailed userInfo:@{
                     NSLocalizedDescriptionKey: @(mbgl::util::toString(exception).c_str()),
                 }];
+#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+                [[MMEEventsManager sharedManager] reportError:error];
+#endif
             }
             dispatch_async(dispatch_get_main_queue(), [&, completion, error](void) {
                 completion(error);
@@ -567,6 +595,9 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
                 error = [NSError errorWithDomain:MGLErrorDomain code:MGLErrorCodeUnknown userInfo:@{
                     NSLocalizedDescriptionKey: @(mbgl::util::toString(exception).c_str()),
                 }];
+#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+                [[MMEEventsManager sharedManager] reportError:error];
+#endif
             }
             dispatch_async(dispatch_get_main_queue(), ^{
                 completion(error);

@@ -180,6 +180,13 @@ using namespace std::string_literals;
         XCTAssertEqualObjects([expression expressionValueWithObject:nil context:context], @1);
     }
     {
+        NSExpression *expression = [NSExpression expressionForVariable:@"featureAccumulated"];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, @[@"accumulated"]);
+        XCTAssertEqualObjects([NSExpression expressionWithFormat:@"$featureAccumulated"].mgl_jsonExpressionObject, @[@"accumulated"]);
+        XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:@[@"accumulated"]], expression);
+    }
+
+    {
         NSExpression *expression = [NSExpression expressionForVariable:@"geometryType"];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, @[@"geometry-type"]);
         XCTAssertEqualObjects([NSExpression expressionWithFormat:@"$geometryType"].mgl_jsonExpressionObject, @[@"geometry-type"]);
@@ -381,6 +388,26 @@ using namespace std::string_literals;
         XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:jsonExpression], expression);
     }
     {
+        NSExpression *testExpression = [NSExpression expressionWithFormat:@"sum:({1, 1, 2})"];
+        NSExpression *expression = [NSExpression expressionForFunction:@"sum:" arguments:@[[NSExpression expressionForAggregate:@[MGLConstantExpression(@1), MGLConstantExpression(@1), MGLConstantExpression(@2)]]]];
+
+        NSArray *jsonExpression = @[@"+", @1, @1, @2];
+
+        XCTAssertEqualObjects(testExpression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects(expression, testExpression);
+    }
+    {
+        NSExpression *expression = [NSExpression expressionForFunction:@"sum:" arguments:@[MGLConstantExpression(@1), MGLConstantExpression(@1), MGLConstantExpression(@2)]];
+        NSArray *jsonExpression = @[@"+", @1, @1, @2];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+
+        // - [NSExpression expressionWithMGLJSONObject:] creates an expression with an aggregate expression as an argument. This is not equal to an expression with an array of expressions as an argument. For testing purposes, we will compare their operands and arrays of expressions.
+        NSExpression *aggregateExpression = [NSExpression expressionWithMGLJSONObject:jsonExpression];
+        XCTAssertEqualObjects(aggregateExpression.operand, expression.operand);
+        XCTAssertEqualObjects(aggregateExpression.arguments.firstObject.collection, expression.arguments);
+    }
+    {
         NSArray *threeArguments = @[MGLConstantExpression(@1), MGLConstantExpression(@1), MGLConstantExpression(@1)];
         NSExpression *expression = [NSExpression expressionForFunction:@"add:to:" arguments:threeArguments];
         NSArray *jsonExpression = @[@"+", @1, @1, @1];
@@ -416,6 +443,24 @@ using namespace std::string_literals;
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
         // NSExpression lacks a shorthand operator for modulus.
         XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:jsonExpression], expression);
+    }
+    {
+        NSExpression *expression = [NSExpression expressionForFunction:@"max:" arguments:arguments];
+        NSArray *jsonExpression = @[@"max", @1, @1];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+
+        NSExpression *aggregateExpression = [NSExpression expressionWithMGLJSONObject:jsonExpression];
+        XCTAssertEqualObjects(aggregateExpression.operand, expression.operand);
+        XCTAssertEqualObjects(aggregateExpression.arguments.firstObject.collection, expression.arguments);
+    }
+    {
+        NSExpression *expression = [NSExpression expressionForFunction:@"min:" arguments:arguments];
+        NSArray *jsonExpression = @[@"min", @1, @1];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+
+        NSExpression *aggregateExpression = [NSExpression expressionWithMGLJSONObject:jsonExpression];
+        XCTAssertEqualObjects(aggregateExpression.operand, expression.operand);
+        XCTAssertEqualObjects(aggregateExpression.arguments.firstObject.collection, expression.arguments);
     }
     {
         NSExpression *expression = [NSExpression expressionForFunction:@"ceiling:" arguments:@[MGLConstantExpression(@1.5)]];
@@ -620,6 +665,16 @@ using namespace std::string_literals;
         XCTAssertEqualObjects([expression expressionValueWithObject:nil context:nil], @"OldMacDonald");
         XCTAssertEqualObjects([aftermarketExpression expressionValueWithObject:nil context:nil], @"OldMacDonald");
         XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:jsonExpression], aftermarketExpression);
+    }
+    {
+        NSExpression *expression = [NSExpression expressionForFunction:@"mgl_join:" arguments:@[@"Old", @"MacDonald"]];
+        NSExpression *aftermarketExpression = [NSExpression expressionWithFormat:@"mgl_join({'Old', 'MacDonald'})"];
+        NSArray *jsonExpression = @[@"concat", @"Old", @"MacDonald"];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+
+        XCTAssertEqualObjects(aftermarketExpression.mgl_jsonExpressionObject, expression.mgl_jsonExpressionObject);
+        NSExpression *aggregateExpression = [NSExpression expressionWithMGLJSONObject:jsonExpression];
+        XCTAssertEqualObjects(aggregateExpression.operand, expression.operand);
     }
     {
         NSExpression *expression = [NSExpression expressionForFunction:@"uppercase:" arguments:arguments];

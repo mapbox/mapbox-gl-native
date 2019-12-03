@@ -34,7 +34,6 @@ public:
     RenderTile(const RenderTile&) = delete;
     RenderTile(RenderTile&&) = default;
     RenderTile& operator=(const RenderTile&) = delete;
-    RenderTile& operator=(RenderTile&&) = delete;
 
     UnwrappedTileID id;
     mat4 matrix;
@@ -68,6 +67,9 @@ public:
                             style::TranslateAnchorType anchor,
                             const TransformState& state,
                             const bool inViewportPixelUnits) const;
+
+    void setFeatureState(const LayerFeatureStates&);
+
 private:
     Tile& tile;
     // The following members are reset at placement stage.

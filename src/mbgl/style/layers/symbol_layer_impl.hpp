@@ -74,7 +74,7 @@ struct FormatSectionOverrides<TypeList<PaintProperty...>> {
                 },
                 [&checkLiteral] (const PropertyExpression<TextField::Type>& property) {
                     bool expressionHasOverrides = false;
-                    const auto checkExpression = [&](const expression::Expression& e) {
+                    const std::function<void(const expression::Expression&)> checkExpression = [&](const expression::Expression& e) {
                         if (expressionHasOverrides) {
                             return;
                         }
@@ -87,9 +87,7 @@ struct FormatSectionOverrides<TypeList<PaintProperty...>> {
                                 expressionHasOverrides = true;
                             }
                             return;
-                        }
-
-                        if (e.getKind() == expression::Kind::FormatExpression) {
+                        } else if (e.getKind() == expression::Kind::FormatExpression) {
                             const auto* formatExpr = static_cast<const expression::FormatExpression*>(&e);
                             for (const auto& section : formatExpr->getSections()) {
                                 if (Property::hasOverride(section)) {
@@ -97,17 +95,12 @@ struct FormatSectionOverrides<TypeList<PaintProperty...>> {
                                     break;
                                 }
                             }
+                        } else {
+                            e.eachChild(checkExpression);
                         }
                     };
 
-                    // Check root property expression and return early.
                     checkExpression(property.getExpression());
-                    if (expressionHasOverrides) {
-                        return true;
-                    }
-
-                    // Traverse thru children and check whether any of them have overrides.
-                    property.getExpression().eachChild(checkExpression);
                     return expressionHasOverrides;
                 },
                 [] (const auto&) {

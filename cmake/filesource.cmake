@@ -10,7 +10,7 @@ target_include_directories(mbgl-filesource
 
 target_link_libraries(mbgl-filesource
     PUBLIC mbgl-core
-    PUBLIC expected
+    PUBLIC Mapbox::Base::Extras::expected-lite
 )
 
 mbgl_filesource()

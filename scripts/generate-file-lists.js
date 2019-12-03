@@ -130,12 +130,12 @@ generateFileList('vendor/boost-files.json', [ 'vendor/boost' ], vendorRegex, [ "
 generateFileList('vendor/cheap-ruler-cpp-files.json', [ 'vendor/cheap-ruler-cpp' ], vendorRegex, [ "include/**/*.hpp" ]);
 generateFileList('vendor/earcut.hpp-files.json', [ 'vendor/earcut.hpp' ], vendorRegex, [ "include/**/*.hpp" ]);
 generateFileList('vendor/eternal-files.json', [ 'vendor/eternal' ], vendorRegex, [ "include/**/*.hpp" ]);
-generateFileList('vendor/expected-files.json', [ 'vendor/expected' ], vendorRegex, [ "include/expected.hpp" ]);
 generateFileList('vendor/geojson-vt-cpp-files.json', [ 'vendor/geojson-vt-cpp' ], vendorRegex, [ "include/**/*.hpp" ]);
 generateFileList('vendor/icu-files.json', [ 'vendor/icu' ], vendorRegex, [ "include/**/*.h", "src/*.h", "src/*.cpp" ]);
 generateFileList('vendor/mapbox-base-files.json',
     [ 'vendor/mapbox-base/extras/kdbush.hpp',
       'vendor/mapbox-base/extras/filesystem',
+      'vendor/mapbox-base/extras/expected-lite',
       'vendor/mapbox-base/extras/rapidjson',
       'vendor/mapbox-base/mapbox/pixelmatch-cpp',
       'vendor/mapbox-base/mapbox/geometry.hpp',
@@ -145,7 +145,8 @@ generateFileList('vendor/mapbox-base-files.json',
       'vendor/mapbox-base/mapbox/geojson.hpp',
       'vendor/mapbox-base/mapbox/jni.hpp',
       'vendor/mapbox-base/mapbox/weak',
-      'vendor/mapbox-base/mapbox/typewrapper' ], 
+      'vendor/mapbox-base/mapbox/typewrapper',
+      'vendor/mapbox-base/mapbox/value'], 
     vendorRegex, [ "include/*.hpp", "include/**/*.hpp", "include/**/*.h", "optional.hpp", ":!:include/jni/string_conversion.hpp" ]);
 generateFileList('vendor/polylabel-files.json', [ 'vendor/polylabel' ], vendorRegex, [ "include/**/*.hpp" ]);
 generateFileList('vendor/protozero-files.json', [ 'vendor/protozero' ], vendorRegex, [ "include/**/*.hpp" ]);

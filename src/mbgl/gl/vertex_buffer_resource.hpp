@@ -8,10 +8,11 @@ namespace gl {
 
 class VertexBufferResource : public gfx::VertexBufferResource {
 public:
-    VertexBufferResource(UniqueBuffer&& buffer_) : buffer(std::move(buffer_)) {
-    }
+    VertexBufferResource(UniqueBuffer&& buffer_, int byteSize_) : buffer(std::move(buffer_)), byteSize(byteSize_) {}
+    ~VertexBufferResource();
 
     UniqueBuffer buffer;
+    int byteSize;
 };
 
 } // namespace gl

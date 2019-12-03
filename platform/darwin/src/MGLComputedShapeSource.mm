@@ -140,7 +140,7 @@ mbgl::style::CustomGeometrySource::Options MBGLCustomGeometrySourceOptionsFromDi
                           @"This will be logged only once.");
                 });
             }
-            mbgl::Feature geoJsonObject = [feature geoJSONObject].get<mbgl::Feature>();
+            mbgl::GeoJSONFeature geoJsonObject = [feature geoJSONObject].get<mbgl::GeoJSONFeature>();
             featureCollection.push_back(geoJsonObject);
         }
         const auto geojson = mbgl::GeoJSON{featureCollection};
@@ -204,7 +204,7 @@ mbgl::style::CustomGeometrySource::Options MBGLCustomGeometrySourceOptionsFromDi
     mbgl::FeatureCollection featureCollection;
     featureCollection.reserve(features.count);
     for (MGLShape <MGLFeature> * feature in features) {
-        mbgl::Feature geoJsonObject = [feature geoJSONObject].get<mbgl::Feature>();
+        mbgl::GeoJSONFeature geoJsonObject = [feature geoJSONObject].get<mbgl::GeoJSONFeature>();
         featureCollection.push_back(geoJsonObject);
         if ([feature isMemberOfClass:[MGLShapeCollection class]]) {
             static dispatch_once_t onceToken;

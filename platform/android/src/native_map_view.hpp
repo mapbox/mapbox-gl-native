@@ -235,6 +235,10 @@ public:
 
     jni::jboolean getPrefetchTiles(JNIEnv&);
 
+    void setPrefetchZoomDelta(JNIEnv&, jni::jint);
+
+    jni::jint getPrefetchZoomDelta(JNIEnv&);
+
     mbgl::Map& getMap();
 
 private:

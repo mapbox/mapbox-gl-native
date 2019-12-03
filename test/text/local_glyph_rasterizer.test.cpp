@@ -33,9 +33,7 @@ namespace {
 class LocalGlyphRasterizerTest {
 public:
     LocalGlyphRasterizerTest(const optional<std::string> fontFamily)
-        : frontend(1, gfx::ContextMode::Unique, fontFamily)
-    {
-    }
+        : frontend(1, gfx::HeadlessBackend::SwapBehaviour::NoFlush, gfx::ContextMode::Unique, fontFamily) {}
 
     util::RunLoop loop;
     std::shared_ptr<StubFileSource> fileSource = std::make_shared<StubFileSource>();
@@ -45,7 +43,9 @@ public:
 
     void checkRendering(const char * name, double imageMatchPixelsThreshold = 0.015, double pixelMatchThreshold = 0.1) {
         test::checkImage(std::string("test/fixtures/local_glyphs/") + name,
-                         frontend.render(map), imageMatchPixelsThreshold, pixelMatchThreshold);
+                         frontend.render(map).image,
+                         imageMatchPixelsThreshold,
+                         pixelMatchThreshold);
     }
 };
 

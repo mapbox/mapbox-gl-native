@@ -7,6 +7,7 @@
         "platform/darwin/src/image.mm",
         "platform/darwin/src/local_glyph_rasterizer.mm",
         "platform/darwin/src/logging_nslog.mm",
+        "platform/darwin/src/number_format.mm",
         "platform/darwin/src/nsthread.mm",
         "platform/darwin/src/reachability.m",
         "platform/darwin/src/string_nsstring.mm",
@@ -15,6 +16,8 @@
         "platform/default/src/mbgl/gl/headless_backend.cpp",
         "platform/default/src/mbgl/map/map_snapshotter.cpp",
         "platform/default/src/mbgl/text/bidi.cpp",
+        "platform/default/src/mbgl/util/compression.cpp",
+        "platform/default/src/mbgl/util/monotonic_timer.cpp",
         "platform/default/src/mbgl/util/png_writer.cpp",
         "platform/default/src/mbgl/util/thread_local.cpp",
         "platform/default/src/mbgl/util/utf.cpp"
@@ -25,8 +28,7 @@
         "mbgl/gfx/headless_backend.hpp": "platform/default/include/mbgl/gfx/headless_backend.hpp",
         "mbgl/gfx/headless_frontend.hpp": "platform/default/include/mbgl/gfx/headless_frontend.hpp",
         "mbgl/gl/headless_backend.hpp": "platform/default/include/mbgl/gl/headless_backend.hpp",
-        "mbgl/map/map_snapshotter.hpp": "platform/default/include/mbgl/map/map_snapshotter.hpp",
-        "mbgl/util/default_styles.hpp": "platform/default/include/mbgl/util/default_styles.hpp"
+        "mbgl/map/map_snapshotter.hpp": "platform/default/include/mbgl/map/map_snapshotter.hpp"
     },
     "private_headers": {
         "CFHandle.hpp": "platform/darwin/src/CFHandle.hpp"

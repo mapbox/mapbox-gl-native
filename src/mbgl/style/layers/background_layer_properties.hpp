@@ -1,3 +1,5 @@
+// clang-format off
+
 // This file is generated. Edit scripts/generate-style-code.js, then run `make style-code`.
 
 #pragma once
@@ -22,8 +24,8 @@ struct BackgroundOpacity : PaintProperty<float> {
     static float defaultValue() { return 1; }
 };
 
-struct BackgroundPattern : CrossFadedPaintProperty<std::string> {
-    static std::string defaultValue() { return ""; }
+struct BackgroundPattern : CrossFadedPaintProperty<expression::Image> {
+    static expression::Image defaultValue() { return {}; }
 };
 
 class BackgroundPaintProperties : public Properties<
@@ -51,3 +53,5 @@ public:
 
 } // namespace style
 } // namespace mbgl
+
+// clang-format on

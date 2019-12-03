@@ -46,6 +46,7 @@ public:
     // Private implementation
     class Impl;
     const Impl& impl() const;
+    bool supportsLayerType(const mbgl::style::LayerTypeInfo*) const override;
     mapbox::base::WeakPtr<Source> makeWeakPtr() override {
         return weakFactory.makeWeakPtr();
     }

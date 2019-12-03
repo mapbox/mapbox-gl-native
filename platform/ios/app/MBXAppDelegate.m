@@ -1,6 +1,7 @@
+@import Mapbox;
+
 #import "MBXAppDelegate.h"
 #import "MBXViewController.h"
-#import <Mapbox/Mapbox.h>
 
 @interface MBXAppDelegate() <MGLMetricsManagerDelegate>
 

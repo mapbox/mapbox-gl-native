@@ -248,12 +248,12 @@ namespace mbgl {
     if (iconImageName && iconImageName.expressionType == NSConstantValueExpressionType) {
         std::string string = ((NSString *)iconImageName.constantValue).UTF8String;
         if (mbgl::style::conversion::hasTokens(string)) {
-            self.rawLayer->setIconImage(mbgl::style::PropertyValue<std::string>(
-                mbgl::style::conversion::convertTokenStringToExpression(string)));
+            self.rawLayer->setIconImage(mbgl::style::PropertyValue<mbgl::style::expression::Image>(
+                mbgl::style::conversion::convertTokenStringToImageExpression(string)));
             return;
         }
     }
-    auto mbglValue = MGLStyleValueTransformer<std::string, NSString *>().toPropertyValue<mbgl::style::PropertyValue<std::string>>(iconImageName, true);
+    auto mbglValue = MGLStyleValueTransformer<mbgl::style::expression::Image, NSString *>().toPropertyValue<mbgl::style::PropertyValue<mbgl::style::expression::Image>>(iconImageName, true);
     self.rawLayer->setIconImage(mbglValue);
 }
 
@@ -264,7 +264,7 @@ namespace mbgl {
     if (propertyValue.isUndefined()) {
         propertyValue = self.rawLayer->getDefaultIconImage();
     }
-    return MGLStyleValueTransformer<std::string, NSString *>().toExpression(propertyValue);
+    return MGLStyleValueTransformer<mbgl::style::expression::Image, NSString *>().toExpression(propertyValue);
 }
 
 - (void)setIconImage:(NSExpression *)iconImage {

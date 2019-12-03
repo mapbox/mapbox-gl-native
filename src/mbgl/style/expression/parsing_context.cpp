@@ -4,22 +4,23 @@
 #include <mbgl/style/expression/is_constant.hpp>
 #include <mbgl/style/expression/type.hpp>
 
-#include <mbgl/style/expression/expression.hpp>
-#include <mbgl/style/expression/at.hpp>
 #include <mbgl/style/expression/assertion.hpp>
+#include <mbgl/style/expression/at.hpp>
 #include <mbgl/style/expression/boolean_operator.hpp>
 #include <mbgl/style/expression/case.hpp>
 #include <mbgl/style/expression/coalesce.hpp>
 #include <mbgl/style/expression/coercion.hpp>
-#include <mbgl/style/expression/compound_expression.hpp>
 #include <mbgl/style/expression/comparison.hpp>
-#include <mbgl/style/expression/number_format.hpp>
+#include <mbgl/style/expression/compound_expression.hpp>
+#include <mbgl/style/expression/expression.hpp>
 #include <mbgl/style/expression/format_expression.hpp>
+#include <mbgl/style/expression/image_expression.hpp>
 #include <mbgl/style/expression/interpolate.hpp>
 #include <mbgl/style/expression/length.hpp>
 #include <mbgl/style/expression/let.hpp>
 #include <mbgl/style/expression/literal.hpp>
 #include <mbgl/style/expression/match.hpp>
+#include <mbgl/style/expression/number_format.hpp>
 #include <mbgl/style/expression/step.hpp>
 
 #include <mbgl/style/expression/find_zoom_curve.hpp>
@@ -100,38 +101,40 @@ ParseResult ParsingContext::parse(const Convertible& value, std::size_t index_, 
 }
 
 using ParseFunction = ParseResult (*)(const conversion::Convertible&, ParsingContext&);
-MAPBOX_ETERNAL_CONSTEXPR const auto expressionRegistry = mapbox::eternal::hash_map<mapbox::eternal::string, ParseFunction>({
-    {"==", parseComparison},
-    {"!=", parseComparison},
-    {">", parseComparison},
-    {"<", parseComparison},
-    {">=", parseComparison},
-    {"<=", parseComparison},
-    {"all", All::parse},
-    {"any", Any::parse},
-    {"array", Assertion::parse},
-    {"at", At::parse},
-    {"boolean", Assertion::parse},
-    {"case", Case::parse},
-    {"coalesce", Coalesce::parse},
-    {"collator", CollatorExpression::parse},
-    {"format", FormatExpression::parse},
-    {"interpolate", parseInterpolate},
-    {"length", Length::parse},
-    {"let", Let::parse},
-    {"literal", Literal::parse},
-    {"match", parseMatch},
-    {"number", Assertion::parse},
-    {"number-format", NumberFormat::parse},
-    {"object", Assertion::parse},
-    {"step", Step::parse},
-    {"string", Assertion::parse},
-    {"to-boolean", Coercion::parse},
-    {"to-color", Coercion::parse},
-    {"to-number", Coercion::parse},
-    {"to-string", Coercion::parse},
-    {"var", Var::parse},
-});
+MAPBOX_ETERNAL_CONSTEXPR const auto expressionRegistry =
+    mapbox::eternal::hash_map<mapbox::eternal::string, ParseFunction>({
+        {"==", parseComparison},
+        {"!=", parseComparison},
+        {">", parseComparison},
+        {"<", parseComparison},
+        {">=", parseComparison},
+        {"<=", parseComparison},
+        {"all", All::parse},
+        {"any", Any::parse},
+        {"array", Assertion::parse},
+        {"at", At::parse},
+        {"boolean", Assertion::parse},
+        {"case", Case::parse},
+        {"coalesce", Coalesce::parse},
+        {"collator", CollatorExpression::parse},
+        {"format", FormatExpression::parse},
+        {"image", ImageExpression::parse},
+        {"interpolate", parseInterpolate},
+        {"length", Length::parse},
+        {"let", Let::parse},
+        {"literal", Literal::parse},
+        {"match", parseMatch},
+        {"number", Assertion::parse},
+        {"number-format", NumberFormat::parse},
+        {"object", Assertion::parse},
+        {"step", Step::parse},
+        {"string", Assertion::parse},
+        {"to-boolean", Coercion::parse},
+        {"to-color", Coercion::parse},
+        {"to-number", Coercion::parse},
+        {"to-string", Coercion::parse},
+        {"var", Var::parse},
+    });
 
 bool isExpression(const std::string& name) {
     return expressionRegistry.contains(name.c_str());
@@ -191,7 +194,8 @@ ParseResult ParsingContext::parse(const Convertible& value, optional<TypeAnnotat
         const type::Type actual = (*parsed)->getType();
         if ((*expected == type::String || *expected == type::Number || *expected == type::Boolean || *expected == type::Object || expected->is<type::Array>()) && actual == type::Value) {
             parsed = { annotate(std::move(*parsed), *expected, typeAnnotationOption.value_or(TypeAnnotationOption::assert)) };
-        } else if ((*expected == type::Color || *expected == type::Formatted) && (actual == type::Value || actual == type::String)) {
+        } else if ((*expected == type::Color || *expected == type::Formatted || *expected == type::Image) &&
+                   (actual == type::Value || actual == type::String)) {
             parsed = { annotate(std::move(*parsed), *expected, typeAnnotationOption.value_or(TypeAnnotationOption::coerce)) };
         } else {
             checkType((*parsed)->getType());
@@ -203,8 +207,9 @@ ParseResult ParsingContext::parse(const Convertible& value, optional<TypeAnnotat
 
     // If an expression's arguments are all constant, we can evaluate
     // it immediately and replace it with a literal value in the
-    // parsed result.
-    if ((*parsed)->getKind() != Kind::Literal && isConstant(**parsed)) {
+    // parsed/compiled result. Expressions that expect an image should
+    // not be resolved here so we can later get the available images.
+    if ((*parsed)->getKind() != Kind::Literal && (*parsed)->getType() != type::Image && isConstant(**parsed)) {
         EvaluationContext params(nullptr);
         EvaluationResult evaluated((*parsed)->evaluate(params));
         if (!evaluated) {

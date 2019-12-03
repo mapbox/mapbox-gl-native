@@ -7,35 +7,37 @@
 #include "qt_conversion.hpp"
 #include "qt_geojson.hpp"
 
+#include <mbgl/actor/scheduler.hpp>
 #include <mbgl/annotation/annotation.hpp>
 #include <mbgl/map/camera.hpp>
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/map_options.hpp>
 #include <mbgl/math/log2.hpp>
 #include <mbgl/math/minmax.hpp>
-#include <mbgl/style/style.hpp>
-#include <mbgl/style/conversion/layer.hpp>
-#include <mbgl/style/conversion/source.hpp>
+#include <mbgl/renderer/renderer.hpp>
+#include <mbgl/storage/default_file_source.hpp>
+#include <mbgl/storage/network_status.hpp>
+#include <mbgl/storage/resource_options.hpp>
 #include <mbgl/style/conversion/filter.hpp>
 #include <mbgl/style/conversion/geojson.hpp>
+#include <mbgl/style/conversion/layer.hpp>
+#include <mbgl/style/conversion/source.hpp>
 #include <mbgl/style/conversion_impl.hpp>
 #include <mbgl/style/filter.hpp>
-#include <mbgl/style/layers/custom_layer.hpp>
+#include <mbgl/style/image.hpp>
 #include <mbgl/style/layers/background_layer.hpp>
 #include <mbgl/style/layers/circle_layer.hpp>
-#include <mbgl/style/layers/fill_layer.hpp>
+#include <mbgl/style/layers/custom_layer.hpp>
 #include <mbgl/style/layers/fill_extrusion_layer.hpp>
+#include <mbgl/style/layers/fill_layer.hpp>
 #include <mbgl/style/layers/line_layer.hpp>
 #include <mbgl/style/layers/raster_layer.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/style/rapidjson_conversion.hpp>
 #include <mbgl/style/sources/geojson_source.hpp>
+#include <mbgl/style/sources/image_source.hpp>
+#include <mbgl/style/style.hpp>
 #include <mbgl/style/transition_options.hpp>
-#include <mbgl/style/image.hpp>
-#include <mbgl/renderer/renderer.hpp>
-#include <mbgl/storage/default_file_source.hpp>
-#include <mbgl/storage/network_status.hpp>
-#include <mbgl/storage/resource_options.hpp>
 #include <mbgl/util/color.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/geo.hpp>
@@ -44,7 +46,6 @@
 #include <mbgl/util/rapidjson.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/traits.hpp>
-#include <mbgl/actor/scheduler.hpp>
 
 #include <QGuiApplication>
 
@@ -439,8 +440,7 @@ void QMapboxGLSettings::setLocalFontFamily(const QString &family)
 /*!
     Returns resource transformation callback used to transform requested URLs.
 */
-std::function<std::string(const std::string &&)> QMapboxGLSettings::resourceTransform() const
-{
+std::function<std::string(const std::string &)> QMapboxGLSettings::resourceTransform() const {
     return m_resourceTransform;
 }
 
@@ -452,8 +452,7 @@ std::function<std::string(const std::string &&)> QMapboxGLSettings::resourceTran
     used add or remove custom parameters, or reroute certain requests to other
     servers or endpoints.
 */
-void QMapboxGLSettings::setResourceTransform(const std::function<std::string(const std::string &&)> &transform)
-{
+void QMapboxGLSettings::setResourceTransform(const std::function<std::string(const std::string &)> &transform) {
     m_resourceTransform = transform;
 }
 
@@ -1012,7 +1011,7 @@ void QMapboxGL::removeAnnotation(QMapbox::AnnotationID id)
 */
 bool QMapboxGL::setLayoutProperty(const QString& layer, const QString& propertyName, const QVariant& value)
 {
-    return d_ptr->setProperty(&mbgl::style::Layer::setLayoutProperty, layer, propertyName, value);
+    return d_ptr->setProperty(&mbgl::style::Layer::setProperty, layer, propertyName, value);
 }
 
 /*!
@@ -1072,7 +1071,7 @@ bool QMapboxGL::setLayoutProperty(const QString& layer, const QString& propertyN
 
 bool QMapboxGL::setPaintProperty(const QString& layer, const QString& propertyName, const QVariant& value)
 {
-    return d_ptr->setProperty(&mbgl::style::Layer::setPaintProperty, layer, propertyName, value);
+    return d_ptr->setProperty(&mbgl::style::Layer::setProperty, layer, propertyName, value);
 }
 
 /*!
@@ -1297,7 +1296,7 @@ bool QMapboxGL::sourceExists(const QString& sourceID)
     Updates the source \a id with new \a params.
 
     If the source does not exist, it will be added like in addSource(). Only
-    GeoJSON sources can be updated.
+    image and GeoJSON sources can be updated.
 */
 void QMapboxGL::updateSource(const QString &id, const QVariantMap &params)
 {
@@ -1311,12 +1310,15 @@ void QMapboxGL::updateSource(const QString &id, const QVariantMap &params)
     }
 
     auto sourceGeoJSON = source->as<GeoJSONSource>();
-    if (!sourceGeoJSON) {
-        qWarning() << "Unable to update source: only GeoJSON sources are mutable.";
+    auto sourceImage = source->as<ImageSource>();
+    if (!sourceGeoJSON && !sourceImage) {
+        qWarning() << "Unable to update source: only GeoJSON and Image sources are mutable.";
         return;
     }
 
-    if (params.contains("data")) {
+    if (sourceImage && params.contains("url")) {
+        sourceImage->setURL(params["url"].toString().toStdString());
+    } else if (sourceGeoJSON && params.contains("data")) {
         Error error;
         auto result = convert<mbgl::GeoJSON>(params["data"], error);
         if (result) {
@@ -1744,8 +1746,9 @@ QMapboxGLPrivate::QMapboxGLPrivate(QMapboxGL *q, const QMapboxGLSettings &settin
                                          resourceOptions);
 
      if (settings.resourceTransform()) {
-         m_resourceTransform = std::make_unique<mbgl::Actor<mbgl::ResourceTransform>>(*mbgl::Scheduler::GetCurrent(),
-             [callback = settings.resourceTransform()] (mbgl::Resource::Kind, const std::string &&url_) -> std::string {
+         m_resourceTransform = std::make_unique<mbgl::Actor<mbgl::ResourceTransform>>(
+             *mbgl::Scheduler::GetCurrent(),
+             [callback = settings.resourceTransform()](mbgl::Resource::Kind, const std::string &url_) -> std::string {
                  return callback(std::move(url_));
              });
          auto fs = mbgl::FileSource::getSharedFileSource(resourceOptions);

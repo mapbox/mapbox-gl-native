@@ -48,14 +48,14 @@ std::vector<Feature> getTopClusterFeature(QueryTest& test) {
     };
 
     LatLng coordinate{0, 0};
-    GeoJSONOptions options{};
-    options.cluster = true;
-    auto source = std::make_unique<GeoJSONSource>("cluster_source"s, options);
+    Mutable<GeoJSONOptions> options = makeMutable<GeoJSONOptions>();
+    options->cluster = true;
+    auto source = std::make_unique<GeoJSONSource>("cluster_source"s, std::move(options));
     source->setURL("http://url"s);
     source->loadDescription(*test.fileSource);
 
     auto clusterLayer = std::make_unique<SymbolLayer>("cluster_layer"s, "cluster_source"s);
-    clusterLayer->setIconImage("test-icon"s);
+    clusterLayer->setIconImage({"test-icon"s});
     clusterLayer->setIconSize(12.0f);
 
     test.map.jumpTo(CameraOptions().withCenter(coordinate).withZoom(0.0));
@@ -75,10 +75,22 @@ std::vector<Feature> getTopClusterFeature(QueryTest& test) {
 TEST(Query, QueryRenderedFeatures) {
     QueryTest test;
 
-    auto features1 = test.frontend.getRenderer()->queryRenderedFeatures(test.map.pixelForLatLng({ 0, 0 }));
+    // Batch conversion of latLngs to pixels
+    auto points = test.map.pixelsForLatLngs({{0, 0}, {9, 9}});
+    ASSERT_EQ(2, points.size());
+    // Single conversion of latLng to pixel
+    auto point0 = test.map.pixelForLatLng({0, 0});
+    ASSERT_NEAR(points[0].x, point0.x, 1e-8);
+    ASSERT_NEAR(points[0].y, point0.y, 1e-8);
+
+    auto point1 = test.map.pixelForLatLng({9, 9});
+    ASSERT_NEAR(points[1].x, point1.x, 1e-8);
+    ASSERT_NEAR(points[1].y, point1.y, 1e-8);
+
+    auto features1 = test.frontend.getRenderer()->queryRenderedFeatures(point0);
     EXPECT_EQ(features1.size(), 4u);
 
-    auto features2 = test.frontend.getRenderer()->queryRenderedFeatures(test.map.pixelForLatLng({ 9, 9 }));
+    auto features2 = test.frontend.getRenderer()->queryRenderedFeatures(point1);
     EXPECT_EQ(features2.size(), 0u);
 }
 
@@ -124,6 +136,22 @@ TEST(Query, QuerySourceFeatures) {
 
     auto features1 = test.frontend.getRenderer()->querySourceFeatures("source3");
     EXPECT_EQ(features1.size(), 1u);
+}
+
+TEST(Query, QuerySourceFeatureStates) {
+    QueryTest test;
+
+    FeatureState newState;
+    newState["hover"] = true;
+    newState["radius"].set<uint64_t>(20);
+    test.frontend.getRenderer()->setFeatureState("source1", {}, "feature1", newState);
+
+    FeatureState states;
+    test.frontend.getRenderer()->getFeatureState(states, "source1", {}, "feature1");
+    ASSERT_EQ(states.size(), 2u);
+    ASSERT_EQ(states["hover"], true);
+    ASSERT_EQ(states["radius"].get<uint64_t>(), 20u);
+    ASSERT_EQ(newState, states);
 }
 
 TEST(Query, QuerySourceFeaturesOptionValidation) {

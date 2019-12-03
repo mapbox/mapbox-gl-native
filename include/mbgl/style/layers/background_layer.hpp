@@ -1,3 +1,5 @@
+// clang-format off
+
 // This file is generated. Do not edit.
 
 #pragma once
@@ -19,8 +21,9 @@ public:
     ~BackgroundLayer() final;
 
     // Dynamic properties
-    optional<conversion::Error> setLayoutProperty(const std::string& name, const conversion::Convertible& value) final;
-    optional<conversion::Error> setPaintProperty(const std::string& name, const conversion::Convertible& value) final;
+    optional<conversion::Error> setProperty(const std::string& name, const conversion::Convertible& value) final;
+
+    StyleProperty getProperty(const std::string& name) const final;
 
     // Paint properties
 
@@ -36,9 +39,9 @@ public:
     void setBackgroundOpacityTransition(const TransitionOptions&);
     TransitionOptions getBackgroundOpacityTransition() const;
 
-    static PropertyValue<std::string> getDefaultBackgroundPattern();
-    const PropertyValue<std::string>& getBackgroundPattern() const;
-    void setBackgroundPattern(const PropertyValue<std::string>&);
+    static PropertyValue<expression::Image> getDefaultBackgroundPattern();
+    const PropertyValue<expression::Image>& getBackgroundPattern() const;
+    void setBackgroundPattern(const PropertyValue<expression::Image>&);
     void setBackgroundPatternTransition(const TransitionOptions&);
     TransitionOptions getBackgroundPatternTransition() const;
 
@@ -57,3 +60,5 @@ protected:
 
 } // namespace style
 } // namespace mbgl
+
+// clang-format on

@@ -61,12 +61,23 @@ public:
                    std::set<LayerRenderItem> layerRenderItems_,
                    std::vector<std::unique_ptr<RenderItem>> sourceRenderItems_,
                    LineAtlas& lineAtlas_,
-                   PatternAtlas& patternAtlas_)
+                   PatternAtlas& patternAtlas_,
+                   std::vector<std::reference_wrapper<RenderLayer>> layersNeedPlacement_,
+                   Immutable<Placement> placement_,
+                   bool updateSymbolOpacities_)
         : RenderTree(std::move(parameters_)),
           layerRenderItems(std::move(layerRenderItems_)),
           sourceRenderItems(std::move(sourceRenderItems_)),
           lineAtlas(lineAtlas_),
-          patternAtlas(patternAtlas_) {
+          patternAtlas(patternAtlas_),
+          layersNeedPlacement(std::move(layersNeedPlacement_)),
+          placement(std::move(placement_)),
+          updateSymbolOpacities(updateSymbolOpacities_) {}
+
+    void prepare() override {
+        for (auto it = layersNeedPlacement.rbegin(); it != layersNeedPlacement.rend(); ++it) {
+            placement->updateLayerBuckets(*it, parameters->transformParams.state, updateSymbolOpacities);
+        }
     }
 
     RenderItems getLayerRenderItems() const override {
@@ -85,24 +96,24 @@ public:
     std::vector<std::unique_ptr<RenderItem>> sourceRenderItems;
     std::reference_wrapper<LineAtlas> lineAtlas;
     std::reference_wrapper<PatternAtlas> patternAtlas;
+    std::vector<std::reference_wrapper<RenderLayer>> layersNeedPlacement;
+    Immutable<Placement> placement;
+    bool updateSymbolOpacities;
 };
 
 }  // namespace
 
-RenderOrchestrator::RenderOrchestrator(
-                     bool backgroundLayerAsColor_,
-                     optional<std::string> localFontFamily_)
-    : observer(&nullObserver())
-    , glyphManager(std::make_unique<GlyphManager>(std::make_unique<LocalGlyphRasterizer>(std::move(localFontFamily_))))
-    , imageManager(std::make_unique<ImageManager>())
-    , lineAtlas(std::make_unique<LineAtlas>(Size{ 256, 512 }))
-    , patternAtlas(std::make_unique<PatternAtlas>())
-    , imageImpls(makeMutable<std::vector<Immutable<style::Image::Impl>>>())
-    , sourceImpls(makeMutable<std::vector<Immutable<style::Source::Impl>>>())
-    , layerImpls(makeMutable<std::vector<Immutable<style::Layer::Impl>>>())
-    , renderLight(makeMutable<Light::Impl>())
-    , placement(std::make_unique<Placement>(TransformState{}, MapMode::Static, TransitionOptions{}, true))
-    , backgroundLayerAsColor(backgroundLayerAsColor_) {
+RenderOrchestrator::RenderOrchestrator(bool backgroundLayerAsColor_, optional<std::string> localFontFamily_)
+    : observer(&nullObserver()),
+      glyphManager(std::make_unique<GlyphManager>(std::make_unique<LocalGlyphRasterizer>(std::move(localFontFamily_)))),
+      imageManager(std::make_unique<ImageManager>()),
+      lineAtlas(std::make_unique<LineAtlas>()),
+      patternAtlas(std::make_unique<PatternAtlas>()),
+      imageImpls(makeMutable<std::vector<Immutable<style::Image::Impl>>>()),
+      sourceImpls(makeMutable<std::vector<Immutable<style::Source::Impl>>>()),
+      layerImpls(makeMutable<std::vector<Immutable<style::Layer::Impl>>>()),
+      renderLight(makeMutable<Light::Impl>()),
+      backgroundLayerAsColor(backgroundLayerAsColor_) {
     glyphManager->setObserver(this);
     imageManager->setObserver(this);
 }
@@ -207,6 +218,7 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
 
     const LayerDifference layerDiff = diffLayers(layerImpls, updateParameters.layers);
     layerImpls = updateParameters.layers;
+    const bool layersAddedOrRemoved = !layerDiff.added.empty() || !layerDiff.removed.empty();
 
     // Remove render layers for removed layers.
     for (const auto& entry : layerDiff.removed) {
@@ -225,20 +237,31 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
         renderLayers.at(entry.first)->transition(transitionParameters, entry.second.after);
     }
 
-    if (!layerDiff.removed.empty() || !layerDiff.added.empty() || !layerDiff.changed.empty()) {
-        glyphManager->evict(fontStacks(*updateParameters.layers));
+    if (layersAddedOrRemoved) {
+        orderedLayers.clear();
+        orderedLayers.reserve(layerImpls->size());
+        for (const auto& layerImpl : *layerImpls) {
+            RenderLayer* layer = renderLayers.at(layerImpl->id).get();
+            assert(layer);
+            orderedLayers.emplace_back(*layer);
+        }
+    }
+    assert(orderedLayers.size() == renderLayers.size());
+
+    if (layersAddedOrRemoved || !layerDiff.changed.empty()) {
+        glyphManager->evict(fontStacks(*layerImpls));
     }
 
     // Update layers for class and zoom changes.
     std::unordered_set<std::string> constantsMaskChanged;
-    for (const auto& entry : renderLayers) {
-        RenderLayer& layer = *entry.second;
-        const bool layerAddedOrChanged = layerDiff.added.count(entry.first) || layerDiff.changed.count(entry.first);
+    for (RenderLayer& layer : orderedLayers) {
+        const std::string& id = layer.getID();
+        const bool layerAddedOrChanged = layerDiff.added.count(id) || layerDiff.changed.count(id);
         if (layerAddedOrChanged || zoomChanged || layer.hasTransition() || layer.hasCrossfade()) {
             auto previousMask = layer.evaluatedProperties->constantsMask();
             layer.evaluate(evaluationParameters);
             if (previousMask != layer.evaluatedProperties->constantsMask()) {
-                constantsMaskChanged.insert(layer.getID());
+                constantsMaskChanged.insert(id);
             }
         }
     }
@@ -268,7 +291,7 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
         renderLight.getEvaluated());
 
     std::set<LayerRenderItem> layerRenderItems;
-    std::vector<std::reference_wrapper<RenderLayer>> layersNeedPlacement;
+    layersNeedPlacement.clear();
     auto renderItemsEmplaceHint = layerRenderItems.begin();
 
     // Reserve size for filteredLayersForSource if there are sources.
@@ -280,27 +303,26 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
     for (const auto& sourceImpl : *sourceImpls) {
         RenderSource* source = renderSources.at(sourceImpl->id).get();
         bool sourceNeedsRendering = false;
-        bool sourceNeedsRelayout = false;       
-        
-        uint32_t index = 0u;
-        const auto begin = layerImpls->begin();
-        const auto end = layerImpls->end();
-        for (auto it = begin; it != end; ++it, ++index) {
-            const Immutable<Layer::Impl>& layerImpl = *it;
-            RenderLayer* layer = getRenderLayer(layerImpl->id);
-            const auto* layerInfo = layerImpl->getTypeInfo();
-            const bool layerIsVisible = layer->baseImpl->visibility != style::VisibilityType::None;
-            const bool zoomFitsLayer = layer->supportsZoom(zoomHistory.lastZoom);
+        bool sourceNeedsRelayout = false;
+
+        for (uint32_t index = 0u; index < orderedLayers.size(); ++index) {
+            RenderLayer& layer = orderedLayers[index];
+            const auto* layerInfo = layer.baseImpl->getTypeInfo();
+            const bool layerIsVisible = layer.baseImpl->visibility != style::VisibilityType::None;
+            const bool zoomFitsLayer = layer.supportsZoom(zoomHistory.lastZoom);
             renderTreeParameters->has3D |= (layerInfo->pass3d == LayerTypeInfo::Pass3D::Required);
 
             if (layerInfo->source != LayerTypeInfo::Source::NotRequired) {
-                if (layerImpl->source == sourceImpl->id) {
-                    sourceNeedsRelayout = (sourceNeedsRelayout || hasImageDiff || constantsMaskChanged.count(layerImpl->id) || hasLayoutDifference(layerDiff, layerImpl->id));
+                if (layer.baseImpl->source == sourceImpl->id) {
+                    const std::string& layerId = layer.getID();
+                    sourceNeedsRelayout = (sourceNeedsRelayout || hasImageDiff || constantsMaskChanged.count(layerId) ||
+                                           hasLayoutDifference(layerDiff, layerId));
                     if (layerIsVisible) {
-                        filteredLayersForSource.push_back(layer->evaluatedProperties);
+                        filteredLayersForSource.push_back(layer.evaluatedProperties);
                         if (zoomFitsLayer) {
                             sourceNeedsRendering = true;
-                            renderItemsEmplaceHint = layerRenderItems.emplace_hint(renderItemsEmplaceHint, *layer, source, index);
+                            renderItemsEmplaceHint =
+                                layerRenderItems.emplace_hint(renderItemsEmplaceHint, layer, source, index);
                         }
                     }
                 }
@@ -309,14 +331,14 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
 
             // Handle layers without source.
             if (layerIsVisible && zoomFitsLayer && sourceImpl.get() == sourceImpls->at(0).get()) {
-                if (backgroundLayerAsColor && layerImpl.get() == layerImpls->at(0).get()) {
-                    const auto& solidBackground = layer->getSolidBackground();
+                if (backgroundLayerAsColor && layer.baseImpl == layerImpls->front()) {
+                    const auto& solidBackground = layer.getSolidBackground();
                     if (solidBackground) {
                         renderTreeParameters->backgroundColor = *solidBackground;
                         continue; // This layer is shown with background color, and it shall not be added to render items. 
                     }
                 }
-                renderItemsEmplaceHint = layerRenderItems.emplace_hint(renderItemsEmplaceHint, *layer, nullptr, index);
+                renderItemsEmplaceHint = layerRenderItems.emplace_hint(renderItemsEmplaceHint, layer, nullptr, index);
             }
         }
         source->update(sourceImpl,
@@ -354,47 +376,53 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
         }
     }
     // Symbol placement.
+    bool symbolBucketsChanged = false;
     {
         if (!isMapModeContinuous) {
             // TODO: Think about right way for symbol index to handle still rendering
             crossTileSymbolIndex.reset();
         }
 
-        bool symbolBucketsChanged = false;
-        renderTreeParameters->placementChanged = !placement->stillRecent(updateParameters.timePoint, updateParameters.transformState.getZoom());
+        bool symbolBucketsAdded = false;
+        for (auto it = layersNeedPlacement.rbegin(); it != layersNeedPlacement.rend(); ++it) {
+            auto result = crossTileSymbolIndex.addLayer(*it, updateParameters.transformState.getLatLng().longitude()); 
+            symbolBucketsAdded = symbolBucketsAdded || (result & CrossTileSymbolIndex::AddLayerResult::BucketsAdded);
+            symbolBucketsChanged = symbolBucketsChanged || (result != CrossTileSymbolIndex::AddLayerResult::NoChanges);
+        }
+        // We want new symbols to show up faster, however simple setting `placementChanged` to `true` would
+        // initiate placement too often as new buckets ususally come from several rendered tiles in a row within
+        // a short period of time. Instead, we squeeze placement update period to coalesce buckets updates from several tiles.
+        optional<Duration> maximumPlacementUpdatePeriod;
+        if (symbolBucketsAdded) maximumPlacementUpdatePeriod = optional<Duration>(Milliseconds(30));
+        renderTreeParameters->placementChanged = !placementController.placementIsRecent(
+            updateParameters.timePoint, updateParameters.transformState.getZoom(), maximumPlacementUpdatePeriod);
+        symbolBucketsChanged |= renderTreeParameters->placementChanged;
+
         std::set<std::string> usedSymbolLayers;
         if (renderTreeParameters->placementChanged) {
-            placement = std::make_unique<Placement>(
-                updateParameters.transformState, updateParameters.mode,
-                updateParameters.transitionOptions, updateParameters.crossSourceCollisions,
-                std::move(placement));
-        }
+            Mutable<Placement> placement = makeMutable<Placement>(updateParameters.transformState,
+                                                                  updateParameters.mode,
+                                                                  updateParameters.transitionOptions,
+                                                                  updateParameters.crossSourceCollisions,
+                                                                  placementController.getPlacement());
 
-        for (auto it = layersNeedPlacement.rbegin(); it != layersNeedPlacement.rend(); ++it) {
-            const RenderLayer& layer = *it;
-            if (crossTileSymbolIndex.addLayer(layer, updateParameters.transformState.getLatLng().longitude())) symbolBucketsChanged = true;
-
-            if (renderTreeParameters->placementChanged) {
+            for (auto it = layersNeedPlacement.rbegin(); it != layersNeedPlacement.rend(); ++it) {
+                const RenderLayer& layer = *it;
                 usedSymbolLayers.insert(layer.getID());
                 placement->placeLayer(layer, renderTreeParameters->transformParams.projMatrix, updateParameters.debugOptions & MapDebugOptions::Collision);
             }
-        }
 
-        if (renderTreeParameters->placementChanged) {
             placement->commit(updateParameters.timePoint, updateParameters.transformState.getZoom());
             crossTileSymbolIndex.pruneUnusedLayers(usedSymbolLayers);
             for (const auto& entry : renderSources) {
                 entry.second->updateFadingTiles();
             }
+            placementController.setPlacement(std::move(placement));
         } else {
-            placement->setStale();
+            placementController.setPlacementStale();
         }
-
-        for (auto it = layersNeedPlacement.rbegin(); it != layersNeedPlacement.rend(); ++it) {
-            placement->updateLayerBuckets(*it, updateParameters.transformState, renderTreeParameters->placementChanged || symbolBucketsChanged);
-        }
-
-        renderTreeParameters->symbolFadeChange = placement->symbolFadeChange(updateParameters.timePoint);
+        renderTreeParameters->symbolFadeChange =
+            placementController.getPlacement()->symbolFadeChange(updateParameters.timePoint);
     }
 
     renderTreeParameters->needsRepaint = isMapModeContinuous && hasTransitions(updateParameters.timePoint);
@@ -411,12 +439,14 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
         }
     }
 
-    return std::make_unique<RenderTreeImpl>(
-        std::move(renderTreeParameters),
-        std::move(layerRenderItems),
-        std::move(sourceRenderItems),
-        *lineAtlas,
-        *patternAtlas);
+    return std::make_unique<RenderTreeImpl>(std::move(renderTreeParameters),
+                                            std::move(layerRenderItems),
+                                            std::move(sourceRenderItems),
+                                            *lineAtlas,
+                                            *patternAtlas,
+                                            std::move(layersNeedPlacement),
+                                            placementController.getPlacement(),
+                                            symbolBucketsChanged);
 }
 
 std::vector<Feature> RenderOrchestrator::queryRenderedFeatures(const ScreenLineString& geometry, const RenderedQueryOptions& options) const {
@@ -453,11 +483,11 @@ void RenderOrchestrator::queryRenderedSymbols(std::unordered_map<std::string, st
     if (crossTileSymbolIndexLayers.empty()) {
         return;
     }
-
-    auto renderedSymbols = placement->getCollisionIndex().queryRenderedSymbols(geometry);
+    const Placement& placement = *placementController.getPlacement();
+    auto renderedSymbols = placement.getCollisionIndex().queryRenderedSymbols(geometry);
     std::vector<std::reference_wrapper<const RetainedQueryData>> bucketQueryData;
     for (auto entry : renderedSymbols) {
-        bucketQueryData.emplace_back(placement->getQueryData(entry.first));
+        bucketQueryData.emplace_back(placement.getQueryData(entry.first));
     }
     // Although symbol query is global, symbol results are only sortable within a bucket
     // For a predictable global sort renderItems, we sort the buckets based on their corresponding tile position
@@ -557,6 +587,29 @@ FeatureExtensionValue RenderOrchestrator::queryFeatureExtensions(const std::stri
     return {};
 }
 
+void RenderOrchestrator::setFeatureState(const std::string& sourceID, const optional<std::string>& sourceLayerID,
+                                         const std::string& featureID, const FeatureState& state) {
+    if (RenderSource* renderSource = getRenderSource(sourceID)) {
+        renderSource->setFeatureState(sourceLayerID, featureID, state);
+    }
+}
+
+void RenderOrchestrator::getFeatureState(FeatureState& state, const std::string& sourceID,
+                                         const optional<std::string>& sourceLayerID,
+                                         const std::string& featureID) const {
+    if (RenderSource* renderSource = getRenderSource(sourceID)) {
+        renderSource->getFeatureState(state, sourceLayerID, featureID);
+    }
+}
+
+void RenderOrchestrator::removeFeatureState(const std::string& sourceID, const optional<std::string>& sourceLayerID,
+                                            const optional<std::string>& featureID,
+                                            const optional<std::string>& stateKey) {
+    if (RenderSource* renderSource = getRenderSource(sourceID)) {
+        renderSource->removeFeatureState(sourceLayerID, featureID, stateKey);
+    }
+}
+
 void RenderOrchestrator::reduceMemoryUse() {
     filteredLayersForSource.shrink_to_fit();
     for (const auto& entry : renderSources) {
@@ -600,7 +653,7 @@ bool RenderOrchestrator::hasTransitions(TimePoint timePoint) const {
         }
     }
 
-    if (placement->hasTransitions(timePoint)) {
+    if (placementController.hasTransitions(timePoint)) {
         return true;
     }
 

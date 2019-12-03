@@ -2,6 +2,7 @@
     "//": "This file is generated. Do not edit. Regenerate it with scripts/generate-file-lists.js",
     "sources": [],
     "public_headers": {
+        "nonstd/expected.hpp": "vendor/mapbox-base/extras/expected-lite/include/nonstd/expected.hpp",
         "ghc/filesystem.hpp": "vendor/mapbox-base/extras/filesystem/include/ghc/filesystem.hpp",
         "ghc/fs_fwd.hpp": "vendor/mapbox-base/extras/filesystem/include/ghc/fs_fwd.hpp",
         "ghc/fs_impl.hpp": "vendor/mapbox-base/extras/filesystem/include/ghc/fs_impl.hpp",
@@ -94,6 +95,7 @@
         "mapbox/pixelmatch.hpp": "vendor/mapbox-base/mapbox/pixelmatch-cpp/include/mapbox/pixelmatch.hpp",
         "supercluster.hpp": "vendor/mapbox-base/mapbox/supercluster.hpp/include/supercluster.hpp",
         "mapbox/type_wrapper.hpp": "vendor/mapbox-base/mapbox/typewrapper/include/mapbox/type_wrapper.hpp",
+        "mapbox/value.hpp": "vendor/mapbox-base/mapbox/value/include/mapbox/value.hpp",
         "mapbox/optional.hpp": "vendor/mapbox-base/mapbox/variant/include/mapbox/optional.hpp",
         "mapbox/recursive_wrapper.hpp": "vendor/mapbox-base/mapbox/variant/include/mapbox/recursive_wrapper.hpp",
         "mapbox/variant.hpp": "vendor/mapbox-base/mapbox/variant/include/mapbox/variant.hpp",

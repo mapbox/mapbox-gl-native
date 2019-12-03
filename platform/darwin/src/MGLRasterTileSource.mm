@@ -1,5 +1,6 @@
 #import "MGLRasterTileSource_Private.h"
 
+#import "MGLLoggingConfiguration_Private.h"
 #import "MGLMapView_Private.h"
 #import "MGLSource_Private.h"
 #import "MGLTileSource_Private.h"
@@ -33,15 +34,16 @@ static const CGFloat MGLRasterTileSourceRetinaTileSize = 512;
 }
 
 - (instancetype)initWithIdentifier:(NSString *)identifier configurationURL:(NSURL *)configurationURL tileSize:(CGFloat)tileSize {
-    auto source = [self pendingSourceWithIdentifier:identifier configurationURL:configurationURL tileSize:tileSize];
+    NSString *configurationURLString = configurationURL.mgl_URLByStandardizingScheme.absoluteString;
+    auto source = [self pendingSourceWithIdentifier:identifier urlOrTileset:configurationURLString.UTF8String tileSize:uint16_t(round(tileSize))];
     return self = [super initWithPendingSource:std::move(source)];
 }
 
-- (std::unique_ptr<mbgl::style::RasterSource>)pendingSourceWithIdentifier:(NSString *)identifier configurationURL:(NSURL *)configurationURL tileSize:(CGFloat)tileSize {
-    NSString *configurationURLString = configurationURL.mgl_URLByStandardizingScheme.absoluteString;
-    return std::make_unique<mbgl::style::RasterSource>(identifier.UTF8String,
-                                                       configurationURLString.UTF8String,
-                                                       uint16_t(round(tileSize)));
+- (std::unique_ptr<mbgl::style::RasterSource>)pendingSourceWithIdentifier:(NSString *)identifier urlOrTileset:(mbgl::variant<std::string, mbgl::Tileset>)urlOrTileset tileSize:(uint16_t)tileSize {
+    auto source = std::make_unique<mbgl::style::RasterSource>(identifier.UTF8String,
+                                                              urlOrTileset,
+                                                              tileSize);
+    return source;
 }
 
 - (instancetype)initWithIdentifier:(NSString *)identifier tileURLTemplates:(NSArray<NSString *> *)tileURLTemplates options:(nullable NSDictionary<MGLTileSourceOption, id> *)options {
@@ -56,7 +58,7 @@ static const CGFloat MGLRasterTileSourceRetinaTileSize = 512;
         tileSize = static_cast<uint16_t>(round(tileSizeNumber.doubleValue));
     }
 
-    auto source = std::make_unique<mbgl::style::RasterSource>(identifier.UTF8String, tileSet, tileSize);
+    auto source = [self pendingSourceWithIdentifier:identifier urlOrTileset:tileSet tileSize:tileSize];
     return self = [super initWithPendingSource:std::move(source)];
 }
 
@@ -71,7 +73,11 @@ static const CGFloat MGLRasterTileSourceRetinaTileSize = 512;
 }
 
 - (NSString *)attributionHTMLString {
-    MGLAssertStyleSourceIsValid();
+    if (!self.rawSource) {
+        MGLAssert(0, @"Source with identifier `%@` was invalidated after a style change", self.identifier);
+        return nil;
+    }
+
     auto attribution = self.rawSource->getAttribution();
     return attribution ? @(attribution->c_str()) : nil;
 }

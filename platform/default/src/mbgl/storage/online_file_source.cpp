@@ -78,10 +78,12 @@ public:
         if (resourceTransform) {
             // Request the ResourceTransform actor a new url and replace the resource url with the
             // transformed one before proceeding to schedule the request.
-            resourceTransform->invoke(&ResourceTransform::transform, request->resource.kind,
-                std::move(request->resource.url), [ref = request->actor()](const std::string&& url) {
-                    ref.invoke(&OnlineFileRequest::setTransformedURL, std::move(url));
-                });
+            resourceTransform->invoke(&ResourceTransform::transform,
+                                      request->resource.kind,
+                                      std::move(request->resource.url),
+                                      [ref = request->actor()](const std::string&& url) {
+                                          ref.invoke(&OnlineFileRequest::setTransformedURL, url);
+                                      });
         } else {
             request->schedule();
         }
@@ -156,7 +158,9 @@ public:
 
     void setOnlineStatus(const bool status) {
         online = status;
-        networkIsReachableAgain();
+        if (online) {
+            networkIsReachableAgain();
+        }
     }
 
     uint32_t getMaximumConcurrentRequests() const {
@@ -466,8 +470,8 @@ void OnlineFileRequest::networkIsReachableAgain() {
 }
 
 void OnlineFileRequest::setTransformedURL(const std::string&& url) {
-     resource.url = std::move(url);
-     schedule();
+    resource.url = url;
+    schedule();
 }
 
 ActorRef<OnlineFileRequest> OnlineFileRequest::actor() {

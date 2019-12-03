@@ -14,21 +14,17 @@ using namespace mbgl::style::expression::dsl;
 
 using namespace std::string_literals;
 
-static StubGeometryTileFeature oneInteger {
-    PropertyMap {{ "property", uint64_t(1) }}
-};
+static const StubGeometryTileFeature oneInteger{PropertyMap{{"property", uint64_t(1)}}};
 
-static StubGeometryTileFeature oneDouble {
-    PropertyMap {{ "property", 1.0 }}
-};
+static const StubGeometryTileFeature oneDouble{PropertyMap{{"property", 1.0}}};
 
-static StubGeometryTileFeature oneString {
-    PropertyMap {{ "property", "1"s }}
-};
+static const StubGeometryTileFeature oneString{PropertyMap{{"property", "1"s}}};
 
-static StubGeometryTileFeature oneColor {
-    PropertyMap {{ "color", "red"s }}
-};
+static const StubGeometryTileFeature oneColor{PropertyMap{{"color", "red"s}}};
+
+static const StubGeometryTileFeature oneImage{PropertyMap{{"image_name", "maki-11"s}}};
+
+static const StubGeometryTileFeature emptyTileFeature{PropertyMap{}};
 
 float evaluate(PropertyValue<float> value, float zoom) {
     return value.evaluate(PropertyEvaluator<float>(PropertyEvaluationParameters(zoom), 0));
@@ -169,5 +165,56 @@ TEST(PropertyExpression, FormatSectionOverride) {
         EXPECT_TRUE(*override1 != *override2);
         EXPECT_TRUE(*override2 != *override3);
         EXPECT_TRUE(*override1 != *override4);
+    }
+}
+
+TEST(PropertyExpression, ImageExpression) {
+    const std::set<std::string> emptySet;
+    const std::set<std::string> availableImages = {"maki-11", "airport-11", "bicycle-15"};
+
+    // evaluation test without available images
+    {
+        PropertyExpression<expression::Image> propExpr(image(literal("airport-11")));
+        auto evaluatedImage = propExpr.evaluate(emptyTileFeature, emptySet, expression::Image());
+        EXPECT_FALSE(evaluatedImage.isAvailable());
+        EXPECT_EQ(evaluatedImage.id(), "airport-11"s);
+
+        PropertyExpression<expression::Image> ddPropExpr(image(get(literal("image_name"s))));
+        evaluatedImage = ddPropExpr.evaluate(oneImage, emptySet, expression::Image());
+        EXPECT_FALSE(evaluatedImage.isAvailable());
+        EXPECT_EQ(evaluatedImage.id(), "maki-11"s);
+
+        evaluatedImage = ddPropExpr.evaluate(emptyTileFeature, emptySet, expression::Image());
+        EXPECT_FALSE(evaluatedImage.isAvailable());
+        EXPECT_EQ(evaluatedImage.id(), ""s);
+    }
+
+    // evaluation test with available images
+    {
+        PropertyExpression<expression::Image> propExpr(image(literal("airport-11")));
+        auto evaluatedImage = propExpr.evaluate(emptyTileFeature, availableImages, expression::Image());
+        EXPECT_TRUE(evaluatedImage.isAvailable());
+        EXPECT_EQ(evaluatedImage.id(), "airport-11"s);
+
+        PropertyExpression<expression::Image> ddPropExpr(image(get(literal("image_name"s))));
+        evaluatedImage = ddPropExpr.evaluate(oneImage, availableImages, expression::Image());
+        EXPECT_TRUE(evaluatedImage.isAvailable());
+        EXPECT_EQ(evaluatedImage.id(), "maki-11"s);
+
+        evaluatedImage = ddPropExpr.evaluate(emptyTileFeature, availableImages, expression::Image());
+        EXPECT_FALSE(evaluatedImage.isAvailable());
+        EXPECT_EQ(evaluatedImage.id(), ""s);
+    }
+
+    // evaluation with zoom
+    {
+        auto expr = step(zoom(), image(literal("airport-11")), 18.0, image(literal("bicycle-15")));
+        PropertyExpression<expression::Image> propExpr(std::move(expr));
+        auto evaluatedImage = propExpr.evaluate(0.0, emptyTileFeature, availableImages, expression::Image());
+        EXPECT_TRUE(evaluatedImage.isAvailable());
+        EXPECT_EQ(evaluatedImage.id(), "airport-11"s);
+        evaluatedImage = propExpr.evaluate(18.0, emptyTileFeature, availableImages, expression::Image());
+        EXPECT_TRUE(evaluatedImage.isAvailable());
+        EXPECT_EQ(evaluatedImage.id(), "bicycle-15"s);
     }
 }

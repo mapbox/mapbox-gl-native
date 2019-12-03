@@ -1,6 +1,5 @@
 #import "MBXBenchAppDelegate.h"
 #import "MBXBenchViewController.h"
-#import <Mapbox/Mapbox.h>
 
 @implementation MBXBenchAppDelegate
 

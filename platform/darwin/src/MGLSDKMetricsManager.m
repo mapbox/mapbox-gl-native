@@ -18,6 +18,23 @@ NSString* MGLStringFromMetricType(MGLMetricType metricType) {
     return eventName;
 }
 
+// Taken verbatim from NXFreeArchInfo header documentation
+#if TARGET_OS_IOS
+static void MGLFreeArchInfo(const NXArchInfo *x)
+{
+    const NXArchInfo *p;
+
+    p = NXGetAllArchInfos();
+    while(p->name != NULL){
+        if(x == p)
+            return;
+        p++;
+    }
+    free((char *)x->description);
+    free((NXArchInfo *)x);
+}
+#endif
+
 @interface MGLMetricsManager() <MGLNetworkConfigurationMetricsDelegate>
 
 @property (strong, nonatomic) NSDictionary *metadata;
@@ -42,12 +59,30 @@ NSString* MGLStringFromMetricType(MGLMetricType metricType) {
                                 [UIScreen mainScreen].bounds.size.height];
         
         NSLocale *currentLocale = [NSLocale currentLocale];
-        NSString *country = [currentLocale objectForKey:NSLocaleCountryCode];
+        
+        NSString *country = [currentLocale objectForKey:NSLocaleCountryCode] ?: @"unknown";
         
         NSString *device = deviceName();
         
-        const NXArchInfo localArchInfo = *NXGetLocalArchInfo();
-        NSString *abi = [NSString stringWithUTF8String:localArchInfo.description];
+        NSString *abi = @"unknown";
+        
+        {
+            const NXArchInfo *localArchInfo = NXGetLocalArchInfo();
+        
+            if (localArchInfo) {
+                abi = @(localArchInfo->description);
+
+                NSProcessInfo *processInfo = [NSProcessInfo processInfo];
+
+                // Although NXFreeArchInfo appears to be weakly linked, it does
+                // not have the weak_import attribute, so check the OS version.
+                if (&NXFreeArchInfo && [processInfo isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion){10, 0, 0}]) {
+                    NXFreeArchInfo(localArchInfo);
+                } else {
+                    MGLFreeArchInfo(localArchInfo);
+                }
+            }
+        }
         
         NSString *ram = [NSString stringWithFormat:@"%llu", [NSProcessInfo processInfo].physicalMemory];
         

@@ -336,8 +336,8 @@ MGL_DEFINE_FEATURE_ATTRIBUTES_GETTER();
     featureCollection.reserve(self.shapes.count);
     for (MGLShape <MGLFeature> *feature in self.shapes) {
         auto geoJSONObject = feature.geoJSONObject;
-        MGLAssert(geoJSONObject.is<mbgl::Feature>(), @"Feature collection must only contain features.");
-        featureCollection.push_back(geoJSONObject.get<mbgl::Feature>());
+        MGLAssert(geoJSONObject.is<mbgl::GeoJSONFeature>(), @"Feature collection must only contain features.");
+        featureCollection.push_back(geoJSONObject.get<mbgl::GeoJSONFeature>());
     }
     return featureCollection;
 }
@@ -470,7 +470,7 @@ public:
         return shape;
     }
 
-    MGLShape <MGLFeature> * operator()(const mbgl::Feature &feature) const {
+    MGLShape <MGLFeature> * operator()(const mbgl::GeoJSONFeature &feature) const {
         MGLShape <MGLFeature> *shape = (MGLShape <MGLFeature> *)MGLFeatureFromMBGLFeature(feature);
         return shape;
     }
@@ -487,12 +487,20 @@ public:
 NSArray<MGLShape <MGLFeature> *> *MGLFeaturesFromMBGLFeatures(const std::vector<mbgl::Feature> &features) {
     NSMutableArray *shapes = [NSMutableArray arrayWithCapacity:features.size()];
     for (const auto &feature : features) {
+        [shapes addObject:MGLFeatureFromMBGLFeature(static_cast<mbgl::GeoJSONFeature>(feature))];
+    }
+    return shapes;
+}
+
+NSArray<MGLShape <MGLFeature> *> *MGLFeaturesFromMBGLFeatures(const std::vector<mbgl::GeoJSONFeature> &features) {
+    NSMutableArray *shapes = [NSMutableArray arrayWithCapacity:features.size()];
+    for (const auto &feature : features) {
         [shapes addObject:MGLFeatureFromMBGLFeature(feature)];
     }
     return shapes;
 }
 
-id <MGLFeature> MGLFeatureFromMBGLFeature(const mbgl::Feature &feature) {
+id <MGLFeature> MGLFeatureFromMBGLFeature(const mbgl::GeoJSONFeature &feature) {
     NSMutableDictionary *attributes = [NSMutableDictionary dictionaryWithCapacity:feature.properties.size()];
     for (auto &pair : feature.properties) {
         auto &value = pair.second;
@@ -515,7 +523,7 @@ MGLShape* MGLShapeFromGeoJSON(const mapbox::geojson::geojson &geojson) {
     return shape;
 }
 
-mbgl::Feature mbglFeature(mbgl::Feature feature, id identifier, NSDictionary *attributes)
+mbgl::GeoJSONFeature mbglFeature(mbgl::GeoJSONFeature feature, id identifier, NSDictionary *attributes)
 {
     if (identifier) {
         NSExpression *identifierExpression = [NSExpression expressionForConstantValue:identifier];

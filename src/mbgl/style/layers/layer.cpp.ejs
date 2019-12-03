@@ -2,6 +2,7 @@
   const type = locals.type;
   const layoutProperties = locals.layoutProperties;
   const paintProperties = locals.paintProperties;
+  const allProperties = paintProperties.concat(layoutProperties);
 -%>
 // This file is generated. Edit scripts/generate-style-code.js, then run `make style-code`.
 
@@ -27,13 +28,20 @@ let defaults = { caps: { 'Source':   'NotRequired',
                          'Pass3D':   'NotRequired',
                          'Layout':   'NotRequired',
                          'FadingTiles': 'NotRequired',
-                         'CrossTileIndex': 'NotRequired'
+                         'CrossTileIndex': 'NotRequired',
+                         'TileKind' : 'NotRequired'
                  },
                  require: function(cap) {
-                             let copy = Object.assign({}, this);
-                             copy.caps = Object.assign({}, this.caps);
-                             copy.caps[cap] = 'Required';
-                             return copy;
+                            let copy = Object.assign({}, this);
+                            copy.caps = Object.assign({}, this.caps);
+                            copy.caps[cap] = 'Required';
+                            return copy;
+                 },
+                 set: function(cap, value) {
+                            let copy = Object.assign({}, this);
+                            copy.caps = Object.assign({}, this.caps);
+                            copy.caps[cap] = value;
+                            return copy;
                  },
                  finalize: function() {
                     return Object.keys(this.caps).reduce((acc, key) => {
@@ -46,30 +54,45 @@ let defaults = { caps: { 'Source':   'NotRequired',
 layerCapabilities['background']     = defaults.finalize();
 layerCapabilities['fill']           = defaults.require('Source')
                                               .require('Layout')
+                                              .set('TileKind', 'Geometry')
                                               .finalize();
 layerCapabilities['fill-extrusion'] = defaults.require('Source')
                                               .require('Pass3D')
                                               .require('Layout')
+                                              .set('TileKind', 'Geometry')
                                               .finalize();
 layerCapabilities['hillshade']      = defaults.require('Source')
                                               .require('Pass3D')
+                                              .set('TileKind', 'RasterDEM')
                                               .finalize();
 layerCapabilities['symbol']         = defaults.require('Source')
                                               .require('Layout')
                                               .require('FadingTiles')
                                               .require('CrossTileIndex')
+                                              .set('TileKind', 'Geometry')
                                               .finalize();
-layerCapabilities['circle']         = defaults.require('Source').finalize();
+layerCapabilities['circle']         = defaults.require('Source').set('TileKind', 'Geometry').finalize();
 layerCapabilities['line']           = layerCapabilities['fill'];
-layerCapabilities['heatmap']        = layerCapabilities['hillshade'];
-layerCapabilities['raster']         = layerCapabilities['circle'];
+layerCapabilities['heatmap']        = defaults.require('Source')
+                                              .require('Pass3D')
+                                              .set('TileKind', 'Geometry')
+                                              .finalize();
+layerCapabilities['raster']         = defaults.require('Source').set('TileKind', 'Raster').finalize();
+
+// Splits lines that are over 120 characters at the firts occurance of '='.
+const split120Line = line => {
+    const ident = '           ';
+    if (line.length + ident.length > 120) {
+        return line.replace('=', `=\n${ident}`);
+    }
+    return line;
+};
+
 %>
 // static
 const LayerTypeInfo* <%- camelize(type) %>Layer::Impl::staticTypeInfo() noexcept {
-    const static LayerTypeInfo typeInfo
-        {"<%- type %>",
-          <%-`${layerCapabilities[type].map(cap => `LayerTypeInfo::${cap}`).join(',\n          ')}` %>
-        };
+    const static LayerTypeInfo typeInfo{"<%- type %>",
+                                        <%-`${layerCapabilities[type].map(cap => `LayerTypeInfo::${cap}`).join(',\n                                        ')}` %>};
     return &typeInfo;
 }
 
@@ -143,7 +166,7 @@ void <%- camelize(type) %>Layer::set<%- camelize(property.name) %>(const <%- pro
     std::string rawValue = R"JSON(<%- JSON.stringify(property.default) %>)JSON";
     return *conversion::convertJSON<<%- propertyValueType(property)%>>(rawValue, error);
 <% } else { -%>
-    return { <%- defaultValue(property) %> };
+    return {<%- defaultValue(property) %>};
 <% } -%>
 }
 
@@ -176,127 +199,117 @@ TransitionOptions <%- camelize(type) %>Layer::get<%- camelize(property.name) %>T
 
 using namespace conversion;
 
-optional<Error> <%- camelize(type) %>Layer::setPaintProperty(const std::string& name, const Convertible& value) {
-    enum class Property {
+namespace {
+
+enum class Property : uint8_t {
 <% for (const property of paintProperties) { -%>
-        <%- camelize(property.name) %>,
+    <%- camelize(property.name) %>,
 <% } -%>
 <% for (const property of paintProperties) { -%>
-        <%- camelize(property.name) %>Transition,
+    <%- camelize(property.name) %>Transition,
 <% } -%>
-    };
+<% for (const property of layoutProperties) { -%>
+    <%- camelize(property.name) %>,
+<% } -%>
+};
 
-    MAPBOX_ETERNAL_CONSTEXPR const auto properties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>({
-        <%- paintProperties.map(p => `{ "${p.name}", mbgl::underlying_type(Property::${camelize(p.name)}) }`).join(',\n        ') %>,
-        <%- paintProperties.map(p => `{ "${p.name}-transition", mbgl::underlying_type(Property::${camelize(p.name)}Transition) }`).join(',\n        ') %>
-    });
+template <typename T>
+constexpr uint8_t toUint8(T t) noexcept {
+    return uint8_t(mbgl::underlying_type(t));
+}
 
-    const auto it = properties.find(name.c_str());
-    if (it == properties.end()) {
-        return Error { "layer doesn't support this property" };
+MAPBOX_ETERNAL_CONSTEXPR const auto layerProperties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>(
+    {<%- paintProperties.map(p => `{"${p.name}", toUint8(Property::${camelize(p.name)})}`).join(',\n     ') %>,
+<% if (!layoutProperties.length) { -%>
+     <%- paintProperties.map(p => `{"${p.name}-transition", toUint8(Property::${camelize(p.name)}Transition)}`).join(',\n     ') %>});
+<% } else { -%>
+     <%- paintProperties.map(p => `{"${p.name}-transition", toUint8(Property::${camelize(p.name)}Transition)}`).join(',\n     ') %>,
+     <%- layoutProperties.map(p => `{"${p.name}", toUint8(Property::${camelize(p.name)})}`).join(',\n     ') %>});
+<% } -%>
+} // namespace
+
+optional<Error> <%- camelize(type) %>Layer::setProperty(const std::string& name, const Convertible& value) {
+    const auto it = layerProperties.find(name.c_str());
+    if (it == layerProperties.end()) {
+        if (name == "visibility") return setVisibility(value);
+        return Error{"layer doesn't support this property"};
     }
 
     auto property = static_cast<Property>(it->second);
 
-    <%
-        const paintConversions = {};
-        for (const property of paintProperties) {
-            const dataDriven = property['property-type'] === 'data-driven' || property['property-type'] === 'cross-faded-data-driven';
-            const convertTokens = property.name === 'icon-image' || property.name === 'text-field';
-            const conversion = `optional<${propertyValueType(property)}> typedValue = convert<${propertyValueType(property)}>(value, error, ${dataDriven}, ${convertTokens})`;
-            paintConversions[conversion] = paintConversions[conversion] || [];
-            paintConversions[conversion].push(property);
-        }
-    -%>
-    <% for (const key in paintConversions) {
-        const properties = paintConversions[key];
-    %>
-    if (<%- properties.map(p => `property == Property::${camelize(p.name)}`).join(' || ') %>) {
+<%
+    const conversions = {};
+    for (const property of allProperties) {
+        const dataDriven = property['property-type'] === 'data-driven' || property['property-type'] === 'cross-faded-data-driven';
+        const convertTokens = property.name === 'icon-image' || property.name === 'text-field';
+        const conversion = `const auto& typedValue = convert<${propertyValueType(property)}>(value, error, ${dataDriven}, ${convertTokens})`;
+        conversions[conversion] = conversions[conversion] || [];
+        conversions[conversion].push(property);
+    }
+    const reduceConditions = (total, e) => {
+        const splitter = ' || ';
+        const ident = '        ';
+        let totalLength = total.length + e.length + ident.length + splitter.length + 3 /* ||*/;
+        const lastCR = total.lastIndexOf('\n');
+        const length = (lastCR == -1) ? totalLength : (totalLength - (ident.length + lastCR));
+        return total + (length <= 120 ? splitter : ` ||\n${ident}`) + e;
+    }
+-%>
+<% for (const key in conversions) {
+    const properties = conversions[key];
+-%>
+    if (<%- properties.map(p => `property == Property::${camelize(p.name)}`).reduce(reduceConditions) %>) {
         Error error;
-        <%- key %>;
+        <%- split120Line(key) %>;
         if (!typedValue) {
             return error;
         }
-        <% if (properties.length == 1) { %>
+<% if (properties.length == 1) { %>
         set<%- camelize(properties[0].name) %>(*typedValue);
         return nullopt;
-        <% } else for (const property of properties) { %>
+<% } else for (const property of properties) { %>
         if (property == Property::<%- camelize(property.name) %>) {
             set<%- camelize(property.name) %>(*typedValue);
             return nullopt;
         }
-        <% } %>
+<% } -%>
     }
-    <% } %>
-
+<% } %>
     Error error;
     optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
     if (!transition) {
         return error;
     }
-    <% for (const property of paintProperties) { %>
+<% for (const property of paintProperties) { %>
     if (property == Property::<%- camelize(property.name) %>Transition) {
         set<%- camelize(property.name) %>Transition(*transition);
         return nullopt;
     }
-    <% } %>
-
-    return Error { "layer doesn't support this property" };
+<% } %>
+    return Error{"layer doesn't support this property"};
 }
 
-optional<Error> <%- camelize(type) %>Layer::setLayoutProperty(const std::string& name, const Convertible& value) {
-    if (name == "visibility") {
-        return Layer::setVisibility(value);
+StyleProperty <%- camelize(type) %>Layer::getProperty(const std::string& name) const {
+    const auto it = layerProperties.find(name.c_str());
+    if (it == layerProperties.end()) {
+        return {};
     }
-<% if (layoutProperties.length) { -%>
-    enum class Property {
-<% for (const property of layoutProperties) { -%>
-        <%- camelize(property.name) %>,
+
+    switch (static_cast<Property>(it->second)) {
+<% for (const property of paintProperties) { -%>
+        case Property::<%- camelize(property.name) %>:
+            return makeStyleProperty(get<%- camelize(property.name) %>());
 <% } -%>
-    };
-    MAPBOX_ETERNAL_CONSTEXPR const auto properties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>({
-        <%- layoutProperties.map(p => `{ "${p.name}", mbgl::underlying_type(Property::${camelize(p.name)}) }`).join(',\n        ') %>
-    });
-
-    const auto it = properties.find(name.c_str());
-    if (it == properties.end()) {
-        return Error { "layer doesn't support this property" };
+<% for (const property of paintProperties) { -%>
+        case Property::<%- camelize(property.name) %>Transition:
+            return makeStyleProperty(get<%- camelize(property.name) %>Transition());
+<% } -%>
+<% for (const property of layoutProperties) { -%>
+        case Property::<%- camelize(property.name) %>:
+            return makeStyleProperty(get<%- camelize(property.name) %>());
+<% } -%>
     }
-
-    auto property = static_cast<Property>(it->second);
-
-    <%
-        const layoutConversions = {};
-        for (const property of layoutProperties) {
-            const dataDriven = property['property-type'] === 'data-driven' || property['property-type'] === 'cross-faded-data-driven';
-            const convertTokens = property.name === 'icon-image' || property.name === 'text-field';
-            const conversion = `optional<${propertyValueType(property)}> typedValue = convert<${propertyValueType(property)}>(value, error, ${dataDriven}, ${convertTokens})`;
-            layoutConversions[conversion] = layoutConversions[conversion] || [];
-            layoutConversions[conversion].push(property);
-        }
-    -%>
-    <% for (const key in layoutConversions) {
-        const properties = layoutConversions[key];
-    %>
-    if (<%- properties.map(p => `property == Property::${camelize(p.name)}`).join(' || ') %>) {
-        Error error;
-        <%- key %>;
-        if (!typedValue) {
-            return error;
-        }
-        <% if (properties.length == 1) { %>
-        set<%- camelize(properties[0].name) %>(*typedValue);
-        return nullopt;
-        <% } else for (const property of properties) { %>
-        if (property == Property::<%- camelize(property.name) %>) {
-            set<%- camelize(property.name) %>(*typedValue);
-            return nullopt;
-        }
-        <% } %>
-    }
-    <% } %>
-<% } /* if (layoutProperties.length) */ %>
-    return Error { "layer doesn't support this property" };
+    return {};
 }
 
 Mutable<Layer::Impl> <%- camelize(type) %>Layer::mutableBaseImpl() const {

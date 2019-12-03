@@ -68,6 +68,10 @@ void TilePyramid::update(const std::vector<Immutable<style::LayerProperties>>& l
     if (!needsRendering) {
         if (!needsRelayout) {
             for (auto& entry : tiles) {
+                // These tiles are invisible, we set optional necessity
+                // for them and thus suppress network requests on
+                // tiles expiration (see `OnlineFileRequest`).
+                entry.second->setNecessity(TileNecessity::Optional);
                 cache.add(entry.first, std::move(entry.second));
             }
         }
@@ -278,12 +282,10 @@ void TilePyramid::handleWrapJump(float lng) {
     }
 }
 
-
-std::unordered_map<std::string, std::vector<Feature>> TilePyramid::queryRenderedFeatures(const ScreenLineString& geometry,
-                                           const TransformState& transformState,
-                                           const std::unordered_map<std::string, const RenderLayer*>& layers,
-                                           const RenderedQueryOptions& options,
-                                           const mat4& projMatrix) const {
+std::unordered_map<std::string, std::vector<Feature>> TilePyramid::queryRenderedFeatures(
+    const ScreenLineString& geometry, const TransformState& transformState,
+    const std::unordered_map<std::string, const RenderLayer*>& layers, const RenderedQueryOptions& options,
+    const mat4& projMatrix, const SourceFeatureState& featureState) const {
     std::unordered_map<std::string, std::vector<Feature>> result;
     if (renderedTiles.empty() || geometry.empty()) {
         return result;
@@ -331,12 +333,8 @@ std::unordered_map<std::string, std::vector<Feature>> TilePyramid::queryRendered
             tileSpaceQueryGeometry.push_back(TileCoordinate::toGeometryCoordinate(id, c));
         }
 
-        tile.queryRenderedFeatures(result,
-                                   tileSpaceQueryGeometry,
-                                   transformState,
-                                   layers,
-                                   options,
-                                   projMatrix);
+        tile.queryRenderedFeatures(result, tileSpaceQueryGeometry, transformState, layers, options, projMatrix,
+                                   featureState);
     }
 
     return result;

@@ -4,15 +4,16 @@
 #include <mbgl/tile/geojson_tile.hpp>
 #include <mbgl/tile/tile_loader_impl.hpp>
 
-#include <mbgl/util/run_loop.hpp>
+#include <mbgl/annotation/annotation_manager.hpp>
 #include <mbgl/map/transform.hpp>
+#include <mbgl/renderer/image_manager.hpp>
 #include <mbgl/renderer/tile_parameters.hpp>
-#include <mbgl/style/style.hpp>
 #include <mbgl/style/layers/circle_layer.hpp>
 #include <mbgl/style/layers/circle_layer_impl.hpp>
-#include <mbgl/annotation/annotation_manager.hpp>
-#include <mbgl/renderer/image_manager.hpp>
+#include <mbgl/style/sources/geojson_source.hpp>
+#include <mbgl/style/style.hpp>
 #include <mbgl/text/glyph_manager.hpp>
+#include <mbgl/util/run_loop.hpp>
 
 #include <memory>
 
@@ -43,6 +44,29 @@ public:
     };
 };
 
+namespace {
+
+class FakeGeoJSONData : public GeoJSONData {
+public:
+    FakeGeoJSONData(TileFeatures features_) : features(std::move(features_)) {}
+
+    void getTile(const CanonicalTileID&, const std::function<void(TileFeatures)>& fn) final {
+        assert(fn);
+        fn(features);
+    }
+
+    Features getChildren(const std::uint32_t) final { return {}; }
+
+    Features getLeaves(const std::uint32_t, const std::uint32_t, const std::uint32_t) final { return {}; }
+
+    std::uint8_t getClusterExpansionZoom(std::uint32_t) final { return 0; }
+
+private:
+    TileFeatures features;
+};
+
+} // namespace
+
 TEST(GeoJSONTile, Issue7648) {
     GeoJSONTileTest test;
 
@@ -50,8 +74,8 @@ TEST(GeoJSONTile, Issue7648) {
 
     mapbox::feature::feature_collection<int16_t> features;
     features.push_back(mapbox::feature::feature<int16_t> { mapbox::geometry::point<int16_t>(0, 0) });
-
-    GeoJSONTile tile(OverscaledTileID(0, 0, 0), "source", test.tileParameters, features);
+    auto data = std::make_shared<FakeGeoJSONData>(std::move(features));
+    GeoJSONTile tile(OverscaledTileID(0, 0, 0), "source", test.tileParameters, data);
     Immutable<LayerProperties> layerProperties = makeMutable<CircleLayerProperties>(staticImmutableCast<CircleLayer::Impl>(layer.baseImpl));
     StubTileObserver observer;
     observer.tileChanged = [&] (const Tile&) {
@@ -68,7 +92,7 @@ TEST(GeoJSONTile, Issue7648) {
         test.loop.runOnce();
     }
 
-    tile.updateData(features);
+    tile.updateData(data);
     while (!tile.isComplete()) {
         test.loop.runOnce();
     }
@@ -83,8 +107,8 @@ TEST(GeoJSONTile, Issue9927) {
 
     mapbox::feature::feature_collection<int16_t> features;
     features.push_back(mapbox::feature::feature<int16_t> { mapbox::geometry::point<int16_t>(0, 0) });
-
-    GeoJSONTile tile(OverscaledTileID(0, 0, 0), "source", test.tileParameters, features);
+    auto data = std::make_shared<FakeGeoJSONData>(std::move(features));
+    GeoJSONTile tile(OverscaledTileID(0, 0, 0), "source", test.tileParameters, data);
 
     Immutable<LayerProperties> layerProperties = makeMutable<CircleLayerProperties>(staticImmutableCast<CircleLayer::Impl>(layer.baseImpl));
     std::vector<Immutable<LayerProperties>> layers { layerProperties };

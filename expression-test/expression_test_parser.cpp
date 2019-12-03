@@ -118,6 +118,8 @@ style::expression::type::Type stringToType(const std::string& type) {
         return type::Value;
     } else if (type == "formatted"s) {
         return type::Formatted;
+    } else if (type == "resolvedImage"s) {
+        return type::Image;
     }
 
     // Should not reach.
@@ -252,6 +254,16 @@ bool parseInputs(const JSValue& inputsValue, TestData& data) {
             heatmapDensity = evaluationContext["heatmapDensity"].GetDouble();
         }
 
+        // Parse availableImages
+        std::set<std::string> availableImages;
+        if (evaluationContext.HasMember("availableImages")) {
+            assert(evaluationContext["availableImages"].IsArray());
+            for (const auto& image : evaluationContext["availableImages"].GetArray()) {
+                assert(image.IsString());
+                availableImages.emplace(toString(image));
+            }
+        }
+
         // Parse feature properties
         Feature feature(mapbox::geometry::point<double>(0.0, 0.0));
         const auto& featureObject = input[1].GetObject();
@@ -270,7 +282,8 @@ bool parseInputs(const JSValue& inputsValue, TestData& data) {
             feature.id = mapbox::geojson::convert<mapbox::feature::identifier>(featureObject["id"]);
         }
 
-        data.inputs.emplace_back(std::move(zoom), std::move(heatmapDensity), std::move(feature));
+        data.inputs.emplace_back(
+            std::move(zoom), std::move(heatmapDensity), std::move(availableImages), std::move(feature));
     }
     return true;
 }
@@ -439,33 +452,7 @@ optional<Value> toValue(const expression::Value& exprValue) {
             std::vector<Value> color { double(c.r), double(c.g), double(c.b), double(c.a) };
             return {Value{std::move(color)}};
         },
-        [](const expression::Formatted& formatted) -> optional<Value> {
-            std::unordered_map<std::string, Value> serialized;
-            std::vector<Value> sections;
-            for (const auto& section : formatted.sections) {
-                std::unordered_map<std::string, Value> serializedSection;
-                serializedSection.emplace("text", section.text);
-                if (section.fontScale) {
-                    serializedSection.emplace("scale", *section.fontScale);
-                } else {
-                    serializedSection.emplace("scale", NullValue());
-                }
-                if (section.fontStack) {
-                    std::string fontStackString;
-                    serializedSection.emplace("fontStack", fontStackToString(*section.fontStack));
-                } else {
-                    serializedSection.emplace("fontStack", NullValue());
-                }
-                if (section.textColor) {
-                    serializedSection.emplace("textColor", section.textColor->toObject());
-                } else {
-                    serializedSection.emplace("textColor", NullValue());
-                }
-                sections.emplace_back(serializedSection);
-            }
-            serialized.emplace("sections", sections);
-            return {Value{std::move(serialized)}};
-        },
+        [](const expression::Formatted& formatted) -> optional<Value> { return {formatted.toObject()}; },
         [](const std::vector<expression::Value>& values) -> optional<Value> {
             std::vector<Value> mbglValues;
             for (const auto& value : values) {

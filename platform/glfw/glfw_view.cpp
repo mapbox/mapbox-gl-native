@@ -4,22 +4,24 @@
 #include "ny_route.hpp"
 
 #include <mbgl/annotation/annotation.hpp>
-#include <mbgl/style/style.hpp>
-#include <mbgl/style/sources/custom_geometry_source.hpp>
-#include <mbgl/style/image.hpp>
-#include <mbgl/style/transition_options.hpp>
-#include <mbgl/style/layers/fill_extrusion_layer.hpp>
-#include <mbgl/style/layers/line_layer.hpp>
-#include <mbgl/style/expression/dsl.hpp>
-#include <mbgl/util/logging.hpp>
-#include <mbgl/util/platform.hpp>
-#include <mbgl/util/string.hpp>
-#include <mbgl/util/chrono.hpp>
-#include <mbgl/util/geo.hpp>
-#include <mbgl/renderer/renderer.hpp>
 #include <mbgl/gfx/backend.hpp>
 #include <mbgl/gfx/backend_scope.hpp>
 #include <mbgl/map/camera.hpp>
+#include <mbgl/renderer/renderer.hpp>
+#include <mbgl/style/expression/dsl.hpp>
+#include <mbgl/style/image.hpp>
+#include <mbgl/style/layers/fill_extrusion_layer.hpp>
+#include <mbgl/style/layers/fill_layer.hpp>
+#include <mbgl/style/layers/line_layer.hpp>
+#include <mbgl/style/sources/custom_geometry_source.hpp>
+#include <mbgl/style/sources/geojson_source.hpp>
+#include <mbgl/style/style.hpp>
+#include <mbgl/style/transition_options.hpp>
+#include <mbgl/util/chrono.hpp>
+#include <mbgl/util/geo.hpp>
+#include <mbgl/util/logging.hpp>
+#include <mbgl/util/platform.hpp>
+#include <mbgl/util/string.hpp>
 
 #include <mapbox/cheap_ruler.hpp>
 #include <mapbox/geometry.hpp>
@@ -286,11 +288,10 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
             break;
         case GLFW_KEY_D: {
             static const std::vector<mbgl::LatLngBounds> bounds = {
-                mbgl::LatLngBounds::hull(mbgl::LatLng { -45.0, -170.0 }, mbgl::LatLng { 45.0, 170.0 }),  // inside
-                mbgl::LatLngBounds::hull(mbgl::LatLng { -45.0, -200.0 }, mbgl::LatLng { 45.0, -160.0 }), // left IDL
-                mbgl::LatLngBounds::hull(mbgl::LatLng { -45.0, 160.0 }, mbgl::LatLng { 45.0, 200.0 }),   // right IDL
-                mbgl::LatLngBounds::unbounded()
-            };
+                mbgl::LatLngBounds::hull(mbgl::LatLng{-45.0, -170.0}, mbgl::LatLng{45.0, 170.0}),  // inside
+                mbgl::LatLngBounds::hull(mbgl::LatLng{-45.0, -200.0}, mbgl::LatLng{45.0, -160.0}), // left IDL
+                mbgl::LatLngBounds::hull(mbgl::LatLng{-45.0, 160.0}, mbgl::LatLng{45.0, 200.0}),   // right IDL
+                mbgl::LatLngBounds()};
             static size_t nextBound = 0u;
             static mbgl::AnnotationID boundAnnotationID = std::numeric_limits<mbgl::AnnotationID>::max();
 
@@ -299,7 +300,7 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
 
             view->map->setBounds(mbgl::BoundOptions().withLatLngBounds(bound));
 
-            if (bound == mbgl::LatLngBounds::unbounded()) {
+            if (bound == mbgl::LatLngBounds()) {
                 view->map->removeAnnotation(boundAnnotationID);
                 boundAnnotationID = std::numeric_limits<mbgl::AnnotationID>::max();
             } else {
@@ -323,6 +324,52 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
         case GLFW_KEY_T:
             view->toggleCustomSource();
             break;
+        case GLFW_KEY_F: {
+            using namespace mbgl;
+            using namespace mbgl::style;
+            using namespace mbgl::style::expression::dsl;
+
+            auto &style = view->map->getStyle();
+            if (!style.getSource("states")) {
+                std::string url = "https://docs.mapbox.com/mapbox-gl-js/assets/us_states.geojson";
+                auto source = std::make_unique<GeoJSONSource>("states");
+                source->setURL(url);
+                style.addSource(std::move(source));
+
+                mbgl::CameraOptions cameraOptions;
+                cameraOptions.center = mbgl::LatLng{42.619626, -103.523181};
+                cameraOptions.zoom = 3;
+                cameraOptions.pitch = 0;
+                cameraOptions.bearing = 0;
+                view->map->jumpTo(cameraOptions);
+            }
+
+            auto layer = style.getLayer("state-fills");
+            if (!layer) {
+                auto fillLayer = std::make_unique<FillLayer>("state-fills", "states");
+                fillLayer->setFillColor(mbgl::Color{0.0, 0.0, 1.0, 0.5});
+                fillLayer->setFillOpacity(PropertyExpression<float>(
+                    createExpression(R"(["case", ["boolean", ["feature-state", "hover"], false], 1, 0.5])")));
+                style.addLayer(std::move(fillLayer));
+            } else {
+                layer->setVisibility(layer->getVisibility() == mbgl::style::VisibilityType::Visible
+                                         ? mbgl::style::VisibilityType::None
+                                         : mbgl::style::VisibilityType::Visible);
+            }
+
+            layer = style.getLayer("state-borders");
+            if (!layer) {
+                auto borderLayer = std::make_unique<LineLayer>("state-borders", "states");
+                borderLayer->setLineColor(mbgl::Color{0.0, 0.0, 1.0, 1.0});
+                borderLayer->setLineWidth(PropertyExpression<float>(
+                    createExpression(R"(["case", ["boolean", ["feature-state", "hover"], false], 2, 1])")));
+                style.addLayer(std::move(borderLayer));
+            } else {
+                layer->setVisibility(layer->getVisibility() == mbgl::style::VisibilityType::Visible
+                                         ? mbgl::style::VisibilityType::None
+                                         : mbgl::style::VisibilityType::Visible);
+            }
+        } break;
         }
     }
 
@@ -558,6 +605,41 @@ void GLFWView::onMouseMove(GLFWwindow *window, double x, double y) {
     }
     view->lastX = x;
     view->lastY = y;
+
+    auto &style = view->map->getStyle();
+    if (style.getLayer("state-fills")) {
+        auto screenCoordinate = mbgl::ScreenCoordinate{view->lastX, view->lastY};
+        const mbgl::RenderedQueryOptions queryOptions({{{"state-fills"}}, {}});
+        auto result = view->rendererFrontend->getRenderer()->queryRenderedFeatures(screenCoordinate, queryOptions);
+        using namespace mbgl;
+        FeatureState newState;
+
+        if (result.size() > 0) {
+            FeatureIdentifier id = result[0].id;
+            optional<std::string> idStr = featureIDtoString(id);
+
+            if (idStr) {
+                if (view->featureID && (*view->featureID != *idStr)) {
+                    newState["hover"] = false;
+                    view->rendererFrontend->getRenderer()->setFeatureState("states", {}, *view->featureID, newState);
+                    view->featureID = nullopt;
+                }
+
+                if (!view->featureID) {
+                    newState["hover"] = true;
+                    view->featureID = featureIDtoString(id);
+                    view->rendererFrontend->getRenderer()->setFeatureState("states", {}, *view->featureID, newState);
+                }
+            }
+        } else {
+            if (view->featureID) {
+                newState["hover"] = false;
+                view->rendererFrontend->getRenderer()->setFeatureState("states", {}, *view->featureID, newState);
+                view->featureID = nullopt;
+            }
+        }
+        view->invalidate();
+    }
 }
 
 void GLFWView::onWindowFocus(GLFWwindow *window, int focused) {

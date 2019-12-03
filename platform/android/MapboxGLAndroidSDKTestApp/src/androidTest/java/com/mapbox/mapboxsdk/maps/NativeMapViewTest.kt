@@ -223,6 +223,23 @@ class NativeMapViewTest : AppCenter() {
 
     @Test
     @UiThreadTest
+    fun testPrefetchZoomDelta() {
+      val expected = 2
+      nativeMapView.prefetchZoomDelta = 2
+      val actual = nativeMapView.prefetchZoomDelta
+      assertEquals("Prefetch zoom delta should match", expected, actual)
+    }
+
+    @Test
+    @UiThreadTest
+    fun testPrefetchZoomDeltaDefault() {
+      val expected = 4
+      val actual = nativeMapView.prefetchZoomDelta
+      assertEquals("Prefetch zoom delta should match", expected, actual)
+    }
+
+    @Test
+    @UiThreadTest
     fun testSetContentPadding() {
         val expected = doubleArrayOf(1.0, 2.0, 3.0, 4.0)
         nativeMapView.contentPadding = expected
@@ -254,7 +271,7 @@ class NativeMapViewTest : AppCenter() {
     @Test
     @UiThreadTest
     fun testGetProjectedMetersAtLatitude() {
-        val expected = 38986.83510557766
+        val expected = 77973.67021115532
         val actual = nativeMapView.getMetersPerPixelAtLatitude(5.0)
         assertEquals("Get projected meters should match", expected, actual)
     }

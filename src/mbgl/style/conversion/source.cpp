@@ -86,8 +86,25 @@ static optional<std::unique_ptr<Source>> convertVectorSource(const std::string& 
     if (!urlOrTileset) {
         return nullopt;
     }
-
-    return { std::make_unique<VectorSource>(id, std::move(*urlOrTileset)) };
+    auto maxzoomValue = objectMember(value, "maxzoom");
+    optional<float> maxzoom;
+    if (maxzoomValue) {
+        maxzoom = toNumber(*maxzoomValue);
+        if (!maxzoom || *maxzoom < 0 || *maxzoom > std::numeric_limits<uint8_t>::max()) {
+            error.message = "invalid maxzoom";
+            return nullopt;
+        }
+    }
+    auto minzoomValue = objectMember(value, "minzoom");
+    optional<float> minzoom;
+    if (minzoomValue) {
+        minzoom = toNumber(*minzoomValue);
+        if (!minzoom || *minzoom < 0 || *minzoom > std::numeric_limits<uint8_t>::max()) {
+            error.message = "invalid minzoom";
+            return nullopt;
+        }
+    }
+    return {std::make_unique<VectorSource>(id, std::move(*urlOrTileset), std::move(maxzoom), std::move(minzoom))};
 }
 
 static optional<std::unique_ptr<Source>> convertGeoJSONSource(const std::string& id,
@@ -99,19 +116,19 @@ static optional<std::unique_ptr<Source>> convertGeoJSONSource(const std::string&
         return nullopt;
     }
 
-    optional<GeoJSONOptions> options = convert<GeoJSONOptions>(value, error);
-    if (!options) {
-        return nullopt;
+    Immutable<GeoJSONOptions> options = GeoJSONOptions::defaultOptions();
+    if (optional<GeoJSONOptions> converted = convert<GeoJSONOptions>(value, error)) {
+        options = makeMutable<GeoJSONOptions>(std::move(*converted));
     }
 
-    auto result = std::make_unique<GeoJSONSource>(id, *options);
+    auto result = std::make_unique<GeoJSONSource>(id, std::move(options));
 
     if (isObject(*dataValue)) {
         optional<GeoJSON> geoJSON = convert<GeoJSON>(*dataValue, error);
         if (!geoJSON) {
             return nullopt;
         }
-        result->setGeoJSON(std::move(*geoJSON));
+        result->setGeoJSON(*geoJSON);
     } else if (toString(*dataValue)) {
         result->setURL(*toString(*dataValue));
     } else {

@@ -4,6 +4,9 @@
 *.gcno
 *.gcda
 *~
+**/actual.png
+**/diff.png
+render-test/index.html
 offline.db
 new_offline.db
 xcuserdata
@@ -11,6 +14,7 @@ xcuserdata
 /platform/node/test/diff
 /mason_packages
 /build
+/next/build
 /lib
 /test/node_modules
 /test/fixtures/*/*_actual.*
@@ -18,8 +22,6 @@ xcuserdata
 /test/fixtures/api/2.png
 /test/fixtures/offline_database/offline.db
 /test/fixtures/offline_database/offline.db-*
-/test/fixtures/**/actual.png
-/test/fixtures/**/diff.png
 /test/output
 /node_modules
 /platform/ios/benchmark/assets/glyphs/DIN*
@@ -35,6 +37,16 @@ test/fixtures/storage/assets.zip
 /vendor/.cache
 buck-out
 .buckd
+
+# Android RenderTestRunner
+render-test/android/.*
+render-test/android/app/build/
+render-test/android/app/src/main/assets/data.zip
+render-test/android/local.properties
+render-test/android/app/.*
+render-test/android/package.json
+render-test/android/app/app.iml
+render-test/android/android.iml
 
 # Generated file from npm/yarn
 package-lock.json

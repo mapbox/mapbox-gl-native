@@ -1,15 +1,16 @@
 #include <mbgl/annotation/annotation_manager.hpp>
 #include <mbgl/annotation/annotation_source.hpp>
 #include <mbgl/annotation/annotation_tile.hpp>
-#include <mbgl/annotation/symbol_annotation_impl.hpp>
-#include <mbgl/annotation/line_annotation_impl.hpp>
 #include <mbgl/annotation/fill_annotation_impl.hpp>
+#include <mbgl/annotation/line_annotation_impl.hpp>
+#include <mbgl/annotation/symbol_annotation_impl.hpp>
 #include <mbgl/layermanager/layer_manager.hpp>
-#include <mbgl/style/style.hpp>
-#include <mbgl/style/style_impl.hpp>
+#include <mbgl/style/expression/dsl.hpp>
+#include <mbgl/style/expression/image.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
-#include <mbgl/style/expression/dsl.hpp>
+#include <mbgl/style/style.hpp>
+#include <mbgl/style/style_impl.hpp>
 
 #include <boost/function_output_iterator.hpp>
 
@@ -184,7 +185,8 @@ void AnnotationManager::updateStyle() {
 
         using namespace expression::dsl;
         layer->setSourceLayer(PointLayerID);
-        layer->setIconImage(PropertyExpression<std::string>(concat(vec(literal(SourceID + "."), toString(get("sprite"))))));
+        layer->setIconImage(PropertyExpression<expression::Image>(
+            image(concat(vec(literal(SourceID + "."), toString(get("sprite")))))));
         layer->setIconAllowOverlap(true);
         layer->setIconIgnorePlacement(true);
 

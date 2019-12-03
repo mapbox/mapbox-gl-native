@@ -1,5 +1,7 @@
 #include "file_source.hpp"
+
 #include "attach_env.hpp"
+#include "mapbox.hpp"
 
 #include <mbgl/actor/actor.hpp>
 #include <mbgl/actor/scheduler.hpp>
@@ -14,8 +16,15 @@
 namespace mbgl {
 
 std::shared_ptr<FileSource> FileSource::createPlatformFileSource(const ResourceOptions& options) {
-    auto* assetFileSource = reinterpret_cast<AssetManagerFileSource*>(options.platformContext());
-    auto fileSource = std::make_shared<DefaultFileSource>(options.cachePath(), std::unique_ptr<AssetManagerFileSource>(assetFileSource));
+    auto env{android::AttachEnv()};
+    std::shared_ptr<DefaultFileSource> fileSource;
+    if (android::Mapbox::hasInstance(*env)) {
+        auto assetManager = android::Mapbox::getAssetManager(*env);
+        fileSource = std::make_shared<DefaultFileSource>(options.cachePath(),
+                                                         std::make_unique<AssetManagerFileSource>(*env, assetManager));
+    } else {
+        fileSource = std::make_shared<DefaultFileSource>(options.cachePath(), options.assetPath());
+    }
     fileSource->setAccessToken(options.accessToken());
     return fileSource;
 }
@@ -24,17 +33,12 @@ namespace android {
 
 // FileSource //
 
-FileSource::FileSource(jni::JNIEnv& _env,
-                       const jni::String& accessToken,
-                       const jni::String& _cachePath,
-                       const jni::Object<AssetManager>& assetManager) {
+FileSource::FileSource(jni::JNIEnv& _env, const jni::String& accessToken, const jni::String& _cachePath) {
     std::string path = jni::Make<std::string>(_env, _cachePath);
     mapbox::sqlite::setTempPath(path);
 
-    resourceOptions
-        .withAccessToken(accessToken ? jni::Make<std::string>(_env, accessToken) : "")
-        .withCachePath(path + DATABASE_FILE)
-        .withPlatformContext(reinterpret_cast<void*>(new AssetManagerFileSource(_env, assetManager)));
+    resourceOptions.withAccessToken(accessToken ? jni::Make<std::string>(_env, accessToken) : "")
+        .withCachePath(path + DATABASE_FILE);
 
     // Create a core default file source
     fileSource = std::static_pointer_cast<mbgl::DefaultFileSource>(mbgl::FileSource::getSharedFileSource(resourceOptions));
@@ -58,14 +62,15 @@ void FileSource::setAPIBaseUrl(jni::JNIEnv& env, const jni::String& url) {
 void FileSource::setResourceTransform(jni::JNIEnv& env, const jni::Object<FileSource::ResourceTransformCallback>& transformCallback) {
     if (transformCallback) {
         auto global = jni::NewGlobal<jni::EnvAttachingDeleter>(env, transformCallback);
-        resourceTransform = std::make_unique<Actor<ResourceTransform>>(*Scheduler::GetCurrent(),
+        resourceTransform = std::make_unique<Actor<ResourceTransform>>(
+            *Scheduler::GetCurrent(),
             // Capture the ResourceTransformCallback object as a managed global into
             // the lambda. It is released automatically when we're setting a new ResourceTransform in
             // a subsequent call.
             // Note: we're converting it to shared_ptr because this lambda is converted to a std::function,
             // which requires copyability of its captured variables.
-            [callback = std::make_shared<decltype(global)>(std::move(global))]
-            (mbgl::Resource::Kind kind, const std::string&& url_) {
+            [callback = std::make_shared<decltype(global)>(std::move(global))](mbgl::Resource::Kind kind,
+                                                                               const std::string& url_) {
                 android::UniqueEnv _env = android::AttachEnv();
                 return FileSource::ResourceTransformCallback::onURL(*_env, *callback, int(kind), url_);
             });
@@ -170,20 +175,20 @@ void FileSource::registerNative(jni::JNIEnv& env) {
     #define METHOD(MethodPtr, name) jni::MakeNativePeerMethod<decltype(MethodPtr), (MethodPtr)>(name)
 
     // Register the peer
-    jni::RegisterNativePeer<FileSource>(
-        env, javaClass, "nativePtr",
-        jni::MakePeer<FileSource, const jni::String&, const jni::String&, const jni::Object<AssetManager>&>,
-        "initialize",
-        "finalize",
-        METHOD(&FileSource::getAccessToken, "getAccessToken"),
-        METHOD(&FileSource::setAccessToken, "setAccessToken"),
-        METHOD(&FileSource::setAPIBaseUrl, "setApiBaseUrl"),
-        METHOD(&FileSource::setResourceTransform, "setResourceTransform"),
-        METHOD(&FileSource::setResourceCachePath, "setResourceCachePath"),
-        METHOD(&FileSource::resume, "activate"),
-        METHOD(&FileSource::pause, "deactivate"),
-        METHOD(&FileSource::isResumed, "isActivated")
-    );
+    jni::RegisterNativePeer<FileSource>(env,
+                                        javaClass,
+                                        "nativePtr",
+                                        jni::MakePeer<FileSource, const jni::String&, const jni::String&>,
+                                        "initialize",
+                                        "finalize",
+                                        METHOD(&FileSource::getAccessToken, "getAccessToken"),
+                                        METHOD(&FileSource::setAccessToken, "setAccessToken"),
+                                        METHOD(&FileSource::setAPIBaseUrl, "setApiBaseUrl"),
+                                        METHOD(&FileSource::setResourceTransform, "setResourceTransform"),
+                                        METHOD(&FileSource::setResourceCachePath, "setResourceCachePath"),
+                                        METHOD(&FileSource::resume, "activate"),
+                                        METHOD(&FileSource::pause, "deactivate"),
+                                        METHOD(&FileSource::isResumed, "isActivated"));
 }
 
 

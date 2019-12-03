@@ -105,14 +105,12 @@ public:
         return bounds;
     }
 
-    /// Returns an infinite bound, a bound for which the constrain method returns its
+    /// Construct an infinite bound, a bound for which the constrain method returns its
     /// input unmodified.
     ///
     /// Note: this is different than LatLngBounds::world() since arbitrary unwrapped
     /// coordinates are also inside the bounds.
-    static LatLngBounds unbounded() {
-        return {};
-    }
+    LatLngBounds() : sw({-90, -180}), ne({90, 180}), bounded(false) {}
 
     // Constructs a LatLngBounds object with the tile's exact boundaries.
     LatLngBounds(const CanonicalTileID&);
@@ -170,11 +168,7 @@ private:
     LatLng ne;
     bool bounded = true;
 
-    LatLngBounds(LatLng sw_, LatLng ne_)
-        : sw(std::move(sw_)), ne(std::move(ne_)) {}
-
-    LatLngBounds()
-        : sw({-90, -180}), ne({90, 180}), bounded(false) {}
+    LatLngBounds(LatLng sw_, LatLng ne_) : sw(sw_), ne(ne_) {}
 
     bool containsLatitude(double latitude) const;
     bool containsLongitude(double longitude, LatLng::WrapMode wrap) const;

@@ -16,10 +16,14 @@ namespace mbgl {
 
 // OfflineTilePyramidRegionDefinition
 
-OfflineTilePyramidRegionDefinition::OfflineTilePyramidRegionDefinition(
-    std::string styleURL_, LatLngBounds bounds_, double minZoom_, double maxZoom_, float pixelRatio_, bool includeIdeographs_)
+OfflineTilePyramidRegionDefinition::OfflineTilePyramidRegionDefinition(std::string styleURL_,
+                                                                       LatLngBounds bounds_,
+                                                                       double minZoom_,
+                                                                       double maxZoom_,
+                                                                       float pixelRatio_,
+                                                                       bool includeIdeographs_)
     : styleURL(std::move(styleURL_)),
-      bounds(std::move(bounds_)),
+      bounds(bounds_),
       minZoom(minZoom_),
       maxZoom(maxZoom_),
       pixelRatio(pixelRatio_),
@@ -29,7 +33,6 @@ OfflineTilePyramidRegionDefinition::OfflineTilePyramidRegionDefinition(
         throw std::invalid_argument("Invalid offline region definition");
     }
 }
-
 
 // OfflineGeometryRegionDefinition
 
@@ -147,7 +150,6 @@ OfflineRegion::OfflineRegion(int64_t id_,
       metadata(std::move(metadata_)) {
 }
 
-OfflineRegion::OfflineRegion(OfflineRegion&&) = default;
 OfflineRegion::~OfflineRegion() = default;
 
 const OfflineRegionDefinition& OfflineRegion::getDefinition() const {

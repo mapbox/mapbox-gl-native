@@ -34,7 +34,10 @@ public:
     ~GeometryTile() override;
 
     void setError(std::exception_ptr);
-    void setData(std::unique_ptr<const GeometryTileData>, bool resetLayers = false);
+    void setData(std::unique_ptr<const GeometryTileData>);
+    // Resets the tile's data and layers and leaves the tile in pending state, waiting for the new
+    // data and layers to come.
+    void reset();
 
     std::unique_ptr<TileRenderData> createRenderData() override;
     void setLayers(const std::vector<Immutable<style::LayerProperties>>&) override;
@@ -48,13 +51,11 @@ public:
 
     bool layerPropertiesUpdated(const Immutable<style::LayerProperties>&) override;
 
-    void queryRenderedFeatures(
-            std::unordered_map<std::string, std::vector<Feature>>& result,
-            const GeometryCoordinates& queryGeometry,
-            const TransformState&,
-            const std::unordered_map<std::string, const RenderLayer*>& layers,
-            const RenderedQueryOptions& options,
-            const mat4& projMatrix) override;
+    void queryRenderedFeatures(std::unordered_map<std::string, std::vector<Feature>>& result,
+                               const GeometryCoordinates& queryGeometry, const TransformState&,
+                               const std::unordered_map<std::string, const RenderLayer*>& layers,
+                               const RenderedQueryOptions& options, const mat4& projMatrix,
+                               const SourceFeatureState& featureState) override;
 
     void querySourceFeatures(
         std::vector<Feature>& result,
@@ -93,7 +94,9 @@ public:
     const std::shared_ptr<FeatureIndex> getFeatureIndex() const;
     
     const std::string sourceID;
-    
+
+    void setFeatureState(const LayerFeatureStates&) override;
+
 protected:
     const GeometryTileData* getData() const;
     LayerRenderData* getLayerRenderData(const style::Layer::Impl&);

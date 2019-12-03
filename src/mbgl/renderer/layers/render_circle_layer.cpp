@@ -141,13 +141,10 @@ GeometryCoordinates projectQueryGeometry(const GeometryCoordinates& queryGeometr
     return projectedGeometry;
 }
 
-bool RenderCircleLayer::queryIntersectsFeature(
-        const GeometryCoordinates& queryGeometry,
-        const GeometryTileFeature& feature,
-        const float zoom,
-        const TransformState& transformState,
-        const float pixelsToTileUnits,
-        const mat4& posMatrix) const {
+bool RenderCircleLayer::queryIntersectsFeature(const GeometryCoordinates& queryGeometry,
+                                               const GeometryTileFeature& feature, const float zoom,
+                                               const TransformState& transformState, const float pixelsToTileUnits,
+                                               const mat4& posMatrix, const FeatureState& featureState) const {
     const auto& evaluated = static_cast<const CircleLayerProperties&>(*evaluatedProperties).evaluated;
     // Translate query geometry
     const GeometryCoordinates& translatedQueryGeometry = FeatureIndex::translateQueryGeometry(
@@ -158,8 +155,8 @@ bool RenderCircleLayer::queryIntersectsFeature(
             pixelsToTileUnits).value_or(queryGeometry);
 
     // Evaluate functions
-    auto radius = evaluated.evaluate<style::CircleRadius>(zoom, feature);
-    auto stroke = evaluated.evaluate<style::CircleStrokeWidth>(zoom, feature);
+    auto radius = evaluated.evaluate<style::CircleRadius>(zoom, feature, featureState);
+    auto stroke = evaluated.evaluate<style::CircleStrokeWidth>(zoom, feature, featureState);
     auto size = radius + stroke;
 
     // For pitch-alignment: map, compare feature geometry to query geometry in the plane of the tile

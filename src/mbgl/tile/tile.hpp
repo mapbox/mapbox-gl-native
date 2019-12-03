@@ -28,6 +28,7 @@ class TileRenderData;
 class RenderedQueryOptions;
 class SourceQueryOptions;
 class CollisionIndex;
+class SourceFeatureState;
 
 namespace gfx {
 class UploadPass;
@@ -67,13 +68,11 @@ public:
     virtual void setLayers(const std::vector<Immutable<style::LayerProperties>>&) {}
     virtual void setMask(TileMask&&) {}
 
-    virtual void queryRenderedFeatures(
-            std::unordered_map<std::string, std::vector<Feature>>& result,
-            const GeometryCoordinates& queryGeometry,
-            const TransformState&,
-            const std::unordered_map<std::string, const RenderLayer*>&,
-            const RenderedQueryOptions& options,
-            const mat4& projMatrix);
+    virtual void queryRenderedFeatures(std::unordered_map<std::string, std::vector<Feature>>& result,
+                                       const GeometryCoordinates& queryGeometry, const TransformState&,
+                                       const std::unordered_map<std::string, const RenderLayer*>&,
+                                       const RenderedQueryOptions& options, const mat4& projMatrix,
+                                       const SourceFeatureState& featureState);
 
     virtual void querySourceFeatures(
             std::vector<Feature>& result,
@@ -125,7 +124,9 @@ public:
     // We hold onto a tile for two placements: fading starts with the first placement
     // and will have time to finish by the second placement.
     virtual void performedFadePlacement() {}
-    
+
+    virtual void setFeatureState(const LayerFeatureStates&) {}
+
     void dumpDebugLogs() const;
 
     const Kind kind;

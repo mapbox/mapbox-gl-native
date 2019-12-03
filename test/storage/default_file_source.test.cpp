@@ -1,7 +1,8 @@
 #include <mbgl/actor/actor.hpp>
-#include <mbgl/test/util.hpp>
 #include <mbgl/storage/default_file_source.hpp>
+#include <mbgl/storage/network_status.hpp>
 #include <mbgl/storage/resource_transform.hpp>
+#include <mbgl/test/util.hpp>
 #include <mbgl/util/run_loop.hpp>
 
 using namespace mbgl;
@@ -528,11 +529,11 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(SetResourceTransform)) {
     DefaultFileSource fs(":memory:", ".");
 
     // Translates the URL "localhost://test to http://127.0.0.1:3000/test
-    Actor<ResourceTransform> transform(loop, [](Resource::Kind, const std::string&& url) -> std::string {
+    Actor<ResourceTransform> transform(loop, [](Resource::Kind, const std::string& url) -> std::string {
         if (url == "localhost://test") {
             return "http://127.0.0.1:3000/test";
         } else {
-            return std::move(url);
+            return url;
         }
     });
 
@@ -658,6 +659,80 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(RespondToStaleMustRevalidate)) {
         EXPECT_EQ("snowfall", *res.etag);
         loop.stop();
     });
+
+    loop.run();
+}
+
+// Test that requests for expired resources have lower priority than requests for new resources
+TEST(DefaultFileSource, TEST_REQUIRES_SERVER(CachedResourceLowPriority)) {
+    util::RunLoop loop;
+    DefaultFileSource fs(":memory:", ".");
+
+    Response response;
+    std::size_t online_response_counter = 0;
+
+    using namespace std::chrono_literals;
+    response.expires = util::now() - 1h;
+
+    // Put existing values into the cache.
+    Resource resource1{Resource::Unknown, "http://127.0.0.1:3000/load/3", {}, Resource::LoadingMethod::All};
+    response.data = std::make_shared<std::string>("Cached Request 3");
+    fs.put(resource1, response);
+
+    Resource resource2{Resource::Unknown, "http://127.0.0.1:3000/load/4", {}, Resource::LoadingMethod::All};
+    response.data = std::make_shared<std::string>("Cached Request 4");
+    fs.put(resource2, response);
+
+    fs.setMaximumConcurrentRequests(1);
+    NetworkStatus::Set(NetworkStatus::Status::Offline);
+
+    // Ensure that the online requests for new resources are processed first.
+    Resource nonCached1{Resource::Unknown, "http://127.0.0.1:3000/load/1", {}, Resource::LoadingMethod::All};
+    std::unique_ptr<AsyncRequest> req1 = fs.request(nonCached1, [&](Response res) {
+        online_response_counter++;
+        req1.reset();
+        EXPECT_EQ(online_response_counter, 1); // make sure this is responded first
+        EXPECT_EQ("Request 1", *res.data);
+    });
+
+    Resource nonCached2{Resource::Unknown, "http://127.0.0.1:3000/load/2", {}, Resource::LoadingMethod::All};
+    std::unique_ptr<AsyncRequest> req2 = fs.request(nonCached2, [&](Response res) {
+        online_response_counter++;
+        req2.reset();
+        EXPECT_EQ(online_response_counter, 2); // make sure this is responded second
+        EXPECT_EQ("Request 2", *res.data);
+    });
+
+    bool req3CachedResponseReceived = false;
+    std::unique_ptr<AsyncRequest> req3 = fs.request(resource1, [&](Response res) {
+        // Offline callback is received first
+        if (!req3CachedResponseReceived) {
+            EXPECT_EQ("Cached Request 3", *res.data);
+            req3CachedResponseReceived = true;
+        } else {
+            online_response_counter++;
+            req3.reset();
+            EXPECT_EQ(online_response_counter, 3);
+            EXPECT_EQ("Request 3", *res.data);
+        }
+    });
+
+    bool req4CachedResponseReceived = false;
+    std::unique_ptr<AsyncRequest> req4 = fs.request(resource2, [&](Response res) {
+        // Offline callback is received first
+        if (!req4CachedResponseReceived) {
+            EXPECT_EQ("Cached Request 4", *res.data);
+            req4CachedResponseReceived = true;
+        } else {
+            online_response_counter++;
+            req4.reset();
+            EXPECT_EQ(online_response_counter, 4);
+            EXPECT_EQ("Request 4", *res.data);
+            loop.stop();
+        }
+    });
+
+    NetworkStatus::Set(NetworkStatus::Status::Online);
 
     loop.run();
 }

@@ -1,3 +1,5 @@
+@import Mapbox;
+
 #import "MBXViewController.h"
 
 #import "MBXAppDelegate.h"
@@ -12,8 +14,6 @@
 #import "MBXState.h"
 
 #import "MBXFrameTimeGraphView.h"
-
-#import <Mapbox/Mapbox.h>
 #import "../src/MGLMapView_Experimental.h"
 
 #import <objc/runtime.h>
@@ -729,7 +729,7 @@ CLLocationCoordinate2D randomWorldCoordinate() {
                                                                               acrossDistance:100
                                                                                        pitch:60
                                                                                      heading:0];
-                        __weak typeof(self) weakSelf = self;
+                        __weak MBXViewController *weakSelf = self;
                         [self.mapView setCamera:camera withDuration:0.3 animationTimingFunction:nil completionHandler:^{
                             [weakSelf.mapView setContentInset:contentInsets animated:YES completionHandler:nil];
                         }];

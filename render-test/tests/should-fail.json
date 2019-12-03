@@ -1,0 +1,18 @@
+{
+  "tests/file-size/fail-size-is-over": "Should fail, size is bigger than expected.",
+  "tests/file-size/fail-size-is-under": "Should fail, size is smaller than expected.",
+  "tests/file-size/fail-file-doesnt-match": "Should fail, doesn't match the expectation.",
+  "tests/file-size/fail-file-not-found": "Should fail, file not found.",
+  "tests/network/fail-requests": "Should fail, number of requests higher than expected.",
+  "tests/network/fail-transferred": "Should fail, amount of transferred data higher than expected.",
+  "tests/network/fail-requests-transferred": "Should fail, number of requests higher than expected and amount of transferred data less than expected.",
+  "tests/memory/fail-memory-size-is-too-big": "Should fail, memory size is bigger than expected.",
+  "tests/memory/fail-memory-size-is-too-small": "Should fail, memory size is smaller than expected.",
+  "tests/gfx/fail-ib-mem-mismatch": "Should fail, combined byte size of index buffers doesn't match the expectation.",
+  "tests/gfx/fail-negative-framebuffer-count": "Should fail, number of frame buffers is higher than expected.",
+  "tests/gfx/fail-texture-mem-mismatch": "Should fail, combined byte size of textures doesn't match the expectation.",
+  "tests/gfx/fail-too-many-drawcalls": "Should fail, number of draw calls higher than expected.",
+  "tests/gfx/fail-too-few-buffers": "Should fail, number of vertex and index buffers is smaller than expected.",
+  "tests/gfx/fail-too-few-textures": "Should fail, number of textures is smaller than expected.",
+  "tests/gfx/fail-vb-mem-mismatch": "Should fail, combined byte size of index buffers doesn't match the expectation."
+}

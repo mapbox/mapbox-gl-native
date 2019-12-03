@@ -151,6 +151,8 @@ public class <%- camelize(type) %>LayerTest extends BaseLayerTest {
     layer.setProperties(<%- camelizeWithLeadingLowercase(property.name) %>("{token}"));
 <% if (property.type === 'formatted') { -%>
     assertEquals(layer.get<%- camelize(property.name) %>().getExpression(), <%- defaultExpressionJava(property) %>(Expression.formatEntry(Expression.toString(Expression.get("token")))));
+<% } else if (property.type === 'resolvedImage') {-%>
+    assertEquals(layer.get<%- camelize(property.name) %>().getExpression(), <%- defaultExpressionJava(property) %>(Expression.toString(Expression.get("token"))));
 <% } else {-%>
     assertEquals(layer.get<%- camelize(property.name) %>().getExpression(), Expression.toString(Expression.get("token")));
 <% } -%>
@@ -169,6 +171,8 @@ public class <%- camelize(type) %>LayerTest extends BaseLayerTest {
     // Set and Get
 <% if (property.type === 'formatted') { -%>
     Expression expression = <%- defaultExpressionJava(property) %>(Expression.formatEntry(Expression.get("undefined"), FormatOption.formatFontScale(2.0), FormatOption.formatTextFont(new String[]{"Open Sans Regular", "Arial Unicode MS Regular"})));
+<% } else if (property.type === 'resolvedImage') { -%>
+    Expression expression = <%- defaultExpressionJava(property) %>(string(Expression.get("undefined")));
 <% } else { -%>
     Expression expression = <%- defaultExpressionJava(property) %>(Expression.get("undefined"));
 <% } -%>

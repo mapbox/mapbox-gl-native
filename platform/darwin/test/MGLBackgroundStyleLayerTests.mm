@@ -140,22 +140,22 @@
                       @"background-pattern should be unset initially.");
         NSExpression *defaultExpression = layer.backgroundPattern;
 
-        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"'Background Pattern'"];
+        NSExpression *constantExpression = [NSExpression expressionForConstantValue:@"Background Pattern"];
         layer.backgroundPattern = constantExpression;
-        mbgl::style::PropertyValue<std::string> propertyValue = { "Background Pattern" };
+        mbgl::style::PropertyValue<mbgl::style::expression::Image> propertyValue = { "Background Pattern" };
         XCTAssertEqual(rawLayer->getBackgroundPattern(), propertyValue,
                        @"Setting backgroundPattern to a constant value expression should update background-pattern.");
         XCTAssertEqualObjects(layer.backgroundPattern, constantExpression,
                               @"backgroundPattern should round-trip constant value expressions.");
 
-        constantExpression = [NSExpression expressionWithFormat:@"'Background Pattern'"];
+        constantExpression = [NSExpression expressionWithFormat:@"MGL_FUNCTION('image', 'Background Pattern')"];
         NSExpression *functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, %@, %@)", constantExpression, @{@18: constantExpression}];
         layer.backgroundPattern = functionExpression;
 
         {
             using namespace mbgl::style::expression::dsl;
-            propertyValue = mbgl::style::PropertyExpression<std::string>(
-                step(zoom(), literal("Background Pattern"), 18.0, literal("Background Pattern"))
+            propertyValue = mbgl::style::PropertyExpression<mbgl::style::expression::Image>(
+                step(zoom(), image(literal("Background Pattern")), 18.0, image(literal("Background Pattern")))
             );
         }
 

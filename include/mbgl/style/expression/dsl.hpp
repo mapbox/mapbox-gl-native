@@ -49,6 +49,7 @@ std::unique_ptr<Expression> toString(std::unique_ptr<Expression>,
                                      std::unique_ptr<Expression> def = nullptr);
 std::unique_ptr<Expression> toFormatted(std::unique_ptr<Expression>,
                                         std::unique_ptr<Expression> def = nullptr);
+std::unique_ptr<Expression> toImage(std::unique_ptr<Expression>, std::unique_ptr<Expression> def = nullptr);
 
 std::unique_ptr<Expression> get(const char* value);
 std::unique_ptr<Expression> get(std::unique_ptr<Expression>);
@@ -88,6 +89,9 @@ std::unique_ptr<Expression> concat(std::vector<std::unique_ptr<Expression>> inpu
 
 std::unique_ptr<Expression> format(const char* value);
 std::unique_ptr<Expression> format(std::unique_ptr<Expression>);
+
+std::unique_ptr<Expression> image(const char* value);
+std::unique_ptr<Expression> image(std::unique_ptr<Expression>);
 
 } // namespace dsl
 } // namespace expression

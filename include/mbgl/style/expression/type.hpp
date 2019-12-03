@@ -14,65 +14,70 @@ template <class T>
 std::string toString(const T& t);
 
 struct NullType {
-    constexpr NullType() {};
+    constexpr NullType() = default;
     std::string getName() const { return "null"; }
     bool operator==(const NullType&) const { return true; }
 };
 
 struct NumberType {
-    constexpr NumberType() {};
+    constexpr NumberType() = default;
     std::string getName() const { return "number"; }
     bool operator==(const NumberType&) const { return true; }
 };
 
 struct BooleanType {
-    constexpr BooleanType() {};
+    constexpr BooleanType() = default;
     std::string getName() const { return "boolean"; }
     bool operator==(const BooleanType&) const { return true; }
 };
 
 struct StringType {
-    constexpr StringType() {};
+    constexpr StringType() = default;
     std::string getName() const { return "string"; }
     bool operator==(const StringType&) const { return true; }
 };
 
 struct ColorType {
-    constexpr ColorType() {};
+    constexpr ColorType() = default;
     std::string getName() const { return "color"; }
     bool operator==(const ColorType&) const { return true; }
 };
 
 struct ObjectType {
-    constexpr ObjectType() {};
+    constexpr ObjectType() = default;
     std::string getName() const { return "object"; }
     bool operator==(const ObjectType&) const { return true; }
 };
 
 struct ErrorType {
-    constexpr ErrorType() {};
+    constexpr ErrorType() = default;
     std::string getName() const { return "error"; }
     bool operator==(const ErrorType&) const { return true; }
 };
 
 struct ValueType {
-    constexpr ValueType() {};
+    constexpr ValueType() = default;
     std::string getName() const { return "value"; }
     bool operator==(const ValueType&) const { return true; }
 };
     
 struct CollatorType {
-    constexpr CollatorType() {}; // NOLINT
+    constexpr CollatorType() = default;
     std::string getName() const { return "collator"; }
     bool operator==(const CollatorType&) const { return true; }
 };
     
 struct FormattedType {
-    constexpr FormattedType() {}; // NOLINT
+    constexpr FormattedType() = default;
     std::string getName() const { return "formatted"; }
     bool operator==(const FormattedType&) const { return true; }
 };
 
+struct ImageType {
+    constexpr ImageType() = default;
+    std::string getName() const { return "resolvedImage"; }
+    bool operator==(const ImageType&) const { return true; }
+};
 
 constexpr NullType Null;
 constexpr NumberType Number;
@@ -84,21 +89,22 @@ constexpr ObjectType Object;
 constexpr CollatorType Collator;
 constexpr FormattedType Formatted;
 constexpr ErrorType Error;
+constexpr ImageType Image;
 
 struct Array;
 
-using Type = variant<
-    NullType,
-    NumberType,
-    BooleanType,
-    StringType,
-    ColorType,
-    ObjectType,
-    ValueType,
-    mapbox::util::recursive_wrapper<Array>,
-    CollatorType,
-    FormattedType,
-    ErrorType>;
+using Type = variant<NullType,
+                     NumberType,
+                     BooleanType,
+                     StringType,
+                     ColorType,
+                     ObjectType,
+                     ValueType,
+                     mapbox::util::recursive_wrapper<Array>,
+                     CollatorType,
+                     FormattedType,
+                     ErrorType,
+                     ImageType>;
 
 struct Array {
     explicit Array(Type itemType_) : itemType(std::move(itemType_)) {}

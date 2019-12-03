@@ -1,3 +1,5 @@
+// clang-format off
+
 // This file is generated. Do not edit.
 
 #pragma once
@@ -19,8 +21,9 @@ public:
     ~CircleLayer() final;
 
     // Dynamic properties
-    optional<conversion::Error> setLayoutProperty(const std::string& name, const conversion::Convertible& value) final;
-    optional<conversion::Error> setPaintProperty(const std::string& name, const conversion::Convertible& value) final;
+    optional<conversion::Error> setProperty(const std::string& name, const conversion::Convertible& value) final;
+
+    StyleProperty getProperty(const std::string& name) const final;
 
     // Paint properties
 
@@ -105,3 +108,5 @@ protected:
 
 } // namespace style
 } // namespace mbgl
+
+// clang-format on

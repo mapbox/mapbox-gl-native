@@ -32,7 +32,7 @@ AnchorAlignment AnchorAlignment::getAnchorAlignment(style::SymbolAnchorType anch
         result.horizontalAlign = 0.0f;
         break;
     default:
-	break;
+        break;
     }
 
     switch (anchor) {
@@ -83,97 +83,122 @@ PositionedIcon PositionedIcon::shapeIcon(const ImagePosition& image,
     return PositionedIcon { image, top, bottom, left, right, iconRotation };
 }
 
-void PositionedIcon::fitIconToText(const style::SymbolLayoutProperties::Evaluated& layout,
-                                   const Shaping& shapedText,
-                                   float layoutTextSize) {
-   using namespace style;
-   assert(layout.get<IconTextFit>() != IconTextFitType::None);
-   if (shapedText) {
-        auto iconWidth = _right - _left;
-        auto iconHeight = _bottom - _top;
-        auto size = layoutTextSize / 24.0f;
-        auto textLeft = shapedText.left * size;
-        auto textRight = shapedText.right * size;
-        auto textTop = shapedText.top * size;
-        auto textBottom = shapedText.bottom * size;
-        auto textWidth = textRight - textLeft;
-        auto textHeight = textBottom - textTop;
-        auto padT = layout.get<IconTextFitPadding>()[0];
-        auto padR = layout.get<IconTextFitPadding>()[1];
-        auto padB = layout.get<IconTextFitPadding>()[2];
-        auto padL = layout.get<IconTextFitPadding>()[3];
-        auto offsetY = layout.get<IconTextFit>() == IconTextFitType::Width ? (textHeight - iconHeight) * 0.5 : 0;
-        auto offsetX = layout.get<IconTextFit>() == IconTextFitType::Height ? (textWidth - iconWidth) * 0.5 : 0;
-        auto width = layout.get<IconTextFit>() == IconTextFitType::Width || layout.get<IconTextFit>() == IconTextFitType::Both ? textWidth : iconWidth;
-        auto height = layout.get<IconTextFit>() == IconTextFitType::Height || layout.get<IconTextFit>() == IconTextFitType::Both ? textHeight : iconHeight;
-        _left = textLeft + offsetX - padL;
-        _top = textTop + offsetY - padT;
-        _right = textLeft + offsetX + padR + width;
-        _bottom = textTop + offsetY + padB + height;
+void PositionedIcon::fitIconToText(const Shaping& shapedText,
+                                   const style::IconTextFitType textFit,
+                                   const std::array<float, 4>& padding,
+                                   const std::array<float, 2>& iconOffset,
+                                   const float fontScale) {
+    assert(textFit != style::IconTextFitType::None);
+    assert(shapedText);
+
+    // We don't respect the icon-anchor, because icon-text-fit is set. Instead,
+    // the icon will be centered on the text, then stretched in the given
+    // dimensions.
+
+    const float textLeft = shapedText.left * fontScale;
+    const float textRight = shapedText.right * fontScale;
+
+    if (textFit == style::IconTextFitType::Width || textFit == style::IconTextFitType::Both) {
+        // Stretched horizontally to the text width
+        _left = iconOffset[0] + textLeft - padding[3];
+        _right = iconOffset[0] + textRight + padding[1];
+    } else {
+        // Centered on the text
+        _left = iconOffset[0] + (textLeft + textRight - image().displaySize()[0]) / 2.0f;
+        _right = _left + image().displaySize()[0];
+    }
+
+    const float textTop = shapedText.top * fontScale;
+    const float textBottom = shapedText.bottom * fontScale;
+    if (textFit == style::IconTextFitType::Height || textFit == style::IconTextFitType::Both) {
+        // Stretched vertically to the text height
+        _top = iconOffset[1] + textTop - padding[0];
+        _bottom = iconOffset[1] + textBottom + padding[2];
+    } else {
+        // Centered on the text
+        _top = iconOffset[1] + (textTop + textBottom - image().displaySize()[1]) / 2.0f;
+        _bottom = _top + image().displaySize()[1];
     }
 }
 
 void align(Shaping& shaping,
-           const float justify,
-           const float horizontalAlign,
-           const float verticalAlign,
-           const float maxLineLength,
-           const float lineHeight,
-           const std::size_t lineCount) {
+           float justify,
+           float horizontalAlign,
+           float verticalAlign,
+           float maxLineLength,
+           float maxLineHeight,
+           float lineHeight,
+           float blockHeight,
+           std::size_t lineCount) {
     const float shiftX = (justify - horizontalAlign) * maxLineLength;
-    const float shiftY = (-verticalAlign * lineCount + 0.5) * lineHeight;
-    
-    for (auto& glyph : shaping.positionedGlyphs) {
-        glyph.x += shiftX;
-        glyph.y += shiftY;
-    }
-}
+    float shiftY = 0.0f;
 
-// justify left = 0, right = 1, center = .5
-void justifyLine(std::vector<PositionedGlyph>& positionedGlyphs,
-                 const GlyphMap& glyphMap,
-                 std::size_t start,
-                 std::size_t end,
-                 float justify) {
-    if (!justify) {
-        return;
+    if (maxLineHeight != lineHeight) {
+        shiftY = -blockHeight * verticalAlign - Shaping::yOffset;
+    } else {
+        shiftY = (-verticalAlign * lineCount + 0.5) * lineHeight;
     }
-    
-    PositionedGlyph& glyph = positionedGlyphs[end];
-    auto glyphs = glyphMap.find(glyph.font);
-    if (glyphs == glyphMap.end()) {
-        return;
-    }
-    auto it = glyphs->second.find(glyph.glyph);
-    if (it != glyphs->second.end() && it->second) {
-        const float lastAdvance = (*it->second)->metrics.advance * glyph.scale;
-        const float lineIndent = float(glyph.x + lastAdvance) * justify;
-        
-        for (std::size_t j = start; j <= end; j++) {
-            positionedGlyphs[j].x -= lineIndent;
+
+    for (auto& line : shaping.positionedLines) {
+        for (auto& positionedGlyph : line.positionedGlyphs) {
+            positionedGlyph.x += shiftX;
+            positionedGlyph.y += shiftY;
         }
     }
 }
 
+// justify left = 0, right = 1, center = .5
+void justifyLine(std::vector<PositionedGlyph>& positionedGlyphs, float justify, float lineOffset) {
+    if (!justify && !lineOffset) {
+        return;
+    }
+
+    PositionedGlyph& lastGlyph = positionedGlyphs.back();
+    const float lastAdvance = lastGlyph.metrics.advance * lastGlyph.scale;
+    const float lineIndent = float(lastGlyph.x + lastAdvance) * justify;
+    for (auto& positionedGlyph : positionedGlyphs) {
+        positionedGlyph.x -= lineIndent;
+        positionedGlyph.y += lineOffset;
+    }
+}
+
+float getGlyphAdvance(char16_t codePoint,
+                      const SectionOptions& section,
+                      const GlyphMap& glyphMap,
+                      const ImagePositions& imagePositions,
+                      float layoutTextSize,
+                      float spacing) {
+    if (!section.imageID) {
+        auto glyphs = glyphMap.find(section.fontStackHash);
+        if (glyphs == glyphMap.end()) {
+            return 0.0f;
+        }
+        auto it = glyphs->second.find(codePoint);
+        if (it == glyphs->second.end() || !it->second) {
+            return 0.0f;
+        }
+        return (*it->second)->metrics.advance * section.scale + spacing;
+    } else {
+        auto image = imagePositions.find(*section.imageID);
+        if (image == imagePositions.end()) {
+            return 0.0f;
+        }
+        return image->second.displaySize()[0] * section.scale * util::ONE_EM / layoutTextSize + spacing;
+    }
+}
+
 float determineAverageLineWidth(const TaggedString& logicalInput,
-                                const float spacing,
+                                float spacing,
                                 float maxWidth,
-                                const GlyphMap& glyphMap) {
+                                const GlyphMap& glyphMap,
+                                const ImagePositions& imagePositions,
+                                float layoutTextSize) {
     float totalWidth = 0;
     
     for (std::size_t i = 0; i < logicalInput.length(); i++) {
         const SectionOptions& section = logicalInput.getSection(i);
         char16_t codePoint = logicalInput.getCharCodeAt(i);
-        auto glyphs = glyphMap.find(section.fontStackHash);
-        if (glyphs == glyphMap.end()) {
-            continue;
-        }
-        auto it = glyphs->second.find(codePoint);
-        if (it == glyphs->second.end() || !it->second) {
-            continue;
-        }
-        
-        totalWidth += (*it->second)->metrics.advance * section.scale + spacing;
+        totalWidth += getGlyphAdvance(codePoint, section, glyphMap, imagePositions, layoutTextSize, spacing);
     }
     
     int32_t targetLineCount = ::fmax(1, std::ceil(totalWidth / maxWidth));
@@ -271,7 +296,9 @@ std::set<std::size_t> leastBadBreaks(const PotentialBreak& lastLineBreak) {
 std::set<std::size_t> determineLineBreaks(const TaggedString& logicalInput,
                                           const float spacing,
                                           float maxWidth,
-                                          const GlyphMap& glyphMap) {
+                                          const GlyphMap& glyphMap,
+                                          const ImagePositions& imagePositions,
+                                          float layoutTextSize) {
     if (!maxWidth) {
         return {};
     }
@@ -279,9 +306,10 @@ std::set<std::size_t> determineLineBreaks(const TaggedString& logicalInput,
     if (logicalInput.empty()) {
         return {};
     }
-    
-    const float targetWidth = determineAverageLineWidth(logicalInput, spacing, maxWidth, glyphMap);
-    
+
+    const float targetWidth =
+        determineAverageLineWidth(logicalInput, spacing, maxWidth, glyphMap, imagePositions, layoutTextSize);
+
     std::list<PotentialBreak> potentialBreaks;
     float currentX = 0;
     // Find first occurance of zero width space (ZWSP) character.
@@ -290,20 +318,15 @@ std::set<std::size_t> determineLineBreaks(const TaggedString& logicalInput,
     for (std::size_t i = 0; i < logicalInput.length(); i++) {
         const SectionOptions& section = logicalInput.getSection(i);
         char16_t codePoint = logicalInput.getCharCodeAt(i);
-        auto glyphs = glyphMap.find(section.fontStackHash);
-        if (glyphs == glyphMap.end()) {
-            continue;
+        if (!util::i18n::isWhitespace(codePoint)) {
+            currentX += getGlyphAdvance(codePoint, section, glyphMap, imagePositions, layoutTextSize, spacing);
         }
-        auto it = glyphs->second.find(codePoint);
-        if (it != glyphs->second.end() && it->second && !util::i18n::isWhitespace(codePoint)) {
-            currentX += (*it->second)->metrics.advance * section.scale + spacing;
-        }
-        
+
         // Ideographic characters, spaces, and word-breaking punctuation that often appear without
         // surrounding spaces.
         if (i < logicalInput.length() - 1) {
             const bool allowsIdeographicBreak = util::i18n::allowsIdeographicBreaking(codePoint);
-            if (allowsIdeographicBreak || util::i18n::allowsWordBreaking(codePoint)) {
+            if (section.imageID || allowsIdeographicBreak || util::i18n::allowsWordBreaking(codePoint)) {
                 const bool penalizableIdeographicBreak = allowsIdeographicBreak && hasServerSuggestedBreaks;
                 const std::size_t nextIndex = i + 1;
                 potentialBreaks.push_back(evaluateBreak(nextIndex, currentX, targetWidth, potentialBreaks,
@@ -324,81 +347,170 @@ void shapeLines(Shaping& shaping,
                 const style::TextJustifyType textJustify,
                 const WritingModeType writingMode,
                 const GlyphMap& glyphMap,
+                const GlyphPositions& glyphPositions,
+                const ImagePositions& imagePositions,
+                float layoutTextSize,
                 bool allowVerticalPlacement) {
-    float x = 0;
+    float x = 0.0f;
     float y = Shaping::yOffset;
-    
-    float maxLineLength = 0;
 
+    float maxLineLength = 0.0f;
+    double maxLineHeight = 0.0f;
 
-    const float justify = textJustify == style::TextJustifyType::Right ? 1 :
-        textJustify == style::TextJustifyType::Left ? 0 :
-        0.5;
-    
+    const float justify =
+        textJustify == style::TextJustifyType::Right ? 1.0f : textJustify == style::TextJustifyType::Left ? 0.0f : 0.5f;
+
     for (TaggedString& line : lines) {
         // Collapse whitespace so it doesn't throw off justification
         line.trim();
         
         const double lineMaxScale = line.getMaxScale();
-        
+        const double maxLineOffset = (lineMaxScale - 1.0) * util::ONE_EM;
+        double lineOffset = 0.0;
+        shaping.positionedLines.emplace_back();
+        auto& positionedLine = shaping.positionedLines.back();
+        auto& positionedGlyphs = positionedLine.positionedGlyphs;
+
         if (line.empty()) {
             y += lineHeight; // Still need a line feed after empty line
             continue;
         }
         
-        std::size_t lineStartIndex = shaping.positionedGlyphs.size();
         for (std::size_t i = 0; i < line.length(); i++) {
             const std::size_t sectionIndex = line.getSectionIndex(i);
             const SectionOptions& section = line.sectionAt(sectionIndex);
             char16_t codePoint = line.getCharCodeAt(i);
-            auto glyphs = glyphMap.find(section.fontStackHash);
-            if (glyphs == glyphMap.end()) {
-                continue;
-            }
-            auto it = glyphs->second.find(codePoint);
-            if (it == glyphs->second.end() || !it->second) {
-                continue;
-            }
-            
-            // We don't know the baseline, but since we're laying out
-            // at 24 points, we can calculate how much it will move when
-            // we scale up or down.
-            const double baselineOffset = (lineMaxScale - section.scale) * util::ONE_EM;
-            
-            const Glyph& glyph = **it->second;
+            double baselineOffset = 0.0;
+            Rect<uint16_t> rect;
+            GlyphMetrics metrics;
+            float advance = 0.0f;
+            float verticalAdvance = util::ONE_EM;
+            double sectionScale = section.scale;
+            assert(sectionScale);
 
-            if (writingMode == WritingModeType::Horizontal ||
-                // Don't verticalize glyphs that have no upright orientation if vertical placement is disabled.
-                (!allowVerticalPlacement && !util::i18n::hasUprightVerticalOrientation(codePoint)) ||
-                // If vertical placement is ebabled, don't verticalize glyphs that
-                // are from complex text layout script, or whitespaces.
-                (allowVerticalPlacement && (util::i18n::isWhitespace(codePoint) || util::i18n::isCharInComplexShapingScript(codePoint)))) {
-                shaping.positionedGlyphs.emplace_back(codePoint, x, y + baselineOffset, false, section.fontStackHash, section.scale, sectionIndex);
-                x += glyph.metrics.advance * section.scale + spacing;
+            const bool vertical =
+                !(writingMode == WritingModeType::Horizontal ||
+                  // Don't verticalize glyphs that have no upright orientation if vertical placement is disabled.
+                  (!allowVerticalPlacement && !util::i18n::hasUprightVerticalOrientation(codePoint)) ||
+                  // If vertical placement is ebabled, don't verticalize glyphs that
+                  // are from complex text layout script, or whitespaces.
+                  (allowVerticalPlacement &&
+                   (util::i18n::isWhitespace(codePoint) || util::i18n::isCharInComplexShapingScript(codePoint))));
+
+            if (!section.imageID) {
+                auto glyphPositionMap = glyphPositions.find(section.fontStackHash);
+                if (glyphPositionMap == glyphPositions.end()) {
+                    continue;
+                }
+
+                auto glyphPosition = glyphPositionMap->second.find(codePoint);
+                if (glyphPosition != glyphPositionMap->second.end()) {
+                    rect = glyphPosition->second.rect;
+                    metrics = glyphPosition->second.metrics;
+                } else {
+                    auto glyphs = glyphMap.find(section.fontStackHash);
+                    if (glyphs == glyphMap.end()) {
+                        continue;
+                    }
+
+                    auto glyph = glyphs->second.find(codePoint);
+                    if (glyph == glyphs->second.end() || !glyph->second) {
+                        continue;
+                    }
+                    metrics = (*glyph->second)->metrics;
+                }
+                advance = metrics.advance;
+                // We don't know the baseline, but since we're laying out
+                // at 24 points, we can calculate how much it will move when
+                // we scale up or down.
+                baselineOffset = (lineMaxScale - sectionScale) * util::ONE_EM;
             } else {
-                shaping.positionedGlyphs.emplace_back(codePoint, x, y + baselineOffset, true, section.fontStackHash, section.scale, sectionIndex);
-                x += util::ONE_EM * section.scale + spacing;
+                auto image = imagePositions.find(*section.imageID);
+                if (image == imagePositions.end()) {
+                    continue;
+                }
+                shaping.iconsInText |= true;
+                const auto& displaySize = image->second.displaySize();
+                metrics.width = displaySize[0];
+                metrics.height = displaySize[1];
+                metrics.left = ImagePosition::padding;
+                metrics.top = -Glyph::borderSize;
+                metrics.advance = vertical ? displaySize[1] : displaySize[0];
+                rect = image->second.paddedTextureRect();
+
+                // If needed, allow to set scale factor for an image using
+                // alias "image-scale" that could be alias for "font-scale"
+                // when FormattedSection is an image section.
+                sectionScale = sectionScale * util::ONE_EM / layoutTextSize;
+
+                // Difference between one EM and an image size.
+                // Aligns bottom of an image to a baseline level.
+                float imageOffset = util::ONE_EM - displaySize[1] * sectionScale;
+                baselineOffset = maxLineOffset + imageOffset;
+                advance = verticalAdvance = metrics.advance;
+
+                // Difference between height of an image and one EM at max line scale.
+                // Pushes current line down if an image size is over 1 EM at max line scale.
+                double offset =
+                    (vertical ? displaySize[0] : displaySize[1]) * sectionScale - util::ONE_EM * lineMaxScale;
+                if (offset > 0.0 && offset > lineOffset) {
+                    lineOffset = offset;
+                }
+            }
+
+            if (!vertical) {
+                positionedGlyphs.emplace_back(codePoint,
+                                              x,
+                                              y + baselineOffset,
+                                              vertical,
+                                              section.fontStackHash,
+                                              sectionScale,
+                                              rect,
+                                              metrics,
+                                              section.imageID,
+                                              sectionIndex);
+                x += advance * sectionScale + spacing;
+            } else {
+                positionedGlyphs.emplace_back(codePoint,
+                                              x,
+                                              y + baselineOffset,
+                                              vertical,
+                                              section.fontStackHash,
+                                              sectionScale,
+                                              rect,
+                                              metrics,
+                                              section.imageID,
+                                              sectionIndex);
+                x += verticalAdvance * sectionScale + spacing;
+                shaping.verticalizable |= true;
             }
         }
-        
+
         // Only justify if we placed at least one glyph
-        if (shaping.positionedGlyphs.size() != lineStartIndex) {
+        if (positionedGlyphs.size() != 0) {
             float lineLength = x - spacing; // Don't count trailing spacing
             maxLineLength = util::max(lineLength, maxLineLength);
-            
-            justifyLine(shaping.positionedGlyphs, glyphMap, lineStartIndex,
-                        shaping.positionedGlyphs.size() - 1, justify);
+            justifyLine(positionedGlyphs, justify, lineOffset);
         }
-        
-        x = 0;
-        y += lineHeight * lineMaxScale;
+
+        double currentLineHeight = lineHeight * lineMaxScale + lineOffset;
+        x = 0.0f;
+        y += currentLineHeight;
+        positionedLine.lineOffset = std::max(lineOffset, maxLineOffset);
+        maxLineHeight = std::max(currentLineHeight, maxLineHeight);
     }
 
     auto anchorAlign = AnchorAlignment::getAnchorAlignment(textAnchor);
-
-    align(shaping, justify, anchorAlign.horizontalAlign, anchorAlign.verticalAlign, maxLineLength,
-          lineHeight, lines.size());
     const float height = y - Shaping::yOffset;
+    align(shaping,
+          justify,
+          anchorAlign.horizontalAlign,
+          anchorAlign.verticalAlign,
+          maxLineLength,
+          maxLineHeight,
+          lineHeight,
+          height,
+          lines.size());
 
     // Calculate the bounding box
     shaping.top += -anchorAlign.verticalAlign * height;
@@ -416,28 +528,44 @@ const Shaping getShaping(const TaggedString& formattedString,
                          const std::array<float, 2>& translate,
                          const WritingModeType writingMode,
                          BiDi& bidi,
-                         const GlyphMap& glyphs,
+                         const GlyphMap& glyphMap,
+                         const GlyphPositions& glyphPositions,
+                         const ImagePositions& imagePositions,
+                         float layoutTextSize,
+                         float layoutTextSizeAtBucketZoomLevel,
                          bool allowVerticalPlacement) {
+    assert(layoutTextSize);
     std::vector<TaggedString> reorderedLines;
     if (formattedString.sectionCount() == 1) {
-        auto untaggedLines = bidi.processText(formattedString.rawText(),
-                                              determineLineBreaks(formattedString, spacing, maxWidth, glyphs));
+        auto untaggedLines = bidi.processText(
+            formattedString.rawText(),
+            determineLineBreaks(formattedString, spacing, maxWidth, glyphMap, imagePositions, layoutTextSize));
         for (const auto& line : untaggedLines) {
             reorderedLines.emplace_back(line, formattedString.sectionAt(0));
         }
     } else {
-        auto processedLines = bidi.processStyledText(formattedString.getStyledText(),
-                                                     determineLineBreaks(formattedString, spacing, maxWidth, glyphs));
+        auto processedLines = bidi.processStyledText(
+            formattedString.getStyledText(),
+            determineLineBreaks(formattedString, spacing, maxWidth, glyphMap, imagePositions, layoutTextSize));
         for (const auto& line : processedLines) {
             reorderedLines.emplace_back(line, formattedString.getSections());
         }
     }
-    Shaping shaping(translate[0], translate[1], writingMode, reorderedLines.size());
-    shapeLines(shaping, reorderedLines, spacing, lineHeight, textAnchor,
-               textJustify, writingMode, glyphs, allowVerticalPlacement);
-    
+    Shaping shaping(translate[0], translate[1], writingMode);
+    shapeLines(shaping,
+               reorderedLines,
+               spacing,
+               lineHeight,
+               textAnchor,
+               textJustify,
+               writingMode,
+               glyphMap,
+               glyphPositions,
+               imagePositions,
+               layoutTextSizeAtBucketZoomLevel,
+               allowVerticalPlacement);
+
     return shaping;
 }
-
 
 } // namespace mbgl

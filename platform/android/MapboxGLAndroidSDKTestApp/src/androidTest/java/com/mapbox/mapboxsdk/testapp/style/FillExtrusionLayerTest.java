@@ -244,7 +244,7 @@ public class FillExtrusionLayerTest extends BaseLayerTest {
     assertNull(layer.getFillExtrusionPattern().getExpression());
 
     // Set and Get
-    Expression expression = string(Expression.get("undefined"));
+    Expression expression = image(string(Expression.get("undefined")));
     layer.setProperties(fillExtrusionPattern(expression));
     assertEquals(layer.getFillExtrusionPattern().getExpression(), expression);
   }

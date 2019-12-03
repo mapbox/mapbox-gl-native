@@ -58,6 +58,7 @@ public:
 class RenderTree {
 public:
     virtual ~RenderTree() = default;
+    virtual void prepare() {}
     // Render items
     virtual RenderItems getLayerRenderItems() const = 0;
     virtual RenderItems getSourceRenderItems() const = 0;

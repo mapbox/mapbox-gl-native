@@ -6,6 +6,7 @@ import android.graphics.PointF;
 import android.graphics.RectF;
 import android.os.Bundle;
 import android.support.annotation.FloatRange;
+import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.Size;
@@ -246,12 +247,16 @@ public final class MapboxMap {
   // Style
 
   /**
-   * Sets tile pre-fetching from MapboxOptions.
+   * Sets tile pre-fetching zoom delta from MapboxOptions.
    *
    * @param options the options object
    */
   private void setPrefetchesTiles(@NonNull MapboxMapOptions options) {
-    setPrefetchesTiles(options.getPrefetchesTiles());
+    if (!options.getPrefetchesTiles()) {
+      setPrefetchZoomDelta(0);
+    } else {
+      setPrefetchZoomDelta(options.getPrefetchZoomDelta());
+    }
   }
 
   /**
@@ -259,7 +264,9 @@ public final class MapboxMap {
    * tile is rendered as soon as possible at the expense of a little bandwidth.
    *
    * @param enable true to enable
+   * @deprecated Use {@link #setPrefetchZoomDelta(int)} instead.
    */
+  @Deprecated
   public void setPrefetchesTiles(boolean enable) {
     nativeMapView.setPrefetchTiles(enable);
   }
@@ -269,9 +276,36 @@ public final class MapboxMap {
    *
    * @return true if enabled
    * @see MapboxMap#setPrefetchesTiles(boolean)
+   * @deprecated Use {@link #getPrefetchZoomDelta()} instead.
    */
+  @Deprecated
   public boolean getPrefetchesTiles() {
     return nativeMapView.getPrefetchTiles();
+  }
+
+  /**
+   * Set the tile pre-fetching zoom delta. Pre-fetching makes sure that a low-resolution
+   * tile at the (current_zoom_level - delta) is rendered as soon as possible at the
+   * expense of a little bandwidth.
+   * Note: This operation will override the MapboxMapOptions#setPrefetchesTiles(boolean)
+   *       Setting zoom delta to 0 will disable pre-fetching.
+   * Default zoom delta is 4.
+   *
+   * @param delta zoom delta
+   */
+  public void setPrefetchZoomDelta(@IntRange(from = 0) int delta) {
+    nativeMapView.setPrefetchZoomDelta(delta);
+  }
+
+  /**
+   * Check current pre-fetching zoom delta.
+   *
+   * @return current zoom delta.
+   * @see MapboxMap#setPrefetchZoomDelta(int)
+   */
+  @IntRange(from = 0)
+  public int getPrefetchZoomDelta() {
+    return nativeMapView.getPrefetchZoomDelta();
   }
 
   //

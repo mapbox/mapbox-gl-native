@@ -386,22 +386,22 @@
                       @"fill-extrusion-pattern should be unset initially.");
         NSExpression *defaultExpression = layer.fillExtrusionPattern;
 
-        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"'Fill Extrusion Pattern'"];
+        NSExpression *constantExpression = [NSExpression expressionForConstantValue:@"Fill Extrusion Pattern"];
         layer.fillExtrusionPattern = constantExpression;
-        mbgl::style::PropertyValue<std::string> propertyValue = { "Fill Extrusion Pattern" };
+        mbgl::style::PropertyValue<mbgl::style::expression::Image> propertyValue = { "Fill Extrusion Pattern" };
         XCTAssertEqual(rawLayer->getFillExtrusionPattern(), propertyValue,
                        @"Setting fillExtrusionPattern to a constant value expression should update fill-extrusion-pattern.");
         XCTAssertEqualObjects(layer.fillExtrusionPattern, constantExpression,
                               @"fillExtrusionPattern should round-trip constant value expressions.");
 
-        constantExpression = [NSExpression expressionWithFormat:@"'Fill Extrusion Pattern'"];
+        constantExpression = [NSExpression expressionWithFormat:@"MGL_FUNCTION('image', 'Fill Extrusion Pattern')"];
         NSExpression *functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, %@, %@)", constantExpression, @{@18: constantExpression}];
         layer.fillExtrusionPattern = functionExpression;
 
         {
             using namespace mbgl::style::expression::dsl;
-            propertyValue = mbgl::style::PropertyExpression<std::string>(
-                step(zoom(), literal("Fill Extrusion Pattern"), 18.0, literal("Fill Extrusion Pattern"))
+            propertyValue = mbgl::style::PropertyExpression<mbgl::style::expression::Image>(
+                step(zoom(), image(literal("Fill Extrusion Pattern")), 18.0, image(literal("Fill Extrusion Pattern")))
             );
         }
 

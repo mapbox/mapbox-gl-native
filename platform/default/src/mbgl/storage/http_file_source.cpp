@@ -13,85 +13,7 @@
 
 #include <curl/curl.h>
 
-// Dynamically load all cURL functions. Debian-derived systems upgraded the OpenSSL version linked
-// to in https://salsa.debian.org/debian/curl/commit/95c94957bb7e89e36e78b995fed468c42f64d18d
-// They state:
-//     Rename libcurl3 to libcurl4, because libcurl exposes an SSL_CTX via
-//     CURLOPT_SSL_CTX_FUNCTION, and this object changes incompatibly between
-//     openssl 1.0 and openssl 1.1.
-// Since we are not accessing the underlying OpenSSL context, we don't care whether we're linking
-// against libcurl3 or libcurl4; both use the ABI version 4 which hasn't changed since 2006
-// (see https://curl.haxx.se/libcurl/abi.html). In fact, cURL's ABI compatibility is very good as
-// shown on https://abi-laboratory.pro/tracker/timeline/curl/
-// Therefore, we're dynamically loading the cURL symbols we need to avoid linking against versioned
-// symbols.
 #include <dlfcn.h>
-
-namespace curl {
-
-#define CURL_FUNCTIONS \
-    X(global_init) \
-    X(getdate) \
-    X(easy_strerror) \
-    X(easy_init) \
-    X(easy_setopt) \
-    X(easy_cleanup) \
-    X(easy_getinfo) \
-    X(easy_reset) \
-    X(multi_init) \
-    X(multi_add_handle) \
-    X(multi_remove_handle) \
-    X(multi_cleanup) \
-    X(multi_info_read) \
-    X(multi_strerror) \
-    X(multi_socket_action) \
-    X(multi_setopt) \
-    X(share_init) \
-    X(share_cleanup) \
-    X(slist_append) \
-    X(slist_free_all)
-
-#define X(name) static decltype(&curl_ ## name) name = nullptr;
-CURL_FUNCTIONS
-#undef X
-
-static void* handle = nullptr;
-
-static void* load(const char* name) {
-    void* symbol = dlsym(handle, name);
-    if (const char* error = dlerror()) {
-        fprintf(stderr, "Cannot load symbol '%s': %s\n", name, error);
-        dlclose(handle);
-        handle = nullptr;
-        abort();
-    }
-    return symbol;
-}
-
-__attribute__((constructor))
-static void load() {
-    assert(!handle);
-    handle = dlopen("libcurl.so.4", RTLD_LAZY | RTLD_LOCAL);
-    if (!handle) {
-        fprintf(stderr, "Could not open shared library '%s'\n", "libcurl.so.4");
-        abort();
-    }
-
-    #define X(name) name = (decltype(&curl_ ## name))load("curl_" #name);
-    CURL_FUNCTIONS
-    #undef X
-}
-
-__attribute__((constructor))
-static void unload() {
-    if (handle) {
-        dlclose(handle);
-    }
-}
-
-} // namespace curl
-
-
 #include <queue>
 #include <map>
 #include <cassert>
@@ -100,13 +22,13 @@ static void unload() {
 
 static void handleError(CURLMcode code) {
     if (code != CURLM_OK) {
-        throw std::runtime_error(std::string("CURL multi error: ") + curl::multi_strerror(code));
+        throw std::runtime_error(std::string("CURL multi error: ") + curl_multi_strerror(code));
     }
 }
 
 static void handleError(CURLcode code) {
     if (code != CURLE_OK) {
-        throw std::runtime_error(std::string("CURL easy error: ") + curl::easy_strerror(code));
+        throw std::runtime_error(std::string("CURL easy error: ") + curl_easy_strerror(code));
     }
 }
 
@@ -170,29 +92,29 @@ private:
 };
 
 HTTPFileSource::Impl::Impl() {
-    if (curl::global_init(CURL_GLOBAL_ALL)) {
+    if (curl_global_init(CURL_GLOBAL_ALL)) {
         throw std::runtime_error("Could not init cURL");
     }
 
-    share = curl::share_init();
+    share = curl_share_init();
 
-    multi = curl::multi_init();
-    handleError(curl::multi_setopt(multi, CURLMOPT_SOCKETFUNCTION, handleSocket));
-    handleError(curl::multi_setopt(multi, CURLMOPT_SOCKETDATA, this));
-    handleError(curl::multi_setopt(multi, CURLMOPT_TIMERFUNCTION, startTimeout));
-    handleError(curl::multi_setopt(multi, CURLMOPT_TIMERDATA, this));
+    multi = curl_multi_init();
+    handleError(curl_multi_setopt(multi, CURLMOPT_SOCKETFUNCTION, handleSocket));
+    handleError(curl_multi_setopt(multi, CURLMOPT_SOCKETDATA, this));
+    handleError(curl_multi_setopt(multi, CURLMOPT_TIMERFUNCTION, startTimeout));
+    handleError(curl_multi_setopt(multi, CURLMOPT_TIMERDATA, this));
 }
 
 HTTPFileSource::Impl::~Impl() {
     while (!handles.empty()) {
-        curl::easy_cleanup(handles.front());
+        curl_easy_cleanup(handles.front());
         handles.pop();
     }
 
-    curl::multi_cleanup(multi);
+    curl_multi_cleanup(multi);
     multi = nullptr;
 
-    curl::share_cleanup(share);
+    curl_share_cleanup(share);
     share = nullptr;
 
     timeout.stop();
@@ -204,12 +126,12 @@ CURL *HTTPFileSource::Impl::getHandle() {
         handles.pop();
         return handle;
     } else {
-        return curl::easy_init();
+        return curl_easy_init();
     }
 }
 
 void HTTPFileSource::Impl::returnHandle(CURL *handle) {
-    curl::easy_reset(handle);
+    curl_easy_reset(handle);
     handles.push(handle);
 }
 
@@ -217,11 +139,11 @@ void HTTPFileSource::Impl::checkMultiInfo() {
     CURLMsg *message = nullptr;
     int pending = 0;
 
-    while ((message = curl::multi_info_read(multi, &pending))) {
+    while ((message = curl_multi_info_read(multi, &pending))) {
         switch (message->msg) {
         case CURLMSG_DONE: {
             HTTPRequest *baton = nullptr;
-            curl::easy_getinfo(message->easy_handle, CURLINFO_PRIVATE, (char *)&baton);
+            curl_easy_getinfo(message->easy_handle, CURLINFO_PRIVATE, (char *)&baton);
             assert(baton);
             baton->handleResult(message->data.result);
         } break;
@@ -245,7 +167,7 @@ void HTTPFileSource::Impl::perform(curl_socket_t s, util::RunLoop::Event events)
 
 
     int running_handles = 0;
-    curl::multi_socket_action(multi, s, flags, &running_handles);
+    curl_multi_socket_action(multi, s, flags, &running_handles);
     checkMultiInfo();
 }
 
@@ -279,9 +201,9 @@ int HTTPFileSource::Impl::handleSocket(CURL * /* handle */, curl_socket_t s, int
 
 void HTTPFileSource::Impl::onTimeout(Impl *context) {
     int running_handles;
-    CURLMcode error = curl::multi_socket_action(context->multi, CURL_SOCKET_TIMEOUT, 0, &running_handles);
+    CURLMcode error = curl_multi_socket_action(context->multi, CURL_SOCKET_TIMEOUT, 0, &running_handles);
     if (error != CURLM_OK) {
-        throw std::runtime_error(std::string("CURL multi error: ") + curl::multi_strerror(error));
+        throw std::runtime_error(std::string("CURL multi error: ") + curl_multi_strerror(error));
     }
     context->checkMultiInfo();
 }
@@ -312,45 +234,44 @@ HTTPRequest::HTTPRequest(HTTPFileSource::Impl* context_, Resource resource_, Fil
     // getting a 304 response if possible. This avoids redownloading unchanged data.
     if (resource.priorEtag) {
         const std::string header = std::string("If-None-Match: ") + *resource.priorEtag;
-        headers = curl::slist_append(headers, header.c_str());
+        headers = curl_slist_append(headers, header.c_str());
     } else if (resource.priorModified) {
         const std::string time =
             std::string("If-Modified-Since: ") + util::rfc1123(*resource.priorModified);
-        headers = curl::slist_append(headers, time.c_str());
+        headers = curl_slist_append(headers, time.c_str());
     }
 
     if (headers) {
-        curl::easy_setopt(handle, CURLOPT_HTTPHEADER, headers);
+        curl_easy_setopt(handle, CURLOPT_HTTPHEADER, headers);
     }
 
-    handleError(curl::easy_setopt(handle, CURLOPT_PRIVATE, this));
-    handleError(curl::easy_setopt(handle, CURLOPT_ERRORBUFFER, error));
-    handleError(curl::easy_setopt(handle, CURLOPT_CAINFO, "ca-bundle.crt"));
-    handleError(curl::easy_setopt(handle, CURLOPT_FOLLOWLOCATION, 1));
-    handleError(curl::easy_setopt(handle, CURLOPT_URL, resource.url.c_str()));
-    handleError(curl::easy_setopt(handle, CURLOPT_WRITEFUNCTION, writeCallback));
-    handleError(curl::easy_setopt(handle, CURLOPT_WRITEDATA, this));
-    handleError(curl::easy_setopt(handle, CURLOPT_HEADERFUNCTION, headerCallback));
-    handleError(curl::easy_setopt(handle, CURLOPT_HEADERDATA, this));
+    handleError(curl_easy_setopt(handle, CURLOPT_PRIVATE, this));
+    handleError(curl_easy_setopt(handle, CURLOPT_ERRORBUFFER, error));
+    handleError(curl_easy_setopt(handle, CURLOPT_FOLLOWLOCATION, 1));
+    handleError(curl_easy_setopt(handle, CURLOPT_URL, resource.url.c_str()));
+    handleError(curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, writeCallback));
+    handleError(curl_easy_setopt(handle, CURLOPT_WRITEDATA, this));
+    handleError(curl_easy_setopt(handle, CURLOPT_HEADERFUNCTION, headerCallback));
+    handleError(curl_easy_setopt(handle, CURLOPT_HEADERDATA, this));
 #if LIBCURL_VERSION_NUM >= ((7) << 16 | (21) << 8 | 6) // Renamed in 7.21.6
-    handleError(curl::easy_setopt(handle, CURLOPT_ACCEPT_ENCODING, "gzip, deflate"));
+    handleError(curl_easy_setopt(handle, CURLOPT_ACCEPT_ENCODING, "gzip, deflate"));
 #else
-    handleError(curl::easy_setopt(handle, CURLOPT_ENCODING, "gzip, deflate"));
+    handleError(curl_easy_setopt(handle, CURLOPT_ENCODING, "gzip, deflate"));
 #endif
-    handleError(curl::easy_setopt(handle, CURLOPT_USERAGENT, "MapboxGL/1.0"));
-    handleError(curl::easy_setopt(handle, CURLOPT_SHARE, context->share));
+    handleError(curl_easy_setopt(handle, CURLOPT_USERAGENT, "MapboxGL/1.0"));
+    handleError(curl_easy_setopt(handle, CURLOPT_SHARE, context->share));
 
     // Start requesting the information.
-    handleError(curl::multi_add_handle(context->multi, handle));
+    handleError(curl_multi_add_handle(context->multi, handle));
 }
 
 HTTPRequest::~HTTPRequest() {
-    handleError(curl::multi_remove_handle(context->multi, handle));
+    handleError(curl_multi_remove_handle(context->multi, handle));
     context->returnHandle(handle);
     handle = nullptr;
 
     if (headers) {
-        curl::slist_free_all(headers);
+        curl_slist_free_all(headers);
         headers = nullptr;
     }
 }
@@ -399,7 +320,7 @@ size_t HTTPRequest::headerCallback(char *const buffer, const size_t size, const 
         // Always overwrite the modification date; We might already have a value here from the
         // Date header, but this one is more accurate.
         const std::string value { buffer + begin, length - begin - 2 }; // remove \r\n
-        baton->response->modified = Timestamp{ Seconds(curl::getdate(value.c_str(), nullptr)) };
+        baton->response->modified = Timestamp{Seconds(curl_getdate(value.c_str(), nullptr))};
     } else if ((begin = headerMatches("etag: ", buffer, length)) != std::string::npos) {
         baton->response->etag = std::string(buffer + begin, length - begin - 2); // remove \r\n
     } else if ((begin = headerMatches("cache-control: ", buffer, length)) != std::string::npos) {
@@ -409,7 +330,7 @@ size_t HTTPRequest::headerCallback(char *const buffer, const size_t size, const 
         baton->response->mustRevalidate = cc.mustRevalidate;
     } else if ((begin = headerMatches("expires: ", buffer, length)) != std::string::npos) {
         const std::string value { buffer + begin, length - begin - 2 }; // remove \r\n
-        baton->response->expires = Timestamp{ Seconds(curl::getdate(value.c_str(), nullptr)) };
+        baton->response->expires = Timestamp{Seconds(curl_getdate(value.c_str(), nullptr))};
     } else if ((begin = headerMatches("retry-after: ", buffer, length)) != std::string::npos) {
         baton->retryAfter = std::string(buffer + begin, length - begin - 2); // remove \r\n
     } else if ((begin = headerMatches("x-rate-limit-reset: ", buffer, length)) != std::string::npos) {
@@ -435,18 +356,18 @@ void HTTPRequest::handleResult(CURLcode code) {
         case CURLE_COULDNT_CONNECT:
         case CURLE_OPERATION_TIMEDOUT:
 
-            response->error = std::make_unique<Error>(
-                Error::Reason::Connection, std::string{ curl::easy_strerror(code) } + ": " + error);
+            response->error = std::make_unique<Error>(Error::Reason::Connection,
+                                                      std::string{curl_easy_strerror(code)} + ": " + error);
             break;
 
         default:
-            response->error = std::make_unique<Error>(
-                Error::Reason::Other, std::string{ curl::easy_strerror(code) } + ": " + error);
+            response->error =
+                std::make_unique<Error>(Error::Reason::Other, std::string{curl_easy_strerror(code)} + ": " + error);
             break;
         }
     } else {
         long responseCode = 0;
-        curl::easy_getinfo(handle, CURLINFO_RESPONSE_CODE, &responseCode);
+        curl_easy_getinfo(handle, CURLINFO_RESPONSE_CODE, &responseCode);
 
         if (responseCode == 200) {
             if (data) {

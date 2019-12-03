@@ -27,16 +27,12 @@ std::unique_ptr<style::Layer> SymbolLayerFactory::createLayer(const std::string&
 std::unique_ptr<Layout> SymbolLayerFactory::createLayout(const LayoutParameters& parameters,
                                                          std::unique_ptr<GeometryTileLayer> tileLayer,
                                                          const std::vector<Immutable<style::LayerProperties>>& group) noexcept {
-    return std::make_unique<SymbolLayout>(parameters.bucketParameters,
-                                          group,
-                                          std::move(tileLayer),
-                                          parameters.imageDependencies,
-                                          parameters.glyphDependencies);
+    return std::make_unique<SymbolLayout>(parameters.bucketParameters, group, std::move(tileLayer), parameters);
 }
 
 std::unique_ptr<RenderLayer> SymbolLayerFactory::createRenderLayer(Immutable<style::Layer::Impl> impl) noexcept {
     assert(impl->getTypeInfo() == getTypeInfo());
-    return std::make_unique<RenderSymbolLayer>(staticImmutableCast<style::SymbolLayer::Impl>(std::move(impl)));
+    return std::make_unique<RenderSymbolLayer>(staticImmutableCast<style::SymbolLayer::Impl>(impl));
 }
 
 } // namespace mbgl

@@ -1,5 +1,5 @@
 // NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
-
+// clang-format off
 #include <mbgl/programs/debug_program.hpp>
 #include <mbgl/programs/gl/preludes.hpp>
 #include <mbgl/programs/gl/shader_source.hpp>
@@ -15,7 +15,7 @@ struct ShaderSource;
 template <>
 struct ShaderSource<DebugProgram> {
     static constexpr const char* name = "debug";
-    static constexpr const uint8_t hash[8] = { 0xa8, 0x7d, 0x87, 0x6e, 0x36, 0xa8, 0x81, 0xe3 };
+    static constexpr const uint8_t hash[8] = {0xa8, 0x7d, 0x87, 0x6e, 0x36, 0xa8, 0x81, 0xe3};
     static constexpr const auto vertexOffset = 12494;
     static constexpr const auto fragmentOffset = 12590;
 };
@@ -58,4 +58,4 @@ void main() {
 }
 
 */
-
+// clang-format on

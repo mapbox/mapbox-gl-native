@@ -85,25 +85,23 @@ void RenderGeoJSONSource::update(Immutable<style::Source::Impl> baseImpl_,
     enabled = needsRendering;
 
     auto data_ = impl().getData().lock();
-
     if (data.lock() != data_) {
         data = data_;
-        tilePyramid.reduceMemoryUse();
-
-        if (data_) {
+        if (parameters.mode != MapMode::Continuous) {
+            // Clearing the tile pyramid in order to avoid render tests being flaky.
+            tilePyramid.clearAll();
+        } else if (data_) {
+            tilePyramid.reduceMemoryUse();
             const uint8_t maxZ = impl().getZoomRange().max;
             for (const auto& pair : tilePyramid.getTiles()) {
                 if (pair.first.canonical.z <= maxZ) {
-                    static_cast<GeoJSONTile*>(pair.second.get())->updateData(data_->getTile(pair.first.canonical), needsRelayout);
+                    static_cast<GeoJSONTile*>(pair.second.get())->updateData(data_, needsRelayout);
                 }
             }
         }
     }
 
-    if (!data_) {
-        tilePyramid.clearAll();
-        return;
-    }
+    if (!data_) return;
 
     tilePyramid.update(layers,
                        needsRendering,
@@ -113,8 +111,8 @@ void RenderGeoJSONSource::update(Immutable<style::Source::Impl> baseImpl_,
                        util::tileSize,
                        impl().getZoomRange(),
                        optional<LatLngBounds>{},
-                       [&, data_] (const OverscaledTileID& tileID) {
-                           return std::make_unique<GeoJSONTile>(tileID, impl().id, parameters, data_->getTile(tileID.canonical));
+                       [&, data_](const OverscaledTileID& tileID) {
+                           return std::make_unique<GeoJSONTile>(tileID, impl().id, parameters, data_);
                        });
 }
 

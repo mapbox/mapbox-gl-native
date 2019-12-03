@@ -1,5 +1,9 @@
-add_library(unique_resource INTERFACE)
+if(TARGET mbgl-vendor-unique_resource)
+    return()
+endif()
 
-target_include_directories(unique_resource SYSTEM INTERFACE
-    ${CMAKE_SOURCE_DIR}/vendor/unique_resource
+add_library(mbgl-vendor-unique_resource INTERFACE)
+
+target_include_directories(mbgl-vendor-unique_resource SYSTEM INTERFACE
+    ${CMAKE_CURRENT_LIST_DIR}/unique_resource
 )

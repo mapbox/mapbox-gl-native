@@ -2,6 +2,7 @@
 
 #include <mbgl/util/optional.hpp>
 
+#include <functional>
 #include <memory>
 #include <mutex>
 #include <queue>
@@ -34,6 +35,7 @@ public:
     void receive();
 
     static void maybeReceive(std::weak_ptr<Mailbox>);
+    static std::function<void()> makeClosure(std::weak_ptr<Mailbox>);
 
 private:
     optional<Scheduler*> scheduler;

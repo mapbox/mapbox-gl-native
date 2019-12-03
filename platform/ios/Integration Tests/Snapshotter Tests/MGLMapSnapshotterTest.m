@@ -1,4 +1,5 @@
 #import "MGLMapViewIntegrationTest.h"
+#import "MGLMapSnapshotter_Private.h"
 
 @interface MGLMapSnapshotter ()
 @property (nonatomic) BOOL cancelled;
@@ -24,13 +25,24 @@ MGLMapSnapshotter* snapshotterWithCoordinates(CLLocationCoordinate2D coordinates
     return snapshotter;
 }
 
+MGLMapSnapshotter* snapshotterWithBounds(MGLCoordinateBounds bounds, CGSize size) {
+
+    MGLMapCamera* mapCamera = [[MGLMapCamera alloc] init];
+    MGLMapSnapshotOptions* options = [[MGLMapSnapshotOptions alloc] initWithStyleURL:[MGLStyle satelliteStreetsStyleURL]
+                                                                              camera:mapCamera
+                                                                                size:size];
+    options.coordinateBounds = bounds;
+
+    // Create and start the snapshotter
+    MGLMapSnapshotter* snapshotter = [[MGLMapSnapshotter alloc] initWithOptions:options];
+    return snapshotter;
+}
+
+
+
 @implementation MGLMapSnapshotterTest
 
-- (void)testMultipleSnapshotsWithASingleSnapshotter {
-    if (![self validAccessToken]) {
-        return;
-    }
-
+- (void)testMultipleSnapshotsWithASingleSnapshotter🔒 {
     CGSize size = self.mapView.bounds.size;
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"snapshots"];
@@ -60,11 +72,8 @@ MGLMapSnapshotter* snapshotterWithCoordinates(CLLocationCoordinate2D coordinates
     [self waitForExpectations:@[expectation] timeout:10.0];
 }
 
-- (void)testDeallocatingSnapshotterDuringSnapshot {
+- (void)testDeallocatingSnapshotterDuringSnapshot🔒 {
     // See also https://github.com/mapbox/mapbox-gl-native/issues/12336
-    if (![self validAccessToken]) {
-        return;
-    }
 
     NSTimeInterval timeout         = 10.0;
     XCTestExpectation *expectation = [self expectationWithDescription:@"snapshot"];
@@ -108,15 +117,11 @@ MGLMapSnapshotter* snapshotterWithCoordinates(CLLocationCoordinate2D coordinates
     [self waitForExpectations:@[expectation] timeout:timeout];
 }
 
-- (void)testSnapshotterUsingNestedDispatchQueues {
+- (void)testSnapshotterUsingNestedDispatchQueues🔒 {
     // This is the opposite pair to the above test `testDeallocatingSnapshotterDuringSnapshot`
     // The only significant difference is that the snapshotter is a `__block` variable, so
     // its lifetime should continue until it's set to nil in the completion block.
     // See also https://github.com/mapbox/mapbox-gl-native/issues/12336
-
-    if (![self validAccessToken]) {
-        return;
-    }
 
     NSTimeInterval timeout         = 10.0;
     XCTestExpectation *expectation = [self expectationWithDescription:@"snapshot"];
@@ -156,11 +161,7 @@ MGLMapSnapshotter* snapshotterWithCoordinates(CLLocationCoordinate2D coordinates
     [self waitForExpectations:@[expectation] timeout:timeout];
 }
 
-- (void)testCancellingSnapshot {
-    if (![self validAccessToken]) {
-        return;
-    }
-
+- (void)testCancellingSnapshot🔒 {
     XCTestExpectation *expectation = [self expectationWithDescription:@"snapshots"];
     expectation.assertForOverFulfill = YES;
     expectation.expectedFulfillmentCount = 1;
@@ -189,11 +190,7 @@ MGLMapSnapshotter* snapshotterWithCoordinates(CLLocationCoordinate2D coordinates
     [self waitForExpectations:@[expectation] timeout:5.0];
 }
 
-- (void)testAllocatingSnapshotOnBackgroundQueue {
-    if (![self validAccessToken]) {
-        return;
-    }
-
+- (void)testAllocatingSnapshotOnBackgroundQueue🔒 {
     XCTestExpectation *expectation = [self expectationWithDescription:@"snapshots"];
 
     CGSize size                  = self.mapView.bounds.size;
@@ -226,11 +223,7 @@ MGLMapSnapshotter* snapshotterWithCoordinates(CLLocationCoordinate2D coordinates
     [self waitForExpectations:@[expectation] timeout:2.0];
 }
 
-- (void)testSnapshotterFromBackgroundQueueShouldFail {
-    if (![self validAccessToken]) {
-        return;
-    }
-
+- (void)testSnapshotterFromBackgroundQueueShouldFail🔒 {
     CGSize size = self.mapView.bounds.size;
     CLLocationCoordinate2D coord = CLLocationCoordinate2DMake(30.0, 30.0);
 
@@ -281,12 +274,7 @@ MGLMapSnapshotter* snapshotterWithCoordinates(CLLocationCoordinate2D coordinates
     [self waitForExpectations:@[expectation] timeout:60.0];
 }
 
-- (void)testMultipleSnapshottersPENDING {
-
-    if (![self validAccessToken]) {
-        return;
-    }
-
+- (void)testMultipleSnapshotters🔒🙁 {
     NSUInteger numSnapshots = 8;
     CGSize size = self.mapView.bounds.size;
 
@@ -340,11 +328,7 @@ MGLMapSnapshotter* snapshotterWithCoordinates(CLLocationCoordinate2D coordinates
     [self waitForExpectations:@[expectation] timeout:60.0];
 }
 
-- (void)testSnapshotPointConversion {
-    if (![self validAccessToken]) {
-        return;
-    }
-
+- (void)testSnapshotPointConversion🔒 {
     CGSize size = self.mapView.bounds.size;
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"snapshot"];
@@ -382,11 +366,7 @@ MGLMapSnapshotter* snapshotterWithCoordinates(CLLocationCoordinate2D coordinates
     [self waitForExpectations:@[expectation] timeout:10.0];
 }
 
-- (void)testSnapshotPointConversionCoordinateOrdering {
-    if (![self validAccessToken]) {
-        return;
-    }
-
+- (void)testSnapshotPointConversionCoordinateOrdering🔒 {
     CGSize size = self.mapView.bounds.size;
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"snapshot"];
@@ -422,6 +402,130 @@ MGLMapSnapshotter* snapshotterWithCoordinates(CLLocationCoordinate2D coordinates
 
         MGLTestAssert(myself, coordBR.longitude > coord.longitude);
         MGLTestAssert(myself, coordBR.latitude < coord.latitude);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectations:@[expectation] timeout:10.0];
+}
+
+- (void)testSnapshotWithOverlayHandlerFailure🔒 {
+    CGSize size = self.mapView.bounds.size;
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@"snapshot with overlay fails"];
+    expectation.expectedFulfillmentCount = 2;
+
+    CLLocationCoordinate2D coord = CLLocationCoordinate2DMake(30.0, 30.0);
+
+    MGLMapSnapshotter *snapshotter = snapshotterWithCoordinates(coord, size);
+    XCTAssertNotNil(snapshotter);
+
+    [snapshotter startWithOverlayHandler:^(MGLMapSnapshotOverlay *snapshotOverlay) {
+        XCTAssertNotNil(snapshotOverlay);
+        
+        UIGraphicsEndImageContext();
+        [expectation fulfill];
+    } completionHandler:^(MGLMapSnapshot * _Nullable snapshot, NSError * _Nullable error) {
+        XCTAssertNil(snapshot);
+        XCTAssertNotNil(error);
+        XCTAssertEqualObjects(error.domain, MGLErrorDomain);
+        XCTAssertEqual(error.code, MGLErrorCodeSnapshotFailed);
+        XCTAssertEqualObjects(error.localizedDescription, @"Failed to generate composited snapshot.");
+                
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectations:@[expectation] timeout:10.0];
+}
+
+- (void)testSnapshotWithOverlayHandlerSuccess🔒 {
+    CGSize size = self.mapView.bounds.size;
+    CGRect snapshotRect = CGRectMake(0, 0, size.width, size.height);
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@"snapshot with overlay succeeds"];
+    expectation.expectedFulfillmentCount = 2;
+
+    CLLocationCoordinate2D coord = CLLocationCoordinate2DMake(30.0, 30.0);
+
+    MGLMapSnapshotter *snapshotter = snapshotterWithCoordinates(coord, size);
+    XCTAssertNotNil(snapshotter);
+    
+    CGFloat scale = snapshotter.options.scale;
+    
+    [snapshotter startWithOverlayHandler:^(MGLMapSnapshotOverlay *snapshotOverlay) {
+        XCTAssertNotNil(snapshotOverlay);
+        
+        CGFloat width = CGBitmapContextGetWidth(snapshotOverlay.context);
+        CGFloat height = CGBitmapContextGetHeight(snapshotOverlay.context);
+
+        CGRect contextRect = CGContextConvertRectToDeviceSpace(snapshotOverlay.context, CGRectMake(0, 0, 1, 0));
+        CGFloat scaleFromContext = contextRect.size.width;
+        XCTAssertEqual(scale, scaleFromContext);
+        XCTAssertEqual(width, size.width*scale);
+        XCTAssertEqual(height, size.height*scale);
+        
+        CGContextSetFillColorWithColor(snapshotOverlay.context, [UIColor.greenColor CGColor]);
+        CGContextSetAlpha(snapshotOverlay.context, 0.2);
+        CGContextAddRect(snapshotOverlay.context, snapshotRect);
+        CGContextFillRect(snapshotOverlay.context, snapshotRect);
+        [expectation fulfill];
+    } completionHandler:^(MGLMapSnapshot * _Nullable snapshot, NSError * _Nullable error) {
+        XCTAssertNil(error);
+        XCTAssertNotNil(snapshot);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectations:@[expectation] timeout:10.0];
+}
+
+- (void)testSnapshotCoordinatesWithOverlayHandler🔒 {
+    CGSize size = self.mapView.bounds.size;
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@"snapshot with overlay succeeds"];
+    expectation.expectedFulfillmentCount = 2;
+
+    CLLocationCoordinate2D london = { .latitude = 51.5074, .longitude = -0.1278 };
+    CLLocationCoordinate2D paris  = { .latitude = 48.8566, .longitude = 2.3522 };
+
+    MGLCoordinateBounds bounds = {
+        .ne = london,
+        .sw = paris
+    };
+
+    MGLMapSnapshotter *snapshotter = snapshotterWithBounds(bounds, size);
+    XCTAssertNotNil(snapshotter);
+
+    void (^testCoordinates)(id<MGLMapSnapshotProtocol>) = ^(id<MGLMapSnapshotProtocol> snapshot){
+        XCTAssertNotNil(snapshot);
+
+        CGPoint londonPoint = [snapshot pointForCoordinate:london];
+        CGPoint parisPoint  = [snapshot pointForCoordinate:paris];
+
+        XCTAssertEqualWithAccuracy(londonPoint.x, 0, 0.1);
+        XCTAssertEqualWithAccuracy(parisPoint.x, size.width, 0.1);
+
+        // Vertically, London and Paris are inset (due to the size vs coordinate bounds)
+        XCTAssert(parisPoint.y > londonPoint.y);
+        XCTAssert(londonPoint.y > 0.0);
+        XCTAssert(parisPoint.y < size.height);
+
+        CLLocationCoordinate2D london2 = [snapshot coordinateForPoint:londonPoint];
+        CLLocationCoordinate2D paris2  = [snapshot coordinateForPoint:parisPoint];
+
+        XCTAssertEqualWithAccuracy(london.latitude,  london2.latitude,  0.0000001);
+        XCTAssertEqualWithAccuracy(london.longitude, london2.longitude, 0.0000001);
+        XCTAssertEqualWithAccuracy(paris.latitude,   paris2.latitude,   0.0000001);
+        XCTAssertEqualWithAccuracy(paris.longitude,  paris2.longitude,  0.0000001);
+    };
+
+    [snapshotter startWithOverlayHandler:^(MGLMapSnapshotOverlay *snapshotOverlay) {
+        XCTAssert([snapshotOverlay conformsToProtocol:@protocol(MGLMapSnapshotProtocol)]);
+        testCoordinates((id<MGLMapSnapshotProtocol>)snapshotOverlay);
+
+        [expectation fulfill];
+    } completionHandler:^(MGLMapSnapshot * _Nullable snapshot, NSError * _Nullable error) {
+        XCTAssert([snapshot conformsToProtocol:@protocol(MGLMapSnapshotProtocol)]);
+        testCoordinates((id<MGLMapSnapshotProtocol>)snapshot);
 
         [expectation fulfill];
     }];

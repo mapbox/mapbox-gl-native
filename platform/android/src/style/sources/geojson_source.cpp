@@ -1,4 +1,5 @@
 #include "geojson_source.hpp"
+#include <mbgl/style/sources/geojson_source_impl.hpp>
 #include "../../attach_env.hpp"
 
 #include <mbgl/renderer/query.hpp>
@@ -29,46 +30,42 @@ namespace android {
     // This conversion is expected not to fail because it's used only in contexts where
     // the value was originally a GeoJsonOptions object on the Java side. If it fails
     // to convert, it's a bug in our serialization or Java-side static typing.
-    static style::GeoJSONOptions convertGeoJSONOptions(jni::JNIEnv& env, const jni::Object<>& options) {
-        using namespace mbgl::style::conversion;
-        if (!options) {
-            return style::GeoJSONOptions();
-        }
-        Error error;
-        optional<style::GeoJSONOptions> result = convert<style::GeoJSONOptions>(
-            mbgl::android::Value(env, options), error);
-        if (!result) {
-            throw std::logic_error(error.message);
-        }
-        return *result;
+static Immutable<style::GeoJSONOptions> convertGeoJSONOptions(jni::JNIEnv& env, const jni::Object<>& options) {
+    using namespace mbgl::style::conversion;
+    if (!options) {
+        return style::GeoJSONOptions::defaultOptions();
     }
-
-    GeoJSONSource::GeoJSONSource(jni::JNIEnv& env, const jni::String& sourceId, const jni::Object<>& options)
-        : Source(env, std::make_unique<mbgl::style::GeoJSONSource>(
-                jni::Make<std::string>(env, sourceId),
-                convertGeoJSONOptions(env, options)))
-        , converter(std::make_unique<Actor<FeatureConverter>>(Scheduler::GetBackground())) {
+    Error error;
+    optional<style::GeoJSONOptions> result = convert<style::GeoJSONOptions>(mbgl::android::Value(env, options), error);
+    if (!result) {
+        throw std::logic_error(error.message);
     }
+    return makeMutable<style::GeoJSONOptions>(std::move(*result));
+}
 
-    GeoJSONSource::GeoJSONSource(jni::JNIEnv& env,
-                                 mbgl::style::Source& coreSource,
-                                 AndroidRendererFrontend& frontend)
-        : Source(env, coreSource, createJavaPeer(env), frontend)
-        , converter(std::make_unique<Actor<FeatureConverter>>(Scheduler::GetBackground())) {
-    }
+GeoJSONSource::GeoJSONSource(jni::JNIEnv& env, const jni::String& sourceId, const jni::Object<>& options)
+    : Source(env,
+             std::make_unique<mbgl::style::GeoJSONSource>(jni::Make<std::string>(env, sourceId),
+                                                          convertGeoJSONOptions(env, options))),
+      converter(std::make_unique<Actor<FeatureConverter>>(Scheduler::GetBackground(),
+                                                          source.as<style::GeoJSONSource>()->impl().getOptions())) {}
 
-    GeoJSONSource::~GeoJSONSource() = default;
+GeoJSONSource::GeoJSONSource(jni::JNIEnv& env, mbgl::style::Source& coreSource, AndroidRendererFrontend& frontend)
+    : Source(env, coreSource, createJavaPeer(env), frontend),
+      converter(std::make_unique<Actor<FeatureConverter>>(Scheduler::GetBackground(),
+                                                          source.as<style::GeoJSONSource>()->impl().getOptions())) {}
 
-    void GeoJSONSource::setGeoJSONString(jni::JNIEnv& env, const jni::String& jString) {
+GeoJSONSource::~GeoJSONSource() = default;
 
-        std::shared_ptr<std::string> json = std::make_shared<std::string>(jni::Make<std::string>(env, jString));
+void GeoJSONSource::setGeoJSONString(jni::JNIEnv& env, const jni::String& jString) {
+    std::shared_ptr<std::string> json = std::make_shared<std::string>(jni::Make<std::string>(env, jString));
 
-        Update::Converter converterFn = [this, json](ActorRef<Callback> _callback) {
-            converter->self().invoke(&FeatureConverter::convertJson, json, _callback);
-        };
+    Update::Converter converterFn = [this, json](ActorRef<GeoJSONDataCallback> _callback) {
+        converter->self().invoke(&FeatureConverter::convertJson, json, _callback);
+    };
 
-        setAsync(converterFn);
-    }
+    setAsync(converterFn);
+}
 
     void GeoJSONSource::setFeatureCollection(jni::JNIEnv& env, const jni::Object<geojson::FeatureCollection>& jFeatures) {
         setCollectionAsync(env, jFeatures);
@@ -84,11 +81,11 @@ namespace android {
 
     void GeoJSONSource::setURL(jni::JNIEnv& env, const jni::String& url) {
         // Update the core source
-        source.as<mbgl::style::GeoJSONSource>()->GeoJSONSource::setURL(jni::Make<std::string>(env, url));
+        source.as<style::GeoJSONSource>()->setURL(jni::Make<std::string>(env, url));
     }
 
     jni::Local<jni::String> GeoJSONSource::getURL(jni::JNIEnv& env) {
-        optional<std::string> url = source.as<mbgl::style::GeoJSONSource>()->GeoJSONSource::getURL();
+        optional<std::string> url = source.as<style::GeoJSONSource>()->getURL();
         return url ? jni::Make<jni::String>(env, *url) : jni::Local<jni::String>();
     }
 
@@ -166,7 +163,7 @@ namespace android {
         auto global = jni::NewGlobal<jni::EnvAttachingDeleter>(env, jObject);
         auto object = std::make_shared<decltype(global)>(std::move(global));
 
-        Update::Converter converterFn = [this, object](ActorRef<Callback> _callback) {
+        Update::Converter converterFn = [this, object](ActorRef<GeoJSONDataCallback> _callback) {
             converter->self().invoke(&FeatureConverter::convertObject<JNIType>, object, _callback);
         };
 
@@ -175,25 +172,23 @@ namespace android {
 
     void GeoJSONSource::setAsync(Update::Converter converterFn) {
         awaitingUpdate = std::make_unique<Update>(
-                std::move(converterFn),
-                std::make_unique<Actor<Callback>>(
-                        *Scheduler::GetCurrent(),
-                        [this](GeoJSON geoJSON) {
-                            // conversion from Java features to core ones finished
-                            android::UniqueEnv _env = android::AttachEnv();
+            std::move(converterFn),
+            std::make_unique<Actor<GeoJSONDataCallback>>(
+                *Scheduler::GetCurrent(), [this](std::shared_ptr<style::GeoJSONData> geoJSONData) {
+                    // conversion from Java features to core ones finished
+                    android::UniqueEnv _env = android::AttachEnv();
 
-                            // Update the core source
-                            source.as<mbgl::style::GeoJSONSource>()->GeoJSONSource::setGeoJSON(geoJSON);
+                    // Update the core source
+                    source.as<mbgl::style::GeoJSONSource>()->setGeoJSONData(std::move(geoJSONData));
 
-                            // if there is an awaiting update, execute it, otherwise, release resources
-                            if (awaitingUpdate) {
-                                update = std::move(awaitingUpdate);
-                                update->converterFn(update->callback->self());
-                            } else {
-                                update.reset();
-                            }
-                        })
-        );
+                    // if there is an awaiting update, execute it, otherwise, release resources
+                    if (awaitingUpdate) {
+                        update = std::move(awaitingUpdate);
+                        update->converterFn(update->callback->self());
+                    } else {
+                        update.reset();
+                    }
+                }));
 
         // If another update is running, wait
         if (update) {
@@ -230,12 +225,10 @@ namespace android {
         );
     }
 
-    void FeatureConverter::convertJson(std::shared_ptr<std::string> json,
-                                       ActorRef<Callback> callback) {
+    void FeatureConverter::convertJson(std::shared_ptr<std::string> json, ActorRef<GeoJSONDataCallback> callback) {
         using namespace mbgl::style::conversion;
 
         android::UniqueEnv _env = android::AttachEnv();
-
         // Convert the jni object
         Error error;
         optional<GeoJSON> converted = parseGeoJSON(*json, error);
@@ -244,22 +237,23 @@ namespace android {
             return;
         }
 
-        callback.invoke(&Callback::operator(), *converted);
+        callback.invoke(&GeoJSONDataCallback::operator(), style::GeoJSONData::create(*converted, options));
     }
 
     template <class JNIType>
-    void FeatureConverter::convertObject(std::shared_ptr<jni::Global<jni::Object<JNIType>, jni::EnvAttachingDeleter>> jObject, ActorRef<Callback> callback) {
+    void FeatureConverter::convertObject(
+        std::shared_ptr<jni::Global<jni::Object<JNIType>, jni::EnvAttachingDeleter>> jObject,
+        ActorRef<GeoJSONDataCallback> callback) {
         using namespace mbgl::android::geojson;
 
         android::UniqueEnv _env = android::AttachEnv();
         // Convert the jni object
         auto geometry = JNIType::convert(*_env, *jObject);
-        callback.invoke(&Callback::operator(), GeoJSON(geometry));
+        callback.invoke(&GeoJSONDataCallback::operator(), style::GeoJSONData::create(geometry, options));
     }
 
-    Update::Update(Converter _converterFn, std::unique_ptr<Actor<Callback>> _callback)
-            : converterFn(std::move(_converterFn))
-            , callback(std::move(_callback)) {}
+    Update::Update(Converter _converterFn, std::unique_ptr<Actor<GeoJSONDataCallback>> _callback)
+        : converterFn(std::move(_converterFn)), callback(std::move(_callback)) {}
 
 } // namespace android
 } // namespace mbgl

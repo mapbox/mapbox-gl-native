@@ -1,10 +1,11 @@
 #pragma once
 
-#include <mbgl/text/glyph.hpp>
-#include <mbgl/text/tagged_string.hpp>
 #include <mbgl/renderer/image_atlas.hpp>
-#include <mbgl/style/types.hpp>
 #include <mbgl/style/layers/symbol_layer_properties.hpp>
+#include <mbgl/style/types.hpp>
+#include <mbgl/text/glyph.hpp>
+#include <mbgl/text/glyph_atlas.hpp>
+#include <mbgl/text/tagged_string.hpp>
 
 namespace mbgl {
 
@@ -27,18 +28,8 @@ class BiDi;
 
 class PositionedIcon {
 private:
-    PositionedIcon(ImagePosition image_,
-                   float top_,
-                   float bottom_,
-                   float left_,
-                   float right_,
-                   float angle_)
-        : _image(std::move(image_)),
-          _top(top_),
-          _bottom(bottom_),
-          _left(left_),
-          _right(right_),
-          _angle(angle_) {}
+    PositionedIcon(ImagePosition image_, float top_, float bottom_, float left_, float right_, float angle_)
+        : _image(image_), _top(top_), _bottom(bottom_), _left(left_), _right(right_), _angle(angle_) {}
 
     ImagePosition _image;
     float _top;
@@ -55,9 +46,11 @@ public:
 
     // Updates shaped icon's bounds based on shaped text's bounds and provided
     // layout properties.
-    void fitIconToText(const style::SymbolLayoutProperties::Evaluated& layout,
-                       const Shaping& shapedText,
-                       float layoutTextSize);
+    void fitIconToText(const Shaping& shapedText,
+                       const style::IconTextFitType textFit,
+                       const std::array<float, 4>& padding,
+                       const std::array<float, 2>& iconOffset,
+                       const float fontScale);
 
     const ImagePosition& image() const { return _image; }
     float top() const { return _top; }
@@ -76,7 +69,11 @@ const Shaping getShaping(const TaggedString& string,
                          const std::array<float, 2>& translate,
                          const WritingModeType,
                          BiDi& bidi,
-                         const GlyphMap& glyphs,
+                         const GlyphMap& glyphMap,
+                         const GlyphPositions& glyphPositions,
+                         const ImagePositions& imagePositions,
+                         float layoutTextSize,
+                         float layoutTextSizeAtBucketZoomLevel,
                          bool allowVerticalPlacement);
 
 } // namespace mbgl

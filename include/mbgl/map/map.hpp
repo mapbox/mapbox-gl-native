@@ -97,6 +97,8 @@ public:
     // Projection
     ScreenCoordinate pixelForLatLng(const LatLng&) const;
     LatLng latLngForPixel(const ScreenCoordinate&) const;
+    std::vector<ScreenCoordinate> pixelsForLatLngs(const std::vector<LatLng>&) const;
+    std::vector<LatLng> latLngsForPixels(const std::vector<ScreenCoordinate>&) const;
 
     // Annotations
     void addAnnotationImage(std::unique_ptr<style::Image>);

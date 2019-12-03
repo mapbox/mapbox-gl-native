@@ -2,6 +2,8 @@ package com.mapbox.mapboxsdk;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.res.AssetManager;
+import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
@@ -24,6 +26,7 @@ import com.mapbox.mapboxsdk.utils.ThreadUtils;
  */
 @UiThread
 @SuppressLint("StaticFieldLeak")
+@Keep
 public final class Mapbox {
 
   private static final String TAG = "Mbgl-Mapbox";
@@ -221,5 +224,14 @@ public final class Mapbox {
    */
   public static boolean hasInstance() {
     return INSTANCE != null;
+  }
+
+  /**
+   * Internal use. Returns AssetManager.
+   *
+   * @return the asset manager
+   */
+  private static AssetManager getAssetManager() {
+    return getApplicationContext().getResources().getAssets();
   }
 }

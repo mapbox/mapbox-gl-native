@@ -8,6 +8,7 @@
 # Build files
 build/
 .externalNativeBuild
+**/.cxx
 *.so
 *.apk
 

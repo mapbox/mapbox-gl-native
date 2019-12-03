@@ -9,13 +9,12 @@ namespace style {
 namespace expression {
 
 EvaluationResult toBoolean(const Value& v) {
-    return v.match(
-        [&] (double f) { return static_cast<bool>(f); },
-        [&] (const std::string& s) { return s.length() > 0; },
-        [&] (bool b) { return b; },
-        [&] (const NullValue&) { return false; },
-        [&] (const auto&) { return true; }
-    );
+    return v.match([&](double f) { return static_cast<bool>(f); },
+                   [&](const std::string& s) { return s.length() > 0; },
+                   [&](bool b) { return b; },
+                   [&](const NullValue&) { return false; },
+                   [&](const Image& i) { return i.isAvailable(); },
+                   [&](const auto&) { return true; });
 }
 
 EvaluationResult toNumber(const Value& v) {
@@ -86,6 +85,10 @@ EvaluationResult toFormatted(const Value& formattedValue) {
     return Formatted(toString(formattedValue).c_str());
 }
 
+EvaluationResult toImage(const Value& imageValue) {
+    return Image(toString(imageValue).c_str());
+}
+
 Coercion::Coercion(type::Type type_, std::vector<std::unique_ptr<Expression>> inputs_) :
     Expression(Kind::Coercion, std::move(type_)),
     inputs(std::move(inputs_))
@@ -102,6 +105,8 @@ Coercion::Coercion(type::Type type_, std::vector<std::unique_ptr<Expression>> in
         coerceSingleValue = [] (const Value& v) -> EvaluationResult { return toString(v); };
     } else if (t.is<type::FormattedType>()) {
         coerceSingleValue = toFormatted;
+    } else if (t.is<type::ImageType>()) {
+        coerceSingleValue = toImage;
     } else {
         assert(false);
     }
@@ -115,6 +120,8 @@ mbgl::Value Coercion::serialize() const {
         serialized.push_back(inputs[0]->serialize());
         serialized.emplace_back(std::unordered_map<std::string, mbgl::Value>());
         return serialized;
+    } else if (getType().is<type::ImageType>()) {
+        return std::vector<mbgl::Value>{{std::string("image")}, inputs[0]->serialize()};
     } else {
         return Expression::serialize();
     }
@@ -148,11 +155,13 @@ ParseResult Coercion::parse(const Convertible& value, ParsingContext& ctx) {
     auto it = types.find(*toString(arrayMember(value, 0)));
     assert(it != types.end());
 
-    if ((it->second == type::Boolean || it->second == type::String || it->second == type::Formatted) && length != 2) {
+    if ((it->second == type::Boolean || it->second == type::String || it->second == type::Formatted ||
+         it->second == type::Image) &&
+        length != 2) {
         ctx.error("Expected one argument.");
         return ParseResult();
     }
-    
+
     /**
      * Special form for error-coalescing coercion expressions "to-number",
      * "to-color".  Since these coercions can fail at runtime, they accept multiple

@@ -17,11 +17,7 @@ bool isFeatureConstant(const Expression& expression) {
             return false;
         } else if (name == "has" && parameterCount && *parameterCount == 1) {
             return false;
-        } else if (
-            name == "properties" ||
-            name == "geometry-type" ||
-            name == "id"
-        ) {
+        } else if (name == "properties" || name == "geometry-type" || name == "id" || name == "feature-state") {
             return false;
         } else if (0u == name.rfind(filter, 0u)) {
             // Legacy filters begin with "filter-" and are never constant.
@@ -53,6 +49,19 @@ bool isZoomConstant(const Expression& e) {
     return isGlobalPropertyConstant(e, std::array<std::string, 1>{{"zoom"}});
 }
 
+bool isRuntimeConstant(const Expression& expression) {
+    if (expression.getKind() == Kind::ImageExpression) {
+        return false;
+    }
+
+    bool runtimeConstant = true;
+    expression.eachChild([&](const Expression& e) {
+        if (runtimeConstant && !isRuntimeConstant(e)) {
+            runtimeConstant = false;
+        }
+    });
+    return runtimeConstant;
+}
 
 } // namespace expression
 } // namespace style

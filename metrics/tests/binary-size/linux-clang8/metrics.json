@@ -1,0 +1,19 @@
+{
+    "file-size": [
+        [
+            "mbgl-glfw",
+            "/src/workspace/next-linux-clang8-release/bin/mbgl-glfw",
+            6290568
+        ],
+        [
+            "mbgl-offline",
+            "/src/workspace/next-linux-clang8-release/bin/mbgl-offline",
+            5597912
+        ],
+        [
+            "mbgl-render",
+            "/src/workspace/next-linux-clang8-release/bin/mbgl-render",
+            6220728
+        ]
+    ]
+}

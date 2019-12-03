@@ -23,7 +23,7 @@ FeatureType VectorTileFeature::getType() const {
 
 optional<Value> VectorTileFeature::getValue(const std::string& key) const {
     const optional<Value> value(feature.getValue(key));
-    return value->is<NullValue>() ? nullopt : std::move(value);
+    return value->is<NullValue>() ? nullopt : value;
 }
 
 const PropertyMap& VectorTileFeature::getProperties() const {

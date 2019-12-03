@@ -1,0 +1,47 @@
+{
+    "memory": [
+        [
+            "probeMemory - default - end",
+            3530938,
+            11650
+        ],
+        [
+            "probeMemory - default - start",
+            32,
+            1
+        ]
+    ],
+    "network": [
+        [
+            "probeNetwork - default - end",
+            12,
+            1726951
+        ],
+        [
+            "probeNetwork - default - start",
+            0,
+            0
+        ]
+    ],
+    "gfx": [
+        [
+            "probeGFX - default - end",
+            3,
+            4,
+            11,
+            1,
+            [
+                51945,
+                51945
+            ],
+            [
+                2158,
+                2158
+            ],
+            [
+                21504,
+                21504
+            ]
+        ]
+    ]
+}

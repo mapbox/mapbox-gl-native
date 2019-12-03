@@ -23,8 +23,7 @@ public:
                               const bool,
                               const bool) = 0;
 
-    virtual void prepareSymbols(const GlyphMap&, const GlyphPositions&,
-                                const ImageMap&, const ImagePositions&) {};
+    virtual void prepareSymbols(const GlyphMap&, const GlyphPositions&, const ImageMap&, const ImagePositions&){};
 
     virtual bool hasSymbolInstances() const {
         return true;
@@ -38,6 +37,7 @@ public:
     const BucketParameters& bucketParameters;
     GlyphDependencies& glyphDependencies;
     ImageDependencies& imageDependencies;
+    std::set<std::string>& availableImages;
 };
 
 } // namespace mbgl

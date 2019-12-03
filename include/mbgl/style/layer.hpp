@@ -1,9 +1,10 @@
 #pragma once
 
+#include <mbgl/style/conversion.hpp>
+#include <mbgl/style/style_property.hpp>
+#include <mbgl/style/types.hpp>
 #include <mbgl/util/immutable.hpp>
 #include <mbgl/util/optional.hpp>
-#include <mbgl/style/types.hpp>
-#include <mbgl/style/conversion.hpp>
 
 #include <mapbox/weak.hpp>
 #include <mapbox/type_wrapper.hpp>
@@ -57,6 +58,12 @@ struct LayerTypeInfo {
      * requires cross-tile indexing and placement. Contains \c CrossTileIndex::NotRequired otherwise.
      */
     const enum class CrossTileIndex { Required, NotRequired } crossTileIndex;
+
+    /**
+     * @brief contains the Id of the supported tile type. Used for internal checks.
+     * The contained values correspond to \c Tile::Kind enum.
+     */
+    const enum class TileKind : uint8_t { Geometry, Raster, RasterDEM, NotRequired } tileKind;
 };
 
 /**
@@ -103,9 +110,10 @@ public:
     void setMaxZoom(float);
 
     // Dynamic properties
-    virtual optional<conversion::Error> setLayoutProperty(const std::string& name, const conversion::Convertible& value) = 0;
-    virtual optional<conversion::Error> setPaintProperty(const std::string& name, const conversion::Convertible& value) = 0;
+    virtual optional<conversion::Error> setProperty(const std::string& name, const conversion::Convertible& value) = 0;
     optional<conversion::Error> setVisibility(const conversion::Convertible& value);
+
+    virtual StyleProperty getProperty(const std::string&) const = 0;
 
     // Private implementation
     // TODO : We should not have public mutable data members.

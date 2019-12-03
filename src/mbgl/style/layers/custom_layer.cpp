@@ -8,13 +8,13 @@ namespace mbgl {
 namespace style {
 
 namespace {
-    const LayerTypeInfo typeInfoCustom
-    { "",
-      LayerTypeInfo::Source::NotRequired,
-      LayerTypeInfo::Pass3D::NotRequired,
-      LayerTypeInfo::Layout::NotRequired,
-      LayerTypeInfo::FadingTiles::NotRequired,
-      LayerTypeInfo::CrossTileIndex::NotRequired };
+const LayerTypeInfo typeInfoCustom{"",
+                                   LayerTypeInfo::Source::NotRequired,
+                                   LayerTypeInfo::Pass3D::NotRequired,
+                                   LayerTypeInfo::Layout::NotRequired,
+                                   LayerTypeInfo::FadingTiles::NotRequired,
+                                   LayerTypeInfo::CrossTileIndex::NotRequired,
+                                   LayerTypeInfo::TileKind::NotRequired};
 }  // namespace
 
 CustomLayer::CustomLayer(const std::string& layerID,
@@ -39,12 +39,12 @@ std::unique_ptr<Layer> CustomLayer::cloneRef(const std::string&) const {
 
 using namespace conversion;
 
-optional<Error> CustomLayer::setPaintProperty(const std::string&, const Convertible&) {
+optional<Error> CustomLayer::setProperty(const std::string&, const Convertible&) {
     return Error { "layer doesn't support this property" };
 }
 
-optional<Error> CustomLayer::setLayoutProperty(const std::string&, const Convertible&) {
-    return Error { "layer doesn't support this property" };
+StyleProperty CustomLayer::getProperty(const std::string&) const {
+    return {};
 }
 
 Mutable<Layer::Impl> CustomLayer::mutableBaseImpl() const {

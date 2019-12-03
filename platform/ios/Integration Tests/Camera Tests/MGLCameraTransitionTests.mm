@@ -333,7 +333,7 @@
 
 #pragma mark - Pending tests
 
-- (void)testContinuallyResettingNorthInIsChangingPENDING {
+- (void)testContinuallyResettingNorthInIsChanging🙁{
     // See https://github.com/mapbox/mapbox-gl-native/pull/11614
     // This test currently fails, unsurprisingly, since we're continually
     // setting the camera to the same parameters during its update.
@@ -365,8 +365,8 @@
     XCTAssertEqualWithAccuracy(self.mapView.direction, 0.0, 0.001, @"Camera should have reset to north. %0.3f", self.mapView.direction);
 }
 
-- (void)testContinuallySettingCoordinateInIsChangingPENDING {
-    // See above comment in `-testContinuallyResettingNorthInIsChangingPENDING`
+- (void)testContinuallySettingCoordinateInIsChanging🙁 {
+    // See above comment in `-testContinuallyResettingNorthInIsChanging🙁`
 
     // Reset to non-zero, prior to testing
     [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(0.0, 0.0) animated:NO];

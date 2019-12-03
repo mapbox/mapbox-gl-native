@@ -5,6 +5,10 @@
 #import "NSString+MGLAdditions.h"
 #import "MGLTypes.h"
 
+#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+#import "MMEEventsManager.h"
+#endif
+
 #import <mbgl/util/geo.hpp>
 
 bool operator==(const CLLocationCoordinate2D lhs, const CLLocationCoordinate2D rhs) {
@@ -18,6 +22,9 @@ bool operator==(const CLLocationCoordinate2D lhs, const CLLocationCoordinate2D r
     if (!string) {
         if (outError) {
             *outError = [NSError errorWithDomain:MGLErrorDomain code:MGLErrorCodeUnknown userInfo:nil];
+#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+            [[MMEEventsManager sharedManager] reportError:*outError];
+#endif
         }
         return nil;
     }
@@ -30,6 +37,9 @@ bool operator==(const CLLocationCoordinate2D lhs, const CLLocationCoordinate2D r
             *outError = [NSError errorWithDomain:MGLErrorDomain code:MGLErrorCodeUnknown userInfo:@{
                 NSLocalizedFailureReasonErrorKey: @(err.what()),
             }];
+#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+            [[MMEEventsManager sharedManager] reportError:*outError];
+#endif
         }
         return nil;
     }

@@ -1,20 +1,21 @@
-#include <mbgl/renderer/layers/render_line_layer.hpp>
-#include <mbgl/renderer/buckets/line_bucket.hpp>
-#include <mbgl/renderer/render_tile.hpp>
-#include <mbgl/renderer/render_source.hpp>
-#include <mbgl/renderer/upload_parameters.hpp>
-#include <mbgl/renderer/paint_parameters.hpp>
-#include <mbgl/renderer/image_manager.hpp>
-#include <mbgl/programs/programs.hpp>
-#include <mbgl/programs/line_program.hpp>
-#include <mbgl/geometry/line_atlas.hpp>
-#include <mbgl/tile/tile.hpp>
-#include <mbgl/style/layers/line_layer_impl.hpp>
-#include <mbgl/gfx/cull_face_mode.hpp>
 #include <mbgl/geometry/feature_index.hpp>
-#include <mbgl/util/math.hpp>
-#include <mbgl/util/intersection_tests.hpp>
+#include <mbgl/geometry/line_atlas.hpp>
+#include <mbgl/gfx/cull_face_mode.hpp>
+#include <mbgl/programs/line_program.hpp>
+#include <mbgl/programs/programs.hpp>
+#include <mbgl/renderer/buckets/line_bucket.hpp>
+#include <mbgl/renderer/image_manager.hpp>
+#include <mbgl/renderer/layers/render_line_layer.hpp>
+#include <mbgl/renderer/paint_parameters.hpp>
+#include <mbgl/renderer/render_source.hpp>
+#include <mbgl/renderer/render_tile.hpp>
+#include <mbgl/renderer/upload_parameters.hpp>
+#include <mbgl/style/expression/image.hpp>
+#include <mbgl/style/layers/line_layer_impl.hpp>
 #include <mbgl/tile/geometry_tile.hpp>
+#include <mbgl/tile/tile.hpp>
+#include <mbgl/util/intersection_tests.hpp>
+#include <mbgl/util/math.hpp>
 
 namespace mbgl {
 
@@ -78,8 +79,8 @@ void RenderLineLayer::prepare(const LayerPrepareParameters& params) {
         const LinePatternCap cap = bucket.layout.get<LineCap>() == LineCapType::Round
             ? LinePatternCap::Round : LinePatternCap::Square;
         // Ensures that the dash data gets added to the atlas.
-        params.lineAtlas.getDashPosition(evaluated.get<LineDasharray>().from, cap);
-        params.lineAtlas.getDashPosition(evaluated.get<LineDasharray>().to, cap);
+        params.lineAtlas.getDashPatternTexture(
+            evaluated.get<LineDasharray>().from, evaluated.get<LineDasharray>().to, cap);
     }
 }
 
@@ -146,34 +147,33 @@ void RenderLineLayer::render(PaintParameters& parameters) {
         };
 
         if (!evaluated.get<LineDasharray>().from.empty()) {
-            const LinePatternCap cap = bucket.layout.get<LineCap>() == LineCapType::Round
-                ? LinePatternCap::Round : LinePatternCap::Square;
-            LinePatternPos posA = parameters.lineAtlas.getDashPosition(evaluated.get<LineDasharray>().from, cap);
-            LinePatternPos posB = parameters.lineAtlas.getDashPosition(evaluated.get<LineDasharray>().to, cap);
+            const LinePatternCap cap =
+                bucket.layout.get<LineCap>() == LineCapType::Round ? LinePatternCap::Round : LinePatternCap::Square;
+            const auto& dashPatternTexture = parameters.lineAtlas.getDashPatternTexture(
+                evaluated.get<LineDasharray>().from, evaluated.get<LineDasharray>().to, cap);
 
             draw(parameters.programs.getLineLayerPrograms().lineSDF,
-                 LineSDFProgram::layoutUniformValues(
-                     evaluated,
-                     parameters.pixelRatio,
-                     tile,
-                     parameters.state,
-                     parameters.pixelsToGLUnits,
-                     posA,
-                     posB,
-                     crossfade,
-                     parameters.lineAtlas.getSize().width),
-                     {},
-                     {},
-                     LineSDFProgram::TextureBindings{
-                         parameters.lineAtlas.textureBinding(),
-                     });
+                 LineSDFProgram::layoutUniformValues(evaluated,
+                                                     parameters.pixelRatio,
+                                                     tile,
+                                                     parameters.state,
+                                                     parameters.pixelsToGLUnits,
+                                                     dashPatternTexture.getFrom(),
+                                                     dashPatternTexture.getTo(),
+                                                     crossfade,
+                                                     dashPatternTexture.getSize().width),
+                 {},
+                 {},
+                 LineSDFProgram::TextureBindings{
+                     dashPatternTexture.textureBinding(),
+                 });
 
         } else if (!unevaluated.get<LinePattern>().isUndefined()) {
-            const auto& linePatternValue = evaluated.get<LinePattern>().constantOr(Faded<std::basic_string<char>>{ "", ""});
+            const auto& linePatternValue = evaluated.get<LinePattern>().constantOr(Faded<expression::Image>{"", ""});
             const Size& texsize = tile.getIconAtlasTexture().size;
 
-            optional<ImagePosition> posA = tile.getPattern(linePatternValue.from);
-            optional<ImagePosition> posB = tile.getPattern(linePatternValue.to);
+            optional<ImagePosition> posA = tile.getPattern(linePatternValue.from.id());
+            optional<ImagePosition> posB = tile.getPattern(linePatternValue.to.id());
 
             draw(parameters.programs.getLineLayerPrograms().linePattern,
                  LinePatternProgram::layoutUniformValues(
@@ -257,13 +257,10 @@ GeometryCollection offsetLine(const GeometryCollection& rings, double offset) {
 
 } // namespace
 
-bool RenderLineLayer::queryIntersectsFeature(
-        const GeometryCoordinates& queryGeometry,
-        const GeometryTileFeature& feature,
-        const float zoom,
-        const TransformState& transformState,
-        const float pixelsToTileUnits,
-        const mat4&) const {
+bool RenderLineLayer::queryIntersectsFeature(const GeometryCoordinates& queryGeometry,
+                                             const GeometryTileFeature& feature, const float zoom,
+                                             const TransformState& transformState, const float pixelsToTileUnits,
+                                             const mat4&, const FeatureState& featureState) const {
     const auto& evaluated = static_cast<const LineLayerProperties&>(*evaluatedProperties).evaluated;
     // Translate query geometry
     auto translatedQueryGeometry = FeatureIndex::translateQueryGeometry(
@@ -274,10 +271,11 @@ bool RenderLineLayer::queryIntersectsFeature(
             pixelsToTileUnits);
 
     // Evaluate function
-    auto offset = evaluated.get<style::LineOffset>()
-                          .evaluate(feature, zoom, style::LineOffset::defaultValue()) * pixelsToTileUnits;
+    auto offset =
+        evaluated.get<style::LineOffset>().evaluate(feature, zoom, featureState, style::LineOffset::defaultValue()) *
+        pixelsToTileUnits;
     // Test intersection
-    const float halfWidth = getLineWidth(feature, zoom) / 2.0 * pixelsToTileUnits;
+    const auto halfWidth = static_cast<float>(getLineWidth(feature, zoom, featureState) / 2.0 * pixelsToTileUnits);
 
     // Apply offset to geometry
     if (offset != 0.0f && !feature.getGeometries().empty()) {
@@ -314,12 +312,13 @@ void RenderLineLayer::updateColorRamp() {
     }
 }
 
-float RenderLineLayer::getLineWidth(const GeometryTileFeature& feature, const float zoom) const {
+float RenderLineLayer::getLineWidth(const GeometryTileFeature& feature, const float zoom,
+                                    const FeatureState& featureState) const {
     const auto& evaluated = static_cast<const LineLayerProperties&>(*evaluatedProperties).evaluated;
-    float lineWidth = evaluated.get<style::LineWidth>()
-            .evaluate(feature, zoom, style::LineWidth::defaultValue());
-    float gapWidth = evaluated.get<style::LineGapWidth>()
-            .evaluate(feature, zoom, style::LineGapWidth::defaultValue());
+    float lineWidth =
+        evaluated.get<style::LineWidth>().evaluate(feature, zoom, featureState, style::LineWidth::defaultValue());
+    float gapWidth =
+        evaluated.get<style::LineGapWidth>().evaluate(feature, zoom, featureState, style::LineGapWidth::defaultValue());
     if (gapWidth) {
         return gapWidth + 2 * lineWidth;
     } else {

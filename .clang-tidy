@@ -1,3 +1,4 @@
-Checks: 'modernize-*,misc-static-assert,llvm-namespace-comment,-clang-analyzer-security.insecureAPI.rand,-clang-analyzer-core.uninitialized.UndefReturn,-clang-analyzer-core.StackAddressEscape,-clang-analyzer-core.CallAndMessage,-clang-diagnostic-unused-command-line-argument,-clang-analyzer-core.uninitialized.*,-clang-analyzer-core.NullDereference,-clang-analyzer-core.NonNullParamChecker'
-WarningsAsErrors: '*'
+Checks: '-*,bugprone-*,clang-analyzer-*,google-*,modernize-*,performance-*,-clang-analyzer-osx.*,-google-readability-braces-around-statements,-google-readability-todo,-google-runtime-int,-google-runtime-references'
+WarningsAsErrors: 'bugprone-use-after-move,performance-move-const-arg'
+HeaderFilterRegex: '.*'
 FormatStyle: file

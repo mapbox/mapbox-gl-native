@@ -64,6 +64,15 @@ public:
                                                  const std::string& extensionField,
                                                  const optional<std::map<std::string, Value>>& args) const;
 
+    void setFeatureState(const std::string& sourceID, const optional<std::string>& layerID,
+                         const std::string& featureID, const FeatureState& state);
+
+    void getFeatureState(FeatureState& state, const std::string& sourceID, const optional<std::string>& layerID,
+                         const std::string& featureID) const;
+
+    void removeFeatureState(const std::string& sourceID, const optional<std::string>& sourceLayerID,
+                            const optional<std::string>& featureID, const optional<std::string>& stateKey);
+
     void reduceMemoryUse();
     void dumpDebugLogs();
 
@@ -113,14 +122,16 @@ private:
     RenderLight renderLight;
 
     CrossTileSymbolIndex crossTileSymbolIndex;
-    std::unique_ptr<Placement> placement;
+    PlacementController placementController;
 
     const bool backgroundLayerAsColor;
     bool contextLost = false;
 
-    // Vector with reserved capacity of layerImpls->size() to avoid reallocation
+    // Vectors with reserved capacity of layerImpls->size() to avoid reallocation
     // on each frame.
     std::vector<Immutable<style::LayerProperties>> filteredLayersForSource;
+    std::vector<std::reference_wrapper<RenderLayer>> orderedLayers;
+    std::vector<std::reference_wrapper<RenderLayer>> layersNeedPlacement;
 };
 
 } // namespace mbgl

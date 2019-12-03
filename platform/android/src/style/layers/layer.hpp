@@ -35,9 +35,7 @@ public:
 
     style::Layer& get();
 
-    void setLayoutProperty(jni::JNIEnv&, const jni::String&, const jni::Object<>& value);
-
-    void setPaintProperty(jni::JNIEnv&, const jni::String&, const jni::Object<>& value);
+    void setProperty(jni::JNIEnv&, const jni::String&, const jni::Object<>& value);
 
     // Zoom
 

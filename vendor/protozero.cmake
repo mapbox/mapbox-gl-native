@@ -1,5 +1,9 @@
-add_library(protozero INTERFACE)
+if(TARGET mbgl-vendor-protozero)
+    return()
+endif()
 
-target_include_directories(protozero SYSTEM INTERFACE
-    ${CMAKE_SOURCE_DIR}/vendor/protozero/include
+add_library(mbgl-vendor-protozero INTERFACE)
+
+target_include_directories(mbgl-vendor-protozero SYSTEM INTERFACE
+    ${CMAKE_CURRENT_LIST_DIR}/protozero/include
 )

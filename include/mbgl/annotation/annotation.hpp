@@ -16,9 +16,7 @@ using AnnotationIDs = std::vector<AnnotationID>;
 
 class SymbolAnnotation {
 public:
-    SymbolAnnotation(Point<double> geometry_, std::string icon_ = {})
-        : geometry(std::move(geometry_)),
-          icon(std::move(icon_)) {}
+    SymbolAnnotation(Point<double> geometry_, std::string icon_ = {}) : geometry(geometry_), icon(std::move(icon_)) {}
 
     Point<double> geometry;
     std::string icon;

@@ -27,13 +27,14 @@ public:
     SymbolLayout(const BucketParameters&,
                  const std::vector<Immutable<style::LayerProperties>>&,
                  std::unique_ptr<GeometryTileLayer>,
-                 ImageDependencies&,
-                 GlyphDependencies&);
-    
+                 const LayoutParameters& parameters);
+
     ~SymbolLayout() final = default;
 
-    void prepareSymbols(const GlyphMap&, const GlyphPositions&,
-                 const ImageMap&, const ImagePositions&) override;
+    void prepareSymbols(const GlyphMap& glyphMap,
+                        const GlyphPositions&,
+                        const ImageMap&,
+                        const ImagePositions&) override;
 
     void createBucket(const ImagePositions&, std::unique_ptr<FeatureIndex>&, std::unordered_map<std::string, LayerRenderData>&, const bool firstLoad, const bool showCollisionBoxes) override;
 
@@ -61,8 +62,10 @@ private:
                     const SymbolFeature&,
                     const ShapedTextOrientations& shapedTextOrientations,
                     optional<PositionedIcon> shapedIcon,
-                    const GlyphPositions&,
+                    const ImageMap&,
                     std::array<float, 2> textOffset,
+                    float layoutTextSize,
+                    float layoutIconSize,
                     const SymbolContent iconType);
 
     bool anchorIsTooClose(const std::u16string& text, const float repeatDistance, const Anchor&);
@@ -106,6 +109,7 @@ private:
     bool iconsNeedLinear = false;
     bool sortFeaturesByY = false;
     bool allowVerticalPlacement = false;
+    bool iconsInText = false;
     std::vector<style::TextWritingModeType> placementModes;
 
     style::TextSize::UnevaluatedType textSize;

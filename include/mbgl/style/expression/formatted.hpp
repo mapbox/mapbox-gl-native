@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mbgl/style/conversion.hpp>
+#include <mbgl/style/expression/image.hpp>
 #include <mbgl/util/color.hpp>
 #include <mbgl/util/font_stack.hpp>
 #include <mbgl/util/optional.hpp>
@@ -17,17 +18,19 @@ extern const char* const kFormattedSectionTextFont;
 extern const char* const kFormattedSectionTextColor;
 
 struct FormattedSection {
-    FormattedSection(std::string text_,
-                     optional<double> fontScale_,
-                     optional<FontStack> fontStack_,
-                     optional<Color> textColor_)
-        : text(std::move(text_))
-        , fontScale(std::move(fontScale_))
-        , fontStack(std::move(fontStack_))
-        , textColor(std::move(textColor_))
-    {}
+    explicit FormattedSection(std::string text_,
+                              optional<double> fontScale_,
+                              optional<FontStack> fontStack_,
+                              optional<Color> textColor_)
+        : text(std::move(text_)),
+          fontScale(std::move(fontScale_)),
+          fontStack(std::move(fontStack_)),
+          textColor(std::move(textColor_)) {}
+
+    explicit FormattedSection(Image image_) : image(std::move(image_)) {}
 
     std::string text;
+    optional<Image> image;
     optional<double> fontScale;
     optional<FontStack> fontStack;
     optional<Color> textColor;
@@ -36,7 +39,7 @@ struct FormattedSection {
 class Formatted {
 public:
     Formatted() = default;
-    
+
     Formatted(const char* plainU8String) {
         sections.emplace_back(std::string(plainU8String), nullopt, nullopt, nullopt);
     }
@@ -48,24 +51,28 @@ public:
     bool operator==(const Formatted& ) const;
     
     std::string toString() const;
-    
-    bool empty() const {
-        return sections.empty() || sections.at(0).text.empty();
-    }
-     
+    mbgl::Value toObject() const;
+
+    bool empty() const;
+
     std::vector<FormattedSection> sections;
 };
             
 } // namespace expression
     
 namespace conversion {
-    
+
 template <>
-struct Converter<mbgl::style::expression::Formatted> {
+struct Converter<expression::Formatted> {
 public:
-    optional<mbgl::style::expression::Formatted> operator()(const Convertible& value, Error& error) const;
+    optional<expression::Formatted> operator()(const Convertible& value, Error& error) const;
 };
-    
+
+template <>
+struct ValueFactory<expression::Formatted> {
+    static Value make(const expression::Formatted& formatted) { return formatted.toObject(); }
+};
+
 } // namespace conversion
     
 } // namespace style

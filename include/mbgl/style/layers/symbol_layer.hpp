@@ -1,3 +1,5 @@
+// clang-format off
+
 // This file is generated. Do not edit.
 
 #pragma once
@@ -21,8 +23,9 @@ public:
     ~SymbolLayer() final;
 
     // Dynamic properties
-    optional<conversion::Error> setLayoutProperty(const std::string& name, const conversion::Convertible& value) final;
-    optional<conversion::Error> setPaintProperty(const std::string& name, const conversion::Convertible& value) final;
+    optional<conversion::Error> setProperty(const std::string& name, const conversion::Convertible& value) final;
+
+    StyleProperty getProperty(const std::string& name) const final;
 
     // Layout properties
 
@@ -38,9 +41,9 @@ public:
     const PropertyValue<bool>& getIconIgnorePlacement() const;
     void setIconIgnorePlacement(const PropertyValue<bool>&);
 
-    static PropertyValue<std::string> getDefaultIconImage();
-    const PropertyValue<std::string>& getIconImage() const;
-    void setIconImage(const PropertyValue<std::string>&);
+    static PropertyValue<expression::Image> getDefaultIconImage();
+    const PropertyValue<expression::Image>& getIconImage() const;
+    void setIconImage(const PropertyValue<expression::Image>&);
 
     static PropertyValue<bool> getDefaultIconKeepUpright();
     const PropertyValue<bool>& getIconKeepUpright() const;
@@ -291,3 +294,5 @@ protected:
 
 } // namespace style
 } // namespace mbgl
+
+// clang-format on

@@ -29,12 +29,12 @@ std::unique_ptr<Layout> FillExtrusionLayerFactory::createLayout(const LayoutPara
                                                                 const std::vector<Immutable<style::LayerProperties>>& group) noexcept {
     using namespace style;
     using LayoutType = PatternLayout<FillExtrusionBucket, FillExtrusionLayerProperties, FillExtrusionPattern>;
-    return std::make_unique<LayoutType>(parameters.bucketParameters, group, std::move(layer), parameters.imageDependencies);
+    return std::make_unique<LayoutType>(parameters.bucketParameters, group, std::move(layer), parameters);
 }
 
 std::unique_ptr<RenderLayer> FillExtrusionLayerFactory::createRenderLayer(Immutable<style::Layer::Impl> impl) noexcept {
     assert(impl->getTypeInfo() == getTypeInfo());
-    return std::make_unique<RenderFillExtrusionLayer>(staticImmutableCast<style::FillExtrusionLayer::Impl>(std::move(impl)));
+    return std::make_unique<RenderFillExtrusionLayer>(staticImmutableCast<style::FillExtrusionLayer::Impl>(impl));
 }
 
 } // namespace mbgl

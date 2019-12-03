@@ -86,6 +86,13 @@ FOUNDATION_EXTERN MGL_EXPORT const MGLExpressionInterpolationMode MGLExpressionI
 
 /**
  `NSExpression` variable that corresponds to the
+ <a href="https://docs.mapbox.com/mapbox-gl-js/style-spec/#accumulated"><code>id</code></a>
+ expression operator in the Mapbox Style Specification.
+ */
+@property (class, nonatomic, readonly) NSExpression *featureAccumulatedVariableExpression;
+
+/**
+ `NSExpression` variable that corresponds to the
  <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-properties"><code>properties</code></a>
  expression operator in the Mapbox Style Specification.
  */

@@ -1,5 +1,5 @@
 // NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
-
+// clang-format off
 #include <mbgl/programs/raster_program.hpp>
 #include <mbgl/programs/gl/preludes.hpp>
 #include <mbgl/programs/gl/shader_source.hpp>
@@ -15,7 +15,7 @@ struct ShaderSource;
 template <>
 struct ShaderSource<RasterProgram> {
     static constexpr const char* name = "raster";
-    static constexpr const uint8_t hash[8] = { 0x40, 0x3d, 0x6c, 0xf4, 0xd0, 0x41, 0x51, 0x0e };
+    static constexpr const uint8_t hash[8] = {0x40, 0x3d, 0x6c, 0xf4, 0xd0, 0x41, 0x51, 0x0e};
     static constexpr const auto vertexOffset = 48839;
     static constexpr const auto fragmentOffset = 49188;
 };
@@ -119,4 +119,4 @@ void main() {
 }
 
 */
-
+// clang-format on

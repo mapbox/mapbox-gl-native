@@ -11,22 +11,28 @@
 namespace mbgl {
 namespace android {
 
-using Callback = std::function<void (GeoJSON)>;
+using GeoJSONDataCallback = std::function<void(std::shared_ptr<style::GeoJSONData>)>;
 
-struct FeatureConverter {
-    void convertJson(std::shared_ptr<std::string>, ActorRef<Callback>);
+class FeatureConverter {
+public:
+    explicit FeatureConverter(Immutable<style::GeoJSONOptions> options_) : options(std::move(options_)) {}
+    void convertJson(std::shared_ptr<std::string>, ActorRef<GeoJSONDataCallback>);
 
     template <class JNIType>
-    void convertObject(std::shared_ptr<jni::Global<jni::Object<JNIType>, jni::EnvAttachingDeleter>>, ActorRef<Callback>);
+    void convertObject(std::shared_ptr<jni::Global<jni::Object<JNIType>, jni::EnvAttachingDeleter>>,
+                       ActorRef<GeoJSONDataCallback>);
+
+private:
+    Immutable<style::GeoJSONOptions> options;
 };
 
 struct Update {
-    using Converter = std::function<void (ActorRef<Callback>)>;
+    using Converter = std::function<void(ActorRef<GeoJSONDataCallback>)>;
     Converter converterFn;
 
-    std::unique_ptr<Actor<Callback>> callback;
+    std::unique_ptr<Actor<GeoJSONDataCallback>> callback;
 
-    Update(Converter, std::unique_ptr<Actor<Callback>>);
+    Update(Converter, std::unique_ptr<Actor<GeoJSONDataCallback>>);
 };
 
 class GeoJSONSource : public Source {

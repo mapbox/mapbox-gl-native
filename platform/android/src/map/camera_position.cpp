@@ -44,19 +44,20 @@ mbgl::CameraOptions CameraPosition::getCameraOptions(jni::JNIEnv& env, const jni
     static auto tilt = javaClass.GetField<jni::jdouble>(env, "tilt");
     static auto zoom = javaClass.GetField<jni::jdouble>(env, "zoom");
     static auto paddingField = javaClass.GetField<jni::Array<jni::jdouble>>(env, "padding");
-    static auto padding = position.Get(env, paddingField);
 
+    auto padding = position.Get(env, paddingField);
     auto center = LatLng::getLatLng(env, position.Get(env, target));
 
-    return mbgl::CameraOptions {
-            center,
-            EdgeInsets {padding.Get(env, 1) * pixelRatio, padding.Get(env, 0) * pixelRatio,
-                        padding.Get(env, 3) * pixelRatio, padding.Get(env, 2) * pixelRatio},
-            {},
-            position.Get(env, zoom),
-            position.Get(env, bearing),
-            position.Get(env, tilt)
-    };
+    return mbgl::CameraOptions{center,
+                               padding && padding.Length(env) == 4 ? EdgeInsets{padding.Get(env, 1) * pixelRatio,
+                                                                                padding.Get(env, 0) * pixelRatio,
+                                                                                padding.Get(env, 3) * pixelRatio,
+                                                                                padding.Get(env, 2) * pixelRatio}
+                                                                   : (EdgeInsets){},
+                               {},
+                               position.Get(env, zoom),
+                               position.Get(env, bearing),
+                               position.Get(env, tilt)};
 }
 
 void CameraPosition::registerNative(jni::JNIEnv &env) {

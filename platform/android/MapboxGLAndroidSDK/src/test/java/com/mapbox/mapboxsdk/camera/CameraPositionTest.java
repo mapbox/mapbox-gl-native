@@ -117,4 +117,15 @@ public class CameraPositionTest {
     CameraPosition cameraPosition2 = CameraPosition.CREATOR.createFromParcel(parcel);
     assertEquals("Parcel should match original object", cameraPosition1, cameraPosition2);
   }
+
+  @Test
+  public void testParcelableNulls() {
+    CameraPosition cameraPosition1 = new CameraPosition(null, 3, 4, 5, null);
+    Parcel parcel = Parcel.obtain();
+    cameraPosition1.writeToParcel(parcel, 0);
+    parcel.setDataPosition(0);
+
+    CameraPosition cameraPosition2 = CameraPosition.CREATOR.createFromParcel(parcel);
+    assertEquals("Parcel should match original object", cameraPosition1, cameraPosition2);
+  }
 }
