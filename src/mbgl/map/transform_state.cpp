@@ -8,7 +8,6 @@
 #include <mbgl/math/clamp.hpp>
 
 namespace mbgl {
-
 TransformState::TransformState(ConstrainMode constrainMode_, ViewportMode viewportMode_)
     : bounds(LatLngBounds()), constrainMode(constrainMode_), viewportMode(viewportMode_) {}
 
@@ -37,6 +36,15 @@ void TransformState::setProperties(const TransformStateProperties& properties) {
     if (properties.axonometric) {
         setAxonometric(*properties.axonometric);
     }
+    if (properties.panning) {
+        setPanning(*properties.panning);
+    }
+    if (properties.scaling) {
+        setScaling(*properties.scaling);
+    }
+    if (properties.rotating) {
+        setRotating(*properties.rotating);
+    }
     if (properties.edgeInsets) {
         setEdgeInsets(*properties.edgeInsets);
     }
@@ -52,7 +60,6 @@ void TransformState::setProperties(const TransformStateProperties& properties) {
     if (properties.viewPortMode) {
         setViewportMode(*properties.viewPortMode);
     }
-    updateMatrix();
 }
 
 #pragma mark - Matrix
@@ -62,9 +69,8 @@ void TransformState::matrixFor(mat4& matrix, const UnwrappedTileID& tileID) cons
     const double s = Projection::worldSize(scale) / tileScale;
 
     matrix::identity(matrix);
-    matrix::translate(matrix, matrix,
-                      int64_t(tileID.canonical.x + tileID.wrap * tileScale) * s,
-                      int64_t(tileID.canonical.y) * s, 0);
+    matrix::translate(
+        matrix, matrix, int64_t(tileID.canonical.x + tileID.wrap * tileScale) * s, int64_t(tileID.canonical.y) * s, 0);
     matrix::scale(matrix, matrix, s / util::EXTENT, s / util::EXTENT, 1);
 }
 
@@ -108,10 +114,18 @@ void TransformState::getProjMatrix(mat4& projMatrix, uint16_t nearZ, bool aligne
 
     using NO = NorthOrientation;
     switch (getNorthOrientation()) {
-        case NO::Rightwards: matrix::rotate_y(projMatrix, projMatrix, getPitch()); break;
-        case NO::Downwards: matrix::rotate_x(projMatrix, projMatrix, -getPitch()); break;
-        case NO::Leftwards: matrix::rotate_y(projMatrix, projMatrix, -getPitch()); break;
-        default: matrix::rotate_x(projMatrix, projMatrix, getPitch()); break;
+        case NO::Rightwards:
+            matrix::rotate_y(projMatrix, projMatrix, getPitch());
+            break;
+        case NO::Downwards:
+            matrix::rotate_x(projMatrix, projMatrix, -getPitch());
+            break;
+        case NO::Leftwards:
+            matrix::rotate_y(projMatrix, projMatrix, -getPitch());
+            break;
+        default:
+            matrix::rotate_x(projMatrix, projMatrix, getPitch());
+            break;
     }
 
     matrix::rotate_z(projMatrix, projMatrix, getBearing() + getNorthOrientationAngle());
@@ -147,13 +161,11 @@ void TransformState::getProjMatrix(mat4& projMatrix, uint16_t nearZ, bool aligne
     }
 }
 
-void TransformState::updateMatrix() {
-    if (size.isEmpty()) {
-        return;
-    }
-    if (matrixUpdated) return;
+void TransformState::updateMatrix() const {
+    if (matrixUpdated || size.isEmpty()) return;
+
     getProjMatrix(projectionMatrix);
-    coordMatrix = coordinatePointMatrix();
+    coordMatrix = coordinatePointMatrix(projectionMatrix);
 
     bool err = matrix::invert(invertedMatrix, coordMatrix);
 
@@ -452,7 +464,8 @@ ScreenCoordinate TransformState::latLngToScreenCoordinate(const LatLng& latLng) 
 
     vec4 p;
     Point<double> pt = Projection::project(latLng, scale) / util::tileSize;
-    vec4 c = {{ pt.x, pt.y, 0, 1 }};
+    vec4 c = {{pt.x, pt.y, 0, 1}};
+    updateMatrix();
     matrix::transformMat4(p, c, coordMatrix);
     return {p[0] / p[3], size.height - p[1] / p[3]};
 }
@@ -470,9 +483,10 @@ TileCoordinate TransformState::screenCoordinateToTileCoordinate(const ScreenCoor
     // unproject two points to get a line and then find the point on that
     // line with z=0
 
+    updateMatrix();
     vec4 coord0;
     vec4 coord1;
-    vec4 point0 = {{ point.x, flippedY, 0, 1 }};
+    vec4 point0 = {{point.x, flippedY, 0, 1}};
     vec4 point1 = {{point.x, flippedY, 1, 1}};
     matrix::transformMat4(coord0, point0, invertedMatrix);
     matrix::transformMat4(coord1, point1, invertedMatrix);
@@ -496,8 +510,8 @@ LatLng TransformState::screenCoordinateToLatLng(const ScreenCoordinate& point, L
     return Projection::unproject(coord.p, 1 / util::tileSize, wrapMode);
 }
 
-mat4 TransformState::coordinatePointMatrix() const {
-    mat4 proj = projectionMatrix;
+mat4 TransformState::coordinatePointMatrix(const mat4& projMatrix) const {
+    mat4 proj = projMatrix;
     matrix::scale(proj, proj, util::tileSize, util::tileSize, 1);
     matrix::multiply(proj, getPixelMatrix(), proj);
     return proj;
@@ -579,12 +593,12 @@ void TransformState::setScalePoint(const double newScale, const ScreenCoordinate
     Bc = Projection::worldSize(scale) / util::DEGREES_MAX;
     Cc = Projection::worldSize(scale) / util::M2PI;
     matrixUpdated = false;
-    updateMatrix();
 }
 
 float TransformState::getCameraToTileDistance(const UnwrappedTileID& tileID) const {
     mat4 tileProjectionMatrix;
     matrixFor(tileProjectionMatrix, tileID);
+    updateMatrix();
     matrix::multiply(tileProjectionMatrix, projectionMatrix, tileProjectionMatrix);
     vec4 tileCenter = {{util::tileSize / 2, util::tileSize / 2, 0, 1}};
     vec4 projectedCenter;
@@ -601,6 +615,7 @@ float TransformState::maxPitchScaleFactor() const {
     Point<double> pt = Projection::project(latLng, scale) / util::tileSize;
     vec4 p = {{ pt.x, pt.y, 0, 1 }};
     vec4 topPoint;
+    updateMatrix();
     matrix::transformMat4(topPoint, p, coordMatrix);
     return topPoint[3] / getCameraToCenterDistance();
 }

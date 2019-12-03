@@ -127,14 +127,15 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
 
     // Minimize rotation by taking the shorter path around the circle.
     bearing = _normalizeAngle(bearing, state.getBearing());
-    state.setProperties(TransformStateProperties().withBearing(_normalizeAngle(state.getBearing(), bearing)));
+    state.setBearing(_normalizeAngle(state.getBearing(), bearing));
 
     const double startZoom = state.getZoom();
     const double startBearing = state.getBearing();
     const double startPitch = state.getPitch();
-    state.setPanning(unwrappedLatLng != startLatLng);
-    state.setScaling(zoom != startZoom);
-    state.setRotating(bearing != startBearing);
+    state.setProperties(TransformStateProperties()
+                            .withPanning(unwrappedLatLng != startLatLng)
+                            .withScaling(zoom != startZoom)
+                            .withRotating(bearing != startBearing));
     const EdgeInsets startEdgeInsets = state.getEdgeInsets();
 
     startTransition(
@@ -145,26 +146,21 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
             LatLng frameLatLng = Projection::unproject(framePoint, state.zoomScale(startZoom));
             double frameZoom = util::interpolate(startZoom, zoom, t);
             state.setLatLngZoom(frameLatLng, frameZoom);
-            TransformStateProperties properties;
             if (bearing != startBearing) {
-                properties.withBearing(util::wrap(util::interpolate(startBearing, bearing, t), -M_PI, M_PI));
+                state.setBearing(util::wrap(util::interpolate(startBearing, bearing, t), -M_PI, M_PI));
             }
-            double maxPitch;
             if (padding != startEdgeInsets) {
                 // Interpolate edge insets
-                EdgeInsets edgeInsets{util::interpolate(startEdgeInsets.top(), padding.top(), t),
-                                      util::interpolate(startEdgeInsets.left(), padding.left(), t),
-                                      util::interpolate(startEdgeInsets.bottom(), padding.bottom(), t),
-                                      util::interpolate(startEdgeInsets.right(), padding.right(), t)};
-                properties.withEdgeInsets(edgeInsets);
-                maxPitch = getMaxPitchForEdgeInsets(edgeInsets);
-            } else {
-                maxPitch = getMaxPitchForEdgeInsets(state.getEdgeInsets());
+                EdgeInsets edgeInsets;
+                state.setEdgeInsets({util::interpolate(startEdgeInsets.top(), padding.top(), t),
+                                     util::interpolate(startEdgeInsets.left(), padding.left(), t),
+                                     util::interpolate(startEdgeInsets.bottom(), padding.bottom(), t),
+                                     util::interpolate(startEdgeInsets.right(), padding.right(), t)});
             }
+            double maxPitch = getMaxPitchForEdgeInsets(state.getEdgeInsets());
             if (pitch != startPitch || maxPitch < startPitch) {
-                properties.withPitch(std::min(maxPitch, util::interpolate(startPitch, pitch, t)));
+                state.setPitch(std::min(maxPitch, util::interpolate(startPitch, pitch, t)));
             }
-            state.setProperties(properties);
         },
         duration);
 }
@@ -204,7 +200,7 @@ void Transform::flyTo(const CameraOptions& camera, const AnimationOptions& anima
 
     // Minimize rotation by taking the shorter path around the circle.
     bearing = _normalizeAngle(bearing, state.getBearing());
-    state.setProperties(TransformStateProperties().withBearing(_normalizeAngle(state.getBearing(), bearing)));
+    state.setBearing(_normalizeAngle(state.getBearing(), bearing));
     const double startZoom = state.scaleZoom(state.getScale());
     const double startBearing = state.getBearing();
     const double startPitch = state.getPitch();
@@ -297,9 +293,8 @@ void Transform::flyTo(const CameraOptions& camera, const AnimationOptions& anima
     }
 
     const double startScale = state.getScale();
-    state.setPanning(true);
-    state.setScaling(true);
-    state.setRotating(bearing != startBearing);
+    state.setProperties(
+        TransformStateProperties().withPanning(true).withScaling(true).withRotating(bearing != startBearing));
     const EdgeInsets startEdgeInsets = state.getEdgeInsets();
 
     startTransition(
@@ -324,26 +319,22 @@ void Transform::flyTo(const CameraOptions& camera, const AnimationOptions& anima
             // Convert to geographic coordinates and set the new viewpoint.
             LatLng frameLatLng = Projection::unproject(framePoint, startScale);
             state.setLatLngZoom(frameLatLng, frameZoom);
-            TransformStateProperties properties;
             if (bearing != startBearing) {
-                properties.withBearing(util::wrap(util::interpolate(startBearing, bearing, k), -M_PI, M_PI));
+                state.setBearing(util::wrap(util::interpolate(startBearing, bearing, k), -M_PI, M_PI));
             }
-            double maxPitch;
+
             if (padding != startEdgeInsets) {
                 // Interpolate edge insets
-                EdgeInsets edgeInsets{util::interpolate(startEdgeInsets.top(), padding.top(), k),
-                                      util::interpolate(startEdgeInsets.left(), padding.left(), k),
-                                      util::interpolate(startEdgeInsets.bottom(), padding.bottom(), k),
-                                      util::interpolate(startEdgeInsets.right(), padding.right(), k)};
-                properties.withEdgeInsets(edgeInsets);
-                maxPitch = getMaxPitchForEdgeInsets(edgeInsets);
-            } else {
-                maxPitch = getMaxPitchForEdgeInsets(state.getEdgeInsets());
+                state.setEdgeInsets({util::interpolate(startEdgeInsets.top(), padding.top(), k),
+                                     util::interpolate(startEdgeInsets.left(), padding.left(), k),
+                                     util::interpolate(startEdgeInsets.bottom(), padding.bottom(), k),
+                                     util::interpolate(startEdgeInsets.right(), padding.right(), k)});
             }
+            double maxPitch = getMaxPitchForEdgeInsets(state.getEdgeInsets());
+
             if (pitch != startPitch || maxPitch < startPitch) {
-                properties.withPitch(std::min(maxPitch, util::interpolate(startPitch, pitch, k)));
+                state.setPitch(std::min(maxPitch, util::interpolate(startPitch, pitch, k)));
             }
-            state.setProperties(properties);
         },
         duration);
 }
@@ -450,7 +441,7 @@ ConstrainMode Transform::getConstrainMode() const {
 #pragma mark - Viewport mode
 
 void Transform::setViewportMode(mbgl::ViewportMode mode) {
-    state.setProperties(TransformStateProperties().withViewportMode(mode));
+    state.setViewportMode(mode);
 }
 
 ViewportMode Transform::getViewportMode() const {
@@ -525,13 +516,12 @@ void Transform::startTransition(const CameraOptions& camera,
     };
 
     transitionFinishFn = [isAnimated, animation, this] {
-        state.setPanning(false);
-        state.setScaling(false);
-        state.setRotating(false);
+        state.setProperties(TransformStateProperties().withPanning(false).withScaling(false).withRotating(false));
         if (animation.transitionFinishFn) {
             animation.transitionFinishFn();
         }
-        observer.onCameraDidChange(isAnimated ? MapObserver::CameraChangeMode::Animated : MapObserver::CameraChangeMode::Immediate);
+        observer.onCameraDidChange(isAnimated ? MapObserver::CameraChangeMode::Animated
+                                              : MapObserver::CameraChangeMode::Immediate);
     };
 
     if (!isAnimated) {
@@ -618,8 +608,7 @@ LatLng Transform::screenCoordinateToLatLng(const ScreenCoordinate& point, LatLng
     return state.screenCoordinateToLatLng(flippedPoint, wrapMode);
 }
 
-double Transform::getMaxPitchForEdgeInsets(const EdgeInsets &insets) const
-{
+double Transform::getMaxPitchForEdgeInsets(const EdgeInsets& insets) const {
     double centerOffsetY = 0.5 * (insets.top() - insets.bottom()); // See TransformState::getCenterOffset.
 
     const auto height = state.getSize().height;

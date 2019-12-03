@@ -52,6 +52,18 @@ struct TransformStateProperties {
         axonometric = val;
         return *this;
     }
+    TransformStateProperties& withPanning(const optional<bool>& val) {
+        panning = val;
+        return *this;
+    }
+    TransformStateProperties& withScaling(const optional<bool>& val) {
+        scaling = val;
+        return *this;
+    }
+    TransformStateProperties& withRotating(const optional<bool>& val) {
+        rotating = val;
+        return *this;
+    }
     TransformStateProperties& withEdgeInsets(const optional<EdgeInsets>& val) {
         edgeInsets = val;
         return *this;
@@ -77,11 +89,13 @@ struct TransformStateProperties {
     optional<double> y;
     optional<double> bearing;
     optional<double> scale;
-    optional<double> fov;
     optional<double> pitch;
     optional<double> xSkew;
     optional<double> ySkew;
     optional<bool> axonometric;
+    optional<bool> panning;
+    optional<bool> scaling;
+    optional<bool> rotating;
     optional<EdgeInsets> edgeInsets;
     optional<Size> size;
     optional<ConstrainMode> constrain;
@@ -199,7 +213,7 @@ public:
 
 private:
     bool rotatedNorth() const;
-    void updateMatrix();
+    void updateMatrix() const;
 
     // Viewport center offset, from [size.width / 2, size.height / 2], defined
     // by |edgeInsets| in screen coordinates, with top left origin.
@@ -216,7 +230,7 @@ private:
     // logical dimensions
     Size size;
 
-    mat4 coordinatePointMatrix() const;
+    mat4 coordinatePointMatrix(const mat4& projMatrix) const;
     mat4 getPixelMatrix() const;
 
     void setScalePoint(const double scale, const ScreenCoordinate& point);
@@ -251,10 +265,10 @@ private:
     double Bc = Projection::worldSize(scale) / util::DEGREES_MAX;
     double Cc = Projection::worldSize(scale) / util::M2PI;
 
-    bool matrixUpdated{false};
-    mat4 projectionMatrix;
-    mat4 coordMatrix;
-    mat4 invertedMatrix;
+    mutable bool matrixUpdated{false};
+    mutable mat4 projectionMatrix;
+    mutable mat4 coordMatrix;
+    mutable mat4 invertedMatrix;
 };
 
 } // namespace mbgl
