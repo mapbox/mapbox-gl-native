@@ -38,6 +38,7 @@ private:
     Resource resource;
     FileSource::Callback callback;
     Response response;
+    bool executed = false;
 
     util::AsyncTask async { [this] {
         // Calling `callback` may result in deleting `this`. Copy data to temporaries first.
@@ -97,10 +98,11 @@ HTTPRequest::HTTPRequest(jni::JNIEnv& env, const Resource& resource_, FileSource
 HTTPRequest::~HTTPRequest() {
     android::UniqueEnv env = android::AttachEnv();
 
-    static auto& javaClass = jni::Class<HTTPRequest>::Singleton(*env);
-    static auto cancel = javaClass.GetMethod<void ()>(*env, "cancel");
-
-    javaRequest.Call(*env, cancel);
+    if (!executed) {
+        static auto& javaClass = jni::Class<HTTPRequest>::Singleton(*env);
+        static auto cancel = javaClass.GetMethod<void ()>(*env, "cancel");
+        javaRequest.Call(*env, cancel);
+    }
 }
 
 void HTTPRequest::onResponse(jni::JNIEnv& env, int code,
@@ -108,7 +110,7 @@ void HTTPRequest::onResponse(jni::JNIEnv& env, int code,
                              const jni::String& cacheControl, const jni::String& expires,
                              const jni::String& jRetryAfter, const jni::String& jXRateLimitReset,
                              const jni::Array<jni::jbyte>& body) {
-
+    executed = true;
     using Error = Response::Error;
 
     if (etag) {
@@ -163,6 +165,7 @@ void HTTPRequest::onResponse(jni::JNIEnv& env, int code,
 }
 
 void HTTPRequest::onFailure(jni::JNIEnv& env, int type, const jni::String& message) {
+    executed = true;
     std::string messageStr = jni::Make<std::string>(env, message);
 
     using Error = Response::Error;
