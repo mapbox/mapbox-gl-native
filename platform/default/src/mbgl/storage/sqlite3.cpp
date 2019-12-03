@@ -275,7 +275,7 @@ template <> void Query::bind(int offset, const char *value) {
 
 void Query::bind(int offset, const char * value, std::size_t length, bool retain) {
     assert(stmt.impl);
-    if (length > std::numeric_limits<int>::max()) {
+    if (length > std::numeric_limits<size_t>::max()) {
         throw std::range_error("value too long for sqlite3_bind_text");
     }
     stmt.impl->check(sqlite3_bind_text(stmt.impl->stmt, offset, value, int(length),
@@ -288,7 +288,7 @@ void Query::bind(int offset, const std::string& value, bool retain) {
 
 void Query::bindBlob(int offset, const void * value, std::size_t length, bool retain) {
     assert(stmt.impl);
-    if (length > std::numeric_limits<int>::max()) {
+    if (length > std::numeric_limits<size_t>::max()) {
         throw std::range_error("value too long for sqlite3_bind_text");
     }
     stmt.impl->check(sqlite3_bind_blob(stmt.impl->stmt, offset, value, int(length),
