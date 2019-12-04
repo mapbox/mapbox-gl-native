@@ -135,20 +135,9 @@ add_test(
         --seed=${MBGL_RENDER_TEST_SEED}
 )
 
-if(CMAKE_C_COMPILER MATCHES clang OR CMAKE_BUILD_TYPE MATCHES Debug)
-    add_test(
-        NAME mbgl-render-test-probe-unit-tests
-        COMMAND mbgl-render-test-runner tests --manifestPath=${MBGL_ROOT}/render-test/linux-probe-manifest.json
-    )
-else()
-    add_test(
-        NAME mbgl-render-test-probe-gfx-network
-        COMMAND mbgl-render-test-runner render-tests --manifestPath=${MBGL_ROOT}/render-test/linux-manifest-probe-gfx-network.json
-    )
-    add_test(
-        NAME mbgl-render-test-probe-memory
-        COMMAND mbgl-render-test-runner render-tests --manifestPath=${MBGL_ROOT}/render-test/linux-manifest-probe-memory.json
-    )
-endif()
+add_test(
+    NAME mbgl-render-test-probe-unit-tests
+    COMMAND mbgl-render-test-runner tests --manifestPath=${MBGL_ROOT}/render-test/linux-probe-manifest.json
+)
 
 add_test(NAME mbgl-query-test COMMAND mbgl-render-test-runner query-tests --manifestPath=${MBGL_ROOT}/render-test/linux-query-manifest.json)
