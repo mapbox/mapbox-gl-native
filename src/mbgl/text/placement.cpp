@@ -122,13 +122,23 @@ void Placement::placeLayer(const RenderLayer& layer, const mat4& projMatrix, boo
 }
 
 namespace {
-Point<float> calculateVariableLayoutOffset(style::SymbolAnchorType anchor, float width, float height, std::array<float, 2> offset, float textBoxScale) {
+Point<float> calculateVariableLayoutOffset(style::SymbolAnchorType anchor,
+                                           float width,
+                                           float height,
+                                           std::array<float, 2> offset,
+                                           float textBoxScale,
+                                           bool rotateWithMap,
+                                           bool pitchWithMap,
+                                           float bearing) {
     AnchorAlignment alignment = AnchorAlignment::getAnchorAlignment(anchor);
     float shiftX = -(alignment.horizontalAlign - 0.5f) * width;
     float shiftY = -(alignment.verticalAlign - 0.5f) * height;
     auto variableOffset = SymbolLayout::evaluateVariableOffset(anchor, offset);
-    return { shiftX + variableOffset[0] * textBoxScale,
-             shiftY + variableOffset[1] * textBoxScale };
+    Point<float> shift{shiftX + variableOffset[0] * textBoxScale, shiftY + variableOffset[1] * textBoxScale};
+    if (rotateWithMap) {
+        shift = util::rotate(shift, pitchWithMap ? bearing : -bearing);
+    }
+    return shift;
 }
 } // namespace
 
@@ -322,12 +332,14 @@ void Placement::placeBucket(
                     for (size_t i = 0u; i < placementAttempts; ++i) {
                         auto anchor = variableTextAnchors[i % anchorsSize];
                         const bool allowOverlap = (i >= anchorsSize);
-                        shift = calculateVariableLayoutOffset(anchor, width, height, symbolInstance.variableTextOffset, textBoxScale);
-                        if (rotateWithMap) {
-                            float angle = pitchWithMap ? state.getBearing() : -state.getBearing();
-                            shift = util::rotate(shift, angle);
-                        }
-
+                        shift = calculateVariableLayoutOffset(anchor,
+                                                              width,
+                                                              height,
+                                                              symbolInstance.variableTextOffset,
+                                                              textBoxScale,
+                                                              rotateWithMap,
+                                                              pitchWithMap,
+                                                              state.getBearing());
                         textBoxes.clear();
                         placedFeature = collisionIndex.placeFeature(textCollisionFeature,
                                                                     shift,
@@ -896,10 +908,10 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket,
                                                           variableOffset.width,
                                                           variableOffset.height,
                                                           variableOffset.offset,
-                                                          variableOffset.textBoxScale);
-                    if (rotateWithMap) {
-                        shift = util::rotate(shift, pitchWithMap ? state.getBearing() : -state.getBearing());
-                    }
+                                                          variableOffset.textBoxScale,
+                                                          rotateWithMap,
+                                                          pitchWithMap,
+                                                          state.getBearing());
                 } else {
                     // No offset -> this symbol hasn't been placed since coming on-screen
                     // No single box is particularly meaningful and all of them would be too noisy
