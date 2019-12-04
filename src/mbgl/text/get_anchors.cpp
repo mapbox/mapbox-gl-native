@@ -40,7 +40,7 @@ static Anchors resample(const GeometryCoordinates& line,
 
     assert(spacing > 0.0);
 
-    int i = 0;
+    std::size_t i = 0u;
     for (auto it = line.begin(), end = line.end() - 1; it != end; it++, i++) {
         const GeometryCoordinate& a = *(it);
         const GeometryCoordinate& b = *(it + 1);
@@ -147,8 +147,8 @@ optional<Anchor> getCenterAnchor(const GeometryCoordinates& line,
     
     float prevDistance = 0;
     const float centerDistance = getLineLength(line) / 2;
-    
-    int i = 0;
+
+    std::size_t i = 0u;
     for (auto it = line.begin(), end = line.end() - 1; it != end; it++, i++) {
         const GeometryCoordinate& a = *(it);
         const GeometryCoordinate& b = *(it + 1);

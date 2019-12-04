@@ -122,8 +122,12 @@ public:
     bool alongLine;
 
 private:
-    void bboxifyLabel(const GeometryCoordinates& line, GeometryCoordinate& anchorPoint,
-                      const int segment, const float length, const float height, const float overscaling);
+    void bboxifyLabel(const GeometryCoordinates& line,
+                      GeometryCoordinate& anchorPoint,
+                      std::size_t segment,
+                      const float length,
+                      const float height,
+                      const float overscaling);
 };
 
 } // namespace mbgl

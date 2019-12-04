@@ -34,7 +34,7 @@ CollisionFeature::CollisionFeature(const GeometryCoordinates& line,
         height = std::max(10.0f * boxScale, height);
 
         GeometryCoordinate anchorPoint = convertPoint<int16_t>(anchor.point);
-        bboxifyLabel(line, anchorPoint, anchor.segment, length, height, overscaling);
+        bboxifyLabel(line, anchorPoint, anchor.segment.value_or(0u), length, height, overscaling);
     } else {
         if (rotate) {
             // Account for *-rotate in point collision boxes
@@ -61,8 +61,12 @@ CollisionFeature::CollisionFeature(const GeometryCoordinates& line,
     }
 }
 
-void CollisionFeature::bboxifyLabel(const GeometryCoordinates& line, GeometryCoordinate& anchorPoint,
-                                    const int segment, const float labelLength, const float boxSize, const float overscaling) {
+void CollisionFeature::bboxifyLabel(const GeometryCoordinates& line,
+                                    GeometryCoordinate& anchorPoint,
+                                    std::size_t segment,
+                                    const float labelLength,
+                                    const float boxSize,
+                                    const float overscaling) {
     const float step = boxSize / 2;
     const int nBoxes = std::max(static_cast<int>(std::floor(labelLength / step)), 1);
 
@@ -82,16 +86,14 @@ void CollisionFeature::bboxifyLabel(const GeometryCoordinates& line, GeometryCoo
     const float firstBoxOffset = -boxSize / 2;
 
     GeometryCoordinate &p = anchorPoint;
-    int index = segment + 1;
+    std::size_t index = segment + 1;
     float anchorDistance = firstBoxOffset;
     const float labelStartDistance = -labelLength / 2;
     const float paddingStartDistance = labelStartDistance - labelLength / 8;
 
     // move backwards along the line to the first segment the label appears on
     do {
-        index--;
-
-        if (index < 0) {
+        if (index == 0u) {
             if (anchorDistance > labelStartDistance) {
                 // there isn't enough room for the label after the beginning of the line
                 // checkMaxAngle should have already caught this
@@ -104,6 +106,7 @@ void CollisionFeature::bboxifyLabel(const GeometryCoordinates& line, GeometryCoo
             }
         }
 
+        index--;
         anchorDistance -= util::dist<float>(line[index], p);
         p = line[index];
     } while (anchorDistance > paddingStartDistance);
@@ -131,7 +134,7 @@ void CollisionFeature::bboxifyLabel(const GeometryCoordinates& line, GeometryCoo
             index++;
 
             // There isn't enough room before the end of the line.
-            if (index + 1 >= (int)line.size()) return;
+            if (index + 1 >= line.size()) return;
 
             segmentLength = util::dist<float>(line[index], line[index + 1]);
         }
@@ -158,6 +161,5 @@ void CollisionFeature::bboxifyLabel(const GeometryCoordinates& line, GeometryCoo
         boxes.emplace_back(boxAnchor, -boxSize / 2, -boxSize / 2, boxSize / 2, boxSize / 2, paddedAnchorDistance);
     }
 }
-
 
 } // namespace mbgl
