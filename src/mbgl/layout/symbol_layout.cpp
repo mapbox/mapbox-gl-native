@@ -695,18 +695,20 @@ bool SymbolLayout::anchorIsTooClose(const std::u16string& text, const float repe
 // JS version does, but it uses the same logic to calculate tile distances.
 std::vector<float> CalculateTileDistances(const GeometryCoordinates& line, const Anchor& anchor) {
     std::vector<float> tileDistances(line.size());
-    if (anchor.segment != -1) {
-        auto sumForwardLength = util::dist<float>(anchor.point, line[anchor.segment + 1]);
-        auto sumBackwardLength = util::dist<float>(anchor.point, line[anchor.segment]);
-        for (size_t i = anchor.segment + 1; i < line.size(); i++) {
+    if (anchor.segment) {
+        std::size_t segment = *anchor.segment;
+        assert(segment < line.size());
+        auto sumForwardLength = util::dist<float>(anchor.point, line[segment + 1]);
+        auto sumBackwardLength = util::dist<float>(anchor.point, line[segment]);
+        for (std::size_t i = segment + 1; i < line.size(); ++i) {
             tileDistances[i] = sumForwardLength;
             if (i < line.size() - 1) {
                 sumForwardLength += util::dist<float>(line[i + 1], line[i]);
             }
         }
-        for (auto i = anchor.segment; i >= 0; i--) {
+        for (std::size_t i = ++segment; i-- > 0;) {
             tileDistances[i] = sumBackwardLength;
-            if (i > 0) {
+            if (i != 0u) {
                 sumBackwardLength += util::dist<float>(line[i - 1], line[i]);
             }
         }
@@ -743,9 +745,15 @@ void SymbolLayout::createBucket(const ImagePositions&, std::unique_ptr<FeatureIn
         if (hasIcon) {
             const Range<float> sizeData = bucket->iconSizeBinder->getVertexSizeData(feature);
             auto& iconBuffer = symbolInstance.hasSdfIcon() ? bucket->sdfIcon : bucket->icon;
-            const auto placeIcon = [&] (const SymbolQuad& iconQuad, auto& index, const WritingModeType writingMode) {
-                iconBuffer.placedSymbols.emplace_back(symbolInstance.anchor.point, symbolInstance.anchor.segment, sizeData.min, sizeData.max,
-                        symbolInstance.iconOffset, writingMode, symbolInstance.line(), std::vector<float>());
+            const auto placeIcon = [&](const SymbolQuad& iconQuad, auto& index, const WritingModeType writingMode) {
+                iconBuffer.placedSymbols.emplace_back(symbolInstance.anchor.point,
+                                                      symbolInstance.anchor.segment.value_or(0u),
+                                                      sizeData.min,
+                                                      sizeData.max,
+                                                      symbolInstance.iconOffset,
+                                                      writingMode,
+                                                      symbolInstance.line(),
+                                                      std::vector<float>());
                 index = iconBuffer.placedSymbols.size() - 1;
                 PlacedSymbol& iconSymbol = iconBuffer.placedSymbols.back();
                 iconSymbol.angle = (allowVerticalPlacement && writingMode == WritingModeType::Vertical) ? M_PI_2 : 0;
@@ -827,8 +835,15 @@ std::size_t SymbolLayout::addSymbolGlyphQuads(SymbolBucket& bucket,
     const Range<float> sizeData = bucket.textSizeBinder->getVertexSizeData(feature);
     const bool hasFormatSectionOverrides = bucket.hasFormatSectionOverrides();
     const auto& placedIconIndex = writingMode == WritingModeType::Vertical ? symbolInstance.placedVerticalIconIndex : symbolInstance.placedIconIndex;
-    bucket.text.placedSymbols.emplace_back(symbolInstance.anchor.point, symbolInstance.anchor.segment, sizeData.min, sizeData.max,
-            symbolInstance.textOffset, writingMode, symbolInstance.line(), CalculateTileDistances(symbolInstance.line(), symbolInstance.anchor), placedIconIndex);
+    bucket.text.placedSymbols.emplace_back(symbolInstance.anchor.point,
+                                           symbolInstance.anchor.segment.value_or(0u),
+                                           sizeData.min,
+                                           sizeData.max,
+                                           symbolInstance.textOffset,
+                                           writingMode,
+                                           symbolInstance.line(),
+                                           CalculateTileDistances(symbolInstance.line(), symbolInstance.anchor),
+                                           placedIconIndex);
     placedIndex = bucket.text.placedSymbols.size() - 1;
     PlacedSymbol& placedSymbol = bucket.text.placedSymbols.back();
     placedSymbol.angle = (allowVerticalPlacement && writingMode == WritingModeType::Vertical) ? M_PI_2 : 0;

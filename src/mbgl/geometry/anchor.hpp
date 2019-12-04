@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mbgl/util/geometry.hpp>
+#include <mbgl/util/optional.hpp>
 
 #include <vector>
 
@@ -11,9 +12,9 @@ public:
     Point<float> point;
     float angle = 0.0f;
     float scale = 0.0f;
-    int segment = -1;
+    optional<std::size_t> segment;
 
-    Anchor(float x_, float y_, float angle_, float scale_, int segment_ = -1)
+    Anchor(float x_, float y_, float angle_, float scale_, optional<std::size_t> segment_ = nullopt)
         : point(x_, y_), angle(angle_), scale(scale_), segment(segment_) {}
 };
 
