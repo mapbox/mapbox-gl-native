@@ -1,10 +1,9 @@
 {
     "base_test_path":"../mapbox-gl-js/test/integration",
-    "expectation_paths":["expected/"],
+    "expectation_paths":["../render-test/expected/"],
     "ignore_paths":["../platform/node/test/ignores.json", "../render-test/ignores/linux-ignores.json"],
     "vendor_path":"../vendor",
     "asset_path": "../mapbox-gl-js/test/integration",
-    "probes": ["probeMemory"],
-    "metric_path":"metrics/linux-gcc8",
-    "filter": "real-world"
+    "probes": ["probeGFX", "probeNetwork"],
+    "metric_path":"../metrics/next-linux-gcc8-release"
 }

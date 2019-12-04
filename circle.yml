@@ -36,6 +36,8 @@ workflows:
           target_is_linux: true
           config_params: '-G Ninja -DCMAKE_INSTALL_PREFIX=workspace/$CIRCLE_JOB -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=gcc-8 -DCMAKE_CXX_COMPILER=g++-8'
           install: true
+          memory_metrics: true
+          gfx_and_network_metrics: true
       - next-build-template:
           name: next-linux-gcc4.9-release
           executor_name: ubuntu-disco
@@ -273,6 +275,7 @@ commands:
         type: string
       runtime_wrapper:
         type: string
+        default: 'xvfb-run -s -noreset'
       metrics_params:
         type: string
     steps:
@@ -739,6 +742,12 @@ jobs:
       binary_size_metrics:
         type: boolean
         default: false
+      memory_metrics:
+        type: boolean
+        default: false
+      gfx_and_network_metrics:
+        type: boolean
+        default: false
     executor: << parameters.executor_name >>
     steps:
       - checkout
@@ -782,8 +791,19 @@ jobs:
                 at: workspace
             - next-metrics:
                 step_name: 'Binary Size Metrics'
-                runtime_wrapper: 'xvfb-run -s -noreset'
                 metrics_params: '-p metrics/binary-size.json'
+      - when:
+          condition: << parameters.memory_metrics >>
+          steps:
+            - next-metrics:
+                step_name: 'Memory Metrics'
+                metrics_params: 'render-tests -p metrics/$CIRCLE_JOB-probe-memory.json'
+      - when:
+          condition: << parameters.gfx_and_network_metrics >>
+          steps:
+            - next-metrics:
+                step_name: 'GFX and Network Metrics'
+                metrics_params: 'render-tests -p metrics/$CIRCLE_JOB-probe-gfx-network.json'
       - next-save
 # ------------------------------------------------------------------------------
   node-linux-release:
