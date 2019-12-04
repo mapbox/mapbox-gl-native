@@ -595,10 +595,6 @@ void NativeMapView::setDebug(JNIEnv&, jni::jboolean debug) {
     map->setDebug(debugOptions);
 }
 
-void NativeMapView::cycleDebugOptions(JNIEnv&) {
-    map->cycleDebugOptions();
-}
-
 jni::jboolean NativeMapView::getDebug(JNIEnv&) {
     return map->getDebug() != DebugOptions::NoDebug;
 }
@@ -1120,7 +1116,6 @@ void NativeMapView::registerNative(jni::JNIEnv& env) {
         METHOD(&NativeMapView::updateMarker, "nativeUpdateMarker"),
         METHOD(&NativeMapView::addMarkers, "nativeAddMarkers"),
         METHOD(&NativeMapView::setDebug, "nativeSetDebug"),
-        METHOD(&NativeMapView::cycleDebugOptions, "nativeCycleDebugOptions"),
         METHOD(&NativeMapView::getDebug, "nativeGetDebug"),
         METHOD(&NativeMapView::isFullyLoaded, "nativeIsFullyLoaded"),
         METHOD(&NativeMapView::onLowMemory, "nativeOnLowMemory"),

@@ -583,15 +583,6 @@ QMapboxGL::~QMapboxGL()
 }
 
 /*!
-    Cycles through several debug options like showing the tile borders,
-    tile numbers, expiration time and wireframe.
-*/
-void QMapboxGL::cycleDebugOptions()
-{
-    d_ptr->mapObj->cycleDebugOptions();
-}
-
-/*!
     \property QMapboxGL::styleJson
     \brief the map style JSON.
 
