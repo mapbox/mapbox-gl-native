@@ -20,14 +20,28 @@ class CrossTileSymbolLayerIndex;
 
 class PlacedSymbol {
 public:
-    PlacedSymbol(Point<float> anchorPoint_, uint16_t segment_, float lowerSize_, float upperSize_,
-            std::array<float, 2> lineOffset_, WritingModeType writingModes_, GeometryCoordinates line_, std::vector<float> tileDistances_, optional<size_t> placedIconIndex_ = nullopt) :
-        anchorPoint(anchorPoint_), segment(segment_), lowerSize(lowerSize_), upperSize(upperSize_),
-        lineOffset(lineOffset_), writingModes(writingModes_), line(std::move(line_)), tileDistances(std::move(tileDistances_)), hidden(false), vertexStartIndex(0), placedIconIndex(std::move(placedIconIndex_))
-    {
-    }
+    PlacedSymbol(Point<float> anchorPoint_,
+                 std::size_t segment_,
+                 float lowerSize_,
+                 float upperSize_,
+                 std::array<float, 2> lineOffset_,
+                 WritingModeType writingModes_,
+                 GeometryCoordinates line_,
+                 std::vector<float> tileDistances_,
+                 optional<size_t> placedIconIndex_ = nullopt)
+        : anchorPoint(anchorPoint_),
+          segment(segment_),
+          lowerSize(lowerSize_),
+          upperSize(upperSize_),
+          lineOffset(lineOffset_),
+          writingModes(writingModes_),
+          line(std::move(line_)),
+          tileDistances(std::move(tileDistances_)),
+          hidden(false),
+          vertexStartIndex(0),
+          placedIconIndex(std::move(placedIconIndex_)) {}
     Point<float> anchorPoint;
-    uint16_t segment;
+    std::size_t segment;
     float lowerSize;
     float upperSize;
     std::array<float, 2> lineOffset;
