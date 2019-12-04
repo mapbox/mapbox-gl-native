@@ -81,13 +81,35 @@ CollisionTileBoundaries CollisionIndex::projectTileBoundaries(const mat4& posMat
     
 }
 
-bool CollisionIndex::isInsideTile(float x1, float y1, float x2, float y2, const CollisionTileBoundaries& tileBoundaries) const {
-    // This check is only well defined when the tile boundaries are axis-aligned
-    // We are relying on it only being used in MapMode::Tile, where that is always the case
-
+// The tile border checks below are only well defined when the tile boundaries are axis-aligned
+// We are relying on it only being used in MapMode::Tile, where that is always the case
+inline bool CollisionIndex::isInsideTile(
+    float x1, float y1, float x2, float y2, const CollisionTileBoundaries& tileBoundaries) const {
     return x1 >= tileBoundaries[0] && y1 >= tileBoundaries[1] && x2 < tileBoundaries[2] && y2 < tileBoundaries[3];
 }
 
+inline bool CollisionIndex::intersectsTileBorders(
+    float x1, float y1, float x2, float y2, const CollisionTileBoundaries& tileBoundaries) const {
+    return x1 < tileBoundaries[2] && x2 > tileBoundaries[0] && y1 < tileBoundaries[3] && y2 > tileBoundaries[1];
+}
+
+bool CollisionIndex::featureIntersectsTileBorders(const CollisionFeature& feature,
+                                                  Point<float> shift,
+                                                  const mat4& posMatrix,
+                                                  const float textPixelRatio,
+                                                  const CollisionTileBoundaries& tileEdges) const {
+    assert(!feature.alongLine);
+    assert(!feature.boxes.empty());
+    const CollisionBox& box = feature.boxes.front();
+    const auto projectedPoint = projectAndGetPerspectiveRatio(posMatrix, box.anchor);
+    const float tileToViewport = textPixelRatio * projectedPoint.second;
+    float px1 = (box.x1 + shift.x) * tileToViewport + projectedPoint.first.x;
+    float py1 = (box.y1 + shift.y) * tileToViewport + projectedPoint.first.y;
+    float px2 = (box.x2 + shift.x) * tileToViewport + projectedPoint.first.x;
+    float py2 = (box.y2 + shift.y) * tileToViewport + projectedPoint.first.y;
+
+    return !intersectsTileBorders(px1, py1, px2, py2, tileEdges);
+}
 
 std::pair<bool,bool> CollisionIndex::placeFeature(const CollisionFeature& feature,
                                       Point<float> shift,
