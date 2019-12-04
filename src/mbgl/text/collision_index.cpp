@@ -108,7 +108,7 @@ bool CollisionIndex::featureIntersectsTileBorders(const CollisionFeature& featur
     float px2 = (box.x2 + shift.x) * tileToViewport + projectedPoint.first.x;
     float py2 = (box.y2 + shift.y) * tileToViewport + projectedPoint.first.y;
 
-    return !intersectsTileBorders(px1, py1, px2, py2, tileEdges);
+    return intersectsTileBorders(px1, py1, px2, py2, tileEdges);
 }
 
 std::pair<bool,bool> CollisionIndex::placeFeature(const CollisionFeature& feature,
