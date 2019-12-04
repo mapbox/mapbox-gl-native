@@ -6,6 +6,7 @@ import androidx.test.rule.ActivityTestRule;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.Assert;
 import org.junit.runner.RunWith;
 import android.util.Log;
 
@@ -24,6 +25,8 @@ public class NativeActivityTest {
             Log.v("Test", "Test is running");
             Thread.sleep(1000L);
         }
-        Log.v("Test", "End the test");
+        Log.v("Test", "All render tests are finished!");
+        Assert.assertTrue("All test cases are passed", TestState.testResult);
+
     }
 }
