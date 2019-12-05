@@ -133,9 +133,9 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
     const double startBearing = state.getBearing();
     const double startPitch = state.getPitch();
     state.setProperties(TransformStateProperties()
-                            .withPanning(unwrappedLatLng != startLatLng)
-                            .withScaling(zoom != startZoom)
-                            .withRotating(bearing != startBearing));
+                            .withPanningInProgress(unwrappedLatLng != startLatLng)
+                            .withScalingInProgress(zoom != startZoom)
+                            .withRotatingInProgress(bearing != startBearing));
     const EdgeInsets startEdgeInsets = state.getEdgeInsets();
 
     startTransition(
@@ -294,7 +294,8 @@ void Transform::flyTo(const CameraOptions& camera, const AnimationOptions& anima
 
     const double startScale = state.getScale();
     state.setProperties(
-        TransformStateProperties().withPanning(true).withScaling(true).withRotating(bearing != startBearing));
+        TransformStateProperties().withPanningInProgress(true).withScalingInProgress(true).withRotatingInProgress(
+            bearing != startBearing));
     const EdgeInsets startEdgeInsets = state.getEdgeInsets();
 
     startTransition(
@@ -342,7 +343,7 @@ void Transform::flyTo(const CameraOptions& camera, const AnimationOptions& anima
 #pragma mark - Position
 
 void Transform::moveBy(const ScreenCoordinate& offset, const AnimationOptions& animation) {
-    ScreenCoordinate centerOffset = { offset.x, offset.y };
+    ScreenCoordinate centerOffset = {offset.x, offset.y};
     ScreenCoordinate pointOnScreen =
         state.getEdgeInsets().getCenter(state.getSize().width, state.getSize().height) - centerOffset;
     // Use unwrapped LatLng to carry information about moveBy direction.
@@ -380,7 +381,9 @@ void Transform::setMaxZoom(const double maxZoom) {
 
 #pragma mark - Bearing
 
-void Transform::rotateBy(const ScreenCoordinate& first, const ScreenCoordinate& second,  const AnimationOptions& animation) {
+void Transform::rotateBy(const ScreenCoordinate& first,
+                         const ScreenCoordinate& second,
+                         const AnimationOptions& animation) {
     ScreenCoordinate center = state.getEdgeInsets().getCenter(state.getSize().width, state.getSize().height);
     const ScreenCoordinate offset = first - center;
     const double distance = std::sqrt(std::pow(2, offset.x) + std::pow(2, offset.y));
@@ -516,7 +519,9 @@ void Transform::startTransition(const CameraOptions& camera,
     };
 
     transitionFinishFn = [isAnimated, animation, this] {
-        state.setProperties(TransformStateProperties().withPanning(false).withScaling(false).withRotating(false));
+        state.setProperties(
+            TransformStateProperties().withPanningInProgress(false).withScalingInProgress(false).withRotatingInProgress(
+                false));
         if (animation.transitionFinishFn) {
             animation.transitionFinishFn();
         }

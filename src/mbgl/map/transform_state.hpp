@@ -52,15 +52,15 @@ struct TransformStateProperties {
         axonometric = val;
         return *this;
     }
-    TransformStateProperties& withPanning(const optional<bool>& val) {
+    TransformStateProperties& withPanningInProgress(const optional<bool>& val) {
         panning = val;
         return *this;
     }
-    TransformStateProperties& withScaling(const optional<bool>& val) {
+    TransformStateProperties& withScalingInProgress(const optional<bool>& val) {
         scaling = val;
         return *this;
     }
-    TransformStateProperties& withRotating(const optional<bool>& val) {
+    TransformStateProperties& withRotatingInProgress(const optional<bool>& val) {
         rotating = val;
         return *this;
     }
@@ -182,11 +182,11 @@ public:
     // State
     bool isChanging() const;
     bool isRotating() const;
-    void setRotating(bool val) { rotating = val; }
+    void setRotatingInProgress(bool val) { rotating = val; }
     bool isScaling() const;
-    void setScaling(bool val) { scaling = val; }
+    void setScalingInProgress(bool val) { scaling = val; }
     bool isPanning() const;
-    void setPanning(bool val) { panning = val; }
+    void setPanningInProgress(bool val) { panning = val; }
     bool isGestureInProgress() const;
     void setGestureInProgress(bool val) { gestureInProgress = val; }
 
@@ -213,7 +213,6 @@ public:
 
 private:
     bool rotatedNorth() const;
-    void updateMatrix() const;
 
     // Viewport center offset, from [size.width / 2, size.height / 2], defined
     // by |edgeInsets| in screen coordinates, with top left origin.
@@ -234,6 +233,12 @@ private:
     mat4 getPixelMatrix() const;
 
     void setScalePoint(const double scale, const ScreenCoordinate& point);
+
+    void updateMatricesIfNeeded() const;
+    bool needsMatricesUpdate() const { return requestMatricesUpdate; }
+    const mat4& getProjectionMatrix() const;
+    const mat4& getCoordMatrix() const;
+    const mat4& getInvertedMatrix() const;
 
 private:
     ConstrainMode constrainMode;
@@ -265,7 +270,7 @@ private:
     double Bc = Projection::worldSize(scale) / util::DEGREES_MAX;
     double Cc = Projection::worldSize(scale) / util::M2PI;
 
-    mutable bool matrixUpdated{false};
+    mutable bool requestMatricesUpdate{true};
     mutable mat4 projectionMatrix;
     mutable mat4 coordMatrix;
     mutable mat4 invertedMatrix;

@@ -37,13 +37,13 @@ void TransformState::setProperties(const TransformStateProperties& properties) {
         setAxonometric(*properties.axonometric);
     }
     if (properties.panning) {
-        setPanning(*properties.panning);
+        setPanningInProgress(*properties.panning);
     }
     if (properties.scaling) {
-        setScaling(*properties.scaling);
+        setScalingInProgress(*properties.scaling);
     }
     if (properties.rotating) {
-        setRotating(*properties.rotating);
+        setRotatingInProgress(*properties.rotating);
     }
     if (properties.edgeInsets) {
         setEdgeInsets(*properties.edgeInsets);
@@ -161,8 +161,8 @@ void TransformState::getProjMatrix(mat4& projMatrix, uint16_t nearZ, bool aligne
     }
 }
 
-void TransformState::updateMatrix() const {
-    if (matrixUpdated || size.isEmpty()) return;
+void TransformState::updateMatricesIfNeeded() const {
+    if (!needsMatricesUpdate() || size.isEmpty()) return;
 
     getProjMatrix(projectionMatrix);
     coordMatrix = coordinatePointMatrix(projectionMatrix);
@@ -170,7 +170,22 @@ void TransformState::updateMatrix() const {
     bool err = matrix::invert(invertedMatrix, coordMatrix);
 
     if (err) throw std::runtime_error("failed to invert coordinatePointMatrix");
-    matrixUpdated = true;
+    requestMatricesUpdate = false;
+}
+
+const mat4& TransformState::getProjectionMatrix() const {
+    updateMatricesIfNeeded();
+    return projectionMatrix;
+}
+
+const mat4& TransformState::getCoordMatrix() const {
+    updateMatricesIfNeeded();
+    return coordMatrix;
+}
+
+const mat4& TransformState::getInvertedMatrix() const {
+    updateMatricesIfNeeded();
+    return invertedMatrix;
 }
 
 #pragma mark - Dimensions
@@ -182,7 +197,7 @@ Size TransformState::getSize() const {
 void TransformState::setSize(const Size& size_) {
     if (size != size_) {
         size = size_;
-        matrixUpdated = false;
+        requestMatricesUpdate = true;
     }
 }
 
@@ -195,7 +210,7 @@ NorthOrientation TransformState::getNorthOrientation() const {
 void TransformState::setNorthOrientation(const NorthOrientation val) {
     if (orientation != val) {
         orientation = val;
-        matrixUpdated = false;
+        requestMatricesUpdate = true;
     }
 }
 
@@ -220,7 +235,7 @@ ConstrainMode TransformState::getConstrainMode() const {
 void TransformState::setConstrainMode(const ConstrainMode val) {
     if (constrainMode != val) {
         constrainMode = val;
-        matrixUpdated = false;
+        requestMatricesUpdate = true;
     }
 }
 
@@ -233,7 +248,7 @@ ViewportMode TransformState::getViewportMode() const {
 void TransformState::setViewportMode(ViewportMode val) {
     if (viewportMode != val) {
         viewportMode = val;
-        matrixUpdated = false;
+        requestMatricesUpdate = true;
     }
 }
 
@@ -253,7 +268,7 @@ CameraOptions TransformState::getCameraOptions(optional<EdgeInsets> padding) con
 void TransformState::setEdgeInsets(const EdgeInsets& val) {
     if (edgeInsets != val) {
         edgeInsets = val;
-        matrixUpdated = false;
+        requestMatricesUpdate = true;
     }
 }
 
@@ -333,7 +348,7 @@ double TransformState::getScale() const {
 void TransformState::setScale(double val) {
     if (scale != val) {
         scale = val;
-        matrixUpdated = false;
+        requestMatricesUpdate = true;
     }
 }
 
@@ -346,7 +361,7 @@ double TransformState::getX() const {
 void TransformState::setX(double val) {
     if (x != val) {
         x = val;
-        matrixUpdated = false;
+        requestMatricesUpdate = true;
     }
 }
 
@@ -357,7 +372,7 @@ double TransformState::getY() const {
 void TransformState::setY(double val) {
     if (y != val) {
         y = val;
-        matrixUpdated = false;
+        requestMatricesUpdate = true;
     }
 }
 
@@ -370,7 +385,7 @@ double TransformState::getBearing() const {
 void TransformState::setBearing(double val) {
     if (bearing != val) {
         bearing = val;
-        matrixUpdated = false;
+        requestMatricesUpdate = true;
     }
 }
 
@@ -389,7 +404,7 @@ double TransformState::getPitch() const {
 void TransformState::setPitch(double val) {
     if (pitch != val) {
         pitch = val;
-        matrixUpdated = false;
+        requestMatricesUpdate = true;
     }
 }
 
@@ -400,7 +415,7 @@ double TransformState::getXSkew() const {
 void TransformState::setXSkew(double val) {
     if (xSkew != val) {
         xSkew = val;
-        matrixUpdated = false;
+        requestMatricesUpdate = true;
     }
 }
 double TransformState::getYSkew() const {
@@ -410,7 +425,7 @@ double TransformState::getYSkew() const {
 void TransformState::setYSkew(double val) {
     if (ySkew != val) {
         ySkew = val;
-        matrixUpdated = false;
+        requestMatricesUpdate = true;
     }
 }
 
@@ -421,7 +436,7 @@ bool TransformState::getAxonometric() const {
 void TransformState::setAxonometric(bool val) {
     if (axonometric != val) {
         axonometric = val;
-        matrixUpdated = false;
+        requestMatricesUpdate = true;
     }
 }
 
@@ -465,8 +480,7 @@ ScreenCoordinate TransformState::latLngToScreenCoordinate(const LatLng& latLng) 
     vec4 p;
     Point<double> pt = Projection::project(latLng, scale) / util::tileSize;
     vec4 c = {{pt.x, pt.y, 0, 1}};
-    updateMatrix();
-    matrix::transformMat4(p, c, coordMatrix);
+    matrix::transformMat4(p, c, getCoordMatrix());
     return {p[0] / p[3], size.height - p[1] / p[3]};
 }
 
@@ -483,13 +497,12 @@ TileCoordinate TransformState::screenCoordinateToTileCoordinate(const ScreenCoor
     // unproject two points to get a line and then find the point on that
     // line with z=0
 
-    updateMatrix();
     vec4 coord0;
     vec4 coord1;
     vec4 point0 = {{point.x, flippedY, 0, 1}};
     vec4 point1 = {{point.x, flippedY, 1, 1}};
-    matrix::transformMat4(coord0, point0, invertedMatrix);
-    matrix::transformMat4(coord1, point1, invertedMatrix);
+    matrix::transformMat4(coord0, point0, getInvertedMatrix());
+    matrix::transformMat4(coord1, point1, getInvertedMatrix());
 
     double w0 = coord0[3];
     double w1 = coord1[3];
@@ -592,14 +605,13 @@ void TransformState::setScalePoint(const double newScale, const ScreenCoordinate
     y = constrainedPoint.y;
     Bc = Projection::worldSize(scale) / util::DEGREES_MAX;
     Cc = Projection::worldSize(scale) / util::M2PI;
-    matrixUpdated = false;
+    requestMatricesUpdate = true;
 }
 
 float TransformState::getCameraToTileDistance(const UnwrappedTileID& tileID) const {
     mat4 tileProjectionMatrix;
     matrixFor(tileProjectionMatrix, tileID);
-    updateMatrix();
-    matrix::multiply(tileProjectionMatrix, projectionMatrix, tileProjectionMatrix);
+    matrix::multiply(tileProjectionMatrix, getProjectionMatrix(), tileProjectionMatrix);
     vec4 tileCenter = {{util::tileSize / 2, util::tileSize / 2, 0, 1}};
     vec4 projectedCenter;
     matrix::transformMat4(projectedCenter, tileCenter, tileProjectionMatrix);
@@ -615,8 +627,7 @@ float TransformState::maxPitchScaleFactor() const {
     Point<double> pt = Projection::project(latLng, scale) / util::tileSize;
     vec4 p = {{ pt.x, pt.y, 0, 1 }};
     vec4 topPoint;
-    updateMatrix();
-    matrix::transformMat4(topPoint, p, coordMatrix);
+    matrix::transformMat4(topPoint, p, getCoordMatrix());
     return topPoint[3] / getCameraToCenterDistance();
 }
 
