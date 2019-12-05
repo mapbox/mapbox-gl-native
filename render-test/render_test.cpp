@@ -41,30 +41,14 @@ void operator delete(void* ptr, size_t) noexcept {
 
 namespace {
 
-template <typename T>
-TestRunner::UpdateResults initUpdateResults(T& testUpdateResultsValue) {
-    if (!testUpdateResultsValue) {
-#if !TEST_READ_ONLY
-        if (getenv("UPDATE_DEFAULT")) return TestRunner::UpdateResults::DEFAULT;
-        if (getenv("UPDATE_PLATFORM")) return TestRunner::UpdateResults::PLATFORM;
-        if (getenv("UPDATE_METRICS")) return TestRunner::UpdateResults::METRICS;
-#endif
-        return TestRunner::UpdateResults::NO;
-    }
-    std::string str = args::get(testUpdateResultsValue);
-#if !TEST_READ_ONLY
-    if (str == "default") return TestRunner::UpdateResults::DEFAULT;
-    if (str == "platform") return TestRunner::UpdateResults::PLATFORM;
-    if (str == "metrics") return TestRunner::UpdateResults::METRICS;
-#endif
-    mbgl::Log::Warning(
-        mbgl::Event::General, "Unsupported update test results mode: \"%s\" will be ignored", str.c_str());
-    return TestRunner::UpdateResults::NO;
-}
-
 using ArgumentsTuple =
     std::tuple<bool, bool, uint32_t, std::string, TestRunner::UpdateResults, std::vector<std::string>, std::string>;
 ArgumentsTuple parseArguments(int argc, char** argv) {
+    const static std::unordered_map<std::string, TestRunner::UpdateResults> updateResultsFlags = {
+        {"default", TestRunner::UpdateResults::DEFAULT},
+        {"platform", TestRunner::UpdateResults::PLATFORM},
+        {"metrics", TestRunner::UpdateResults::METRICS}};
+
     args::ArgumentParser argumentParser("Mapbox GL Test Runner");
 
     args::HelpFlag helpFlag(argumentParser, "help", "Display this help menu", {'h', "help"});
@@ -75,11 +59,13 @@ ArgumentsTuple parseArguments(int argc, char** argv) {
     args::ValueFlag<std::string> testPathValue(
         argumentParser, "manifestPath", "Test manifest file path", {'p', "manifestPath"});
     args::ValueFlag<std::string> testFilterValue(argumentParser, "filter", "Test filter regex", {'f', "filter"});
-    args::ValueFlag<std::string> testUpdateResultsValue(
+    args::MapFlag<std::string, TestRunner::UpdateResults> testUpdateResultsValue(
         argumentParser,
         "update",
         "Test results update mode. Supported values are: \"default\", \"platform\", \"metrics\"",
-        {'u', "update"});
+        {'u', "update"},
+        updateResultsFlags);
+
     args::PositionalList<std::string> testNameValues(argumentParser, "URL", "Test name(s)");
 
     try {
@@ -108,14 +94,15 @@ ArgumentsTuple parseArguments(int argc, char** argv) {
         mbgl::Log::Error(mbgl::Event::General,
                          "Provided test manifest file path '%s' does not exist",
                          manifestPath.string().c_str());
-        exit(4);
+        exit(3);
     }
 
     auto testNames = testNameValues ? args::get(testNameValues) : std::vector<std::string>{};
     auto testFilter = testFilterValue ? args::get(testFilterValue) : std::string{};
     const auto shuffle = shuffleFlag ? args::get(shuffleFlag) : false;
     const auto seed = seedValue ? args::get(seedValue) : 1u;
-    TestRunner::UpdateResults updateResults = initUpdateResults(testUpdateResultsValue);
+    TestRunner::UpdateResults updateResults =
+        testUpdateResultsValue ? args::get(testUpdateResultsValue) : TestRunner::UpdateResults::NO;
     return ArgumentsTuple{recycleMapFlag ? args::get(recycleMapFlag) : false,
                           shuffle,
                           seed,

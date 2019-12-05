@@ -186,7 +186,6 @@ bool TestRunner::checkQueryTestResults(mbgl::PremultipliedImage&& actualImage,
         return false;
     }
 
-#if !TEST_READ_ONLY
     if (updateResults == UpdateResults::PLATFORM) {
         mbgl::filesystem::create_directories(expectations.back());
         mbgl::util::write_file(expectations.back().string() + "/expected.json", metadata.actualJson);
@@ -197,7 +196,6 @@ bool TestRunner::checkQueryTestResults(mbgl::PremultipliedImage&& actualImage,
     }
 
     mbgl::util::write_file(base + "/actual.json", metadata.actualJson);
-#endif
 
     std::vector<std::string> expectedJsonPaths;
     mbgl::filesystem::path expectedMetricsPath;
@@ -256,7 +254,6 @@ bool TestRunner::checkRenderTestResults(mbgl::PremultipliedImage&& actualImage, 
             return false;
         }
 
-#if !TEST_READ_ONLY
         if (updateResults == UpdateResults::PLATFORM) {
             mbgl::filesystem::create_directories(expectations.back());
             mbgl::util::write_file(expectations.back().string() + "/expected.png", mbgl::encodePNG(actualImage));
@@ -267,7 +264,6 @@ bool TestRunner::checkRenderTestResults(mbgl::PremultipliedImage&& actualImage, 
         }
 
         mbgl::util::write_file(base + "/actual.png", metadata.actual);
-#endif
 
         mbgl::PremultipliedImage expectedImage{actualImage.size};
         mbgl::PremultipliedImage imageDiff{actualImage.size};
@@ -307,9 +303,7 @@ bool TestRunner::checkRenderTestResults(mbgl::PremultipliedImage&& actualImage, 
 
             metadata.diff = mbgl::encodePNG(imageDiff);
 
-#if !TEST_READ_ONLY
             mbgl::util::write_file(base + "/diff.png", metadata.diff);
-#endif
 
             metadata.difference = pixels / expectedImage.size.area();
             if (metadata.difference <= metadata.allowed) {
@@ -323,13 +317,11 @@ bool TestRunner::checkRenderTestResults(mbgl::PremultipliedImage&& actualImage, 
 bool TestRunner::checkProbingResults(TestMetadata& metadata) {
     if (metadata.metrics.isEmpty()) return true;
     const std::vector<mbgl::filesystem::path>& expectedMetrics = metadata.paths.expectedMetrics;
-#if !TEST_READ_ONLY
     if (updateResults == UpdateResults::METRICS) {
         mbgl::filesystem::create_directories(expectedMetrics.back());
         mbgl::util::write_file(expectedMetrics.back().string() + "/metrics.json", serializeMetrics(metadata.metrics));
         return true;
     }
-#endif
 
     // Check the possible paths in reverse order, so that the default path with the test style will only be checked in
     // the very end.
