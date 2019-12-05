@@ -533,6 +533,7 @@ void Placement::placeBucket(
 }
 
 void Placement::commit(TimePoint now, const double zoom) {
+    assert(getPrevPlacement());
     commitTime = now;
 
     bool placementChanged = false;

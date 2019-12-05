@@ -377,21 +377,17 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
     }
     // Symbol placement.
     bool symbolBucketsChanged = false;
-    {
-        if (!isMapModeContinuous) {
-            // TODO: Think about right way for symbol index to handle still rendering
-            crossTileSymbolIndex.reset();
-        }
-
+    if (isMapModeContinuous) {
         bool symbolBucketsAdded = false;
-        for (auto it = layersNeedPlacement.rbegin(); it != layersNeedPlacement.rend(); ++it) {
-            auto result = crossTileSymbolIndex.addLayer(*it, updateParameters.transformState.getLatLng().longitude()); 
+        for (auto it = layersNeedPlacement.crbegin(); it != layersNeedPlacement.crend(); ++it) {
+            auto result = crossTileSymbolIndex.addLayer(*it, updateParameters.transformState.getLatLng().longitude());
             symbolBucketsAdded = symbolBucketsAdded || (result & CrossTileSymbolIndex::AddLayerResult::BucketsAdded);
             symbolBucketsChanged = symbolBucketsChanged || (result != CrossTileSymbolIndex::AddLayerResult::NoChanges);
         }
         // We want new symbols to show up faster, however simple setting `placementChanged` to `true` would
         // initiate placement too often as new buckets ususally come from several rendered tiles in a row within
-        // a short period of time. Instead, we squeeze placement update period to coalesce buckets updates from several tiles.
+        // a short period of time. Instead, we squeeze placement update period to coalesce buckets updates from several
+        // tiles.
         optional<Duration> maximumPlacementUpdatePeriod;
         if (symbolBucketsAdded) maximumPlacementUpdatePeriod = optional<Duration>(Milliseconds(30));
         renderTreeParameters->placementChanged = !placementController.placementIsRecent(
@@ -406,7 +402,7 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
                                                                   updateParameters.crossSourceCollisions,
                                                                   placementController.getPlacement());
 
-            for (auto it = layersNeedPlacement.rbegin(); it != layersNeedPlacement.rend(); ++it) {
+            for (auto it = layersNeedPlacement.crbegin(); it != layersNeedPlacement.crend(); ++it) {
                 const RenderLayer& layer = *it;
                 usedSymbolLayers.insert(layer.getID());
                 placement->placeLayer(layer, renderTreeParameters->transformParams.projMatrix, updateParameters.debugOptions & MapDebugOptions::Collision);
@@ -423,9 +419,30 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
         }
         renderTreeParameters->symbolFadeChange =
             placementController.getPlacement()->symbolFadeChange(updateParameters.timePoint);
+        renderTreeParameters->needsRepaint = hasTransitions(updateParameters.timePoint);
+    } else {
+        crossTileSymbolIndex.reset();
+        renderTreeParameters->placementChanged = symbolBucketsChanged = !layersNeedPlacement.empty();
+        if (renderTreeParameters->placementChanged) {
+            Mutable<Placement> placement = makeMutable<Placement>(updateParameters.transformState,
+                                                                  updateParameters.mode,
+                                                                  updateParameters.transitionOptions,
+                                                                  updateParameters.crossSourceCollisions,
+                                                                  placementController.getPlacement());
+            for (auto it = layersNeedPlacement.crbegin(); it != layersNeedPlacement.crend(); ++it) {
+                const RenderLayer& layer = *it;
+                crossTileSymbolIndex.addLayer(layer, updateParameters.transformState.getLatLng().longitude());
+                placement->placeLayer(layer,
+                                      renderTreeParameters->transformParams.projMatrix,
+                                      updateParameters.debugOptions & MapDebugOptions::Collision);
+            }
+            placement->commit(updateParameters.timePoint, updateParameters.transformState.getZoom());
+            placementController.setPlacement(std::move(placement));
+        }
+        renderTreeParameters->symbolFadeChange = 1.0f;
+        renderTreeParameters->needsRepaint = false;
     }
 
-    renderTreeParameters->needsRepaint = isMapModeContinuous && hasTransitions(updateParameters.timePoint);
     if (!renderTreeParameters->needsRepaint && renderTreeParameters->loaded) {
         // Notify observer about unused images when map is fully loaded
         // and there are no ongoing transitions.
