@@ -45,12 +45,12 @@ ScreenCoordinate RendererState::pixelForLatLng(const UpdateParameters& updatePar
     LatLng unwrappedLatLng = latLng.wrapped();
     unwrappedLatLng.unwrapForShortestPath(updateParameters.transformState.getLatLng());
     const ScreenCoordinate point = updateParameters.transformState.latLngToScreenCoordinate(latLng);
-    return ScreenCoordinate { point.x, updateParameters.transformState.size.height - point.y };
+    return ScreenCoordinate{point.x, updateParameters.transformState.getSize().height - point.y};
 }
 
 LatLng RendererState::latLngForPixel(const UpdateParameters& updateParameters, const ScreenCoordinate& point) {
     ScreenCoordinate flippedPoint = point;
-    flippedPoint.y = updateParameters.transformState.size.height - flippedPoint.y;
+    flippedPoint.y = updateParameters.transformState.getSize().height - flippedPoint.y;
     return updateParameters.transformState.screenCoordinateToLatLng(flippedPoint);
 }
 
