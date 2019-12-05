@@ -427,8 +427,7 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
             Mutable<Placement> placement = makeMutable<Placement>(updateParameters.transformState,
                                                                   updateParameters.mode,
                                                                   updateParameters.transitionOptions,
-                                                                  updateParameters.crossSourceCollisions,
-                                                                  placementController.getPlacement());
+                                                                  updateParameters.crossSourceCollisions);
             for (auto it = layersNeedPlacement.crbegin(); it != layersNeedPlacement.crend(); ++it) {
                 const RenderLayer& layer = *it;
                 crossTileSymbolIndex.addLayer(layer, updateParameters.transformState.getLatLng().longitude());

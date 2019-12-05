@@ -116,7 +116,7 @@ public:
               MapMode,
               style::TransitionOptions,
               const bool crossSourceCollisions,
-              optional<Immutable<Placement>> prevPlacement);
+              optional<Immutable<Placement>> prevPlacement = nullopt);
     void placeLayer(const RenderLayer&, const mat4&, bool showCollisionBoxes);
     void commit(TimePoint, const double zoom);
     void updateLayerBuckets(const RenderLayer&, const TransformState&, bool updateOpacities) const;

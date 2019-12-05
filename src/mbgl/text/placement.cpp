@@ -101,6 +101,7 @@ Placement::Placement(const TransformState& state_,
       placementZoom(state_.getZoom()),
       collisionGroups(crossSourceCollisions),
       prevPlacement(std::move(prevPlacement_)) {
+    assert(prevPlacement || mapMode != MapMode::Continuous);
     if (prevPlacement) {
         prevPlacement->get()->prevPlacement = nullopt; // Only hold on to one placement back
     }
@@ -533,13 +534,22 @@ void Placement::placeBucket(
 }
 
 void Placement::commit(TimePoint now, const double zoom) {
-    assert(getPrevPlacement());
     commitTime = now;
+    if (!getPrevPlacement()) {
+        assert(mapMode != MapMode::Continuous);
+        fadeStartTime = commitTime;
+        for (auto& jointPlacement : placements) {
+            opacities.emplace(
+                jointPlacement.first,
+                JointOpacityState(
+                    jointPlacement.second.text, jointPlacement.second.icon, jointPlacement.second.skipFade));
+        }
+        return;
+    }
 
     bool placementChanged = false;
 
     prevZoomAdjustment = getPrevPlacement()->zoomAdjustment(zoom);
-
     float increment = getPrevPlacement()->symbolFadeChange(commitTime);
 
     // add the opacities from the current placement, and copy their current values from the previous placement
