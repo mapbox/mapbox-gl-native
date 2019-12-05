@@ -35,8 +35,14 @@ option(MBGL_WITH_SANITIZER "Use [address|thread|memory|undefined] here" OFF)
 set(CMAKE_CXX_FLAGS_DEBUGCOVERAGE "${CMAKE_CXX_FLAGS_DEBUG} --coverage")
 set(CMAKE_C_FLAGS_DEBUGCOVERAGE "${CMAKE_C_FLAGS_DEBUG} --coverage")
 
-set(CMAKE_CXX_FLAGS_SANITIZE "-DSANITIZE -g -O1 -fno-omit-frame-pointer -fno-optimize-sibling-calls -fsanitize=${MBGL_WITH_SANITIZER}")
-set(CMAKE_C_FLAGS_SANITIZE "-DSANITIZE -g -O1 -fno-omit-frame-pointer -fno-optimize-sibling-calls -fsanitize=${MBGL_WITH_SANITIZER}")
+set(
+    CMAKE_CXX_FLAGS_SANITIZE
+    "-DSANITIZE -g -O1 -fno-omit-frame-pointer -fno-optimize-sibling-calls -fsanitize=implicit-conversion -fsanitize=unsigned-integer-overflow -fsanitize=${MBGL_WITH_SANITIZER}"
+)
+set(
+    CMAKE_C_FLAGS_SANITIZE
+    "-DSANITIZE -g -O1 -fno-omit-frame-pointer -fno-optimize-sibling-calls -fsanitize=implicit-conversion -fsanitize=unsigned-integer-overflow -fsanitize=${MBGL_WITH_SANITIZER}"
+)
 
 add_compile_options(
     $<$<COMPILE_LANGUAGE:CXX>:-fno-rtti>
