@@ -47,7 +47,8 @@ ArgumentsTuple parseArguments(int argc, char** argv) {
     const static std::unordered_map<std::string, TestRunner::UpdateResults> updateResultsFlags = {
         {"default", TestRunner::UpdateResults::DEFAULT},
         {"platform", TestRunner::UpdateResults::PLATFORM},
-        {"metrics", TestRunner::UpdateResults::METRICS}};
+        {"metrics", TestRunner::UpdateResults::METRICS},
+        {"rebaseline", TestRunner::UpdateResults::REBASELINE}};
 
     args::ArgumentParser argumentParser("Mapbox GL Test Runner");
 

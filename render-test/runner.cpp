@@ -316,11 +316,17 @@ bool TestRunner::checkRenderTestResults(mbgl::PremultipliedImage&& actualImage, 
 
 bool TestRunner::checkProbingResults(TestMetadata& metadata) {
     if (metadata.metrics.isEmpty()) return true;
+    const auto writeMetrics = [&metadata](const mbgl::filesystem::path& path,
+                                          const std::string& message = std::string()) {
+        mbgl::filesystem::create_directories(path);
+        mbgl::util::write_file(path / "metrics.json", serializeMetrics(metadata.metrics));
+        metadata.errorMessage += message;
+    };
+
     const std::vector<mbgl::filesystem::path>& expectedMetrics = metadata.paths.expectedMetrics;
     if (updateResults == UpdateResults::METRICS) {
-        mbgl::filesystem::create_directories(expectedMetrics.back());
-        mbgl::util::write_file(expectedMetrics.back().string() + "/metrics.json", serializeMetrics(metadata.metrics));
-        return true;
+        writeMetrics(expectedMetrics.back(), " Updated expected metrics.");
+        return false;
     }
 
     // Check the possible paths in reverse order, so that the default path with the test style will only be checked in
@@ -347,8 +353,12 @@ bool TestRunner::checkProbingResults(TestMetadata& metadata) {
 
     if (metadata.expectedMetrics.isEmpty()) {
         metadata.errorMessage = "Failed to find metric expectations for: " + metadata.paths.stylePath.string();
+        if (updateResults == UpdateResults::REBASELINE) {
+            writeMetrics(expectedMetrics.back(), ". Created baseline for missing metrics.");
+        }
         return false;
     }
+
     // Check file size metrics.
     auto checkFileSize = [](TestMetadata& metadata) -> bool {
         if (metadata.metrics.fileSize.empty()) return true;
@@ -567,8 +577,14 @@ bool TestRunner::checkProbingResults(TestMetadata& metadata) {
         return true;
     };
 
-    return checkFileSize(metadata) && checkMemory(metadata) && checkNetwork(metadata) && checkFps(metadata) &&
-           checkGfx(metadata);
+    bool checkResult = checkFileSize(metadata) && checkMemory(metadata) && checkNetwork(metadata) &&
+                       checkFps(metadata) && checkGfx(metadata);
+
+    if (!checkResult && updateResults == UpdateResults::REBASELINE) {
+        writeMetrics(expectedMetrics.back(), " Rebaselined expected metric for failed test.");
+    }
+
+    return checkResult;
 }
 
 bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata, RunContext& ctx) {

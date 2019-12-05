@@ -14,7 +14,7 @@ struct TestMetadata;
 
 class TestRunner {
 public:
-    enum class UpdateResults { NO, DEFAULT, PLATFORM, METRICS };
+    enum class UpdateResults { NO, DEFAULT, PLATFORM, METRICS, REBASELINE };
     TestRunner(Manifest, UpdateResults);
     bool run(TestMetadata&);
     void reset();
