@@ -621,8 +621,60 @@ jni::Local<jni::Object<PointF>> NativeMapView::pixelForLatLng(JNIEnv& env, jdoub
     return PointF::New(env, static_cast<float>(pixel.x), static_cast<float>(pixel.y));
 }
 
+void NativeMapView::pixelsForLatLngs(JNIEnv& env,
+                                     const jni::Array<jdouble>& input,
+                                     jni::Array<jdouble>& output,
+                                     jfloat pixelRatio) {
+    jni::NullCheck(env, &input);
+    std::size_t len = input.Length(env);
+
+    std::vector<mbgl::LatLng> latLngs;
+    latLngs.reserve(len);
+
+    for (std::size_t i = 0; i < len; i += 2) {
+        auto latLng = mbgl::LatLng(input.Get(env, i), input.Get(env, i + 1));
+        latLngs.push_back(latLng);
+    }
+
+    std::vector<jdouble> buffer;
+    buffer.reserve(len);
+    std::vector<ScreenCoordinate> coordinates = map->pixelsForLatLngs(latLngs);
+    for (std::size_t i = 0; i < len / 2; i++) {
+        buffer.push_back(coordinates[i].x * pixelRatio);
+        buffer.push_back(coordinates[i].y * pixelRatio);
+    }
+
+    output.SetRegion<std::vector<jdouble>>(env, 0, buffer);
+}
+
 jni::Local<jni::Object<LatLng>> NativeMapView::latLngForPixel(JNIEnv& env, jfloat x, jfloat y) {
     return LatLng::New(env, map->latLngForPixel(mbgl::ScreenCoordinate(x, y)));
+}
+
+void NativeMapView::latLngsForPixels(JNIEnv& env,
+                                     const jni::Array<jdouble>& input,
+                                     jni::Array<jdouble>& output,
+                                     jfloat pixelRatio) {
+    jni::NullCheck(env, &input);
+    std::size_t len = input.Length(env);
+
+    std::vector<mbgl::ScreenCoordinate> coordinates;
+    coordinates.reserve(len);
+
+    for (std::size_t i = 0; i < len; i += 2) {
+        auto coordinate = mbgl::ScreenCoordinate(input.Get(env, i) / pixelRatio, input.Get(env, i + 1) / pixelRatio);
+        coordinates.push_back(coordinate);
+    }
+
+    std::vector<jdouble> buffer;
+    buffer.reserve(len);
+    std::vector<mbgl::LatLng> latLngs = map->latLngsForPixels(coordinates);
+    for (std::size_t i = 0; i < len / 2; i++) {
+        buffer.push_back(latLngs[i].latitude());
+        buffer.push_back(latLngs[i].longitude());
+    }
+
+    output.SetRegion<std::vector<jdouble>>(env, 0, buffer);
 }
 
 jni::Local<jni::Array<jlong>> NativeMapView::addPolylines(JNIEnv& env, const jni::Array<jni::Object<Polyline>>& polylines) {
@@ -1122,8 +1174,10 @@ void NativeMapView::registerNative(jni::JNIEnv& env) {
         METHOD(&NativeMapView::getMetersPerPixelAtLatitude, "nativeGetMetersPerPixelAtLatitude"),
         METHOD(&NativeMapView::projectedMetersForLatLng, "nativeProjectedMetersForLatLng"),
         METHOD(&NativeMapView::pixelForLatLng, "nativePixelForLatLng"),
+        METHOD(&NativeMapView::pixelsForLatLngs, "nativePixelsForLatLngs"),
         METHOD(&NativeMapView::latLngForProjectedMeters, "nativeLatLngForProjectedMeters"),
         METHOD(&NativeMapView::latLngForPixel, "nativeLatLngForPixel"),
+        METHOD(&NativeMapView::latLngsForPixels, "nativeLatLngsForPixels"),
         METHOD(&NativeMapView::addPolylines, "nativeAddPolylines"),
         METHOD(&NativeMapView::addPolygons, "nativeAddPolygons"),
         METHOD(&NativeMapView::updatePolyline, "nativeUpdatePolyline"),
