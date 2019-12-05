@@ -797,13 +797,13 @@ jobs:
           steps:
             - next-metrics:
                 step_name: 'Memory Metrics'
-                metrics_params: 'render-tests -p metrics/$CIRCLE_JOB-probe-memory.json'
+                metrics_params: 'render-tests -u rebaseline -p metrics/$CIRCLE_JOB-probe-memory.json'
       - when:
           condition: << parameters.gfx_and_network_metrics >>
           steps:
             - next-metrics:
                 step_name: 'GFX and Network Metrics'
-                metrics_params: 'render-tests -p metrics/$CIRCLE_JOB-probe-gfx-network.json'
+                metrics_params: 'render-tests -u rebaseline -p metrics/$CIRCLE_JOB-probe-gfx-network.json'
       - next-save
 # ------------------------------------------------------------------------------
   node-linux-release:
