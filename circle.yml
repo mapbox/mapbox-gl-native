@@ -185,7 +185,7 @@ executors:
     resource_class: xlarge
     working_directory: /src
     environment:
-      UBSAN_OPTIONS: print_stacktrace=1:halt_on_error=1
+      UBSAN_OPTIONS: print_stacktrace=1:halt_on_error=0
       ASAN_OPTIONS: strict_string_checks=1:detect_stack_use_after_return=1:check_initialization_order=1:strict_init_order=1
       QT_INSTALL_DOCS: /usr/share/qt5/doc
       QT_VERSION: 5
