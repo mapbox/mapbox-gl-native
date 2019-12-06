@@ -103,5 +103,7 @@
   "render-tests/icon-text-fit/stretch-underscale": "https://github.com/mapbox/mapbox-gl-native/issues/16017",
   "render-tests/regressions/mapbox-gl-js#9009": "https://github.com/mapbox/mapbox-gl-native/issues/16018",
   "render-tests/zoomed-fill/negative-zoom": "https://github.com/mapbox/mapbox-gl-native/issues/16019",
+  "render-tests/runtime-styling/image-add-remove-add": "skip - https://github.com/mapbox/mapbox-gl-native/issues/16021",
+  "render-tests/runtime-styling/pattern-add-remove-add": "skip - https://github.com/mapbox/mapbox-gl-native/issues/16021",
   "render-tests/text-size/nan": "https://github.com/mapbox/mapbox-gl-native/issues/16020"
 }
