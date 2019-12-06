@@ -111,7 +111,6 @@
     "render-tests/regressions/mapbox-gl-js#7708": "skip - js specific",
     "render-tests/regressions/mapbox-gl-js#8026": "skip - js specific",
     "render-tests/regressions/mapbox-gl-js#8817": "skip - https://github.com/mapbox/mapbox-gl-native/issues/15737",
-    "render-tests/regressions/mapbox-gl-js#9009": "https://github.com/mapbox/mapbox-gl-native/issues/16018",
     "render-tests/regressions/mapbox-gl-native#7357": "https://github.com/mapbox/mapbox-gl-native/issues/7357",
     "render-tests/runtime-styling/image-add-remove-add": "skip - https://github.com/mapbox/mapbox-gl-native/issues/16021",
     "render-tests/runtime-styling/pattern-add-remove-add": "skip - https://github.com/mapbox/mapbox-gl-native/issues/16021",

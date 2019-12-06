@@ -129,18 +129,19 @@ void LineBucket::addGeometry(const GeometryCoordinates& coordinates, const Geome
             total_length += util::dist<double>(coordinates[i], coordinates[i + 1]);
         }
 
-        lineDistances = Distances{*numericValue<double>(clip_start_it->second),
-                                  *numericValue<double>(clip_end_it->second),
-                                  total_length};
+        lineDistances = Distances{
+            *numericValue<double>(clip_start_it->second), *numericValue<double>(clip_end_it->second), total_length};
     }
 
     const LineJoinType joinType = layout.evaluate<LineJoin>(zoom, feature);
 
     const float miterLimit = joinType == LineJoinType::Bevel ? 1.05f : float(layout.get<LineMiterLimit>());
 
-    const double sharpCornerOffset = overscaling == 0 ?
-                                    SHARP_CORNER_OFFSET * (float(util::EXTENT) / util::tileSize) :
-                                    SHARP_CORNER_OFFSET * (float(util::EXTENT) / (util::tileSize * overscaling));
+    const double sharpCornerOffset =
+        overscaling == 0
+            ? SHARP_CORNER_OFFSET * (float(util::EXTENT) / util::tileSize)
+            : (overscaling <= 16.0 ? SHARP_CORNER_OFFSET * (float(util::EXTENT) / (util::tileSize * overscaling))
+                                   : 0.0f);
 
     const GeometryCoordinate firstCoordinate = coordinates[first];
     const LineCapType beginCap = layout.get<LineCap>();
