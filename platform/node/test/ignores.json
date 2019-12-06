@@ -89,5 +89,19 @@
   "query-tests/fill-extrusion/sort": "https://github.com/mapbox/mapbox-gl-native/issues/13139",
   "query-tests/fill-extrusion/top-in": "https://github.com/mapbox/mapbox-gl-native/issues/13139",
   "query-tests/regressions/mapbox-gl-js#7883": "https://github.com/mapbox/mapbox-gl-native/issues/14585",
-  "render-tests/fill-pattern/update-feature-state": "https://github.com/mapbox/mapbox-gl-native/issues/15895"
+  "render-tests/fill-pattern/update-feature-state": "https://github.com/mapbox/mapbox-gl-native/issues/15895",
+  "render-tests/feature-state/promote-id": "https://github.com/mapbox/mapbox-gl-native/issues/16016",
+  "render-tests/icon-text-fit/stretch-fifteen-part": "https://github.com/mapbox/mapbox-gl-native/issues/16017",
+  "render-tests/icon-text-fit/stretch-nine-part-@2x": "https://github.com/mapbox/mapbox-gl-native/issues/16017",
+  "render-tests/icon-text-fit/stretch-nine-part-content-collision": "https://github.com/mapbox/mapbox-gl-native/issues/16017",
+  "render-tests/icon-text-fit/stretch-nine-part-content": "https://github.com/mapbox/mapbox-gl-native/issues/16017",
+  "render-tests/icon-text-fit/stretch-nine-part-just-height": "https://github.com/mapbox/mapbox-gl-native/issues/16017",
+  "render-tests/icon-text-fit/stretch-nine-part-just-width": "https://github.com/mapbox/mapbox-gl-native/issues/16017",
+  "render-tests/icon-text-fit/stretch-nine-part": "https://github.com/mapbox/mapbox-gl-native/issues/16017",
+  "render-tests/icon-text-fit/stretch-three-part": "https://github.com/mapbox/mapbox-gl-native/issues/16017",
+  "render-tests/icon-text-fit/stretch-two-part": "https://github.com/mapbox/mapbox-gl-native/issues/16017",
+  "render-tests/icon-text-fit/stretch-underscale": "https://github.com/mapbox/mapbox-gl-native/issues/16017",
+  "render-tests/regressions/mapbox-gl-js#9009": "https://github.com/mapbox/mapbox-gl-native/issues/16018",
+  "render-tests/zoomed-fill/negative-zoom": "https://github.com/mapbox/mapbox-gl-native/issues/16019",
+  "render-tests/text-size/nan": "https://github.com/mapbox/mapbox-gl-native/issues/16020"
 }
