@@ -88,7 +88,9 @@ private:
 
 class BucketPlacementParameters {
 public:
-    friend bool operator<(const BucketPlacementParameters& lhs, const BucketPlacementParameters& rhs) { return lhs.sortKey < rhs.sortKey; }
+    friend bool operator<(const BucketPlacementParameters& lhs, const BucketPlacementParameters& rhs) {
+        return lhs.sortKey < rhs.sortKey;
+    }
     SymbolBucket& bucket;
     const RenderTile& tile;
     std::string sourceId;

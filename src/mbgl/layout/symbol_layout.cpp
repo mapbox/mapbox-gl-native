@@ -572,16 +572,17 @@ void SymbolLayout::addFeature(const std::size_t layoutFeatureIndex,
         }
     }
 
-    auto addSymbolInstance = [&] (Anchor& anchor, std::shared_ptr<SymbolInstanceSharedData> sharedData) {
+    auto addSymbolInstance = [&](Anchor& anchor, std::shared_ptr<SymbolInstanceSharedData> sharedData) {
         assert(sharedData);
-        const bool anchorInsideTile = anchor.point.x >= 0 && anchor.point.x < util::EXTENT && anchor.point.y >= 0 && anchor.point.y < util::EXTENT;
+        const bool anchorInsideTile = anchor.point.x >= 0 && anchor.point.x < util::EXTENT && anchor.point.y >= 0 &&
+                                      anchor.point.y < util::EXTENT;
 
         if (mode == MapMode::Tile || anchorInsideTile) {
             if (sortFeaturesByKey) {
                 if (sortKeyRanges.size() && sortKeyRanges.back().sortKey == feature.sortKey) {
                     sortKeyRanges.back().symbolInstanceEnd = symbolInstances.size() + 1;
                 } else {
-                    sortKeyRanges.push_back({ feature.sortKey, symbolInstances.size(), symbolInstances.size() + 1 });
+                    sortKeyRanges.push_back({feature.sortKey, symbolInstances.size(), symbolInstances.size() + 1});
                 }
             }
 
@@ -590,13 +591,28 @@ void SymbolLayout::addFeature(const std::size_t layoutFeatureIndex,
             // In tiled rendering mode, add all symbols in the buffers so that we can:
             //  (1) render symbols that overlap into this tile
             //  (2) approximate collision detection effects from neighboring symbols
-            symbolInstances.emplace_back(anchor, std::move(sharedData), shapedTextOrientations,
-                    shapedIcon, verticallyShapedIcon,
-                    textBoxScale, textPadding, textPlacement, textOffset,
-                    iconBoxScale, iconPadding, iconOffset, indexedFeature,
-                    layoutFeatureIndex, feature.index,
-                    feature.formattedText ? feature.formattedText->rawText() : std::u16string(),
-                    overscaling, iconRotation, textRotation, variableTextOffset, allowVerticalPlacement, iconType);
+            symbolInstances.emplace_back(anchor,
+                                         std::move(sharedData),
+                                         shapedTextOrientations,
+                                         shapedIcon,
+                                         verticallyShapedIcon,
+                                         textBoxScale,
+                                         textPadding,
+                                         textPlacement,
+                                         textOffset,
+                                         iconBoxScale,
+                                         iconPadding,
+                                         iconOffset,
+                                         indexedFeature,
+                                         layoutFeatureIndex,
+                                         feature.index,
+                                         feature.formattedText ? feature.formattedText->rawText() : std::u16string(),
+                                         overscaling,
+                                         iconRotation,
+                                         textRotation,
+                                         variableTextOffset,
+                                         allowVerticalPlacement,
+                                         iconType);
         }
     };
 

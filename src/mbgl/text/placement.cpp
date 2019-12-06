@@ -117,37 +117,34 @@ void Placement::placeLayer(const RenderLayer& layer) {
     for (const auto& item : layer.getPlacementData()) {
         SymbolBucket& bucket = item.bucket;
         if (bucket.sortKeyRanges.size() == 0) {
-            BucketPlacementParameters params{
-                    item.bucket,
-                    item.tile,
-                    projMatrix,
-                    layer.baseImpl->source,
-                    item.featureIndex,
-                    showCollisionBoxes,
-                    0.0f,
-                    0,
-                    bucket.symbolInstances.size()};
+            BucketPlacementParameters params{item.bucket,
+                                             item.tile,
+                                             projMatrix,
+                                             layer.baseImpl->source,
+                                             item.featureIndex,
+                                             showCollisionBoxes,
+                                             0.0f,
+                                             0,
+                                             bucket.symbolInstances.size()};
             parameters.push_back(params);
 
         } else {
             for (const SortKeyRange& sortKeyRange : bucket.sortKeyRanges) {
-                BucketPlacementParameters params{
-                        item.bucket,
-                        item.tile,
-                        projMatrix,
-                        layer.baseImpl->source,
-                        item.featureIndex,
-                        showCollisionBoxes,
-                        sortKeyRange.sortKey,
-                        sortKeyRange.symbolInstanceStart,
-                        sortKeyRange.symbolInstanceEnd};
+                BucketPlacementParameters params{item.bucket,
+                                                 item.tile,
+                                                 projMatrix,
+                                                 layer.baseImpl->source,
+                                                 item.featureIndex,
+                                                 showCollisionBoxes,
+                                                 sortKeyRange.sortKey,
+                                                 sortKeyRange.symbolInstanceStart,
+                                                 sortKeyRange.symbolInstanceEnd};
 
                 auto sortPosition = std::upper_bound(parameters.cbegin(), parameters.cend(), params);
                 parameters.insert(sortPosition, std::move(params));
             }
         }
     }
-
 
     for (auto& params : parameters) {
         SymbolBucket& bucket = params.bucket;

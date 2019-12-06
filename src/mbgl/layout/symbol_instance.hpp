@@ -124,7 +124,7 @@ public:
 };
 
 class SortKeyRange {
-    public:
+public:
     float sortKey;
     size_t symbolInstanceStart;
     size_t symbolInstanceEnd;
