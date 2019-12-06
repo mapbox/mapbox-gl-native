@@ -22,20 +22,30 @@ namespace mbgl {
 // the viewport for collision detection so that the bulk of the changes
 // occur offscreen. Making this constant greater increases label
 // stability, but it's expensive.
-static const float viewportPadding = 100;
+static const float viewportPaddingDefault = 100;
+// Viewport padding must be much larger for static tiles to avoid clipped labels.
+static const float viewportPaddingForStaticTiles = 1024;
 
-CollisionIndex::CollisionIndex(const TransformState& transformState_)
-    : transformState(transformState_)
-    , collisionGrid(transformState.getSize().width + 2 * viewportPadding, transformState.getSize().height + 2 * viewportPadding, 25)
-    , ignoredGrid(transformState.getSize().width + 2 * viewportPadding, transformState.getSize().height + 2 * viewportPadding, 25)
-    , screenRightBoundary(transformState.getSize().width + viewportPadding)
-    , screenBottomBoundary(transformState.getSize().height + viewportPadding)
-    , gridRightBoundary(transformState.getSize().width + 2 * viewportPadding)
-    , gridBottomBoundary(transformState.getSize().height + 2 * viewportPadding)
-    , pitchFactor(std::cos(transformState.getPitch()) * transformState.getCameraToCenterDistance())
-{}
+CollisionIndex::CollisionIndex(const TransformState& transformState_, MapMode& mapMode)
+    : transformState(transformState_),
+      viewportPadding(mapMode == MapMode::Tile ? viewportPaddingForStaticTiles : viewportPaddingDefault),
+      collisionGrid(transformState.getSize().width + 2 * viewportPadding,
+                    transformState.getSize().height + 2 * viewportPadding,
+                    25),
+      ignoredGrid(transformState.getSize().width + 2 * viewportPadding,
+                  transformState.getSize().height + 2 * viewportPadding,
+                  25),
+      screenRightBoundary(transformState.getSize().width + viewportPadding),
+      screenBottomBoundary(transformState.getSize().height + viewportPadding),
+      gridRightBoundary(transformState.getSize().width + 2 * viewportPadding),
+      gridBottomBoundary(transformState.getSize().height + 2 * viewportPadding),
+      pitchFactor(std::cos(transformState.getPitch()) * transformState.getCameraToCenterDistance()) {}
 
-float CollisionIndex::approximateTileDistance(const TileDistance& tileDistance, const float lastSegmentAngle, const float pixelsToTileUnits, const float cameraToAnchorDistance, const bool pitchWithMap) {
+float CollisionIndex::approximateTileDistance(const TileDistance& tileDistance,
+                                              const float lastSegmentAngle,
+                                              const float pixelsToTileUnits,
+                                              const float cameraToAnchorDistance,
+                                              const bool pitchWithMap) {
     // This is a quick and dirty solution for chosing which collision circles to use (since collision circles are
     // laid out in tile units). Ideally, I think we should generate collision circles on the fly in viewport coordinates
     // at the time we do collision detection.
