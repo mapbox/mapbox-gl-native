@@ -131,7 +131,8 @@ std::vector<UnwrappedTileID> tileCover(const Point<double>& tl,
 } // namespace
 
 int32_t coveringZoomLevel(double zoom, style::SourceType type, uint16_t size) {
-    zoom += util::log2(util::tileSize / size);
+    // At negative zoom levels load tiles from z0 because negative tile zoom levels don't exist.
+    zoom = ::fmax(0.0, zoom + util::log2(util::tileSize / size));
     if (type == style::SourceType::Raster || type == style::SourceType::Video) {
         return ::round(zoom);
     } else {

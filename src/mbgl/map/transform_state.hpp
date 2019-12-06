@@ -221,7 +221,7 @@ private:
     LatLngBounds bounds;
 
     // Limit the amount of zooming possible on the map.
-    double min_scale = std::pow(2, 0);
+    double min_scale = std::pow(2, util::DEFAULT_MIN_ZOOM);
     double max_scale = std::pow(2, util::DEFAULT_MAX_ZOOM);
 
     NorthOrientation orientation = NorthOrientation::Upwards;
