@@ -1,15 +1,14 @@
-#include <mbgl/text/placement.hpp>
-
+#include <list>
 #include <mbgl/layout/symbol_layout.hpp>
 #include <mbgl/renderer/bucket.hpp>
 #include <mbgl/renderer/buckets/symbol_bucket.hpp>
 #include <mbgl/renderer/render_layer.hpp>
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/renderer/update_parameters.hpp>
+#include <mbgl/text/placement.hpp>
 #include <mbgl/tile/geometry_tile.hpp>
 #include <mbgl/util/math.hpp>
 #include <utility>
-#include <list>
 
 namespace mbgl {
 
@@ -149,10 +148,21 @@ void Placement::placeLayer(const RenderLayer& layer) {
     for (auto& params : parameters) {
         SymbolBucket& bucket = params.bucket;
         bucket.place(*this, params, seenCrossTileIDs);
+
+        bucket.justReloaded = false;
+
+        const OverscaledTileID& overscaledID = params.tile.getOverscaledTileID();
+
+        // As long as this placement lives, we have to hold onto this bucket's
+        // matching FeatureIndex/data for querying purposes
+        retainedQueryData.emplace(std::piecewise_construct,
+                                  std::forward_as_tuple(bucket.bucketInstanceId),
+                                  std::forward_as_tuple(bucket.bucketInstanceId, params.featureIndex, overscaledID));
     }
 }
 
 namespace {
+<<<<<<< HEAD
 Point<float> calculateVariableLayoutOffset(style::SymbolAnchorType anchor,
                                            float width,
                                            float height,
@@ -161,6 +171,10 @@ Point<float> calculateVariableLayoutOffset(style::SymbolAnchorType anchor,
                                            bool rotateWithMap,
                                            bool pitchWithMap,
                                            float bearing) {
+=======
+Point<float> calculateVariableLayoutOffset(
+    style::SymbolAnchorType anchor, float width, float height, std::array<float, 2> offset, float textBoxScale) {
+>>>>>>> fixup
     AnchorAlignment alignment = AnchorAlignment::getAnchorAlignment(anchor);
     float shiftX = -(alignment.horizontalAlign - 0.5f) * width;
     float shiftY = -(alignment.verticalAlign - 0.5f) * height;
@@ -695,14 +709,6 @@ void Placement::placeBucket(const SymbolBucket& bucket,
             placeSymbol(*it);
         }
     }
-
-    bucket.justReloaded = false;
-
-    // As long as this placement lives, we have to hold onto this bucket's
-    // matching FeatureIndex/data for querying purposes
-    retainedQueryData.emplace(std::piecewise_construct,
-                                std::forward_as_tuple(bucket.bucketInstanceId),
-                                std::forward_as_tuple(bucket.bucketInstanceId, params.featureIndex, overscaledID));
 }
 
 void Placement::commit() {
