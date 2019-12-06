@@ -9,6 +9,7 @@
 #include <mbgl/tile/geometry_tile.hpp>
 #include <mbgl/util/math.hpp>
 #include <utility>
+#include <list>
 
 namespace mbgl {
 
@@ -111,9 +112,45 @@ Placement::Placement() : collisionIndex({}, MapMode::Static), collisionGroups(tr
 
 void Placement::placeLayer(const RenderLayer& layer) {
     std::set<uint32_t> seenCrossTileIDs;
+    std::list<BucketPlacementParameters> parameters;
+
     for (const auto& item : layer.getPlacementData()) {
-        Bucket& bucket = item.bucket;
-        BucketPlacementParameters params{item.tile, layer.baseImpl->source, item.featureIndex};
+        SymbolBucket& bucket = item.bucket;
+        if (bucket.sortKeyRanges.size() == 0) {
+            BucketPlacementParameters params{
+                    item.bucket,
+                    item.tile,
+                    projMatrix,
+                    layer.baseImpl->source,
+                    item.featureIndex,
+                    showCollisionBoxes,
+                    0.0f,
+                    0,
+                    bucket.symbolInstances.size()};
+            parameters.push_back(params);
+
+        } else {
+            for (const SortKeyRange& sortKeyRange : bucket.sortKeyRanges) {
+                BucketPlacementParameters params{
+                        item.bucket,
+                        item.tile,
+                        projMatrix,
+                        layer.baseImpl->source,
+                        item.featureIndex,
+                        showCollisionBoxes,
+                        sortKeyRange.sortKey,
+                        sortKeyRange.symbolInstanceStart,
+                        sortKeyRange.symbolInstanceEnd};
+
+                auto sortPosition = std::upper_bound(parameters.cbegin(), parameters.cend(), params);
+                parameters.insert(sortPosition, std::move(params));
+            }
+        }
+    }
+
+
+    for (auto& params : parameters) {
+        SymbolBucket& bucket = params.bucket;
         bucket.place(*this, params, seenCrossTileIDs);
     }
 }
@@ -656,8 +693,9 @@ void Placement::placeBucket(const SymbolBucket& bucket,
         }
 
     } else {
-        for (const SymbolInstance& symbol : bucket.symbolInstances) {
-            placeSymbol(symbol);
+        auto endIt = bucket.symbolInstances.begin() + params.symbolInstanceEnd;
+        for (auto it = bucket.symbolInstances.begin() + params.symbolInstanceStart; it != endIt; it++) {
+            placeSymbol(*it);
         }
     }
 

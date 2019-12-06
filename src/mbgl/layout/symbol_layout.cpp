@@ -106,7 +106,7 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
 
     const bool hasSymbolSortKey = !leader.layout.get<SymbolSortKey>().isUndefined();
     const auto symbolZOrder = layout->get<SymbolZOrder>();
-    const bool sortFeaturesByKey = symbolZOrder != SymbolZOrderType::ViewportY && hasSymbolSortKey;
+    sortFeaturesByKey = symbolZOrder != SymbolZOrderType::ViewportY && hasSymbolSortKey;
     const bool zOrderByViewportY = symbolZOrder == SymbolZOrderType::ViewportY || (symbolZOrder == SymbolZOrderType::Auto && !sortFeaturesByKey);
     sortFeaturesByY = zOrderByViewportY && (layout->get<TextAllowOverlap>() || layout->get<IconAllowOverlap>() ||
         layout->get<TextIgnorePlacement>() || layout->get<IconIgnorePlacement>());
@@ -577,6 +577,14 @@ void SymbolLayout::addFeature(const std::size_t layoutFeatureIndex,
         const bool anchorInsideTile = anchor.point.x >= 0 && anchor.point.x < util::EXTENT && anchor.point.y >= 0 && anchor.point.y < util::EXTENT;
 
         if (mode == MapMode::Tile || anchorInsideTile) {
+            if (sortFeaturesByKey) {
+                if (sortKeyRanges.size() && sortKeyRanges.back().sortKey == feature.sortKey) {
+                    sortKeyRanges.back().symbolInstanceEnd = symbolInstances.size() + 1;
+                } else {
+                    sortKeyRanges.push_back({ feature.sortKey, symbolInstances.size(), symbolInstances.size() + 1 });
+                }
+            }
+
             // For static/continuous rendering, only add symbols anchored within this tile:
             //  neighboring symbols will be added as part of the neighboring tiles.
             // In tiled rendering mode, add all symbols in the buffers so that we can:
@@ -728,6 +736,7 @@ void SymbolLayout::createBucket(const ImagePositions&, std::unique_ptr<FeatureIn
                                                  sortFeaturesByY,
                                                  bucketLeaderID,
                                                  std::move(symbolInstances),
+                                                 std::move(sortKeyRanges),
                                                  tilePixelRatio,
                                                  allowVerticalPlacement,
                                                  std::move(placementModes),
