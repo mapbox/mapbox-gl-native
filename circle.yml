@@ -6,6 +6,7 @@ workflows:
     jobs:
       - next-sanity-checks
       - next-android-benchmark-runner
+      - next-android-api-breakage
       - next-android-render-test-runner
       - next-baselines:
           requires:
@@ -702,6 +703,19 @@ jobs:
               mkdir -p /tmp/tests/benchmark
               gsutil cp $testResult /tmp/tests/benchmark
             fi
+  next-android-api-breakage:
+    executor: ubuntu-disco
+    steps:
+      - run:
+          name: Clone mapbox-gl-native-android in working directory
+          command: git clone https://github.com/mapbox/mapbox-gl-native-android.git .
+      - next-prepare
+      - run:
+          name: Update mapbox-gl-native to match PR
+          command: cd vendor/mapbox-gl-native && git checkout $CIRCLE_SHA1 && git submodule update --init --recursive
+      - run:
+          name: Build SDK
+          command: BUILDTYPE=Release make android-arm-v8
       - next-save
   next-android-render-test-runner:
     executor: ubuntu-disco
