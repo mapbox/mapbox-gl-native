@@ -57,6 +57,7 @@
 #import "NSImage+MGLAdditions.h"
 #import "NSPredicate+MGLPrivateAdditions.h"
 #import "MGLLoggingConfiguration_Private.h"
+#import "MGLNativeInterfaceReceiver.h"
 
 class MGLAnnotationContext;
 
@@ -258,6 +259,7 @@ public:
 }
 
 - (void)commonInit {
+     MGLNativeAppleInterfaceTransmitter.shared.delegate = MGLNativeInterfaceReceiver.shared;
     _isTargetingInterfaceBuilder = NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent;
 
     // Set up cross-platform controllers and resources.
