@@ -693,12 +693,12 @@ bool SymbolLayout::anchorIsTooClose(const std::u16string& text, const float repe
 
 // Analog of `addToLineVertexArray` in JS. This version doesn't need to build up a line array like the
 // JS version does, but it uses the same logic to calculate tile distances.
-std::vector<float> CalculateTileDistances(const GeometryCoordinates& line, const Anchor& anchor) {
+std::vector<float> SymbolLayout::calculateTileDistances(const GeometryCoordinates& line, const Anchor& anchor) {
     std::vector<float> tileDistances(line.size());
     if (anchor.segment) {
         std::size_t segment = *anchor.segment;
         assert(segment < line.size());
-        auto sumForwardLength = util::dist<float>(anchor.point, line[segment + 1]);
+        auto sumForwardLength = (segment + 1 < line.size()) ? util::dist<float>(anchor.point, line[segment + 1]) : .0f;
         auto sumBackwardLength = util::dist<float>(anchor.point, line[segment]);
         for (std::size_t i = segment + 1; i < line.size(); ++i) {
             tileDistances[i] = sumForwardLength;
@@ -842,7 +842,7 @@ std::size_t SymbolLayout::addSymbolGlyphQuads(SymbolBucket& bucket,
                                            symbolInstance.textOffset,
                                            writingMode,
                                            symbolInstance.line(),
-                                           CalculateTileDistances(symbolInstance.line(), symbolInstance.anchor),
+                                           calculateTileDistances(symbolInstance.line(), symbolInstance.anchor),
                                            placedIconIndex);
     placedIndex = bucket.text.placedSymbols.size() - 1;
     PlacedSymbol& placedSymbol = bucket.text.placedSymbols.back();

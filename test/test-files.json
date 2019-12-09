@@ -66,6 +66,7 @@
         "test/style/style_layer.test.cpp",
         "test/style/style_parser.test.cpp",
         "test/text/bidi.test.cpp",
+        "test/text/calculate_tile_distances.test.cpp",
         "test/text/cross_tile_symbol_index.test.cpp",
         "test/text/formatted.test.cpp",
         "test/text/get_anchors.test.cpp",
