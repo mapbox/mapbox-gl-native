@@ -57,7 +57,7 @@ public:
 
 using SymbolQuads = std::vector<SymbolQuad>;
 
-SymbolQuad getIconQuad(const PositionedIcon& shapedIcon, WritingModeType writingMode, SymbolContent iconType);
+SymbolQuads getIconQuads(const PositionedIcon& shapedIcon, WritingModeType writingMode, SymbolContent iconType);
 
 SymbolQuads getGlyphQuads(const Shaping& shapedText,
                           const std::array<float, 2> textOffset,

@@ -945,19 +945,22 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket,
             }
         }
         if (symbolInstance.hasIcon()) {
+            size_t iconOpacityVerticesSize = 0u;
             const auto& opacityVertex =
                 SymbolIconProgram::opacityVertex(opacityState.icon.placed, opacityState.icon.opacity);
             auto& iconBuffer = symbolInstance.hasSdfIcon() ? bucket.sdfIcon : bucket.icon;
             
             if (symbolInstance.placedIconIndex) {
-                iconBuffer.opacityVertices.extend(4, opacityVertex);
+                iconOpacityVerticesSize += symbolInstance.iconQuadsSize * 4;
                 iconBuffer.placedSymbols[*symbolInstance.placedIconIndex].hidden = opacityState.isHidden();
             }
 
             if (symbolInstance.placedVerticalIconIndex) {
-                iconBuffer.opacityVertices.extend(4, opacityVertex);
+                iconOpacityVerticesSize += symbolInstance.iconQuadsSize * 4;
                 iconBuffer.placedSymbols[*symbolInstance.placedVerticalIconIndex].hidden = opacityState.isHidden();
             }
+
+            iconBuffer.opacityVertices.extend(iconOpacityVerticesSize, opacityVertex);
         }
 
         auto updateIconCollisionBox = [&](const auto& feature, const bool placed, const Point<float>& shift) {

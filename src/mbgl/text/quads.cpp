@@ -14,7 +14,7 @@ namespace mbgl {
 
 using namespace style;
 
-SymbolQuad getIconQuad(const PositionedIcon& shapedIcon, WritingModeType writingMode, SymbolContent iconType) {
+SymbolQuads getIconQuads(const PositionedIcon& shapedIcon, WritingModeType writingMode, SymbolContent iconType) {
     const ImagePosition& image = shapedIcon.image();
 
     // If you have a 10px icon that isn't perfectly aligned to the pixel grid it will cover 11 actual
@@ -74,17 +74,17 @@ SymbolQuad getIconQuad(const PositionedIcon& shapedIcon, WritingModeType writing
     Point<float> pixelOffsetBR;
     Point<float> minFontScale;
 
-    return SymbolQuad{tl,
-                      tr,
-                      bl,
-                      br,
-                      textureRect,
-                      writingMode,
-                      {0.0f, 0.0f},
-                      iconType == SymbolContent::IconSDF,
-                      pixelOffsetTL,
-                      pixelOffsetBR,
-                      minFontScale};
+    return {SymbolQuad{tl,
+                       tr,
+                       bl,
+                       br,
+                       textureRect,
+                       writingMode,
+                       {0.0f, 0.0f},
+                       iconType == SymbolContent::IconSDF,
+                       pixelOffsetTL,
+                       pixelOffsetBR,
+                       minFontScale}};
 }
 
 SymbolQuads getGlyphQuads(const Shaping& shapedText,

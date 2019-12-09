@@ -41,8 +41,8 @@ struct SymbolInstanceSharedData {
     SymbolQuads centerJustifiedGlyphQuads;
     SymbolQuads leftJustifiedGlyphQuads;
     SymbolQuads verticalGlyphQuads;
-    optional<SymbolQuad> iconQuad;
-    optional<SymbolQuad> verticalIconQuad;
+    optional<SymbolQuads> iconQuads;
+    optional<SymbolQuads> verticalIconQuads;
 };
 
 class SymbolInstance {
@@ -79,8 +79,8 @@ public:
     bool hasText() const;
     bool hasIcon() const;
     bool hasSdfIcon() const;
-    const optional<SymbolQuad>& iconQuad() const;
-    const optional<SymbolQuad>& verticalIconQuad() const;
+    const optional<SymbolQuads>& iconQuads() const;
+    const optional<SymbolQuads>& verticalIconQuads() const;
     void releaseSharedData();
 
 private:
@@ -94,6 +94,7 @@ public:
     std::size_t centerJustifiedGlyphQuadsSize;
     std::size_t leftJustifiedGlyphQuadsSize;
     std::size_t verticalGlyphQuadsSize;
+    std::size_t iconQuadsSize;
 
     CollisionFeature textCollisionFeature;
     CollisionFeature iconCollisionFeature;
