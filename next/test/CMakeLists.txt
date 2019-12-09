@@ -66,6 +66,7 @@ add_library(
     ${MBGL_ROOT}/test/text/bidi.test.cpp
     ${MBGL_ROOT}/test/text/cross_tile_symbol_index.test.cpp
     ${MBGL_ROOT}/test/text/formatted.test.cpp
+    ${MBGL_ROOT}/test/text/get_anchors.test.cpp
     ${MBGL_ROOT}/test/text/glyph_manager.test.cpp
     ${MBGL_ROOT}/test/text/glyph_pbf.test.cpp
     ${MBGL_ROOT}/test/text/language_tag.test.cpp
