@@ -55,7 +55,8 @@ public:
      * @return std::array<float, 2> offset along x- and y- axis correspondingly.
      */
     static std::array<float, 2> evaluateVariableOffset(style::SymbolAnchorType anchor, std::array<float, 2> textOffset);
-    
+
+    static std::vector<float> calculateTileDistances(const GeometryCoordinates& line, const Anchor& anchor);
 
 private:
     void addFeature(const size_t,
