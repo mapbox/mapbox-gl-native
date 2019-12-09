@@ -190,7 +190,7 @@ HTTPFileSource::HTTPFileSource()
 
 HTTPFileSource::~HTTPFileSource() = default;
 
-__attribute__((visibility ("default")))
+MGL_APPLE_EXPORT
 BOOL isValidMapboxEndpoint(NSURL *url) {
     return ([url.host isEqualToString:@"mapbox.com"] ||
             [url.host hasSuffix:@".mapbox.com"] ||
@@ -198,7 +198,7 @@ BOOL isValidMapboxEndpoint(NSURL *url) {
             [url.host hasSuffix:@".mapbox.cn"]);
 }
 
-__attribute__((visibility ("default")))
+MGL_APPLE_EXPORT
 NSURL *resourceURLWithAccountType(const Resource& resource, NSInteger accountType) {
     
     NSURL *url = [NSURL URLWithString:@(resource.url.c_str())];

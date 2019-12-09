@@ -21,17 +21,19 @@ static MGLNativeInterfaceReceiver *instance = nil;
 
 #pragma mark - MGLNativeAppleInterfaceManager delegate -
 
-- (NSString *)nai_skuToken {
-    return MGLAccountManager.skuToken;
-}
-
 - (NSURLSessionConfiguration *)nai_sessionConfiguration {
     return [MGLNetworkConfiguration sharedManager].sessionConfiguration;
 }
 
+#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
 - (NSString *)nai_accountTypeKey {
     return MGLMapboxAccountTypeKey;
 }
+
+- (NSString *)nai_skuToken {
+    return MGLAccountManager.skuToken;
+}
+#endif
 
 - (void)nai_startDownloadEvent:(NSString *)event type:(NSString *)type {
     [[MGLNetworkConfiguration sharedManager] startDownloadEvent:event type:@"tile"];

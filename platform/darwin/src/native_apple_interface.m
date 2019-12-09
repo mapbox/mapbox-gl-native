@@ -13,16 +13,17 @@ static MGLNativeAppleInterfaceTransmitter *instance = nil;
     return instance;
 }
 
-- (NSString *)skuToken {
-    if(_delegate && [_delegate respondsToSelector:@selector(nai_skuToken)]) {
-        return [_delegate nai_skuToken];
+- (NSURLSessionConfiguration *)sessionConfiguration {
+    if (_delegate && [_delegate respondsToSelector:@selector(nai_sessionConfiguration)]) {
+        return [_delegate nai_sessionConfiguration];
     }
     return nil;
 }
 
-- (NSURLSessionConfiguration *)sessionConfiguration {
-    if (_delegate && [_delegate respondsToSelector:@selector(nai_sessionConfiguration)]) {
-        return [_delegate nai_sessionConfiguration];
+#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+- (NSString *)skuToken {
+    if(_delegate && [_delegate respondsToSelector:@selector(nai_skuToken)]) {
+        return [_delegate nai_skuToken];
     }
     return nil;
 }
@@ -33,6 +34,7 @@ static MGLNativeAppleInterfaceTransmitter *instance = nil;
     }
     return nil;
 }
+#endif
 
 - (void)startDownloadEvent:(NSString *)event type:(NSString *)type {
     if (_delegate && [_delegate respondsToSelector:@selector(nai_startDownloadEvent:type:)]) {

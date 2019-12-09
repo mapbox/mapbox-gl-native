@@ -4,11 +4,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol MGLNativeAppleInterfaceDelegate <NSObject>
 
+#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+
 - (NSString *)nai_skuToken;
+- (NSString *)nai_accountTypeKey;
+
+#endif
 
 - (NSURLSessionConfiguration *)nai_sessionConfiguration;
-
-- (NSString *)nai_accountTypeKey;
 
 - (void)nai_startDownloadEvent:(NSString *)event type:(NSString *)type;
 
@@ -26,11 +29,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, weak) id<MGLNativeAppleInterfaceDelegate> delegate;
 
-@property (nonatomic, readonly) NSURLSessionConfiguration *sessionConfiguration;
-
+#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
 @property (nonatomic, readonly) NSString *accountTypeKey;
-
 @property (nonatomic, readonly) NSString *skuToken;
+#endif
+
+@property (nonatomic, readonly) NSURLSessionConfiguration *sessionConfiguration;
 
 - (void)startDownloadEvent:(NSString *)event type:(NSString *)type;
 
