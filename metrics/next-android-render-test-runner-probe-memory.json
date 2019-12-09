@@ -6,6 +6,6 @@
     "asset_path": "mapbox-gl-js/test/integration",
     "result_path":"/sdcard/",
     "probes": ["probeMemory"],
-    "metric_path":"render-test/metrics/android",
+    "metric_path":"metrics/next-android-render-test-runner",
     "filter": "real-world"
 }  

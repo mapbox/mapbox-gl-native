@@ -678,6 +678,14 @@ jobs:
               mkdir -p /tmp/tests/render-test-app
               gsutil cp $testResult /tmp/tests/render-test-app | true
             fi
+      - run:
+          name: Retrieve Rebaselined Metrics from gcloud
+          when: on_fail
+          command: |
+            if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON}" && -z "${SKIP_FIREBASE:-}" ]]; then
+              metricsResult=$(gsutil ls -d gs://test-lab-186672a0qp5bq-ycr70axads3nc/render-test-app-${CIRCLE_BUILD_NUM}/*/*/sdcard/render-tests/)
+              gsutil -m cp -r $metricsResult metrics/next-android-render-test-runner/render-tests/ | true
+            fi
       - next-save
   next-sanity-checks:
     executor: ubuntu-disco
