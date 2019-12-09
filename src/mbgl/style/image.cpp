@@ -6,11 +6,14 @@ namespace mbgl {
 namespace style {
 
 Image::Image(std::string id,
-             PremultipliedImage &&image,
+             PremultipliedImage&& image,
              const float pixelRatio,
-             bool sdf)
-    : baseImpl(makeMutable<Impl>(std::move(id), std::move(image), pixelRatio, sdf)) {
-}
+             bool sdf,
+             ImageStretches stretchX,
+             ImageStretches stretchY,
+             optional<ImageContent> content)
+    : baseImpl(makeMutable<Impl>(
+          std::move(id), std::move(image), pixelRatio, sdf, std::move(stretchX), std::move(stretchY), content)) {}
 
 std::string Image::getID() const {
     return baseImpl->id;
@@ -28,6 +31,18 @@ bool Image::isSdf() const {
 
 float Image::getPixelRatio() const {
     return baseImpl->pixelRatio;
+}
+
+const ImageStretches& Image::getStretchX() const {
+    return baseImpl->stretchX;
+}
+
+const ImageStretches& Image::getStretchY() const {
+    return baseImpl->stretchY;
+}
+
+const ImageContent& Image::getContent() const {
+    return baseImpl->content;
 }
 
 } // namespace style

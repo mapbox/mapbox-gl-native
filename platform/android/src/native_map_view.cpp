@@ -763,7 +763,7 @@ void NativeMapView::addAnnotationIcon(JNIEnv& env, const jni::String& symbol, ji
 
     mbgl::PremultipliedImage premultipliedImage({ static_cast<uint32_t>(w), static_cast<uint32_t>(h) });
     if (premultipliedImage.bytes() != uint32_t(size)) {
-        throw mbgl::util::SpriteImageException("Sprite image pixel count mismatch");
+        throw mbgl::util::StyleImageException("Annotation icon image pixel count mismatch");
     }
 
     jni::GetArrayRegion(env, *jpixels, 0, size, reinterpret_cast<jbyte*>(premultipliedImage.data.get()));
