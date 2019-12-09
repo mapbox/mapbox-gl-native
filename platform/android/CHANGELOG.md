@@ -11,6 +11,8 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 ### Performance improvements
  - Enable incremental vacuum for the offline database in order to make data removal requests faster and to avoid the excessive disk space usage (creating a backup file on VACUUM call) [#15837](https://github.com/mapbox/mapbox-gl-native/pull/15837)
+ - Introduce `OfflineManager.packDatabase()` API, which explicitly packs the database file (i.e. runs incremental vacuum for the offline database) [#15899](https://github.com/mapbox/mapbox-gl-native/pull/15899) 
+ - Introduce `OfflineManager.runPackDatabaseAutomatically(boolean)`, which sets whether database file packing (i.e. incremental vacuum operation for the offline database) occurs automatically. [#15967](https://github.com/mapbox/mapbox-gl-native/pull/15967)
 
 ## 8.5.0-alpha.2 - October 10, 2019
 [Changes](https://github.com/mapbox/mapbox-gl-native/compare/android-v8.5.0-alpha.1...android-v8.5.0-alpha.2) since [Mapbox Maps SDK for Android v8.5.0-alpha.1](https://github.com/mapbox/mapbox-gl-native/releases/tag/android-v8.5.0-alpha.1):
