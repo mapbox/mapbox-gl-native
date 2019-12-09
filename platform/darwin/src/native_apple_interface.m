@@ -27,9 +27,9 @@ static MGLNativeAppleInterfaceTransmitter *instance = nil;
     return nil;
 }
 
-- (NSString *)accountType {
+- (NSString *)accountTypeKey {
     if (_delegate && [_delegate respondsToSelector:@selector(nai_accountType)]) {
-        return [_delegate nai_accountType];
+        return [_delegate nai_accountTypeKey];
     }
     return nil;
 }

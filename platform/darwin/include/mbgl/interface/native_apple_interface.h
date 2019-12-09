@@ -8,7 +8,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSURLSessionConfiguration *)nai_sessionConfiguration;
 
-- (NSString *)nai_accountType;
+- (NSString *)nai_accountTypeKey;
 
 - (void)nai_startDownloadEvent:(NSString *)event type:(NSString *)type;
 
@@ -28,7 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, readonly) NSURLSessionConfiguration *sessionConfiguration;
 
-@property (nonatomic, readonly) NSString *accountType;
+@property (nonatomic, readonly) NSString *accountTypeKey;
 
 @property (nonatomic, readonly) NSString *skuToken;
 
