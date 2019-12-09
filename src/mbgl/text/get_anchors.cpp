@@ -61,7 +61,7 @@ static Anchors resample(const GeometryCoordinates& line,
             if (x >= 0 && x < util::EXTENT && y >= 0 && y < util::EXTENT &&
                     markedDistance - halfLabelLength >= 0.0f &&
                     markedDistance + halfLabelLength <= lineLength) {
-                Anchor anchor(::round(x), ::round(y), angle, 0.5f, i);
+                Anchor anchor(::round(x), ::round(y), angle, i);
 
                 if (!angleWindowSize || checkMaxAngle(line, anchor, labelLength, angleWindowSize, maxAngle)) {
                     anchors.push_back(anchor);
@@ -160,9 +160,9 @@ optional<Anchor> getCenterAnchor(const GeometryCoordinates& line,
             float t = (centerDistance - prevDistance) / segmentDistance,
                   x = util::interpolate(float(a.x), float(b.x), t),
                   y = util::interpolate(float(a.y), float(b.y), t);
-            
-            Anchor anchor(::round(x), ::round(y), util::angle_to(b, a), 0.5f, i);
-            
+
+            Anchor anchor(::round(x), ::round(y), util::angle_to(b, a), i);
+
             if (!angleWindowSize || checkMaxAngle(line, anchor, labelLength, angleWindowSize, maxAngle)) {
                 return anchor;
             }
