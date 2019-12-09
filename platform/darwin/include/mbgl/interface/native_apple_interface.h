@@ -4,12 +4,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol MGLNativeAppleInterfaceDelegate <NSObject>
 
+@optional
+
 #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
 
 - (NSString *)nai_skuToken;
 - (NSString *)nai_accountTypeKey;
 
 #endif
+
+@required
 
 - (NSURLSessionConfiguration *)nai_sessionConfiguration;
 
