@@ -27,111 +27,160 @@ TEST(Sprite, SpriteImageCreationInvalid) {
     ASSERT_EQ(200u, image_1x.size.width);
     ASSERT_EQ(299u, image_1x.size.height);
 
-    ASSERT_EQ(nullptr, createStyleImage("test", image_1x, 0, 0, 0, 16, 1, false));    // width == 0
-    ASSERT_EQ(nullptr, createStyleImage("test", image_1x, 0, 0, 16, 0, 1, false));    // height == 0
-    ASSERT_EQ(nullptr, createStyleImage("test", image_1x, 0, 0, -1, 16, 1, false));   // width < 0
-    ASSERT_EQ(nullptr, createStyleImage("test", image_1x, 0, 0, 16, -1, 1, false));   // height < 0
-    ASSERT_EQ(nullptr, createStyleImage("test", image_1x, 0, 0, 1, 1, 0, false));     // ratio == 0
-    ASSERT_EQ(nullptr, createStyleImage("test", image_1x, 0, 0, 1, 1, -1, false));    // ratio < 0
-    ASSERT_EQ(nullptr, createStyleImage("test", image_1x, 0, 0, 1, 1, 23, false));    // ratio too large
+    ASSERT_EQ(nullptr, createStyleImage("test", image_1x, 0, 0, 0, 16, 1, false)); // width == 0
+    EXPECT_EQ(1u,
+              log.count({
+                  EventSeverity::Error,
+                  Event::Sprite,
+                  int64_t(-1),
+                  "Can't create image with invalid metrics: 0x16@0,0 in 200x299@1x sprite",
+              }));
+    EXPECT_EQ(0u, log.uncheckedCount());
+
+    ASSERT_EQ(nullptr, createStyleImage("test", image_1x, 0, 0, 16, 0, 1, false)); // height == 0
+    EXPECT_EQ(1u,
+              log.count({
+                  EventSeverity::Error,
+                  Event::Sprite,
+                  int64_t(-1),
+                  "Can't create image with invalid metrics: 16x0@0,0 in 200x299@1x sprite",
+              }));
+    EXPECT_EQ(0u, log.uncheckedCount());
+
+    ASSERT_EQ(nullptr, createStyleImage("test", image_1x, 0, 0, -1, 16, 1, false)); // width < 0
+    EXPECT_EQ(1u,
+              log.count({
+                  EventSeverity::Error,
+                  Event::Sprite,
+                  int64_t(-1),
+                  "Can't create image with invalid metrics: 4294967295x16@0,0 in 200x299@1x sprite",
+              }));
+    EXPECT_EQ(0u, log.uncheckedCount());
+
+    ASSERT_EQ(nullptr, createStyleImage("test", image_1x, 0, 0, 16, -1, 1, false)); // height < 0
+    EXPECT_EQ(1u,
+              log.count({
+                  EventSeverity::Error,
+                  Event::Sprite,
+                  int64_t(-1),
+                  "Can't create image with invalid metrics: 16x4294967295@0,0 in 200x299@1x sprite",
+              }));
+    EXPECT_EQ(0u, log.uncheckedCount());
+
+    ASSERT_EQ(nullptr, createStyleImage("test", image_1x, 0, 0, 1, 1, 0, false)); // ratio == 0
+    EXPECT_EQ(1u,
+              log.count({
+                  EventSeverity::Error,
+                  Event::Sprite,
+                  int64_t(-1),
+                  "Can't create image with invalid metrics: 1x1@0,0 in 200x299@0x sprite",
+              }));
+    EXPECT_EQ(0u, log.uncheckedCount());
+
+    ASSERT_EQ(nullptr, createStyleImage("test", image_1x, 0, 0, 1, 1, -1, false)); // ratio < 0
+    EXPECT_EQ(1u,
+              log.count({
+                  EventSeverity::Error,
+                  Event::Sprite,
+                  int64_t(-1),
+                  "Can't create image with invalid metrics: 1x1@0,0 in 200x299@-1x sprite",
+              }));
+    EXPECT_EQ(0u, log.uncheckedCount());
+
+    ASSERT_EQ(nullptr, createStyleImage("test", image_1x, 0, 0, 1, 1, 23, false)); // ratio too large
+    EXPECT_EQ(1u,
+              log.count({
+                  EventSeverity::Error,
+                  Event::Sprite,
+                  int64_t(-1),
+                  "Can't create image with invalid metrics: 1x1@0,0 in 200x299@23x sprite",
+              }));
+    EXPECT_EQ(0u, log.uncheckedCount());
+
     ASSERT_EQ(nullptr, createStyleImage("test", image_1x, 0, 0, 2048, 16, 1, false)); // too wide
+    EXPECT_EQ(1u,
+              log.count({
+                  EventSeverity::Error,
+                  Event::Sprite,
+                  int64_t(-1),
+                  "Can't create image with invalid metrics: 2048x16@0,0 in 200x299@1x sprite",
+              }));
+    EXPECT_EQ(0u, log.uncheckedCount());
+
     ASSERT_EQ(nullptr, createStyleImage("test", image_1x, 0, 0, 16, 1025, 1, false)); // too tall
-    ASSERT_EQ(nullptr, createStyleImage("test", image_1x, -1, 0, 16, 16, 1, false));  // srcX < 0
-    ASSERT_EQ(nullptr, createStyleImage("test", image_1x, 0, -1, 16, 16, 1, false));  // srcY < 0
-    ASSERT_EQ(nullptr, createStyleImage("test", image_1x, 0, 0, image_1x.size.width + 1, 16, 1, false));   // right edge out of bounds
-    ASSERT_EQ(nullptr, createStyleImage("test", image_1x, 0, 0, 16, image_1x.size.height + 1, 1, false));  // bottom edge out of bounds
+    EXPECT_EQ(1u,
+              log.count({
+                  EventSeverity::Error,
+                  Event::Sprite,
+                  int64_t(-1),
+                  "Can't create image with invalid metrics: 16x1025@0,0 in 200x299@1x sprite",
+              }));
+    EXPECT_EQ(0u, log.uncheckedCount());
 
-    EXPECT_EQ(1u, log.count({
-                      EventSeverity::Error,
-                      Event::Sprite,
-                      int64_t(-1),
-                      "Can't create image with invalid metrics: 0x16@0,0 in 200x299@1x sprite",
-                  }));
+    ASSERT_EQ(nullptr, createStyleImage("test", image_1x, -1, 0, 16, 16, 1, false)); // srcX < 0
+    EXPECT_EQ(1u,
+              log.count({
+                  EventSeverity::Error,
+                  Event::Sprite,
+                  int64_t(-1),
+                  "Can't create image with invalid metrics: 16x16@4294967295,0 in 200x299@1x sprite",
+              }));
+    EXPECT_EQ(0u, log.uncheckedCount());
 
-    EXPECT_EQ(1u, log.count({
-                      EventSeverity::Error,
-                      Event::Sprite,
-                      int64_t(-1),
-                      "Can't create image with invalid metrics: 16x0@0,0 in 200x299@1x sprite",
-                  }));
+    ASSERT_EQ(nullptr, createStyleImage("test", image_1x, 0, -1, 16, 16, 1, false)); // srcY < 0
+    EXPECT_EQ(1u,
+              log.count({
+                  EventSeverity::Error,
+                  Event::Sprite,
+                  int64_t(-1),
+                  "Can't create image with invalid metrics: 16x16@0,4294967295 in 200x299@1x sprite",
+              }));
+    EXPECT_EQ(0u, log.uncheckedCount());
 
-    EXPECT_EQ(1u, log.count({
-                      EventSeverity::Error,
-                      Event::Sprite,
-                      int64_t(-1),
-                      "Can't create image with invalid metrics: 4294967295x16@0,0 in 200x299@1x sprite",
-                  }));
+    ASSERT_EQ(
+        nullptr,
+        createStyleImage("test", image_1x, 0, 0, image_1x.size.width + 1, 16, 1, false)); // right edge out of bounds
+    EXPECT_EQ(1u,
+              log.count({
+                  EventSeverity::Error,
+                  Event::Sprite,
+                  int64_t(-1),
+                  "Can't create image with invalid metrics: 201x16@0,0 in 200x299@1x sprite",
+              }));
+    EXPECT_EQ(0u, log.uncheckedCount());
 
-    EXPECT_EQ(1u, log.count({
-                      EventSeverity::Error,
-                      Event::Sprite,
-                      int64_t(-1),
-                      "Can't create image with invalid metrics: 16x4294967295@0,0 in 200x299@1x sprite",
-                  }));
+    ASSERT_EQ(
+        nullptr,
+        createStyleImage("test", image_1x, 0, 0, 16, image_1x.size.height + 1, 1, false)); // bottom edge out of bounds
+    EXPECT_EQ(1u,
+              log.count({
+                  EventSeverity::Error,
+                  Event::Sprite,
+                  int64_t(-1),
+                  "Can't create image with invalid metrics: 16x300@0,0 in 200x299@1x sprite",
+              }));
+    EXPECT_EQ(0u, log.uncheckedCount());
 
-    EXPECT_EQ(1u, log.count({
-                      EventSeverity::Error,
-                      Event::Sprite,
-                      int64_t(-1),
-                      "Can't create image with invalid metrics: 1x1@0,0 in 200x299@0x sprite",
-                  }));
+    ASSERT_EQ(nullptr, createStyleImage("test", image_1x, 0, 0, 16, 16, 1, false, {{-1, 3}}));
+    EXPECT_EQ(1u,
+              log.count({
+                  EventSeverity::Error,
+                  Event::Sprite,
+                  int64_t(-1),
+                  "Can't create image with invalid metadata: stretchX is out of bounds or overlapping",
+              }));
+    EXPECT_EQ(0u, log.uncheckedCount());
 
-    EXPECT_EQ(1u, log.count({
-                      EventSeverity::Error,
-                      Event::Sprite,
-                      int64_t(-1),
-                      "Can't create image with invalid metrics: 1x1@0,0 in 200x299@-1x sprite",
-                  }));
-
-    EXPECT_EQ(1u, log.count({
-                      EventSeverity::Error,
-                      Event::Sprite,
-                      int64_t(-1),
-                      "Can't create image with invalid metrics: 1x1@0,0 in 200x299@23x sprite",
-                  }));
-
-    EXPECT_EQ(1u, log.count({
-                      EventSeverity::Error,
-                      Event::Sprite,
-                      int64_t(-1),
-                      "Can't create image with invalid metrics: 2048x16@0,0 in 200x299@1x sprite",
-                  }));
-
-    EXPECT_EQ(1u, log.count({
-                      EventSeverity::Error,
-                      Event::Sprite,
-                      int64_t(-1),
-                      "Can't create image with invalid metrics: 16x1025@0,0 in 200x299@1x sprite",
-                  }));
-
-    EXPECT_EQ(1u, log.count({
-                      EventSeverity::Error,
-                      Event::Sprite,
-                      int64_t(-1),
-                      "Can't create image with invalid metrics: 16x16@4294967295,0 in 200x299@1x sprite",
-                  }));
-
-    EXPECT_EQ(1u, log.count({
-                      EventSeverity::Error,
-                      Event::Sprite,
-                      int64_t(-1),
-                      "Can't create image with invalid metrics: 16x16@0,4294967295 in 200x299@1x sprite",
-                  }));
-
-    EXPECT_EQ(1u, log.count({
-                      EventSeverity::Error,
-                      Event::Sprite,
-                      int64_t(-1),
-                      "Can't create image with invalid metrics: 201x16@0,0 in 200x299@1x sprite",
-                  }));
-
-    EXPECT_EQ(1u, log.count({
-                      EventSeverity::Error,
-                      Event::Sprite,
-                      int64_t(-1),
-                      "Can't create image with invalid metrics: 16x300@0,0 in 200x299@1x sprite",
-                  }));
-
+    ASSERT_EQ(nullptr,
+              createStyleImage("test", image_1x, 0, 0, 16, 16, 1, false, {}, {}, style::ImageContent{14, 14, 12, 10}));
+    EXPECT_EQ(1u,
+              log.count({
+                  EventSeverity::Error,
+                  Event::Sprite,
+                  int64_t(-1),
+                  "Can't create image with invalid metadata: content area is invalid",
+              }));
+    EXPECT_EQ(0u, log.uncheckedCount());
 }
 
 TEST(Sprite, SpriteImageCreation1x) {
@@ -294,6 +343,129 @@ TEST(Sprite, SpriteParsingInvalidJSON) {
     }
 }
 
+TEST(Sprite, SpriteParsingInvalidStretches) {
+    FixtureLog log;
+
+    const auto image_1x = util::read_file("test/fixtures/annotations/emerald.png");
+
+    parseSprite(image_1x, R"JSON({
+            "interstate_1": {
+                "width": 40,
+                "height": 42,
+                "x": 100,
+                "y": 44,
+                "pixelRatio": 1,
+                "stretchX": {}
+            }
+        })JSON");
+    EXPECT_EQ(1u,
+              log.count({EventSeverity::Warning,
+                         Event::Sprite,
+                         int64_t(-1),
+                         "Invalid sprite image 'interstate_1': value of 'stretchX' must be an array"}));
+    EXPECT_EQ(0u, log.uncheckedCount());
+
+    parseSprite(image_1x, R"JSON({
+            "interstate_1": {
+                "width": 40,
+                "height": 42,
+                "x": 100,
+                "y": 44,
+                "pixelRatio": 1,
+                "stretchX": [[[]]]
+            }
+        })JSON");
+    EXPECT_EQ(
+        1u,
+        log.count({EventSeverity::Warning,
+                   Event::Sprite,
+                   int64_t(-1),
+                   "Invalid sprite image 'interstate_1': members of 'stretchX' must be an array of two numbers"}));
+    EXPECT_EQ(0u, log.uncheckedCount());
+
+    parseSprite(image_1x, R"JSON({
+            "interstate_1": {
+                "width": 40,
+                "height": 42,
+                "x": 100,
+                "y": 44,
+                "pixelRatio": 1,
+                "stretchX": [[4, false]]
+            }
+        })JSON");
+    EXPECT_EQ(
+        1u,
+        log.count({EventSeverity::Warning,
+                   Event::Sprite,
+                   int64_t(-1),
+                   "Invalid sprite image 'interstate_1': members of 'stretchX' must be an array of two numbers"}));
+    EXPECT_EQ(0u, log.uncheckedCount());
+}
+
+TEST(Sprite, SpriteParsingInvalidContent) {
+    FixtureLog log;
+
+    const auto image_1x = util::read_file("test/fixtures/annotations/emerald.png");
+
+    parseSprite(image_1x, R"JSON({
+        "interstate_1": {
+            "width": 40,
+            "height": 42,
+            "x": 100,
+            "y": 44,
+            "pixelRatio": 1,
+            "content": []
+        }
+    })JSON");
+    EXPECT_EQ(1u,
+              log.count({EventSeverity::Warning,
+                         Event::Sprite,
+                         int64_t(-1),
+                         "Invalid sprite image 'interstate_1': value of 'content' must be an array of four numbers"}));
+    EXPECT_EQ(0u, log.uncheckedCount());
+
+    parseSprite(image_1x, R"JSON({
+        "interstate_1": {
+            "width": 40,
+            "height": 42,
+            "x": 100,
+            "y": 44,
+            "pixelRatio": 1,
+            "content": [4, 4, 4, true]
+        }
+    })JSON");
+    EXPECT_EQ(1u,
+              log.count({EventSeverity::Warning,
+                         Event::Sprite,
+                         int64_t(-1),
+                         "Invalid sprite image 'interstate_1': value of 'content' must be an array of four numbers"}));
+    EXPECT_EQ(0u, log.uncheckedCount());
+}
+
+TEST(Sprite, SpriteParsingStretchAndContent) {
+    FixtureLog log;
+
+    const auto image_1x = util::read_file("test/fixtures/annotations/emerald.png");
+
+    const auto images = parseSprite(image_1x, R"JSON({
+        "image": {
+            "width": 16,
+            "height": 16,
+            "x": 0,
+            "y": 0,
+            "pixelRatio": 1,
+            "stretchX": [[2, 14]],
+            "stretchY": [[0, 4], [12, 16]],
+            "content": [2, 2, 14, 14]
+        }
+    })JSON");
+    EXPECT_EQ(1u, images.size());
+    EXPECT_EQ("image", images[0]->getID());
+    EXPECT_EQ((style::ImageStretches{{2, 14}}), images[0]->getStretchX());
+    EXPECT_EQ((style::ImageStretches{{0, 4}, {12, 16}}), images[0]->getStretchY());
+    EXPECT_EQ((style::ImageContent{2, 2, 14, 14}), images[0]->getContent());
+}
+
 TEST(Sprite, SpriteParsingEmptyImage) {
     FixtureLog log;
 
@@ -303,12 +475,13 @@ TEST(Sprite, SpriteParsingEmptyImage) {
     const auto images = parseSprite(image_1x, json_1x);
     EXPECT_EQ(0u, images.size());
 
-    EXPECT_EQ(1u, log.count({
-                      EventSeverity::Error,
-                      Event::Sprite,
-                      int64_t(-1),
-                      "Can't create image with invalid metrics: 0x0@0,0 in 200x299@1x sprite",
-                  }));
+    EXPECT_EQ(1u,
+              log.count({
+                  EventSeverity::Error,
+                  Event::Sprite,
+                  int64_t(-1),
+                  "Can't create image with invalid metrics: 0x0@0,0 in 200x299@1x sprite",
+              }));
 }
 
 TEST(Sprite, SpriteParsingSimpleWidthHeight) {
@@ -330,18 +503,20 @@ TEST(Sprite, SpriteParsingWidthTooBig) {
     const auto images = parseSprite(image_1x, json_1x);
     EXPECT_EQ(0u, images.size());
 
-    EXPECT_EQ(1u, log.count({
-                      EventSeverity::Warning,
-                      Event::Sprite,
-                      int64_t(-1),
-                      "Value of 'width' must be an integer between 0 and 65535",
-                  }));
-    EXPECT_EQ(1u, log.count({
-                      EventSeverity::Error,
-                      Event::Sprite,
-                      int64_t(-1),
-                      "Can't create image with invalid metrics: 0x32@0,0 in 200x299@1x sprite",
-                  }));
+    EXPECT_EQ(1u,
+              log.count({
+                  EventSeverity::Warning,
+                  Event::Sprite,
+                  int64_t(-1),
+                  "Invalid sprite image 'image': value of 'width' must be an integer between 0 and 65535",
+              }));
+    EXPECT_EQ(1u,
+              log.count({
+                  EventSeverity::Error,
+                  Event::Sprite,
+                  int64_t(-1),
+                  "Can't create image with invalid metrics: 0x32@0,0 in 200x299@1x sprite",
+              }));
 }
 
 TEST(Sprite, SpriteParsingNegativeWidth) {
@@ -353,18 +528,20 @@ TEST(Sprite, SpriteParsingNegativeWidth) {
     const auto images = parseSprite(image_1x, json_1x);
     EXPECT_EQ(0u, images.size());
 
-    EXPECT_EQ(1u, log.count({
-                      EventSeverity::Warning,
-                      Event::Sprite,
-                      int64_t(-1),
-                      "Value of 'width' must be an integer between 0 and 65535",
-                  }));
-    EXPECT_EQ(1u, log.count({
-                      EventSeverity::Error,
-                      Event::Sprite,
-                      int64_t(-1),
-                      "Can't create image with invalid metrics: 0x32@0,0 in 200x299@1x sprite",
-                  }));
+    EXPECT_EQ(1u,
+              log.count({
+                  EventSeverity::Warning,
+                  Event::Sprite,
+                  int64_t(-1),
+                  "Invalid sprite image 'image': value of 'width' must be an integer between 0 and 65535",
+              }));
+    EXPECT_EQ(1u,
+              log.count({
+                  EventSeverity::Error,
+                  Event::Sprite,
+                  int64_t(-1),
+                  "Can't create image with invalid metrics: 0x32@0,0 in 200x299@1x sprite",
+              }));
 }
 
 TEST(Sprite, SpriteParsingNullRatio) {
@@ -376,10 +553,11 @@ TEST(Sprite, SpriteParsingNullRatio) {
     const auto images = parseSprite(image_1x, json_1x);
     EXPECT_EQ(0u, images.size());
 
-    EXPECT_EQ(1u, log.count({
-                      EventSeverity::Error,
-                      Event::Sprite,
-                      int64_t(-1),
-                      "Can't create image with invalid metrics: 32x32@0,0 in 200x299@0x sprite",
-                  }));
+    EXPECT_EQ(1u,
+              log.count({
+                  EventSeverity::Error,
+                  Event::Sprite,
+                  int64_t(-1),
+                  "Can't create image with invalid metrics: 32x32@0,0 in 200x299@0x sprite",
+              }));
 }
