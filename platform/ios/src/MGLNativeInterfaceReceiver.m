@@ -29,7 +29,7 @@ static MGLNativeInterfaceReceiver *instance = nil;
     return [MGLNetworkConfiguration sharedManager].sessionConfiguration;
 }
 
-- (NSString *)nai_accountType {
+- (NSString *)nai_accountTypeKey {
     return MGLMapboxAccountTypeKey;
 }
 
