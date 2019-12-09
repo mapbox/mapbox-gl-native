@@ -25,7 +25,7 @@ std::unique_ptr<style::Image> createStyleImage(const std::string& id,
         ratio <= 0 || ratio > 10 ||
         srcX >= image.size.width || srcY >= image.size.height ||
         srcX + width > image.size.width || srcY + height > image.size.height) {
-        Log::Error(Event::Sprite, "Can't create sprite with invalid metrics: %ux%u@%u,%u in %ux%u@%sx sprite",
+        Log::Error(Event::Sprite, "Can't create image with invalid metrics: %ux%u@%u,%u in %ux%u@%sx sprite",
             width, height, srcX, srcY,
             image.size.width, image.size.height,
             util::toString(ratio).c_str());

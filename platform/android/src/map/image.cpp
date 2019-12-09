@@ -26,7 +26,7 @@ mbgl::style::Image Image::getImage(jni::JNIEnv& env, const jni::Object<Image>& i
 
     mbgl::PremultipliedImage premultipliedImage({ static_cast<uint32_t>(width), static_cast<uint32_t>(height) });
     if (premultipliedImage.bytes() != uint32_t(size)) {
-        throw mbgl::util::SpriteImageException("Sprite image pixel count mismatch");
+        throw mbgl::util::StyleImageException("Image pixel count mismatch");
     }
 
     jni::GetArrayRegion(env, *pixels, 0, size, reinterpret_cast<jbyte*>(premultipliedImage.data.get()));

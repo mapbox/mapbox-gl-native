@@ -10,9 +10,9 @@ struct Exception : std::runtime_error {
     Exception(const std::string &msg) : std::runtime_error(msg) {}
 };
 
-struct SpriteImageException : Exception {
-    SpriteImageException(const char *msg) : Exception(msg) {}
-    SpriteImageException(const std::string &msg) : Exception(msg) {}
+struct StyleImageException : Exception {
+    StyleImageException(const char *msg) : Exception(msg) {}
+    StyleImageException(const std::string &msg) : Exception(msg) {}
 };
 
 struct MisuseException : Exception {

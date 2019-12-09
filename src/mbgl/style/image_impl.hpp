@@ -11,7 +11,13 @@ namespace style {
 
 class Image::Impl {
 public:
-    Impl(std::string id, PremultipliedImage&&, float pixelRatio, bool sdf = false);
+    Impl(std::string id,
+         PremultipliedImage&&,
+         float pixelRatio,
+         bool sdf = false,
+         ImageStretches stretchX = {},
+         ImageStretches stretchY = {},
+         optional<ImageContent> content = nullopt);
 
     const std::string id;
 
@@ -22,6 +28,13 @@ public:
 
     // Whether this image should be interpreted as a signed distance field icon.
     const bool sdf;
+
+    // Stretch areas of this image.
+    const ImageStretches stretchX;
+    const ImageStretches stretchY;
+
+    // The space where text can be fit into this image.
+    const ImageContent content;
 };
 
 } // namespace style
