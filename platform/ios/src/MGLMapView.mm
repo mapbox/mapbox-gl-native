@@ -68,6 +68,7 @@
 #import "MGLMapAccessibilityElement.h"
 #import "MGLLocationManager_Private.h"
 #import "MGLLoggingConfiguration_Private.h"
+#import "MGLNativeInterfaceReceiver.h"
 #import "MMEConstants.h"
 
 #include <algorithm>
@@ -452,6 +453,7 @@ public:
     // setup accessibility
     //
 //    self.isAccessibilityElement = YES;
+    MGLNativeAppleInterfaceTransmitter.shared.delegate = MGLNativeInterfaceReceiver.shared;
     self.accessibilityLabel = NSLocalizedStringWithDefaultValue(@"MAP_A11Y_LABEL", nil, nil, @"Map", @"Accessibility label");
     self.accessibilityTraits = UIAccessibilityTraitAllowsDirectInteraction | UIAccessibilityTraitAdjustable;
     self.backgroundColor = [UIColor clearColor];
