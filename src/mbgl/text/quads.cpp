@@ -70,7 +70,21 @@ SymbolQuad getIconQuad(const PositionedIcon& shapedIcon, WritingModeType writing
         static_cast<uint16_t>(image.textureRect.h + border * 2)
     };
 
-    return SymbolQuad{tl, tr, bl, br, textureRect, writingMode, {0.0f, 0.0f}, iconType == SymbolContent::IconSDF};
+    Point<float> pixelOffsetTL;
+    Point<float> pixelOffsetBR;
+    Point<float> minFontScale;
+
+    return SymbolQuad{tl,
+                      tr,
+                      bl,
+                      br,
+                      textureRect,
+                      writingMode,
+                      {0.0f, 0.0f},
+                      iconType == SymbolContent::IconSDF,
+                      pixelOffsetTL,
+                      pixelOffsetBR,
+                      minFontScale};
 }
 
 SymbolQuads getGlyphQuads(const Shaping& shapedText,
@@ -181,8 +195,22 @@ SymbolQuads getGlyphQuads(const Shaping& shapedText,
                 br = util::matrixMultiply(matrix, br);
             }
 
-            quads.emplace_back(
-                tl, tr, bl, br, rect, shapedText.writingMode, glyphOffset, isSDF, positionedGlyph.sectionIndex);
+            Point<float> pixelOffsetTL;
+            Point<float> pixelOffsetBR;
+            Point<float> minFontScale;
+
+            quads.emplace_back(tl,
+                               tr,
+                               bl,
+                               br,
+                               rect,
+                               shapedText.writingMode,
+                               glyphOffset,
+                               isSDF,
+                               pixelOffsetTL,
+                               pixelOffsetBR,
+                               minFontScale,
+                               positionedGlyph.sectionIndex);
         }
     }
 

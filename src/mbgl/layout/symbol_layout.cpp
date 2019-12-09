@@ -879,9 +879,9 @@ size_t SymbolLayout::addSymbol(SymbolBucket::Buffer& buffer,
     const auto &bl = symbol.bl;
     const auto &br = symbol.br;
     const auto &tex = symbol.tex;
-    const Point<float> pixelOffsetTL{0, 0};
-    const Point<float> pixelOffsetBR{0, 0};
-    const Point<float> minFontScale{0, 0};
+    const auto& pixelOffsetTL = symbol.pixelOffsetTL;
+    const auto& pixelOffsetBR = symbol.pixelOffsetBR;
+    const auto& minFontScale = symbol.minFontScale;
 
     if (buffer.segments.empty() ||
         buffer.segments.back().vertexLength + vertexLength > std::numeric_limits<uint16_t>::max() ||
