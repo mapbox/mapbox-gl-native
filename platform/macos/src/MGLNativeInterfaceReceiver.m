@@ -21,16 +21,8 @@ static MGLNativeInterfaceReceiver *instance = nil;
 
 #pragma mark - MGLNativeAppleInterfaceManager delegate -
 
-- (NSString *)nai_skuToken {
-    return MGLAccountManager.skuToken;
-}
-
 - (NSURLSessionConfiguration *)nai_sessionConfiguration {
     return [MGLNetworkConfiguration sharedManager].sessionConfiguration;
-}
-
-- (NSString *)nai_accountType {
-    return MGLMapboxAccountTypeKey;
 }
 
 - (void)nai_startDownloadEvent:(NSString *)event type:(NSString *)type {
