@@ -3,6 +3,7 @@
     "sources": [
         "platform/darwin/src/MGLImageSource.mm",
         "platform/darwin/src/MGLMapSnapshotter.mm",
+        "platform/macos/src/MGLNativeInterfaceReceiver.m",
         "platform/macos/src/NSImage+MGLAdditions.mm",
         "platform/darwin/src/MGLHillshadeStyleLayer.mm",
         "platform/darwin/src/MGLPointAnnotation.mm",
@@ -193,6 +194,7 @@
         "MGLValueEvaluator.h": "platform/darwin/src/MGLValueEvaluator.h",
         "MGLOfflinePack_Private.h": "platform/darwin/src/MGLOfflinePack_Private.h",
         "MGLFoundation_Private.h": "platform/darwin/src/MGLFoundation_Private.h",
+        "MGLNativeInterfaceReceiver.h": "platform/macos/src/MGLNativeInterfaceReceiver.h",
         "MGLCompassCell.h": "platform/macos/src/MGLCompassCell.h",
         "MGLShapeSource_Private.h": "platform/darwin/src/MGLShapeSource_Private.h",
         "MGLStyle_Private.h": "platform/darwin/src/MGLStyle_Private.h",

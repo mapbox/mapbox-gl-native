@@ -532,6 +532,10 @@
 		CAE7AD5520F46EF5003B6782 /* MGLMapSnapshotterSwiftTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAE7AD5420F46EF5003B6782 /* MGLMapSnapshotterSwiftTests.swift */; };
 		CAFB3C14234505D500399265 /* MGLMapSnapshotter_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = CAFB3C13234505D500399265 /* MGLMapSnapshotter_Private.h */; };
 		CAFB3C15234505D500399265 /* MGLMapSnapshotter_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = CAFB3C13234505D500399265 /* MGLMapSnapshotter_Private.h */; };
+		CF0E9076239EA6950074A30D /* MGLNativeInterfaceReceiver.h in Headers */ = {isa = PBXBuildFile; fileRef = CF0E9074239EA6950074A30D /* MGLNativeInterfaceReceiver.h */; };
+		CF0E9077239EA6950074A30D /* MGLNativeInterfaceReceiver.h in Headers */ = {isa = PBXBuildFile; fileRef = CF0E9074239EA6950074A30D /* MGLNativeInterfaceReceiver.h */; };
+		CF0E9078239EA6950074A30D /* MGLNativeInterfaceReceiver.m in Sources */ = {isa = PBXBuildFile; fileRef = CF0E9075239EA6950074A30D /* MGLNativeInterfaceReceiver.m */; };
+		CF0E9079239EA6950074A30D /* MGLNativeInterfaceReceiver.m in Sources */ = {isa = PBXBuildFile; fileRef = CF0E9075239EA6950074A30D /* MGLNativeInterfaceReceiver.m */; };
 		CF75A91522D85E860058A5C4 /* MGLLoggingConfiguration.mm in Sources */ = {isa = PBXBuildFile; fileRef = CF75A91422D85E860058A5C4 /* MGLLoggingConfiguration.mm */; };
 		CF75A91622D85E860058A5C4 /* MGLLoggingConfiguration.mm in Sources */ = {isa = PBXBuildFile; fileRef = CF75A91422D85E860058A5C4 /* MGLLoggingConfiguration.mm */; };
 		DA00FC8E1D5EEB0D009AABC8 /* MGLAttributionInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = DA00FC8C1D5EEB0D009AABC8 /* MGLAttributionInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1225,6 +1229,8 @@
 		CAE7AD5320F46EF5003B6782 /* integration-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "integration-Bridging-Header.h"; sourceTree = "<group>"; };
 		CAE7AD5420F46EF5003B6782 /* MGLMapSnapshotterSwiftTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MGLMapSnapshotterSwiftTests.swift; sourceTree = "<group>"; };
 		CAFB3C13234505D500399265 /* MGLMapSnapshotter_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLMapSnapshotter_Private.h; sourceTree = "<group>"; };
+		CF0E9074239EA6950074A30D /* MGLNativeInterfaceReceiver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLNativeInterfaceReceiver.h; sourceTree = "<group>"; };
+		CF0E9075239EA6950074A30D /* MGLNativeInterfaceReceiver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLNativeInterfaceReceiver.m; sourceTree = "<group>"; };
 		CF75A91422D85E860058A5C4 /* MGLLoggingConfiguration.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLLoggingConfiguration.mm; sourceTree = "<group>"; };
 		DA00FC8C1D5EEB0D009AABC8 /* MGLAttributionInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLAttributionInfo.h; sourceTree = "<group>"; };
 		DA00FC8D1D5EEB0D009AABC8 /* MGLAttributionInfo.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLAttributionInfo.mm; sourceTree = "<group>"; };
@@ -1961,6 +1967,15 @@
 			name = Annotations;
 			sourceTree = "<group>";
 		};
+		CF0E9073239EA6800074A30D /* Interface */ = {
+			isa = PBXGroup;
+			children = (
+				CF0E9074239EA6950074A30D /* MGLNativeInterfaceReceiver.h */,
+				CF0E9075239EA6950074A30D /* MGLNativeInterfaceReceiver.m */,
+			);
+			name = Interface;
+			sourceTree = "<group>";
+		};
 		DA1DC9411CB6C1C2006E619F = {
 			isa = PBXGroup;
 			children = (
@@ -2188,6 +2203,7 @@
 		DA8848331CBAFB2A00AB86E3 /* Kit */ = {
 			isa = PBXGroup;
 			children = (
+				CF0E9073239EA6800074A30D /* Interface */,
 				DAD165841CF4D06B001FF4B9 /* Annotations */,
 				35CE617F1D4165C2004F2359 /* Categories */,
 				DA8848881CBB036000AB86E3 /* SMCalloutView */,
@@ -2618,6 +2634,7 @@
 				350098BB1D480108004B2AF0 /* MGLVectorTileSource.h in Headers */,
 				DA8847F61CBAFA5100AB86E3 /* MGLOfflineStorage.h in Headers */,
 				DAD1656E1CF41981001FF4B9 /* MGLFeature_Private.h in Headers */,
+				CF0E9076239EA6950074A30D /* MGLNativeInterfaceReceiver.h in Headers */,
 				DA88483C1CBAFB8500AB86E3 /* MGLMapView.h in Headers */,
 				3EA9363147E77DD29FA06063 /* MGLRendererConfiguration.h in Headers */,
 				55E5665121C2A1C20008B8B5 /* MMEReachability.h in Headers */,
@@ -2812,6 +2829,7 @@
 				74CB5EB2219B252C00102936 /* MGLStyleLayerManager.h in Headers */,
 				9221BAB020699F8A0054BDF4 /* MGLTilePyramidOfflineRegion_Private.h in Headers */,
 				96E516F5200059B100A02306 /* MGLNetworkConfiguration.h in Headers */,
+				CF0E9077239EA6950074A30D /* MGLNativeInterfaceReceiver.h in Headers */,
 				96E516DD200054F200A02306 /* MGLPolygon_Private.h in Headers */,
 				353933F91D3FB79F003F57D7 /* MGLLineStyleLayer.h in Headers */,
 				9C6E282622A980AC0056B7BE /* UIKit+MMEMobileEvents.h in Headers */,
@@ -3355,6 +3373,7 @@
 				9620BB3A1E69FE1700705A1D /* MGLSDKUpdateChecker.mm in Sources */,
 				354B83981D2E873E005D9406 /* MGLUserLocationAnnotationView.m in Sources */,
 				40834BEE1FE05E1800C1BD0D /* MMEEventsConfiguration.m in Sources */,
+				CF0E9078239EA6950074A30D /* MGLNativeInterfaceReceiver.m in Sources */,
 				DA88485D1CBAFB9800AB86E3 /* MGLFaux3DUserLocationAnnotationView.m in Sources */,
 				DAD165701CF41981001FF4B9 /* MGLFeature.mm in Sources */,
 				30E578191DAA855E0050F07E /* UIImage+MGLAdditions.mm in Sources */,
@@ -3482,6 +3501,7 @@
 				DAA4E4221CBB730400178DFB /* MGLPointAnnotation.mm in Sources */,
 				40834C021FE05E1800C1BD0D /* MMEEventsConfiguration.m in Sources */,
 				DAED38661D62D0FC00D7640F /* NSURL+MGLAdditions.m in Sources */,
+				CF0E9079239EA6950074A30D /* MGLNativeInterfaceReceiver.m in Sources */,
 				DAD165711CF41981001FF4B9 /* MGLFeature.mm in Sources */,
 				30E5781A1DAA855E0050F07E /* UIImage+MGLAdditions.mm in Sources */,
 				ACD0245B2187EABA00D8C8A7 /* MMEMetricsManager.m in Sources */,

@@ -134,6 +134,8 @@
 		CA8FBC0D21A4A74300D1203C /* MGLRendererConfigurationTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = CA8FBC0C21A4A74300D1203C /* MGLRendererConfigurationTests.mm */; };
 		CA9461A620884CCB0015EB12 /* MGLAnnotationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CA9461A520884CCB0015EB12 /* MGLAnnotationTests.m */; };
 		CAD9D0AC22A88A32001B25EE /* MGLResourceTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = CAD9D0AB22A88A32001B25EE /* MGLResourceTests.mm */; };
+		CF0E907E239EA6BB0074A30D /* MGLNativeInterfaceReceiver.h in Headers */ = {isa = PBXBuildFile; fileRef = CF0E907C239EA6BB0074A30D /* MGLNativeInterfaceReceiver.h */; };
+		CF0E907F239EA6BB0074A30D /* MGLNativeInterfaceReceiver.m in Sources */ = {isa = PBXBuildFile; fileRef = CF0E907D239EA6BB0074A30D /* MGLNativeInterfaceReceiver.m */; };
 		CF762DEF22DC7EFF00338472 /* MGLLoggingConfiguration.mm in Sources */ = {isa = PBXBuildFile; fileRef = CF762DEE22DC7EFF00338472 /* MGLLoggingConfiguration.mm */; };
 		DA00FC8A1D5EEAC3009AABC8 /* MGLAttributionInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = DA00FC881D5EEAC3009AABC8 /* MGLAttributionInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DA00FC8B1D5EEAC3009AABC8 /* MGLAttributionInfo.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA00FC891D5EEAC3009AABC8 /* MGLAttributionInfo.mm */; };
@@ -425,7 +427,7 @@
 		5591AC692298361600FF9ADF /* MGLMapView+Impl.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "MGLMapView+Impl.mm"; sourceTree = "<group>"; };
 		55CAF6312294407F00F17770 /* MGLMapView+OpenGL.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "MGLMapView+OpenGL.h"; sourceTree = "<group>"; };
 		55CAF6332294409B00F17770 /* MGLMapView+OpenGL.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = "MGLMapView+OpenGL.mm"; sourceTree = "<group>"; };
-		55CF7532213EDADF00ED86C4 /* libmbgl-vendor-icu.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libmbgl-vendor-icu.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		55CF7532213EDADF00ED86C4 /* libmbgl-vendor-icu.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = "libmbgl-vendor-icu.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		55D120A41F7906E6004B6D81 /* libmbgl-filesource.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = "libmbgl-filesource.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		55D9B4B01D005D3900C1CCE2 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		55E2AD101E5B0A6900E8C587 /* MGLOfflineStorageTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLOfflineStorageTests.mm; path = ../../darwin/test/MGLOfflineStorageTests.mm; sourceTree = "<group>"; };
@@ -475,6 +477,8 @@
 		CA8FBC0C21A4A74300D1203C /* MGLRendererConfigurationTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLRendererConfigurationTests.mm; path = ../../darwin/test/MGLRendererConfigurationTests.mm; sourceTree = "<group>"; };
 		CA9461A520884CCB0015EB12 /* MGLAnnotationTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLAnnotationTests.m; path = test/MGLAnnotationTests.m; sourceTree = SOURCE_ROOT; };
 		CAD9D0AB22A88A32001B25EE /* MGLResourceTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLResourceTests.mm; path = ../../darwin/test/MGLResourceTests.mm; sourceTree = "<group>"; };
+		CF0E907C239EA6BB0074A30D /* MGLNativeInterfaceReceiver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLNativeInterfaceReceiver.h; sourceTree = "<group>"; };
+		CF0E907D239EA6BB0074A30D /* MGLNativeInterfaceReceiver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLNativeInterfaceReceiver.m; sourceTree = "<group>"; };
 		CF762DEE22DC7EFF00338472 /* MGLLoggingConfiguration.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLLoggingConfiguration.mm; sourceTree = "<group>"; };
 		DA00FC881D5EEAC3009AABC8 /* MGLAttributionInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLAttributionInfo.h; sourceTree = "<group>"; };
 		DA00FC891D5EEAC3009AABC8 /* MGLAttributionInfo.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLAttributionInfo.mm; sourceTree = "<group>"; };
@@ -880,6 +884,15 @@
 			name = "Test Helpers";
 			sourceTree = "<group>";
 		};
+		CF0E907B239EA6AF0074A30D /* Interface */ = {
+			isa = PBXGroup;
+			children = (
+				CF0E907C239EA6BB0074A30D /* MGLNativeInterfaceReceiver.h */,
+				CF0E907D239EA6BB0074A30D /* MGLNativeInterfaceReceiver.m */,
+			);
+			name = Interface;
+			sourceTree = "<group>";
+		};
 		DA33895E1FA3E997001EA329 /* Recovered References */ = {
 			isa = PBXGroup;
 			children = (
@@ -1267,6 +1280,7 @@
 		DAE6C39E1CC31E7C00DB3429 /* Kit */ = {
 			isa = PBXGroup;
 			children = (
+				CF0E907B239EA6AF0074A30D /* Interface */,
 				DA90B12C1DB43B180073CF55 /* Categories */,
 				DAE6C39F1CC31E9400DB3429 /* MGLAnnotationImage.h */,
 				DAC2ABC41CC6D343006D18C4 /* MGLAnnotationImage_Private.h */,
@@ -1406,6 +1420,7 @@
 				3538AA231D542685008EC33D /* MGLStyleLayer.h in Headers */,
 				DAE6C35C1CC31E0400DB3429 /* MGLGeometry.h in Headers */,
 				DAE6C35A1CC31E0400DB3429 /* MGLAccountManager.h in Headers */,
+				CF0E907E239EA6BB0074A30D /* MGLNativeInterfaceReceiver.h in Headers */,
 				DA551B821DB496AC0009AFAF /* MGLTileSource.h in Headers */,
 				35602C001D3EA9B40050646F /* MGLForegroundStyleLayer.h in Headers */,
 				DAE6C35D1CC31E0400DB3429 /* MGLMapCamera.h in Headers */,
@@ -1654,6 +1669,7 @@
 			files = (
 				07A019EF1ED665CD00ACD43E /* MGLImageSource.mm in Sources */,
 				92092EF11F5EB10E00AF5130 /* MGLMapSnapshotter.mm in Sources */,
+				CF0E907F239EA6BB0074A30D /* MGLNativeInterfaceReceiver.m in Sources */,
 				40ABDB561DB0022100372083 /* NSImage+MGLAdditions.mm in Sources */,
 				DAF25715201901C200367EF5 /* MGLHillshadeStyleLayer.mm in Sources */,
 				DAE6C3901CC31E2A00DB3429 /* MGLPointAnnotation.mm in Sources */,
