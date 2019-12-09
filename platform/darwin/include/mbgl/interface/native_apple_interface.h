@@ -6,12 +6,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @optional
 
-#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
-
 - (NSString *)nai_skuToken;
 - (NSString *)nai_accountTypeKey;
-
-#endif
 
 @required
 
@@ -33,10 +29,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, weak) id<MGLNativeAppleInterfaceDelegate> delegate;
 
-#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
 @property (nonatomic, readonly) NSString *accountTypeKey;
 @property (nonatomic, readonly) NSString *skuToken;
-#endif
 
 @property (nonatomic, readonly) NSURLSessionConfiguration *sessionConfiguration;
 
