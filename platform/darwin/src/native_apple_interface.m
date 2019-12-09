@@ -20,7 +20,6 @@ static MGLNativeAppleInterfaceTransmitter *instance = nil;
     return nil;
 }
 
-#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
 - (NSString *)skuToken {
     if(_delegate && [_delegate respondsToSelector:@selector(nai_skuToken)]) {
         return [_delegate nai_skuToken];
@@ -34,7 +33,6 @@ static MGLNativeAppleInterfaceTransmitter *instance = nil;
     }
     return nil;
 }
-#endif
 
 - (void)startDownloadEvent:(NSString *)event type:(NSString *)type {
     if (_delegate && [_delegate respondsToSelector:@selector(nai_startDownloadEvent:type:)]) {
