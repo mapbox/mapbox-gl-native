@@ -45,9 +45,7 @@ MBGL_DEFINE_UNIFORM_SCALAR(bool, rotate_symbol);
 MBGL_DEFINE_UNIFORM_SCALAR(float, aspect_ratio);
 } // namespace uniforms
 
-using SymbolLayoutAttributes = TypeList<
-    attributes::pos_offset,
-    attributes::data<uint16_t, 4>>;
+using SymbolLayoutAttributes = TypeList<attributes::pos_offset, attributes::data<uint16_t, 4>, attributes::pixeloffset>;
 
 using SymbolDynamicLayoutAttributes = TypeList<attributes::projected_pos>;
 
@@ -205,7 +203,9 @@ public:
                                                             uint16_t tx,
                                                             uint16_t ty,
                                                             const Range<float>& sizeData,
-                                                            bool isSDF) {
+                                                            bool isSDF,
+                                                            Point<float> pixelOffset,
+                                                            Point<float> minFontScale) {
         const uint16_t aSizeMin =
             (std::min(MAX_PACKED_SIZE, static_cast<uint16_t>(sizeData.min * SIZE_PACK_FACTOR)) << 1) + uint16_t(isSDF);
         const uint16_t aSizeMax = std::min(MAX_PACKED_SIZE, static_cast<uint16_t>(sizeData.max * SIZE_PACK_FACTOR));
@@ -215,7 +215,12 @@ public:
               static_cast<int16_t>(labelAnchor.y),
               static_cast<int16_t>(::round(o.x * 32)), // use 1/32 pixels for placement
               static_cast<int16_t>(::round((o.y + glyphOffsetY) * 32))}},
-            {{tx, ty, aSizeMin, aSizeMax}}};
+            {{tx, ty, aSizeMin, aSizeMax}},
+            {{static_cast<int16_t>(pixelOffset.x * 16),
+              static_cast<int16_t>(pixelOffset.y * 16),
+              static_cast<int16_t>(minFontScale.x * 256),
+              static_cast<int16_t>(minFontScale.y * 256)}},
+        };
     }
 
     static gfx::Vertex<SymbolDynamicLayoutAttributes> dynamicLayoutVertex(Point<float> anchorPoint, float labelAngle) {

@@ -11,7 +11,7 @@ namespace mbgl {
 
 using namespace style;
 
-static_assert(sizeof(SymbolLayoutVertex) == 16, "expected SymbolLayoutVertex size");
+static_assert(sizeof(SymbolLayoutVertex) == 24, "expected SymbolLayoutVertex size");
 
 std::unique_ptr<SymbolSizeBinder> SymbolSizeBinder::create(const float tileZoom,
                                                     const style::PropertyValue<float>& sizeProperty,

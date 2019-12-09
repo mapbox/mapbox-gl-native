@@ -879,6 +879,9 @@ size_t SymbolLayout::addSymbol(SymbolBucket::Buffer& buffer,
     const auto &bl = symbol.bl;
     const auto &br = symbol.br;
     const auto &tex = symbol.tex;
+    const Point<float> pixelOffsetTL{0, 0};
+    const Point<float> pixelOffsetBR{0, 0};
+    const Point<float> minFontScale{0, 0};
 
     if (buffer.segments.empty() ||
         buffer.segments.back().vertexLength + vertexLength > std::numeric_limits<uint16_t>::max() ||
@@ -893,14 +896,42 @@ size_t SymbolLayout::addSymbol(SymbolBucket::Buffer& buffer,
     uint16_t index = segment.vertexLength;
 
     // coordinates (2 triangles)
-    buffer.vertices.emplace_back(SymbolSDFIconProgram::layoutVertex(
-        labelAnchor.point, tl, symbol.glyphOffset.y, tex.x, tex.y, sizeData, symbol.isSDF));
-    buffer.vertices.emplace_back(SymbolSDFIconProgram::layoutVertex(
-        labelAnchor.point, tr, symbol.glyphOffset.y, tex.x + tex.w, tex.y, sizeData, symbol.isSDF));
-    buffer.vertices.emplace_back(SymbolSDFIconProgram::layoutVertex(
-        labelAnchor.point, bl, symbol.glyphOffset.y, tex.x, tex.y + tex.h, sizeData, symbol.isSDF));
-    buffer.vertices.emplace_back(SymbolSDFIconProgram::layoutVertex(
-        labelAnchor.point, br, symbol.glyphOffset.y, tex.x + tex.w, tex.y + tex.h, sizeData, symbol.isSDF));
+    buffer.vertices.emplace_back(SymbolSDFIconProgram::layoutVertex(labelAnchor.point,
+                                                                    tl,
+                                                                    symbol.glyphOffset.y,
+                                                                    tex.x,
+                                                                    tex.y,
+                                                                    sizeData,
+                                                                    symbol.isSDF,
+                                                                    pixelOffsetTL,
+                                                                    minFontScale));
+    buffer.vertices.emplace_back(SymbolSDFIconProgram::layoutVertex(labelAnchor.point,
+                                                                    tr,
+                                                                    symbol.glyphOffset.y,
+                                                                    tex.x + tex.w,
+                                                                    tex.y,
+                                                                    sizeData,
+                                                                    symbol.isSDF,
+                                                                    {pixelOffsetBR.x, pixelOffsetTL.y},
+                                                                    minFontScale));
+    buffer.vertices.emplace_back(SymbolSDFIconProgram::layoutVertex(labelAnchor.point,
+                                                                    bl,
+                                                                    symbol.glyphOffset.y,
+                                                                    tex.x,
+                                                                    tex.y + tex.h,
+                                                                    sizeData,
+                                                                    symbol.isSDF,
+                                                                    {pixelOffsetTL.x, pixelOffsetBR.y},
+                                                                    minFontScale));
+    buffer.vertices.emplace_back(SymbolSDFIconProgram::layoutVertex(labelAnchor.point,
+                                                                    br,
+                                                                    symbol.glyphOffset.y,
+                                                                    tex.x + tex.w,
+                                                                    tex.y + tex.h,
+                                                                    sizeData,
+                                                                    symbol.isSDF,
+                                                                    pixelOffsetBR,
+                                                                    minFontScale));
 
     // Dynamic/Opacity vertices are initialized so that the vertex count always agrees with
     // the layout vertex buffer, but they will always be updated before rendering happens
