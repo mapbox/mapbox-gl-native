@@ -745,7 +745,7 @@ void SymbolLayout::createBucket(const ImagePositions&, std::unique_ptr<FeatureIn
         if (hasIcon) {
             const Range<float> sizeData = bucket->iconSizeBinder->getVertexSizeData(feature);
             auto& iconBuffer = symbolInstance.hasSdfIcon() ? bucket->sdfIcon : bucket->icon;
-            const auto placeIcon = [&](const SymbolQuad& iconQuad, auto& index, const WritingModeType writingMode) {
+            const auto placeIcon = [&](const SymbolQuads& iconQuads, auto& index, const WritingModeType writingMode) {
                 iconBuffer.placedSymbols.emplace_back(symbolInstance.anchor.point,
                                                       symbolInstance.anchor.segment.value_or(0u),
                                                       sizeData.min,
@@ -757,13 +757,15 @@ void SymbolLayout::createBucket(const ImagePositions&, std::unique_ptr<FeatureIn
                 index = iconBuffer.placedSymbols.size() - 1;
                 PlacedSymbol& iconSymbol = iconBuffer.placedSymbols.back();
                 iconSymbol.angle = (allowVerticalPlacement && writingMode == WritingModeType::Vertical) ? M_PI_2 : 0;
-                iconSymbol.vertexStartIndex = addSymbol(iconBuffer, sizeData, iconQuad,
-                                                        symbolInstance.anchor, iconSymbol, feature.sortKey);
+                iconSymbol.vertexStartIndex =
+                    addSymbols(iconBuffer, sizeData, iconQuads, symbolInstance.anchor, iconSymbol, feature.sortKey);
             };
 
-            placeIcon(*symbolInstance.iconQuad(), symbolInstance.placedIconIndex, WritingModeType::None);
-            if (symbolInstance.verticalIconQuad()) {
-                placeIcon(*symbolInstance.verticalIconQuad(), symbolInstance.placedVerticalIconIndex, WritingModeType::Vertical);
+            placeIcon(*symbolInstance.iconQuads(), symbolInstance.placedIconIndex, WritingModeType::None);
+            if (symbolInstance.verticalIconQuads()) {
+                placeIcon(*symbolInstance.verticalIconQuads(),
+                          symbolInstance.placedVerticalIconIndex,
+                          WritingModeType::Vertical);
             }
 
             for (auto& pair : bucket->paintProperties) {
@@ -957,6 +959,24 @@ size_t SymbolLayout::addSymbol(SymbolBucket::Buffer& buffer,
     placedSymbol.glyphOffsets.push_back(symbol.glyphOffset.x);
 
     return index;
+}
+
+size_t SymbolLayout::addSymbols(SymbolBucket::Buffer& buffer,
+                                const Range<float> sizeData,
+                                const SymbolQuads& symbols,
+                                const Anchor& labelAnchor,
+                                PlacedSymbol& placedSymbol,
+                                float sortKey) {
+    bool firstSymbol = true;
+    size_t firstIndex = 0;
+    for (auto& symbol : symbols) {
+        const size_t index = addSymbol(buffer, sizeData, symbol, labelAnchor, placedSymbol, sortKey);
+        if (firstSymbol) {
+            firstIndex = index;
+            firstSymbol = false;
+        }
+    }
+    return firstIndex;
 }
 
 void SymbolLayout::addToDebugBuffers(SymbolBucket& bucket) {
