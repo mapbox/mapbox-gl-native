@@ -357,34 +357,11 @@ add_custom_command(
     COMMAND
         ${CMAKE_COMMAND}
         -E
-        copy
-        ${MBGL_ROOT}/metrics/next-android-render-test-runner-probe-memory.json
-        ${MBGL_ROOT}/android-manifest-probe-memory.json
-    COMMAND
-        ${CMAKE_COMMAND}
-        -E
-        copy
-        ${MBGL_ROOT}/metrics/next-android-render-test-runner-probe-gfx-network.json
-        ${MBGL_ROOT}/android-manifest-probe-network-gfx.json
-    COMMAND
-        ${CMAKE_COMMAND}
-        -E
-        copy
-        ${MBGL_ROOT}/platform/node/test/ignores.json
-        ${MBGL_ROOT}/render-test/ignores/ignores.json
-    COMMAND
-        ${CMAKE_COMMAND}
-        -E
         tar
         "chf"
         "render-test/android/app/src/main/assets/data.zip"
         --format=zip
         --files-from=render-test/android/app/src/main/assets/to_zip.txt
-    COMMAND
-        ${CMAKE_COMMAND}
-        -E
-        remove
-        ${MBGL_ROOT}/android-manifest*
     WORKING_DIRECTORY ${MBGL_ROOT}
 )
 

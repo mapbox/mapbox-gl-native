@@ -48,6 +48,5 @@ target_link_libraries(
 # not work here because node will do a dlopen(), which is not currently supported.
 if(CMAKE_SYSTEM_NAME STREQUAL Linux AND NOT MBGL_WITH_SANITIZER)
     add_test(NAME mbgl-node-memory COMMAND npm run test-memory WORKING_DIRECTORY ${MBGL_ROOT})
-    add_test(NAME mbgl-node-query COMMAND npm run test-query WORKING_DIRECTORY ${MBGL_ROOT})
     add_test(NAME mbgl-node-test COMMAND npm run test WORKING_DIRECTORY ${MBGL_ROOT})
 endif()

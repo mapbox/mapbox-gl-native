@@ -121,23 +121,3 @@ target_link_libraries(
 
 add_test(NAME mbgl-benchmark-runner COMMAND mbgl-benchmark-runner WORKING_DIRECTORY ${MBGL_ROOT})
 add_test(NAME mbgl-test-runner COMMAND mbgl-test-runner WORKING_DIRECTORY ${MBGL_ROOT})
-
-string(RANDOM LENGTH 5 ALPHABET 0123456789 MBGL_RENDER_TEST_SEED)
-
-add_test(
-    NAME mbgl-render-test
-    COMMAND
-        mbgl-render-test-runner
-        render-tests
-        --recycle-map
-        --shuffle
-        --manifestPath=${MBGL_ROOT}/render-test/linux-manifest.json
-        --seed=${MBGL_RENDER_TEST_SEED}
-)
-
-add_test(
-    NAME mbgl-render-test-probe-unit-tests
-    COMMAND mbgl-render-test-runner tests --manifestPath=${MBGL_ROOT}/render-test/linux-probe-manifest.json
-)
-
-add_test(NAME mbgl-query-test COMMAND mbgl-render-test-runner query-tests --manifestPath=${MBGL_ROOT}/render-test/linux-query-manifest.json)

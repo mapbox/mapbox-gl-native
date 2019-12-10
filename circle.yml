@@ -36,8 +36,8 @@ workflows:
           target_is_linux: true
           config_params: '-G Ninja -DCMAKE_INSTALL_PREFIX=workspace/$CIRCLE_JOB -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=gcc-8 -DCMAKE_CXX_COMPILER=g++-8'
           install: true
-          memory_metrics: true
-          gfx_and_network_metrics: true
+          metrics: true
+          style_tests: true
       - next-build-template:
           name: next-linux-gcc4.9-release
           executor_name: ubuntu-disco
@@ -54,6 +54,7 @@ workflows:
           requires:
             - next-linux-gcc8-release
           config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=gcc-8 -DCMAKE_CXX_COMPILER=g++-8 -DCMAKE_BUILD_TYPE=Debug -DMBGL_WITH_COVERAGE=ON'
+          style_tests: true
       - next-build-template:
           name: next-linux-clang8-release
           executor_name: ubuntu-disco
@@ -67,7 +68,8 @@ workflows:
             - next-macos-xcode11-release
           config_params: '-G Ninja -DCMAKE_INSTALL_PREFIX=workspace/$CIRCLE_JOB -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8'
           install: true
-          binary_size_metrics: true
+          binary_size: true
+          style_tests: true
       - next-build-template:
           name: next-FIXME-linux-asan
           executor_name: ubuntu-disco
@@ -76,6 +78,7 @@ workflows:
             - next-sanity-checks
           config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8 -DMBGL_WITH_SANITIZER=address'
           test_params: '|| true'
+          style_tests: true
       - next-build-template:
           name: next-linux-tsan
           executor_name: ubuntu-disco
@@ -83,6 +86,7 @@ workflows:
           requires:
             - next-sanity-checks
           config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8 -DMBGL_WITH_SANITIZER=thread'
+          style_tests: true
       - next-build-template:
           name: next-FIXME-linux-valgrind
           executor_name: ubuntu-disco
@@ -97,6 +101,7 @@ workflows:
             - next-sanity-checks
           config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8 -DMBGL_WITH_SANITIZER=undefined'
           test_params: '|| true'
+          style_tests: true
       - next-build-template:
           name: next-qt5-linux-gcc5-release
           executor_name: ubuntu-disco
@@ -116,6 +121,7 @@ workflows:
           target_is_macos: true
           config_params: '-G Ninja -DCMAKE_INSTALL_PREFIX=workspace/$CIRCLE_JOB -DCMAKE_CXX_COMPILER_LAUNCHER=ccache'
           install: true
+          style_tests: true
       - next-build-template:
           name: next-macos-xcode11-debug
           executor_name: macos-11_0_0
@@ -123,6 +129,7 @@ workflows:
           requires:
             - next-macos-xcode11-release
           config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_BUILD_TYPE=Debug'
+          style_tests: true
       - next-build-template:
           name: next-ios-xcode11-release
           executor_name: macos-11_0_0
@@ -189,7 +196,7 @@ executors:
     environment:
       DISPLAY: :99
       UBSAN_OPTIONS: print_stacktrace=1:halt_on_error=0
-      ASAN_OPTIONS: strict_string_checks=1:detect_stack_use_after_return=1:check_initialization_order=1:strict_init_order=1
+      ASAN_OPTIONS: strict_string_checks=1:detect_stack_use_after_return=1:check_initialization_order=1:strict_init_order=1:halt_on_error=0
       QT_INSTALL_DOCS: /usr/share/qt5/doc
       QT_VERSION: 5
   macos-11_0_0:
@@ -752,13 +759,13 @@ jobs:
       install:
         type: boolean
         default: false
-      binary_size_metrics:
+      binary_size:
         type: boolean
         default: false
-      memory_metrics:
+      metrics:
         type: boolean
         default: false
-      gfx_and_network_metrics:
+      style_tests:
         type: boolean
         default: false
     executor: << parameters.executor_name >>
@@ -797,25 +804,25 @@ jobs:
           steps:
             - next-install
       - when:
-          condition: << parameters.binary_size_metrics >>
+          condition: << parameters.style_tests >>
+          steps:
+            - next-metrics:
+                step_name: 'Style Tests'
+                metrics_params: '-u rebaseline -p metrics/$CIRCLE_JOB-style.json'
+      - when:
+          condition: << parameters.metrics >>
+          steps:
+            - next-metrics:
+                step_name: 'Metrics'
+                metrics_params: '-u rebaseline -p metrics/$CIRCLE_JOB-metrics.json'
+      - when:
+          condition: << parameters.binary_size >>
           steps:
             - attach_workspace:
                 at: workspace
             - next-metrics:
-                step_name: 'Binary Size Metrics'
-                metrics_params: '-p metrics/binary-size.json'
-      - when:
-          condition: << parameters.memory_metrics >>
-          steps:
-            - next-metrics:
-                step_name: 'Memory Metrics'
-                metrics_params: 'render-tests -u rebaseline -p metrics/$CIRCLE_JOB-probe-memory.json'
-      - when:
-          condition: << parameters.gfx_and_network_metrics >>
-          steps:
-            - next-metrics:
-                step_name: 'GFX and Network Metrics'
-                metrics_params: 'render-tests -u rebaseline -p metrics/$CIRCLE_JOB-probe-gfx-network.json'
+                step_name: 'Binary Size'
+                metrics_params: '-u rebaseline -p metrics/binary-size.json'
       - next-save
 # ------------------------------------------------------------------------------
   node-linux-release:
