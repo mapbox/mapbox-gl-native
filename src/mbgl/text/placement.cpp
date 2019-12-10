@@ -562,9 +562,15 @@ void Placement::placeBucket(const SymbolBucket& bucket,
                                                                          symbolInstances.end());
         optional<style::TextVariableAnchorType> variableAnchor;
         if (!variableTextAnchors.empty()) variableAnchor = variableTextAnchors.front();
+        std::unordered_map<uint32_t, bool> sortedCache;
+        sortedCache.reserve(sorted.size());
 
         auto intersectsTileBorder = [&](const SymbolInstance& symbol) -> bool {
-            if (symbol.textCollisionFeature.boxes.empty()) return false;
+            if (symbol.textCollisionFeature.alongLine || symbol.textCollisionFeature.boxes.empty()) return false;
+
+            auto it = sortedCache.find(symbol.crossTileID);
+            if (it != sortedCache.end()) return it->second;
+
             Point<float> offset{};
             if (variableAnchor) {
                 const CollisionBox& textBox = symbol.textCollisionFeature.boxes.front();
@@ -579,8 +585,10 @@ void Placement::placeBucket(const SymbolBucket& bucket,
                                                        pitchWithMap,
                                                        state.getBearing());
             }
-            return collisionIndex.featureIntersectsTileBorders(
+            bool result = collisionIndex.featureIntersectsTileBorders(
                 symbol.textCollisionFeature, offset, posMatrix, pixelRatio, *tileBorders);
+            sortedCache.insert(std::make_pair(symbol.crossTileID, result));
+            return result;
         };
 
         std::stable_sort(sorted.begin(), sorted.end(), [&](const SymbolInstance& a, const SymbolInstance& b) {
