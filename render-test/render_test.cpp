@@ -245,7 +245,7 @@ int runRenderTests(int argc, char** argv, std::function<void()> testStatus) {
         printf(ANSI_COLOR_RED "%u errored (%.1lf%%)" ANSI_COLOR_RESET "\n", stats.erroredTests, 100.0 * stats.erroredTests / count);
     }
 
-    printf("Results at: %s\n", resultPath.c_str());
+    printf("Results at: %s\n", mbgl::filesystem::canonical(resultPath).c_str());
 
     return stats.failedTests + stats.erroredTests == 0 ? 0 : 1;
 }
