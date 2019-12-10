@@ -45,9 +45,7 @@ Image::Impl::Impl(std::string id_,
       sdf(sdf_),
       stretchX(std::move(stretchX_)),
       stretchY(std::move(stretchY_)),
-      content(content_
-                  ? std::move(*content_)
-                  : ImageContent{0, 0, static_cast<float>(image.size.width), static_cast<float>(image.size.height)}) {
+      content(std::move(content_)) {
     if (!image.valid()) {
         throw util::StyleImageException("dimensions may not be zero");
     } else if (pixelRatio <= 0) {
@@ -56,7 +54,7 @@ Image::Impl::Impl(std::string id_,
         throw util::StyleImageException("stretchX is out of bounds or overlapping");
     } else if (!validateStretch(stretchY, image.size.height)) {
         throw util::StyleImageException("stretchY is out of bounds or overlapping");
-    } else if (!validateContent(content, image.size)) {
+    } else if (content && !validateContent(*content, image.size)) {
         throw util::StyleImageException("content area is invalid");
     }
 }

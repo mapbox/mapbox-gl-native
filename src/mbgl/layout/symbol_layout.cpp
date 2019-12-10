@@ -555,9 +555,10 @@ void SymbolLayout::addFeature(const std::size_t layoutFeatureIndex,
     IndexedSubfeature indexedFeature(feature.index, sourceLayer->getName(), bucketLeaderID, symbolInstances.size());
 
     const auto iconTextFit = evaluatedLayoutProperties.get<style::IconTextFit>();
+    const bool hasIconTextFit = iconTextFit != IconTextFitType::None;
     // Adjust shaped icon size when icon-text-fit is used.
     optional<PositionedIcon> verticallyShapedIcon;
-    if (shapedIcon && iconTextFit != IconTextFitType::None) {
+    if (shapedIcon && hasIconTextFit) {
         // Create vertically shaped icon for vertical writing mode if needed.
         if (allowVerticalPlacement && shapedTextOrientations.vertical) {
             verticallyShapedIcon = shapedIcon;
@@ -602,6 +603,7 @@ void SymbolLayout::addFeature(const std::size_t layoutFeatureIndex,
                                                           imageMap,
                                                           iconRotation,
                                                           iconType,
+                                                          hasIconTextFit,
                                                           allowVerticalPlacement);
     };
 

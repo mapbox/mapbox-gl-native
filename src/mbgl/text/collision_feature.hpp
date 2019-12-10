@@ -79,7 +79,19 @@ public:
                      const IndexedSubfeature& indexedFeature_,
                      const float overscaling,
                      const float rotate)
-        : CollisionFeature(line, anchor, shapedText.top, shapedText.bottom, shapedText.left, shapedText.right, boxScale, padding, placement, indexedFeature_, overscaling, rotate) {}
+        : CollisionFeature(line,
+                           anchor,
+                           shapedText.top,
+                           shapedText.bottom,
+                           shapedText.left,
+                           shapedText.right,
+                           nullopt,
+                           boxScale,
+                           padding,
+                           placement,
+                           indexedFeature_,
+                           overscaling,
+                           rotate) {}
 
     // for icons
     // Icons collision features are always SymbolPlacementType::Point, which means the collision feature
@@ -94,15 +106,19 @@ public:
                      const float padding,
                      const IndexedSubfeature& indexedFeature_,
                      const float rotate)
-        : CollisionFeature(line, anchor,
+        : CollisionFeature(line,
+                           anchor,
                            (shapedIcon ? shapedIcon->top() : 0),
                            (shapedIcon ? shapedIcon->bottom() : 0),
                            (shapedIcon ? shapedIcon->left() : 0),
                            (shapedIcon ? shapedIcon->right() : 0),
+                           (shapedIcon ? shapedIcon->collisionPadding() : optional<Padding>{nullopt}),
                            boxScale,
                            padding,
                            style::SymbolPlacementType::Point,
-                           indexedFeature_, 1, rotate) {}
+                           indexedFeature_,
+                           1,
+                           rotate) {}
 
     CollisionFeature(const GeometryCoordinates& line,
                      const Anchor&,
@@ -110,6 +126,7 @@ public:
                      const float bottom,
                      const float left,
                      const float right,
+                     const optional<Padding>& collisionPadding,
                      const float boxScale,
                      const float padding,
                      const style::SymbolPlacementType,

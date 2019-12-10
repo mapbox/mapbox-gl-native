@@ -79,7 +79,17 @@ PositionedIcon PositionedIcon::shapeIcon(const ImagePosition& image,
     float top = dy - image.displaySize()[1] * anchorAlign.verticalAlign;
     float bottom = top + image.displaySize()[1];
 
-    return PositionedIcon{image, top, bottom, left, right};
+    Padding collisionPadding;
+    if (image.content) {
+        auto& content = *image.content;
+        const auto pixelRatio = image.pixelRatio;
+        collisionPadding.left = content.left / pixelRatio;
+        collisionPadding.top = content.top / pixelRatio;
+        collisionPadding.right = image.displaySize()[0] - content.right / pixelRatio;
+        collisionPadding.bottom = image.displaySize()[1] - content.bottom / pixelRatio;
+    }
+
+    return PositionedIcon{image, top, bottom, left, right, collisionPadding};
 }
 
 void PositionedIcon::fitIconToText(const Shaping& shapedText,

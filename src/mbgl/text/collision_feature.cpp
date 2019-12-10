@@ -10,20 +10,27 @@ CollisionFeature::CollisionFeature(const GeometryCoordinates& line,
                                    const float bottom,
                                    const float left,
                                    const float right,
+                                   const optional<Padding>& collisionPadding,
                                    const float boxScale,
                                    const float padding,
                                    const style::SymbolPlacementType placement,
                                    IndexedSubfeature indexedFeature_,
                                    const float overscaling,
                                    const float rotate)
-        : indexedFeature(std::move(indexedFeature_))
-        , alongLine(placement != style::SymbolPlacementType::Point) {
+    : indexedFeature(std::move(indexedFeature_)), alongLine(placement != style::SymbolPlacementType::Point) {
     if (top == 0 && bottom == 0 && left == 0 && right == 0) return;
 
-    const float y1 = top * boxScale - padding;
-    const float y2 = bottom * boxScale + padding;
-    const float x1 = left * boxScale - padding;
-    const float x2 = right * boxScale + padding;
+    float y1 = top * boxScale - padding;
+    float y2 = bottom * boxScale + padding;
+    float x1 = left * boxScale - padding;
+    float x2 = right * boxScale + padding;
+
+    if (collisionPadding) {
+        x1 -= collisionPadding->left * boxScale;
+        y1 -= collisionPadding->top * boxScale;
+        x2 += collisionPadding->right * boxScale;
+        y2 += collisionPadding->bottom * boxScale;
+    }
 
     if (alongLine) {
         float height = y2 - y1;

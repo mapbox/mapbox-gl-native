@@ -26,7 +26,7 @@ public:
     uint32_t version;
     style::ImageStretches stretchX;
     style::ImageStretches stretchY;
-    style::ImageContent content;
+    optional<style::ImageContent> content;
 
     std::array<uint16_t, 2> tl() const {
         return {{static_cast<uint16_t>(paddedRect.x + padding), static_cast<uint16_t>(paddedRect.y + padding)}};
