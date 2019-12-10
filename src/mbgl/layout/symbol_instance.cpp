@@ -31,10 +31,9 @@ SymbolInstanceSharedData::SymbolInstanceSharedData(GeometryCoordinates line_,
     : line(std::move(line_)) {
     // Create the quads used for rendering the icon and glyphs.
     if (shapedIcon) {
-        iconQuads = getIconQuads(*shapedIcon, getAnyShaping(shapedTextOrientations).writingMode, iconType);
+        iconQuads = getIconQuads(*shapedIcon, iconType);
         if (verticallyShapedIcon) {
-            verticalIconQuads =
-                getIconQuads(*verticallyShapedIcon, shapedTextOrientations.vertical.writingMode, iconType);
+            verticalIconQuads = getIconQuads(*verticallyShapedIcon, iconType);
         }
     }
 
