@@ -24,6 +24,9 @@ public:
     float pixelRatio;
     Rect<uint16_t> textureRect;
     uint32_t version;
+    style::ImageStretches stretchX;
+    style::ImageStretches stretchY;
+    style::ImageContent content;
 
     std::array<uint16_t, 2> tl() const {
         return {{
