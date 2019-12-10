@@ -63,7 +63,10 @@ ArgumentsTuple parseArguments(int argc, char** argv) {
     args::MapFlag<std::string, TestRunner::UpdateResults> testUpdateResultsValue(
         argumentParser,
         "update",
-        "Test results update mode. Supported values are: \"default\", \"platform\", \"metrics\"",
+        "Test results update mode. Supported values are: \n\"default\" Updates generic render test expectations. \
+                                                         \n\"platform\" Updates platform specific render test expectations. \
+                                                         \n\"metrics\" Updates expected metrics for configuration defined by a manifest.\
+                                                         \n\"rebaseline\" Updates or creates expected metrics for configuration defined by a manifest.",
         {'u', "update"},
         updateResultsFlags);
 
