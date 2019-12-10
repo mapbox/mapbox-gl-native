@@ -14,7 +14,7 @@ namespace mbgl {
 
 using namespace style;
 
-SymbolQuads getIconQuads(const PositionedIcon& shapedIcon, SymbolContent iconType) {
+SymbolQuads getIconQuads(const PositionedIcon& shapedIcon, const float iconRotate, const SymbolContent iconType) {
     const ImagePosition& image = shapedIcon.image();
 
     // If you have a 10px icon that isn't perfectly aligned to the pixel grid it will cover 11 actual
@@ -42,7 +42,7 @@ SymbolQuads getIconQuads(const PositionedIcon& shapedIcon, SymbolContent iconTyp
     Point<float> br{right, bottom};
     Point<float> bl{left, bottom};
 
-    const float angle = shapedIcon.angle();
+    const float angle = iconRotate * util::DEG2RAD;
 
     if (angle) {
         // Compute the transformation matrix.
