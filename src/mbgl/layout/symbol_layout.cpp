@@ -474,8 +474,7 @@ void SymbolLayout::prepareSymbols(const GlyphMap& glyphMap,
                 iconType = SymbolContent::IconRGBA;
                 shapedIcon = PositionedIcon::shapeIcon(imagePositions.at(feature.icon->id()),
                                                        layout->evaluate<IconOffset>(zoom, feature),
-                                                       layout->evaluate<IconAnchor>(zoom, feature),
-                                                       layout->evaluate<IconRotate>(zoom, feature) * util::DEG2RAD);
+                                                       layout->evaluate<IconAnchor>(zoom, feature));
                 if (image->second->sdf) {
                     iconType = SymbolContent::IconSDF;
                 }
@@ -601,6 +600,7 @@ void SymbolLayout::addFeature(const std::size_t layoutFeatureIndex,
                                                           textPlacement,
                                                           textOffset,
                                                           imageMap,
+                                                          iconRotation,
                                                           iconType,
                                                           allowVerticalPlacement);
     };

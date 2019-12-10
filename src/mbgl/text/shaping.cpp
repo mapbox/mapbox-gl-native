@@ -70,8 +70,7 @@ style::TextJustifyType getAnchorJustification(style::SymbolAnchorType anchor) {
 
 PositionedIcon PositionedIcon::shapeIcon(const ImagePosition& image,
                                          const std::array<float, 2>& iconOffset,
-                                         style::SymbolAnchorType iconAnchor,
-                                         const float iconRotation) {
+                                         style::SymbolAnchorType iconAnchor) {
     AnchorAlignment anchorAlign = AnchorAlignment::getAnchorAlignment(iconAnchor);
     float dx = iconOffset[0];
     float dy = iconOffset[1];
@@ -80,7 +79,7 @@ PositionedIcon PositionedIcon::shapeIcon(const ImagePosition& image,
     float top = dy - image.displaySize()[1] * anchorAlign.verticalAlign;
     float bottom = top + image.displaySize()[1];
 
-    return PositionedIcon { image, top, bottom, left, right, iconRotation };
+    return PositionedIcon{image, top, bottom, left, right};
 }
 
 void PositionedIcon::fitIconToText(const Shaping& shapedText,

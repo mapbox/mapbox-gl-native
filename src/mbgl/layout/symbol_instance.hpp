@@ -32,6 +32,7 @@ struct SymbolInstanceSharedData {
                              const style::SymbolPlacementType textPlacement,
                              const std::array<float, 2>& textOffset,
                              const ImageMap& imageMap,
+                             float iconRotation,
                              SymbolContent iconType,
                              bool allowVerticalPlacement);
     bool empty() const;

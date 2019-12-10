@@ -24,6 +24,7 @@ SymbolInstance makeSymbolInstance(float x, float y, std::u16string key) {
                                                                  placementType,
                                                                  textOffset,
                                                                  imageMap,
+                                                                 0,
                                                                  SymbolContent::IconSDF,
                                                                  false);
     return SymbolInstance(anchor, std::move(sharedData), shaping, nullopt, nullopt, 0, 0, placementType, textOffset, 0, 0, iconOffset, subfeature, 0, 0, key, 0.0f, 0.0f, 0.0f, variableTextOffset, false);
