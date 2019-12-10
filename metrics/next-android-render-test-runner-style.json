@@ -1,0 +1,20 @@
+{
+    "asset_path": "../mapbox-gl-js/test/integration",
+    "base_test_path": "../mapbox-gl-js/test/integration",
+    "expectation_paths": [
+        "expectations/platform-all",
+        "expectations/platform-android"
+    ],
+    "ignore_paths": [
+        "ignores/platform-all.json",
+        "ignores/platform-linux.json",
+        "ignores/platform-android.json"
+    ],
+    "metric_path": "next-android-render-test-runner",
+    "probes": [
+        "probeGFX",
+        "probeNetwork"
+    ],
+    "result_path": "/sdcard",
+    "vendor_path": "../vendor"
+}

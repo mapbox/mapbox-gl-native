@@ -1,0 +1,17 @@
+{
+    "asset_path": "../mapbox-gl-js/test/integration",
+    "base_test_path": "../mapbox-gl-js/test/integration",
+    "expectation_paths": [
+        "expectations/platform-all"
+    ],
+    "ignore_paths": [
+        "ignores/platform-all.json",
+        "ignores/platform-linux.json"
+    ],
+    "metric_path": "next-linux-gcc8-release",
+    "probes": [
+        "probeGFX",
+        "probeNetwork"
+    ],
+    "vendor_path": "../vendor"
+}

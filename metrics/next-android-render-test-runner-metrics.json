@@ -1,0 +1,19 @@
+{
+    "base_test_path": "tests",
+    "expectation_paths": [
+        "expectations/platform-all",
+        "expectations/platform-android"
+    ],
+    "ignore_paths": [
+        "ignores/platform-all.json",
+        "ignores/platform-linux.json",
+        "ignores/platform-android.json"
+    ],
+    "metric_path": "next-android-render-test-runner",
+    "probes": [
+        "probeGFX",
+        "probeMemory",
+        "probeNetwork"
+    ],
+    "result_path": "/sdcard"
+}

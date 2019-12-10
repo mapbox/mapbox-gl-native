@@ -1,0 +1,12 @@
+{
+    "asset_path": "../mapbox-gl-js/test/integration",
+    "base_test_path": "../mapbox-gl-js/test/integration",
+    "expectation_paths": [
+        "expectations/platform-all"
+    ],
+    "ignore_paths": [
+        "ignores/platform-all.json",
+        "ignores/platform-macos.json"
+    ],
+    "vendor_path": "../vendor"
+}

@@ -283,8 +283,8 @@ void android_main(struct android_app* app) {
             return result;
         };
 
-        auto result = runTestWithManifest("/android-manifest-probe-network-gfx.json");
-        result = runTestWithManifest("/android-manifest-probe-memory.json") && result;
+        auto result = runTestWithManifest("/metrics/next-android-render-test-runner-metrics.json");
+        result = runTestWithManifest("/metrics/next-android-render-test-runner-style.json") && result;
         mbgl::Log::Info(mbgl::Event::General, "All tests are finished!");
         changeState(env, app, result);
     }

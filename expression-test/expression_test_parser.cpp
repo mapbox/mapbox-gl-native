@@ -360,7 +360,7 @@ std::tuple<filesystem::path, std::vector<filesystem::path>, bool, uint32_t> pars
 
 Ignores parseExpressionIgnores() {
     Ignores ignores;
-    const auto mainIgnoresPath = filesystem::path(TEST_RUNNER_ROOT_PATH).append("platform/node/test/ignores.json");
+    const auto mainIgnoresPath = filesystem::path(TEST_RUNNER_ROOT_PATH).append("metrics/ignores/platform-all.json");
     auto maybeIgnores = readJson(mainIgnoresPath);
     if (!maybeIgnores.is<JSDocument>()) { // NOLINT
         return {};
