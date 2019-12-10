@@ -14,7 +14,7 @@ namespace mbgl {
 
 using namespace style;
 
-SymbolQuads getIconQuads(const PositionedIcon& shapedIcon, WritingModeType writingMode, SymbolContent iconType) {
+SymbolQuads getIconQuads(const PositionedIcon& shapedIcon, SymbolContent iconType) {
     const ImagePosition& image = shapedIcon.image();
 
     // If you have a 10px icon that isn't perfectly aligned to the pixel grid it will cover 11 actual
@@ -65,7 +65,7 @@ SymbolQuads getIconQuads(const PositionedIcon& shapedIcon, WritingModeType writi
                        bl,
                        br,
                        image.paddedRect,
-                       writingMode,
+                       WritingModeType::None,
                        {0.0f, 0.0f},
                        iconType == SymbolContent::IconSDF,
                        pixelOffsetTL,
