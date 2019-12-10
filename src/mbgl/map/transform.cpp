@@ -90,7 +90,7 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
         // reuse flyTo, without exaggerated animation, to achieve constant ground speed.
         return flyTo(camera, animation, true);
     }
-    const EdgeInsets& padding = camera.padding.value_or(state.getEdgeInsets());
+    const EdgeInsets& padding = camera.padding.value_or(mbgl::EdgeInsets());
     LatLng startLatLng = getLatLng(LatLng::Unwrapped);
     const LatLng& unwrappedLatLng = camera.center.value_or(startLatLng);
     const LatLng& latLng = state.getLatLngBounds() != LatLngBounds() ? unwrappedLatLng : unwrappedLatLng.wrapped();
