@@ -28,13 +28,14 @@ SymbolInstanceSharedData::SymbolInstanceSharedData(GeometryCoordinates line_,
                                                    const ImageMap& imageMap,
                                                    float iconRotation,
                                                    SymbolContent iconType,
+                                                   bool hasIconTextFit,
                                                    bool allowVerticalPlacement)
     : line(std::move(line_)) {
     // Create the quads used for rendering the icon and glyphs.
     if (shapedIcon) {
-        iconQuads = getIconQuads(*shapedIcon, iconRotation, iconType);
+        iconQuads = getIconQuads(*shapedIcon, iconRotation, iconType, hasIconTextFit);
         if (verticallyShapedIcon) {
-            verticalIconQuads = getIconQuads(*verticallyShapedIcon, iconRotation, iconType);
+            verticalIconQuads = getIconQuads(*verticallyShapedIcon, iconRotation, iconType, hasIconTextFit);
         }
     }
 

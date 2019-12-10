@@ -65,7 +65,7 @@ public:
     const ImageStretches& getStretchY() const;
 
     // The space where text can be fit into this image.
-    const ImageContent& getContent() const;
+    const optional<ImageContent>& getContent() const;
 
     class Impl;
     Immutable<Impl> baseImpl;

@@ -34,6 +34,7 @@ struct SymbolInstanceSharedData {
                              const ImageMap& imageMap,
                              float iconRotation,
                              SymbolContent iconType,
+                             bool hasIconTextFit,
                              bool allowVerticalPlacement);
     bool empty() const;
     GeometryCoordinates line;

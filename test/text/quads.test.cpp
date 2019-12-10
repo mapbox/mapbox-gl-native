@@ -22,18 +22,18 @@ TEST(getIconQuads, normal) {
 
     GeometryCoordinates line;
 
-    SymbolQuads quads = getIconQuads(shapedIcon, 0, SymbolContent::IconRGBA);
+    SymbolQuads quads = getIconQuads(shapedIcon, 0, SymbolContent::IconRGBA, false);
 
     ASSERT_EQ(quads.size(), 1);
     const auto& quad = quads[0];
-    EXPECT_EQ(quad.tl.x, -14);
-    EXPECT_EQ(quad.tl.y, -10);
-    EXPECT_EQ(quad.tr.x, 1);
-    EXPECT_EQ(quad.tr.y, -10);
-    EXPECT_EQ(quad.bl.x, -14);
-    EXPECT_EQ(quad.bl.y, 1);
-    EXPECT_EQ(quad.br.x, 1);
-    EXPECT_EQ(quad.br.y, 1);
+    EXPECT_FLOAT_EQ(quad.tl.x, -14);
+    EXPECT_FLOAT_EQ(quad.tl.y, -10);
+    EXPECT_FLOAT_EQ(quad.tr.x, 1);
+    EXPECT_FLOAT_EQ(quad.tr.y, -10);
+    EXPECT_FLOAT_EQ(quad.bl.x, -14);
+    EXPECT_FLOAT_EQ(quad.bl.y, 1);
+    EXPECT_FLOAT_EQ(quad.br.x, 1);
+    EXPECT_FLOAT_EQ(quad.br.y, 1);
 }
 
 TEST(getIconQuads, style) {
@@ -62,7 +62,7 @@ TEST(getIconQuads, style) {
         EXPECT_FLOAT_EQ(-18.5f, shapedIcon.left());
 
         SymbolLayoutProperties::Evaluated layout;
-        SymbolQuads quads = getIconQuads(shapedIcon, 0, SymbolContent::IconRGBA);
+        SymbolQuads quads = getIconQuads(shapedIcon, 0, SymbolContent::IconRGBA, false);
 
         ASSERT_EQ(quads.size(), 1);
         const auto& quad = quads[0];
@@ -81,7 +81,7 @@ TEST(getIconQuads, style) {
     {
         auto shapedIcon = PositionedIcon::shapeIcon(image, {{-9.5f, -9.5f}}, SymbolAnchorType::Center);
         shapedIcon.fitIconToText(shapedText, IconTextFitType::Width, {{0, 0, 0, 0}}, {{0, 0}}, 24.0f / 24.0f);
-        SymbolQuads quads = getIconQuads(shapedIcon, 0, SymbolContent::IconRGBA);
+        SymbolQuads quads = getIconQuads(shapedIcon, 0, SymbolContent::IconRGBA, false);
 
         ASSERT_EQ(quads.size(), 1);
         const auto& quad = quads[0];
@@ -100,7 +100,7 @@ TEST(getIconQuads, style) {
     {
         auto shapedIcon = PositionedIcon::shapeIcon(image, {{-9.5f, -9.5f}}, SymbolAnchorType::Center);
         shapedIcon.fitIconToText(shapedText, IconTextFitType::Width, {{0, 0, 0, 0}}, {{0, 0}}, 12.0f / 24.0f);
-        SymbolQuads quads = getIconQuads(shapedIcon, 0, SymbolContent::IconRGBA);
+        SymbolQuads quads = getIconQuads(shapedIcon, 0, SymbolContent::IconRGBA, false);
 
         ASSERT_EQ(quads.size(), 1);
         const auto& quad = quads[0];
@@ -119,7 +119,7 @@ TEST(getIconQuads, style) {
     {
         auto shapedIcon = PositionedIcon::shapeIcon(image, {{-9.5f, -9.5f}}, SymbolAnchorType::Center);
         shapedIcon.fitIconToText(shapedText, IconTextFitType::Width, {{5, 10, 5, 10}}, {{0, 0}}, 12.0f / 24.0f);
-        SymbolQuads quads = getIconQuads(shapedIcon, 0, SymbolContent::IconRGBA);
+        SymbolQuads quads = getIconQuads(shapedIcon, 0, SymbolContent::IconRGBA, false);
 
         ASSERT_EQ(quads.size(), 1);
         const auto& quad = quads[0];
@@ -138,7 +138,7 @@ TEST(getIconQuads, style) {
     {
         auto shapedIcon = PositionedIcon::shapeIcon(image, {{-9.5f, -9.5f}}, SymbolAnchorType::Center);
         shapedIcon.fitIconToText(shapedText, IconTextFitType::Height, {{0, 0, 0, 0}}, {{0, 0}}, 24.0f / 24.0f);
-        SymbolQuads quads = getIconQuads(shapedIcon, 0, SymbolContent::IconRGBA);
+        SymbolQuads quads = getIconQuads(shapedIcon, 0, SymbolContent::IconRGBA, false);
 
         ASSERT_EQ(quads.size(), 1);
         const auto& quad = quads[0];
@@ -158,7 +158,7 @@ TEST(getIconQuads, style) {
         SymbolLayoutProperties::Evaluated layout;
         auto shapedIcon = PositionedIcon::shapeIcon(image, {{-9.5f, -9.5f}}, SymbolAnchorType::Center);
         shapedIcon.fitIconToText(shapedText, IconTextFitType::Height, {{0, 0, 0, 0}}, {{0, 0}}, 12.0f / 24.0f);
-        SymbolQuads quads = getIconQuads(shapedIcon, 0, SymbolContent::IconRGBA);
+        SymbolQuads quads = getIconQuads(shapedIcon, 0, SymbolContent::IconRGBA, false);
 
         ASSERT_EQ(quads.size(), 1);
         const auto& quad = quads[0];
@@ -177,7 +177,7 @@ TEST(getIconQuads, style) {
     {
         auto shapedIcon = PositionedIcon::shapeIcon(image, {{-9.5f, -9.5f}}, SymbolAnchorType::Center);
         shapedIcon.fitIconToText(shapedText, IconTextFitType::Height, {{5, 10, 5, 20}}, {{0, 0}}, 12.0f / 24.0f);
-        SymbolQuads quads = getIconQuads(shapedIcon, 0, SymbolContent::IconRGBA);
+        SymbolQuads quads = getIconQuads(shapedIcon, 0, SymbolContent::IconRGBA, false);
 
         ASSERT_EQ(quads.size(), 1);
         const auto& quad = quads[0];
@@ -196,7 +196,7 @@ TEST(getIconQuads, style) {
     {
         auto shapedIcon = PositionedIcon::shapeIcon(image, {{-9.5f, -9.5f}}, SymbolAnchorType::Center);
         shapedIcon.fitIconToText(shapedText, IconTextFitType::Both, {{0, 0, 0, 0}}, {{0, 0}}, 24.0f / 24.0f);
-        SymbolQuads quads = getIconQuads(shapedIcon, 0, SymbolContent::IconRGBA);
+        SymbolQuads quads = getIconQuads(shapedIcon, 0, SymbolContent::IconRGBA, false);
 
         ASSERT_EQ(quads.size(), 1);
         const auto& quad = quads[0];
@@ -215,7 +215,7 @@ TEST(getIconQuads, style) {
     {
         auto shapedIcon = PositionedIcon::shapeIcon(image, {{-9.5f, -9.5f}}, SymbolAnchorType::Center);
         shapedIcon.fitIconToText(shapedText, IconTextFitType::Both, {{0, 0, 0, 0}}, {{0, 0}}, 12.0f / 24.0f);
-        SymbolQuads quads = getIconQuads(shapedIcon, 0, SymbolContent::IconRGBA);
+        SymbolQuads quads = getIconQuads(shapedIcon, 0, SymbolContent::IconRGBA, false);
 
         ASSERT_EQ(quads.size(), 1);
         const auto& quad = quads[0];
@@ -234,7 +234,7 @@ TEST(getIconQuads, style) {
     {
         auto shapedIcon = PositionedIcon::shapeIcon(image, {{-9.5f, -9.5f}}, SymbolAnchorType::Center);
         shapedIcon.fitIconToText(shapedText, IconTextFitType::Both, {{5, 10, 5, 10}}, {{0, 0}}, 12.0f / 24.0f);
-        SymbolQuads quads = getIconQuads(shapedIcon, 0, SymbolContent::IconRGBA);
+        SymbolQuads quads = getIconQuads(shapedIcon, 0, SymbolContent::IconRGBA, false);
 
         ASSERT_EQ(quads.size(), 1);
         const auto& quad = quads[0];
@@ -255,7 +255,7 @@ TEST(getIconQuads, style) {
         layout.get<TextSize>() = 12.0f;
         auto shapedIcon = PositionedIcon::shapeIcon(image, {{-9.5f, -9.5f}}, SymbolAnchorType::Center);
         shapedIcon.fitIconToText(shapedText, IconTextFitType::Both, {{0, 5, 10, 15}}, {{0, 0}}, 12.0f / 24.0f);
-        SymbolQuads quads = getIconQuads(shapedIcon, 0, SymbolContent::IconRGBA);
+        SymbolQuads quads = getIconQuads(shapedIcon, 0, SymbolContent::IconRGBA, false);
 
         ASSERT_EQ(quads.size(), 1);
         const auto& quad = quads[0];

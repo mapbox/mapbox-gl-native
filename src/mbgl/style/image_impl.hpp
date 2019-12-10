@@ -34,7 +34,7 @@ public:
     const ImageStretches stretchY;
 
     // The space where text can be fit into this image.
-    const ImageContent content;
+    const optional<ImageContent> content;
 };
 
 } // namespace style

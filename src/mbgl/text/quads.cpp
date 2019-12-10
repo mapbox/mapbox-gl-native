@@ -1,5 +1,6 @@
 #include <mbgl/geometry/anchor.hpp>
 #include <mbgl/layout/symbol_instance.hpp>
+#include <mbgl/math/minmax.hpp>
 #include <mbgl/style/layers/symbol_layer_properties.hpp>
 #include <mbgl/text/quads.hpp>
 #include <mbgl/text/shaping.hpp>
@@ -14,63 +15,184 @@ namespace mbgl {
 
 using namespace style;
 
-SymbolQuads getIconQuads(const PositionedIcon& shapedIcon, const float iconRotate, const SymbolContent iconType) {
+constexpr const auto border = ImagePosition::padding;
+
+float computeStretchSum(const ImageStretches& stretches) {
+    float sum = 0;
+    for (auto& stretch : stretches) {
+        sum += stretch.second - stretch.first;
+    }
+    return sum;
+}
+
+float sumWithinRange(const ImageStretches& stretches, const float min, const float max) {
+    float sum = 0;
+    for (auto& stretch : stretches) {
+        sum += util::max(min, util::min(max, stretch.second)) - util::max(min, util::min(max, stretch.first));
+    }
+    return sum;
+}
+
+inline float getEmOffset(float stretchOffset, float stretchSize, float iconSize, float iconOffset) {
+    return iconOffset + iconSize * stretchOffset / stretchSize;
+}
+
+inline float getPxOffset(float fixedOffset, float fixedSize, float stretchOffset, float stretchSize) {
+    return fixedOffset - fixedSize * stretchOffset / stretchSize;
+}
+
+struct Cut {
+    float fixed;
+    float stretch;
+};
+
+using Cuts = std::vector<Cut>;
+
+Cuts stretchZonesToCuts(const ImageStretches& stretchZones, const float fixedSize, const float stretchSize) {
+    Cuts cuts{{-border, 0}};
+
+    for (auto& zone : stretchZones) {
+        const auto c1 = zone.first;
+        const auto c2 = zone.second;
+        const auto lastStretch = cuts.back().stretch;
+        cuts.emplace_back(Cut{c1 - lastStretch, lastStretch});
+        cuts.emplace_back(Cut{c1 - lastStretch, lastStretch + (c2 - c1)});
+    }
+    cuts.emplace_back(Cut{fixedSize + border, stretchSize});
+    return cuts;
+}
+
+SymbolQuads getIconQuads(const PositionedIcon& shapedIcon,
+                         const float iconRotate,
+                         const SymbolContent iconType,
+                         const bool hasIconTextFit) {
+    SymbolQuads quads;
+
     const ImagePosition& image = shapedIcon.image();
+    const float pixelRatio = image.pixelRatio;
+    const uint16_t imageWidth = image.paddedRect.w - 2 * border;
+    const uint16_t imageHeight = image.paddedRect.h - 2 * border;
 
-    // If you have a 10px icon that isn't perfectly aligned to the pixel grid it will cover 11 actual
-    // pixels. The quad needs to be padded to account for this, otherwise they'll look slightly clipped
-    // on one edge in some cases.
-    constexpr auto border = ImagePosition::padding;
-
-    // Expand the box to respect the 1 pixel border in the atlas image. We're using `image.paddedRect - border`
-    // instead of image.displaySize because we only pad with one pixel for retina images as well, and the
-    // displaySize uses the logical dimensions, not the physical pixel dimensions.
-    // Unlike the JavaScript version, we're _not_ including the padding in the texture rect, so the
-    // logic "dimension * padded / non-padded - dimension" is swapped.
     const float iconWidth = shapedIcon.right() - shapedIcon.left();
-    const float expandX = (iconWidth * image.paddedRect.w / (image.paddedRect.w - 2 * border) - iconWidth) / 2.0f;
-    const float left = shapedIcon.left() - expandX;
-    const float right = shapedIcon.right() + expandX;
-
     const float iconHeight = shapedIcon.bottom() - shapedIcon.top();
-    const float expandY = (iconHeight * image.paddedRect.h / (image.paddedRect.h - 2 * border) - iconHeight) / 2.0f;
-    const float top = shapedIcon.top() - expandY;
-    const float bottom = shapedIcon.bottom() + expandY;
 
-    Point<float> tl{left, top};
-    Point<float> tr{right, top};
-    Point<float> br{right, bottom};
-    Point<float> bl{left, bottom};
+    const ImageStretches stretchXFull{{0, imageWidth}};
+    const ImageStretches stretchYFull{{0, imageHeight}};
+    const ImageStretches& stretchX = !image.stretchX.empty() ? image.stretchX : stretchXFull;
+    const ImageStretches& stretchY = !image.stretchY.empty() ? image.stretchY : stretchYFull;
 
-    const float angle = iconRotate * util::DEG2RAD;
+    const float stretchWidth = computeStretchSum(stretchX);
+    const float stretchHeight = computeStretchSum(stretchY);
+    const float fixedWidth = imageWidth - stretchWidth;
+    const float fixedHeight = imageHeight - stretchHeight;
 
-    if (angle) {
-        // Compute the transformation matrix.
-        float angle_sin = std::sin(angle);
-        float angle_cos = std::cos(angle);
-        std::array<float, 4> matrix = {{angle_cos, -angle_sin, angle_sin, angle_cos}};
+    float stretchOffsetX = 0;
+    float stretchContentWidth = stretchWidth;
+    float stretchOffsetY = 0;
+    float stretchContentHeight = stretchHeight;
+    float fixedOffsetX = 0;
+    float fixedContentWidth = fixedWidth;
+    float fixedOffsetY = 0;
+    float fixedContentHeight = fixedHeight;
 
-        tl = util::matrixMultiply(matrix, tl);
-        tr = util::matrixMultiply(matrix, tr);
-        bl = util::matrixMultiply(matrix, bl);
-        br = util::matrixMultiply(matrix, br);
+    if (hasIconTextFit && image.content) {
+        auto& content = *image.content;
+        stretchOffsetX = sumWithinRange(stretchX, 0, content.left);
+        stretchOffsetY = sumWithinRange(stretchY, 0, content.top);
+        stretchContentWidth = sumWithinRange(stretchX, content.left, content.right);
+        stretchContentHeight = sumWithinRange(stretchY, content.top, content.bottom);
+        fixedOffsetX = content.left - stretchOffsetX;
+        fixedOffsetY = content.top - stretchOffsetY;
+        fixedContentWidth = content.right - content.left - stretchContentWidth;
+        fixedContentHeight = content.bottom - content.top - stretchContentHeight;
     }
 
-    Point<float> pixelOffsetTL;
-    Point<float> pixelOffsetBR;
-    Point<float> minFontScale;
+    optional<std::array<float, 4>> matrix{nullopt};
+    if (iconRotate) {
+        const float angle = iconRotate * util::DEG2RAD;
+        const float angle_sin = std::sin(angle);
+        const float angle_cos = std::cos(angle);
+        matrix = std::array<float, 4>{{angle_cos, -angle_sin, angle_sin, angle_cos}};
+    }
 
-    return {SymbolQuad{tl,
-                       tr,
-                       bl,
-                       br,
-                       image.paddedRect,
-                       WritingModeType::None,
-                       {0.0f, 0.0f},
-                       iconType == SymbolContent::IconSDF,
-                       pixelOffsetTL,
-                       pixelOffsetBR,
-                       minFontScale}};
+    auto makeBox = [&](Cut left, Cut top, Cut right, Cut bottom) {
+        const float leftEm =
+            getEmOffset(left.stretch - stretchOffsetX, stretchContentWidth, iconWidth, shapedIcon.left());
+        const float leftPx = getPxOffset(left.fixed - fixedOffsetX, fixedContentWidth, left.stretch, stretchWidth);
+
+        const float topEm =
+            getEmOffset(top.stretch - stretchOffsetY, stretchContentHeight, iconHeight, shapedIcon.top());
+        const float topPx = getPxOffset(top.fixed - fixedOffsetY, fixedContentHeight, top.stretch, stretchHeight);
+
+        const float rightEm =
+            getEmOffset(right.stretch - stretchOffsetX, stretchContentWidth, iconWidth, shapedIcon.left());
+        const float rightPx = getPxOffset(right.fixed - fixedOffsetX, fixedContentWidth, right.stretch, stretchWidth);
+
+        const float bottomEm =
+            getEmOffset(bottom.stretch - stretchOffsetY, stretchContentHeight, iconHeight, shapedIcon.top());
+        const float bottomPx =
+            getPxOffset(bottom.fixed - fixedOffsetY, fixedContentHeight, bottom.stretch, stretchHeight);
+
+        Point<float> tl(leftEm, topEm);
+        Point<float> tr(rightEm, topEm);
+        Point<float> br(rightEm, bottomEm);
+        Point<float> bl(leftEm, bottomEm);
+        const Point<float> pixelOffsetTL(leftPx / pixelRatio, topPx / pixelRatio);
+        const Point<float> pixelOffsetBR(rightPx / pixelRatio, bottomPx / pixelRatio);
+
+        if (matrix) {
+            tl = util::matrixMultiply(*matrix, tl);
+            tr = util::matrixMultiply(*matrix, tr);
+            bl = util::matrixMultiply(*matrix, bl);
+            br = util::matrixMultiply(*matrix, br);
+        }
+
+        const float x1 = left.stretch + left.fixed;
+        const float x2 = right.stretch + right.fixed;
+        const float y1 = top.stretch + top.fixed;
+        const float y2 = bottom.stretch + bottom.fixed;
+
+        // TODO: consider making texture coordinates float instead of uint16_t
+        const Rect<uint16_t> subRect{static_cast<uint16_t>(image.paddedRect.x + border + x1),
+                                     static_cast<uint16_t>(image.paddedRect.y + border + y1),
+                                     static_cast<uint16_t>(x2 - x1),
+                                     static_cast<uint16_t>(y2 - y1)};
+
+        const float minFontScaleX = fixedContentWidth / pixelRatio / iconWidth;
+        const float minFontScaleY = fixedContentHeight / pixelRatio / iconHeight;
+
+        // Icon quad is padded, so texture coordinates also need to be padded.
+        quads.emplace_back(tl,
+                           tr,
+                           bl,
+                           br,
+                           subRect,
+                           WritingModeType::None,
+                           Point<float>{0.0f, 0.0f},
+                           iconType == SymbolContent::IconSDF,
+                           pixelOffsetTL,
+                           pixelOffsetBR,
+                           Point<float>{minFontScaleX, minFontScaleY});
+    };
+
+    if (!hasIconTextFit || (image.stretchX.empty() && image.stretchY.empty())) {
+        makeBox({0, -1}, {0, -1}, {0, static_cast<float>(imageWidth + 1)}, {0, static_cast<float>(imageHeight + 1)});
+    } else {
+        const auto xCuts = stretchZonesToCuts(stretchX, fixedWidth, stretchWidth);
+        const auto yCuts = stretchZonesToCuts(stretchY, fixedHeight, stretchHeight);
+
+        for (size_t xi = 0; xi < xCuts.size() - 1; xi++) {
+            const auto& x1 = xCuts[xi];
+            const auto& x2 = xCuts[xi + 1];
+            for (size_t yi = 0; yi < yCuts.size() - 1; yi++) {
+                const auto& y1 = yCuts[yi];
+                const auto& y2 = yCuts[yi + 1];
+                makeBox(x1, y1, x2, y2);
+            }
+        }
+    }
+
+    return quads;
 }
 
 SymbolQuads getGlyphQuads(const Shaping& shapedText,

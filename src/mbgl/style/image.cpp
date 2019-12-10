@@ -41,7 +41,7 @@ const ImageStretches& Image::getStretchY() const {
     return baseImpl->stretchY;
 }
 
-const ImageContent& Image::getContent() const {
+const optional<ImageContent>& Image::getContent() const {
     return baseImpl->content;
 }
 
