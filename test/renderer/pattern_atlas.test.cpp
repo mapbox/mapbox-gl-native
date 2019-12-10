@@ -51,7 +51,7 @@ TEST(PatternAtlas, Updates) {
     ASSERT_TRUE(added);
     auto found = patternAtlas.getPattern("one");
     ASSERT_TRUE(found);
-    EXPECT_EQ(added->textureRect, found->textureRect);
+    EXPECT_EQ(added->paddedRect, found->paddedRect);
 
     auto a = *found;
     EXPECT_EQ(1, a.tl()[0]);

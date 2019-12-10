@@ -20,7 +20,7 @@ SymbolQuads getIconQuads(const PositionedIcon& shapedIcon, WritingModeType writi
     // If you have a 10px icon that isn't perfectly aligned to the pixel grid it will cover 11 actual
     // pixels. The quad needs to be padded to account for this, otherwise they'll look slightly clipped
     // on one edge in some cases.
-    const float border = ImagePosition::padding;
+    constexpr auto border = ImagePosition::padding;
 
     // Expand the box to respect the 1 pixel border in the atlas image. We're using `image.paddedRect - border`
     // instead of image.displaySize because we only pad with one pixel for retina images as well, and the
@@ -28,18 +28,12 @@ SymbolQuads getIconQuads(const PositionedIcon& shapedIcon, WritingModeType writi
     // Unlike the JavaScript version, we're _not_ including the padding in the texture rect, so the
     // logic "dimension * padded / non-padded - dimension" is swapped.
     const float iconWidth = shapedIcon.right() - shapedIcon.left();
-    const float expandX = (iconWidth * (static_cast<float>(image.textureRect.w) + 2.0f * border) /
-                               static_cast<float>(image.textureRect.w) -
-                           iconWidth) /
-                          2.0f;
+    const float expandX = (iconWidth * image.paddedRect.w / (image.paddedRect.w - 2 * border) - iconWidth) / 2.0f;
     const float left = shapedIcon.left() - expandX;
     const float right = shapedIcon.right() + expandX;
 
     const float iconHeight = shapedIcon.bottom() - shapedIcon.top();
-    const float expandY = (iconHeight * (static_cast<float>(image.textureRect.h) + 2.0f * border) /
-                               static_cast<float>(image.textureRect.h) -
-                           iconHeight) /
-                          2.0f;
+    const float expandY = (iconHeight * image.paddedRect.h / (image.paddedRect.h - 2 * border) - iconHeight) / 2.0f;
     const float top = shapedIcon.top() - expandY;
     const float bottom = shapedIcon.bottom() + expandY;
 
@@ -62,14 +56,6 @@ SymbolQuads getIconQuads(const PositionedIcon& shapedIcon, WritingModeType writi
         br = util::matrixMultiply(matrix, br);
     }
 
-    // Icon quad is padded, so texture coordinates also need to be padded.
-    Rect<uint16_t> textureRect {
-        static_cast<uint16_t>(image.textureRect.x - border),
-        static_cast<uint16_t>(image.textureRect.y - border),
-        static_cast<uint16_t>(image.textureRect.w + border * 2),
-        static_cast<uint16_t>(image.textureRect.h + border * 2)
-    };
-
     Point<float> pixelOffsetTL;
     Point<float> pixelOffsetBR;
     Point<float> minFontScale;
@@ -78,7 +64,7 @@ SymbolQuads getIconQuads(const PositionedIcon& shapedIcon, WritingModeType writi
                        tr,
                        bl,
                        br,
-                       textureRect,
+                       image.paddedRect,
                        writingMode,
                        {0.0f, 0.0f},
                        iconType == SymbolContent::IconSDF,

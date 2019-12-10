@@ -9,7 +9,7 @@ static constexpr uint32_t padding = 1;
 
 ImagePosition::ImagePosition(const mapbox::Bin& bin, const style::Image::Impl& image, uint32_t version_)
     : pixelRatio(image.pixelRatio),
-      textureRect(bin.x + padding, bin.y + padding, bin.w - padding * 2, bin.h - padding * 2),
+      paddedRect(bin.x, bin.y, bin.w, bin.h),
       version(version_),
       stretchX(image.stretchX),
       stretchY(image.stretchY),
@@ -65,7 +65,7 @@ void populateImagePatches(
             auto updatedImage = imageManager.getSharedImage(name);
             if (updatedImage == nullptr) continue;
 
-            patches.emplace_back(*updatedImage, position.textureRect);
+            patches.emplace_back(*updatedImage, position.paddedRect);
             position.version = version;
         }
     }
