@@ -436,7 +436,7 @@ void shapeLines(Shaping& shaping,
                 metrics.left = ImagePosition::padding;
                 metrics.top = -Glyph::borderSize;
                 metrics.advance = vertical ? displaySize[1] : displaySize[0];
-                rect = image->second.paddedTextureRect();
+                rect = image->second.paddedRect;
 
                 // If needed, allow to set scale factor for an image using
                 // alias "image-scale" that could be alias for "font-scale"
