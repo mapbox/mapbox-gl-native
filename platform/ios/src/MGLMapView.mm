@@ -656,26 +656,28 @@ public:
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationDidChange:) name:UIDeviceOrientationDidChangeNotification object:nil];
     [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
 
-    // set initial position
-    //
-    mbgl::CameraOptions options;
-    options.center = mbgl::LatLng(0, 0);
-    mbgl::EdgeInsets padding = MGLEdgeInsetsFromNSEdgeInsets(self.contentInset);
-    options.padding = padding;
-    options.zoom = 0;
+    auto cameraOptions = _mbglMap->getCameraOptions();
+    if (!cameraOptions.center && !cameraOptions.zoom) {
+        // set initial position
+        mbgl::CameraOptions options;
+        options.center = mbgl::LatLng(0, 0);
+        mbgl::EdgeInsets padding = MGLEdgeInsetsFromNSEdgeInsets(self.contentInset);
+        options.padding = padding;
+        options.zoom = 0;
 
-    _cameraChangeReasonBitmask = MGLCameraChangeReasonNone;
+        _cameraChangeReasonBitmask = MGLCameraChangeReasonNone;
 
-    _mbglMap->jumpTo(options);
+        _mbglMap->jumpTo(options);
+
+        if ([UIApplication sharedApplication].applicationState != UIApplicationStateBackground) {
+            [MGLMapboxEvents pushTurnstileEvent];
+            [MGLMapboxEvents pushEvent:MMEEventTypeMapLoad withAttributes:@{}];
+        }
+    }
+
     _pendingLatitude = NAN;
     _pendingLongitude = NAN;
     _targetCoordinate = kCLLocationCoordinate2DInvalid;
-
-    if ([UIApplication sharedApplication].applicationState != UIApplicationStateBackground) {
-        [MGLMapboxEvents pushTurnstileEvent];
-        [MGLMapboxEvents pushEvent:MMEEventTypeMapLoad withAttributes:@{}];
-    }
-
 }
 
 - (mbgl::Size)size
