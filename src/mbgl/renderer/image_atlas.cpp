@@ -9,14 +9,11 @@ static constexpr uint32_t padding = 1;
 
 ImagePosition::ImagePosition(const mapbox::Bin& bin, const style::Image::Impl& image, uint32_t version_)
     : pixelRatio(image.pixelRatio),
-      textureRect(
-        bin.x + padding,
-        bin.y + padding,
-        bin.w - padding * 2,
-        bin.h - padding * 2
-      ),
-      version(version_) {
-}
+      textureRect(bin.x + padding, bin.y + padding, bin.w - padding * 2, bin.h - padding * 2),
+      version(version_),
+      stretchX(image.stretchX),
+      stretchY(image.stretchY),
+      content(image.content) {}
 
 const mapbox::Bin& _packImage(mapbox::ShelfPack& pack, const style::Image::Impl& image, ImageAtlas& resultImage, ImageType imageType) {
     const mapbox::Bin& bin = *pack.packOne(-1,
