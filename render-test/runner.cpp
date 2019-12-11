@@ -80,14 +80,6 @@ GfxProbe::GfxProbe(const mbgl::gfx::RenderingStats& stats, const GfxProbe& prev)
       memVertexBuffers(stats.memVertexBuffers, std::max(stats.memVertexBuffers, prev.memVertexBuffers.peak)),
       memTextures(stats.memTextures, std::max(stats.memTextures, prev.memTextures.peak)) {}
 
-struct RunContext {
-    RunContext() = default;
-
-    GfxProbe activeGfxProbe;
-    GfxProbe baselineGfxProbe;
-    bool gfxProbeActive;
-};
-
 class TestRunnerMapObserver : public MapObserver {
 public:
     TestRunnerMapObserver() : mapLoadFailure(false), finishRenderingMap(false), idle(false) {}
@@ -588,7 +580,8 @@ bool TestRunner::checkProbingResults(TestMetadata& resultMetadata) {
     return checkResult;
 }
 
-bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata, RunContext& ctx) {
+bool TestRunner::runOperations(TestContext& ctx) {
+    TestMetadata& metadata = ctx.getMetadata();
     if (!metadata.document.HasMember("metadata") || !metadata.document["metadata"].HasMember("test") ||
         !metadata.document["metadata"]["test"].HasMember("operations")) {
         return true;
@@ -606,9 +599,9 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata, R
     const auto& operationArray = operationIt->GetArray();
     assert(operationArray.Size() >= 1u);
 
-    auto& frontend = maps[key]->frontend;
-    auto& map = maps[key]->map;
-    auto& observer = maps[key]->observer;
+    HeadlessFrontend& frontend = ctx.getFrontend();
+    Map& map = ctx.getMap();
+    TestRunnerMapObserver& observer = ctx.getObserver();
 
     if (operationArray[0].GetString() == waitOp) {
         // wait
@@ -1077,12 +1070,12 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata, R
         // Jump to the starting point of the segment and make sure there's something to render
         map.jumpTo(mbgl::CameraOptions().withCenter(startPos).withZoom(startZoom));
 
-        observer->reset();
-        while (!observer->finishRenderingMap) {
+        observer.reset();
+        while (!observer.finishRenderingMap) {
             frontend.renderOnce(map);
         }
 
-        if (observer->mapLoadFailure) return false;
+        if (observer.mapLoadFailure) return false;
 
         size_t frames = 0;
         float totalTime = 0.0;
@@ -1156,7 +1149,7 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata, R
     }
 
     operationsArray.Erase(operationIt);
-    return runOperations(key, metadata, ctx);
+    return runOperations(ctx);
 }
 
 TestRunner::Impl::Impl(const TestMetadata& metadata)
@@ -1178,9 +1171,29 @@ bool TestRunner::run(TestMetadata& metadata) {
     AllocationIndex::reset();
     ProxyFileSource::setTrackingActive(false);
 
-    RunContext ctx{};
+    struct ContextImpl final : public TestContext {
+        ContextImpl(TestMetadata& metadata_) : metadata(metadata_) {}
+        HeadlessFrontend& getFrontend() override {
+            assert(runnerImpl);
+            return runnerImpl->frontend;
+        }
+        Map& getMap() override {
+            assert(runnerImpl);
+            return runnerImpl->map;
+        }
+        TestRunnerMapObserver& getObserver() override {
+            assert(runnerImpl);
+            return *runnerImpl->observer;
+        }
+        TestMetadata& getMetadata() override { return metadata; }
+
+        TestRunner::Impl* runnerImpl = nullptr;
+        TestMetadata& metadata;
+    };
+
+    ContextImpl ctx(metadata);
     // Run 'begin' probes provided via command line arguments.
-    if (!runInjectedProbesBegin(metadata, ctx)) {
+    if (!metadata.ignoredTest && !runInjectedProbesBegin(ctx)) {
         return false;
     }
 
@@ -1192,8 +1205,9 @@ bool TestRunner::run(TestMetadata& metadata) {
         maps[key] = std::make_unique<TestRunner::Impl>(metadata);
     }
 
-    auto& frontend = maps[key]->frontend;
-    auto& map = maps[key]->map;
+    ctx.runnerImpl = maps[key].get();
+    auto& frontend = ctx.getFrontend();
+    auto& map = ctx.getMap();
 
     frontend.setSize(metadata.size);
     map.setSize(metadata.size);
@@ -1204,7 +1218,7 @@ bool TestRunner::run(TestMetadata& metadata) {
     map.getStyle().loadJSON(serializeJsonValue(metadata.document));
     map.jumpTo(map.getStyle().getDefaultCamera());
 
-    if (!runOperations(key, metadata, ctx)) return false;
+    if (!runOperations(ctx)) return false;
 
     HeadlessFrontend::RenderResult result;
     try {
@@ -1214,9 +1228,7 @@ bool TestRunner::run(TestMetadata& metadata) {
     }
 
     // Run 'end' probes provided via command line arguments
-    if (!runInjectedProbesEnd(metadata, ctx, result.stats)) {
-        return false;
-    }
+    if (!metadata.ignoredTest && !runInjectedProbesEnd(ctx, result.stats)) return false;
 
     if (metadata.renderTest) {
         return checkRenderTestResults(std::move(result.image), metadata) && checkProbingResults(metadata);
@@ -1233,70 +1245,65 @@ bool TestRunner::run(TestMetadata& metadata) {
     }
 }
 
-using InjectedProbeMap = std::map<std::string, std::function<void(TestMetadata&, RunContext&)>>;
-bool runInjectedProbe(TestMetadata& metadata,
-                      const std::set<std::string>& probes,
-                      RunContext& ctx,
-                      const InjectedProbeMap& probeMap) {
+using InjectedProbeMap = std::map<std::string, std::function<void(TestContext&)>>;
+bool runInjectedProbe(const std::set<std::string>& probes, TestContext& ctx, const InjectedProbeMap& probeMap) {
     for (const auto& probe : probes) {
         auto it = probeMap.find(probe);
         if (it == probeMap.end()) {
-            metadata.errorMessage = std::string("Unsupported operation: ") + probe;
+            ctx.getMetadata().errorMessage = std::string("Unsupported operation: ") + probe;
             return false;
         }
-        it->second(metadata, ctx);
+        it->second(ctx);
     }
     return true;
 }
 
-bool TestRunner::runInjectedProbesBegin(TestMetadata& metadata_, RunContext& ctx_) {
-    if (metadata_.ignoredTest) return true;
+bool TestRunner::runInjectedProbesBegin(TestContext& ctx) {
     const std::string mark = " - default - start";
     static const InjectedProbeMap beginInjectedProbeMap = {
         {// Injected memory probe begin
          memoryProbeOp,
-         [&mark](TestMetadata& metadata, RunContext&) {
+         [&mark](TestContext& ctx) {
              assert(!AllocationIndex::isActive());
              AllocationIndex::setActive(true);
-             metadata.metrics.memory.emplace(std::piecewise_construct,
-                                             std::forward_as_tuple(memoryProbeOp + mark),
-                                             std::forward_as_tuple(AllocationIndex::getAllocatedSizePeak(),
-                                                                   AllocationIndex::getAllocationsCount()));
+             ctx.getMetadata().metrics.memory.emplace(std::piecewise_construct,
+                                                      std::forward_as_tuple(memoryProbeOp + mark),
+                                                      std::forward_as_tuple(AllocationIndex::getAllocatedSizePeak(),
+                                                                            AllocationIndex::getAllocationsCount()));
          }},
         {// Injected gfx probe begin
          gfxProbeOp,
-         [](TestMetadata&, RunContext& ctx) {
+         [](TestContext& ctx) {
              assert(!ctx.gfxProbeActive);
              ctx.gfxProbeActive = true;
              ctx.baselineGfxProbe = ctx.activeGfxProbe;
          }},
         {// Injected network probe begin
          networkProbeOp,
-         [&mark](TestMetadata& metadata, RunContext&) {
+         [&mark](TestContext& ctx) {
              assert(!ProxyFileSource::isTrackingActive());
              ProxyFileSource::setTrackingActive(true);
-             metadata.metrics.network.emplace(
+             ctx.getMetadata().metrics.network.emplace(
                  std::piecewise_construct,
                  std::forward_as_tuple(networkProbeOp + mark),
                  std::forward_as_tuple(ProxyFileSource::getRequestCount(), ProxyFileSource::getTransferredSize()));
          }}};
 
-    return runInjectedProbe(metadata_, manifest.getProbes(), ctx_, beginInjectedProbeMap);
+    return runInjectedProbe(manifest.getProbes(), ctx, beginInjectedProbeMap);
 }
 
-bool TestRunner::runInjectedProbesEnd(TestMetadata& metadata_, RunContext& ctx_, mbgl::gfx::RenderingStats stats) {
-    if (metadata_.ignoredTest) return true;
+bool TestRunner::runInjectedProbesEnd(TestContext& ctx, mbgl::gfx::RenderingStats stats) {
     const std::string mark = " - default - end";
     static const InjectedProbeMap endInjectedProbeMap = {
         {// Injected memory probe end
          memoryProbeOp,
-         [&mark](TestMetadata& metadata, RunContext&) {
+         [&mark](TestContext& ctx) {
              assert(AllocationIndex::isActive());
-             auto emplaced =
-                 metadata.metrics.memory.emplace(std::piecewise_construct,
-                                                 std::forward_as_tuple(memoryProbeOp + mark),
-                                                 std::forward_as_tuple(AllocationIndex::getAllocatedSizePeak(),
-                                                                       AllocationIndex::getAllocationsCount()));
+             auto emplaced = ctx.getMetadata().metrics.memory.emplace(
+                 std::piecewise_construct,
+                 std::forward_as_tuple(memoryProbeOp + mark),
+                 std::forward_as_tuple(AllocationIndex::getAllocatedSizePeak(),
+                                       AllocationIndex::getAllocationsCount()));
              assert(emplaced.second);
              // TODO: Improve tolerance handling for memory tests.
              emplaced.first->second.tolerance = 0.2f;
@@ -1305,7 +1312,7 @@ bool TestRunner::runInjectedProbesEnd(TestMetadata& metadata_, RunContext& ctx_,
          }},
         {// Injected gfx probe end
          gfxProbeOp,
-         [&mark, &stats](TestMetadata& metadata, RunContext& ctx) {
+         [&mark, &stats](TestContext& ctx) {
              assert(ctx.gfxProbeActive);
              ctx.activeGfxProbe = GfxProbe(stats, ctx.activeGfxProbe);
 
@@ -1314,22 +1321,22 @@ bool TestRunner::runInjectedProbesEnd(TestMetadata& metadata_, RunContext& ctx_,
              metricProbe.memIndexBuffers.peak -= ctx.baselineGfxProbe.memIndexBuffers.peak;
              metricProbe.memVertexBuffers.peak -= ctx.baselineGfxProbe.memVertexBuffers.peak;
              metricProbe.memTextures.peak -= ctx.baselineGfxProbe.memTextures.peak;
-             metadata.metrics.gfx.insert({gfxProbeOp + mark, metricProbe});
+             ctx.getMetadata().metrics.gfx.insert({gfxProbeOp + mark, metricProbe});
 
              ctx.gfxProbeActive = false;
          }},
         {// Injected network probe end
          networkProbeOp,
-         [&mark](TestMetadata& metadata, RunContext&) {
+         [&mark](TestContext& ctx) {
              assert(ProxyFileSource::isTrackingActive());
-             metadata.metrics.network.emplace(
+             ctx.getMetadata().metrics.network.emplace(
                  std::piecewise_construct,
                  std::forward_as_tuple(networkProbeOp + mark),
                  std::forward_as_tuple(ProxyFileSource::getRequestCount(), ProxyFileSource::getTransferredSize()));
              ProxyFileSource::setTrackingActive(false);
          }}};
 
-    return runInjectedProbe(metadata_, manifest.getProbes(), ctx_, endInjectedProbeMap);
+    return runInjectedProbe(manifest.getProbes(), ctx, endInjectedProbeMap);
 }
 
 void TestRunner::reset() {
