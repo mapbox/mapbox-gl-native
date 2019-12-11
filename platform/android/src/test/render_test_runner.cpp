@@ -257,7 +257,7 @@ void android_main(struct android_app* app) {
         auto runTestWithManifest =
             [&storagePath, &app, &outFd, &outEvents, &source](const std::string& manifest) -> bool {
             const std::string configFile = storagePath + manifest;
-            std::vector<std::string> arguments = {"mbgl-render-test-runner", "-p", configFile};
+            std::vector<std::string> arguments = {"mbgl-render-test-runner", "-p", configFile, "-u", "rebaseline"};
             std::vector<char*> argv;
             for (const auto& arg : arguments) {
                 argv.push_back(const_cast<char*>(arg.data()));

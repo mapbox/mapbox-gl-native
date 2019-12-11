@@ -344,13 +344,13 @@ add_custom_command(
         ${CMAKE_COMMAND}
         -E
         copy
-        ${MBGL_ROOT}/render-test/android-manifest-probe-memory.json
+        ${MBGL_ROOT}/metrics/next-android-render-test-runner-probe-memory.json
         ${MBGL_ROOT}/android-manifest-probe-memory.json
     COMMAND
         ${CMAKE_COMMAND}
         -E
         copy
-        ${MBGL_ROOT}/render-test/android-manifest-probe-network-gfx.json
+        ${MBGL_ROOT}/metrics/next-android-render-test-runner-probe-gfx-network.json
         ${MBGL_ROOT}/android-manifest-probe-network-gfx.json
     COMMAND
         ${CMAKE_COMMAND}
