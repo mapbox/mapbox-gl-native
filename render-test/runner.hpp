@@ -8,9 +8,23 @@
 #include <memory>
 #include <string>
 
-struct RunContext;
 class TestRunnerMapObserver;
 struct TestMetadata;
+
+class TestContext {
+public:
+    virtual mbgl::HeadlessFrontend& getFrontend() = 0;
+    virtual mbgl::Map& getMap() = 0;
+    virtual TestRunnerMapObserver& getObserver() = 0;
+    virtual TestMetadata& getMetadata() = 0;
+
+    GfxProbe activeGfxProbe;
+    GfxProbe baselineGfxProbe;
+    bool gfxProbeActive = false;
+
+protected:
+    virtual ~TestContext() = default;
+};
 
 class TestRunner {
 public:
@@ -24,9 +38,9 @@ public:
     void doShuffle(uint32_t seed);
 
 private:
-    bool runOperations(const std::string& key, TestMetadata&, RunContext&);
-    bool runInjectedProbesBegin(TestMetadata&, RunContext&);
-    bool runInjectedProbesEnd(TestMetadata&, RunContext&, mbgl::gfx::RenderingStats);
+    bool runOperations(TestContext&);
+    bool runInjectedProbesBegin(TestContext&);
+    bool runInjectedProbesEnd(TestContext&, mbgl::gfx::RenderingStats);
 
     bool checkQueryTestResults(mbgl::PremultipliedImage&& actualImage,
                                std::vector<mbgl::Feature>&& features,
