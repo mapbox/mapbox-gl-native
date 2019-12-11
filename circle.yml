@@ -297,7 +297,9 @@ commands:
           name: Collecting artifacts
           when: always
           command: |
-            mkdir -p /tmp/tests/clang-tidy
+            mkdir -p /tmp/tests/nitpick
+            if [ -f nitpick.patch ]; then cp nitpick.patch /tmp/tests/nitpick; fi
+            mkdir -p /tmp/tests/render
             if [ -f clang-tidy.log ]; then cp clang-tidy.log /tmp/tests/clang-tidy; fi
             mkdir -p /tmp/tests/render
             if ls render-test/*.html 1> /dev/null 2>&1; then cp render-test/*.html /tmp/tests/render; fi
@@ -701,7 +703,7 @@ jobs:
             scripts/generate-file-lists.js
             scripts/generate-shaders.js
             scripts/generate-style-code.js
-            git add -A && git diff --staged --exit-code
+            git add -A && git diff --staged --exit-code | tee nitpick.patch
       - run:
           name: Validation Scripts
           command: |
@@ -710,12 +712,12 @@ jobs:
           name: CMake Format
           command: |
             cmake-format -i $(find next -type f -name CMakeLists.txt -o -name '*.cmake')
-            git diff --exit-code
+            git diff --exit-code | tee nitpick.patch
       - run:
           name: Clang Format
           command: |
             git diff -U0 --ignore-submodules=all --no-color origin/master... *.cpp *.hpp | clang-format-diff-8 -p1 -i
-            git diff --exit-code
+            git diff --exit-code | tee nitpick.patch
       - run:
           name: Clang Tidy
           command: |
