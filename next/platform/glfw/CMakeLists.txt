@@ -35,6 +35,7 @@ target_link_libraries(
         Mapbox::Base::Extras::rapidjson
         Mapbox::Map
         OpenGL::GL
+        mbgl-compiler-options
         mbgl-vendor-cheap-ruler-cpp
 )
 

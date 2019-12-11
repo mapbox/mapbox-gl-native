@@ -34,6 +34,7 @@ target_link_libraries(
     PRIVATE
         ${MBGL_CORE_PRIVATE_LIBRARIES}
         mbgl-vendor-benchmark
+        mbgl-compiler-options
         mbgl-core
         $<$<PLATFORM_ID:Android>:mbgl-core-android>
 )
