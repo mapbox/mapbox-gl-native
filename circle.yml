@@ -187,6 +187,7 @@ executors:
     resource_class: xlarge
     working_directory: /src
     environment:
+      DISPLAY: :99
       UBSAN_OPTIONS: print_stacktrace=1:halt_on_error=0
       ASAN_OPTIONS: strict_string_checks=1:detect_stack_use_after_return=1:check_initialization_order=1:strict_init_order=1
       QT_INSTALL_DOCS: /usr/share/qt5/doc
@@ -215,6 +216,13 @@ commands:
             git gc
             npm install --ignore-scripts
             ulimit -c unlimited
+  next-prepare-linux:
+    steps:
+      - run:
+          name: Prepare Linux
+          background: true
+          command: |
+            Xvfb :99 -noreset -screen 0 1280x1024x24
   next-prepare-macos:
     steps:
       - run:
@@ -259,8 +267,6 @@ commands:
             - '*'
   next-test:
     parameters:
-      runtime_wrapper:
-        type: string
       test_params:
         type: string
     steps:
@@ -268,21 +274,18 @@ commands:
           name: Test
           command: |
             cd build
-            << parameters.runtime_wrapper >> ctest -V << parameters.test_params >>
+            ctest -V << parameters.test_params >>
   next-metrics:
     parameters:
       step_name:
         type: string
-      runtime_wrapper:
-        type: string
-        default: 'xvfb-run -s -noreset'
       metrics_params:
         type: string
     steps:
       - run:
           name: << parameters.step_name >>
           command: |
-            << parameters.runtime_wrapper >> build/mbgl-render-test-runner << parameters.metrics_params >>
+            build/mbgl-render-test-runner << parameters.metrics_params >>
   next-save:
     steps:
       - save_cache:
@@ -772,12 +775,12 @@ jobs:
       - when:
           condition: << parameters.target_is_linux >>
           steps:
+            - next-prepare-linux
             - next-config:
                 config_params: << parameters.config_params >>
             - next-build:
                 build_params: << parameters.build_params >>
             - next-test:
-                runtime_wrapper: 'xvfb-run -s -noreset'
                 test_params: << parameters.test_params >>
       - when:
           condition: << parameters.target_is_macos >>
@@ -788,7 +791,6 @@ jobs:
             - next-build:
                 build_params: << parameters.build_params >>
             - next-test:
-                runtime_wrapper: ''
                 test_params: << parameters.test_params >>
       - when:
           condition: << parameters.install >>
