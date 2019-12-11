@@ -132,9 +132,11 @@ target_compile_definitions(
 
 target_link_libraries(
     qmapboxgl
-    Qt5::Core
-    Qt5::Gui
-    mbgl-core
+    PRIVATE
+        Qt5::Core
+        Qt5::Gui
+        mbgl-compiler-options
+        mbgl-core
 )
 
 add_executable(
@@ -150,7 +152,11 @@ set_property(TARGET mbgl-qt PROPERTY CXX_STANDARD 98)
 
 target_link_libraries(
     mbgl-qt
-    PRIVATE Qt5::Widgets Qt5::Gui qmapboxgl
+    PRIVATE
+        Qt5::Widgets
+        Qt5::Gui
+        mbgl-compiler-options
+        qmapboxgl
 )
 
 add_executable(
@@ -168,6 +174,7 @@ target_link_libraries(
     PRIVATE
         Qt5::Gui
         Qt5::OpenGL
+        mbgl-compiler-options
         mbgl-test
         pthread
 )

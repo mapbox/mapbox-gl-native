@@ -254,7 +254,7 @@ target_include_directories(
 
 target_link_libraries(
     mbgl-core-android
-    PRIVATE Mapbox::Base::jni.hpp mbgl-core
+    PRIVATE Mapbox::Base::jni.hpp mbgl-compiler-options mbgl-core
 )
 
 add_library(
@@ -269,7 +269,11 @@ target_include_directories(
 
 target_link_libraries(
     mapbox-gl
-    PRIVATE Mapbox::Base::jni.hpp mbgl-core mbgl-core-android
+    PRIVATE
+        Mapbox::Base::jni.hpp
+        mbgl-compiler-options
+        mbgl-core
+        mbgl-core-android
 )
 
 add_library(
@@ -291,6 +295,7 @@ target_link_libraries(
         Mapbox::Base::value
         Mapbox::Base::weak
         log
+        mbgl-compiler-options
 )
 
 add_executable(
@@ -301,7 +306,11 @@ add_executable(
 
 target_link_libraries(
     mbgl-test-runner
-    PRIVATE Mapbox::Base::jni.hpp mapbox-gl mbgl-test
+    PRIVATE
+        Mapbox::Base::jni.hpp
+        mapbox-gl
+        mbgl-compiler-options
+        mbgl-test
 )
 
 add_executable(
@@ -312,7 +321,11 @@ add_executable(
 
 target_link_libraries(
     mbgl-benchmark-runner
-    PRIVATE Mapbox::Base::jni.hpp mapbox-gl mbgl-benchmark
+    PRIVATE
+        Mapbox::Base::jni.hpp
+        mapbox-gl
+        mbgl-compiler-options
+        mbgl-benchmark
 )
 
 add_library(
@@ -335,6 +348,7 @@ target_link_libraries(
         Mapbox::Base::jni.hpp
         android
         log
+        mbgl-compiler-options
         mbgl-render-test
 )
 

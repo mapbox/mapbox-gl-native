@@ -17,11 +17,9 @@ include(CTest)
 set(
     CMAKE_CONFIGURATION_TYPES
     Debug
-    DebugCoverage
     MinSizeRel
     RelWithDebInfo
     Release
-    Sanitize
 )
 
 if(NOT CMAKE_BUILD_TYPE)
@@ -29,33 +27,46 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 option(MBGL_WITH_CORE_ONLY "Build only the core bits, no platform code" OFF)
+option(MBGL_WITH_COVERAGE "Enable code coverage collection" OFF)
 option(MBGL_WITH_QT "Build Mapbox GL Qt bindings" OFF)
-option(MBGL_WITH_SANITIZER "Use [address|thread|memory|undefined] here" OFF)
+option(MBGL_WITH_SANITIZER "Use [address|thread|undefined] here" OFF)
 
-set(CMAKE_CXX_FLAGS_DEBUGCOVERAGE "${CMAKE_CXX_FLAGS_DEBUG} --coverage")
-set(CMAKE_C_FLAGS_DEBUGCOVERAGE "${CMAKE_C_FLAGS_DEBUG} --coverage")
-
-set(
-    CMAKE_CXX_FLAGS_SANITIZE
-    "-DSANITIZE -g -O1 -fno-omit-frame-pointer -fno-optimize-sibling-calls -fsanitize=implicit-conversion -fsanitize=unsigned-integer-overflow -fsanitize=${MBGL_WITH_SANITIZER}"
-)
-set(
-    CMAKE_C_FLAGS_SANITIZE
-    "-DSANITIZE -g -O1 -fno-omit-frame-pointer -fno-optimize-sibling-calls -fsanitize=implicit-conversion -fsanitize=unsigned-integer-overflow -fsanitize=${MBGL_WITH_SANITIZER}"
+add_library(
+    mbgl-compiler-options INTERFACE
 )
 
-add_compile_options(
-    $<$<COMPILE_LANGUAGE:CXX>:-fno-rtti>
-    $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<NOT:$<PLATFORM_ID:Windows>>>:-Wall>
-    $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<NOT:$<PLATFORM_ID:Windows>>>:-Wextra>
-    $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<NOT:$<PLATFORM_ID:Windows>>>:-Werror>
-    $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<PLATFORM_ID:Android>>:-Wno-error=tautological-constant-compare>
-    $<$<CXX_COMPILER_ID:GNU>:-Wno-error=maybe-uninitialized>
-    $<$<CXX_COMPILER_ID:GNU>:-Wno-error=return-type>
-    $<$<CXX_COMPILER_ID:GNU>:-Wno-error=unknown-pragmas>
-    $<$<CXX_COMPILER_ID:AppleClang>:-Wno-error=deprecated-declarations>
-    $<$<CXX_COMPILER_ID:AppleClang>:-Wno-error=unused-parameter>
-    $<$<CXX_COMPILER_ID:AppleClang>:-Wno-error=unused-property-ivar>
+target_compile_options(
+    mbgl-compiler-options
+    INTERFACE
+        $<$<BOOL:${MBGL_WITH_COVERAGE}>:--coverage>
+        $<$<BOOL:${MBGL_WITH_SANITIZER}>:-DSANITIZE>
+        $<$<BOOL:${MBGL_WITH_SANITIZER}>:-fno-omit-frame-pointer>
+        $<$<BOOL:${MBGL_WITH_SANITIZER}>:-fno-optimize-sibling-calls>
+        $<$<STREQUAL:${MBGL_WITH_SANITIZER},address>:-fsanitize=address>
+        $<$<STREQUAL:${MBGL_WITH_SANITIZER},thread>:-fsanitize=thread>
+        $<$<STREQUAL:${MBGL_WITH_SANITIZER},undefined>:-fsanitize=implicit-conversion>
+        $<$<STREQUAL:${MBGL_WITH_SANITIZER},undefined>:-fsanitize=undefined>
+        $<$<STREQUAL:${MBGL_WITH_SANITIZER},undefined>:-fsanitize=unsigned-integer-overflow>
+        $<$<COMPILE_LANGUAGE:CXX>:-fno-rtti>
+        $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<NOT:$<PLATFORM_ID:Windows>>>:-Wall>
+        $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<NOT:$<PLATFORM_ID:Windows>>>:-Wextra>
+        $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<NOT:$<PLATFORM_ID:Windows>>>:-Werror>
+        $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<PLATFORM_ID:Android>>:-Wno-error=tautological-constant-compare>
+        $<$<CXX_COMPILER_ID:GNU>:-Wno-error=maybe-uninitialized>
+        $<$<CXX_COMPILER_ID:GNU>:-Wno-error=return-type>
+        $<$<CXX_COMPILER_ID:GNU>:-Wno-error=unknown-pragmas>
+        $<$<CXX_COMPILER_ID:AppleClang>:-Wno-error=deprecated-declarations>
+        $<$<CXX_COMPILER_ID:AppleClang>:-Wno-error=unused-parameter>
+        $<$<CXX_COMPILER_ID:AppleClang>:-Wno-error=unused-property-ivar>
+)
+
+target_link_libraries(
+    mbgl-compiler-options
+    INTERFACE
+        $<$<BOOL:${MBGL_WITH_COVERAGE}>:--coverage>
+        $<$<STREQUAL:${MBGL_WITH_SANITIZER},address>:-fsanitize=address>
+        $<$<STREQUAL:${MBGL_WITH_SANITIZER},thread>:-fsanitize=thread>
+        $<$<STREQUAL:${MBGL_WITH_SANITIZER},undefined>:-fsanitize=undefined>
 )
 
 cmake_policy(SET CMP0063 NEW)
@@ -931,6 +942,7 @@ target_link_libraries(
     PRIVATE
         Mapbox::Base::Extras::kdbush.hpp
         Mapbox::Base::supercluster.hpp
+        mbgl-compiler-options
         mbgl-vendor-boost
         mbgl-vendor-earcut.hpp
         mbgl-vendor-eternal

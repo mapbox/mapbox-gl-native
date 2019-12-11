@@ -96,7 +96,7 @@ target_compile_definitions(
 
 target_link_libraries(
     mbgl-test-runner
-    PRIVATE mbgl-test
+    PRIVATE mbgl-compiler-options mbgl-test
 )
 
 add_executable(
@@ -106,7 +106,7 @@ add_executable(
 
 target_link_libraries(
     mbgl-benchmark-runner
-    PRIVATE mbgl-benchmark
+    PRIVATE mbgl-compiler-options mbgl-benchmark
 )
 
 add_executable(
@@ -116,7 +116,7 @@ add_executable(
 
 target_link_libraries(
     mbgl-render-test-runner
-    PRIVATE mbgl-render-test
+    PRIVATE mbgl-compiler-options mbgl-render-test
 )
 
 add_test(NAME mbgl-benchmark-runner COMMAND mbgl-benchmark-runner WORKING_DIRECTORY ${MBGL_ROOT})

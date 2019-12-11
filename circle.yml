@@ -53,7 +53,7 @@ workflows:
           target_is_linux: true
           requires:
             - next-linux-gcc8-release
-          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=gcc-8 -DCMAKE_CXX_COMPILER=g++-8 -DCMAKE_BUILD_TYPE=DebugCoverage'
+          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=gcc-8 -DCMAKE_CXX_COMPILER=g++-8 -DCMAKE_BUILD_TYPE=Debug -DMBGL_WITH_COVERAGE=ON'
       - next-build-template:
           name: next-linux-clang8-release
           executor_name: ubuntu-disco
@@ -74,7 +74,7 @@ workflows:
           target_is_linux: true
           requires:
             - next-sanity-checks
-          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8 -DCMAKE_BUILD_TYPE=Sanitize -DMBGL_WITH_SANITIZER=address'
+          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8 -DMBGL_WITH_SANITIZER=address'
           test_params: '|| true'
       - next-build-template:
           name: next-linux-tsan
@@ -82,7 +82,7 @@ workflows:
           target_is_linux: true
           requires:
             - next-sanity-checks
-          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8 -DCMAKE_BUILD_TYPE=Sanitize -DMBGL_WITH_SANITIZER=thread'
+          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8 -DMBGL_WITH_SANITIZER=thread'
       - next-build-template:
           name: next-FIXME-linux-valgrind
           executor_name: ubuntu-disco
@@ -95,7 +95,7 @@ workflows:
           target_is_linux: true
           requires:
             - next-sanity-checks
-          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8 -DCMAKE_BUILD_TYPE=Sanitize -DMBGL_WITH_SANITIZER=undefined'
+          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8 -DMBGL_WITH_SANITIZER=undefined'
           test_params: '|| true'
       - next-build-template:
           name: next-qt5-linux-gcc5-release
