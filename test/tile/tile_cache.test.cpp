@@ -47,11 +47,11 @@ public:
 
 class VectorTileMock : public VectorTile {
 public:
-    VectorTileMock(const OverscaledTileID& id,
-                   std::string sourceID,
+    VectorTileMock(const OverscaledTileID& id_,
+                   std::string sourceID_,
                    const TileParameters& parameters,
                    const Tileset& tileset)
-        : VectorTile(id, sourceID, parameters, tileset) {
+        : VectorTile(id_, sourceID_, parameters, tileset) {
         renderable = true;
     }
 };
