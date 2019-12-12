@@ -83,13 +83,13 @@ class HTTPFileSource::Impl {
 public:
     Impl() {
         @autoreleasepool {
-            NSURLSessionConfiguration *sessionConfig = MGLNativeAppleInterfaceTransmitter.shared.sessionConfiguration;
+            NSURLSessionConfiguration *sessionConfig = MGLNativeNetworkDelegate.shared.sessionConfiguration;
             session = [NSURLSession sessionWithConfiguration:sessionConfig];
             
             userAgent = getUserAgent();
             
 #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
-            accountType = [[NSUserDefaults standardUserDefaults] integerForKey:MGLNativeAppleInterfaceTransmitter.shared.accountTypeKey];
+            accountType = [[NSUserDefaults standardUserDefaults] integerForKey:MGLNativeNetworkDelegate.shared.accountTypeKey];
 #endif
         }
     }
@@ -212,7 +212,7 @@ NSURL *resourceURLWithAccountType(const Resource& resource, NSInteger accountTyp
             [queryItems addObject:[NSURLQueryItem queryItemWithName:@"offline" value:@"true"]];
         } else {
             // Only add SKU token to requests not tagged as "offline" usage.
-            [queryItems addObject:[NSURLQueryItem queryItemWithName:@"sku" value:MGLNativeAppleInterfaceTransmitter.shared.skuToken]];
+            [queryItems addObject:[NSURLQueryItem queryItemWithName:@"sku" value:MGLNativeNetworkDelegate.shared.skuToken]];
         }
         
         if (components.queryItems) {
@@ -249,17 +249,17 @@ std::unique_ptr<AsyncRequest> HTTPFileSource::request(const Resource& resource, 
         const bool isTile = resource.kind == mbgl::Resource::Kind::Tile;
         
         if (isTile) {
-            [MGLNativeAppleInterfaceTransmitter.shared startDownloadEvent:url.relativePath type:@"tile"];
+            [MGLNativeNetworkDelegate.shared startDownloadEvent:url.relativePath type:@"tile"];
         }
         
         request->task = [impl->session
                          dataTaskWithRequest:req
                          completionHandler:^(NSData* data, NSURLResponse* res, NSError* error) {
             if (error && [error code] == NSURLErrorCancelled) {
-                [MGLNativeAppleInterfaceTransmitter.shared cancelDownloadEventForResponse:res];
+                [MGLNativeNetworkDelegate.shared cancelDownloadEventForResponse:res];
                 return;
             }
-            [MGLNativeAppleInterfaceTransmitter.shared stopDownloadEventForResponse:res];
+            [MGLNativeNetworkDelegate.shared stopDownloadEventForResponse:res];
             Response response;
             using Error = Response::Error;
             
