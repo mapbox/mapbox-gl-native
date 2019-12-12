@@ -78,7 +78,7 @@ TEST(ImageManager, RemoveReleasesBinPackRect) {
 
 class StubImageRequestor : public ImageRequestor {
 public:
-    StubImageRequestor(ImageManager& imageManager) : ImageRequestor(imageManager) {}
+    StubImageRequestor(ImageManager& imageManager_) : ImageRequestor(imageManager_) {}
 
     void onImagesAvailable(ImageMap icons, ImageMap patterns, std::unordered_map<std::string, uint32_t> versionMap, uint64_t imageCorrelationID_) final {
         if (imagesAvailable && imageCorrelationID == imageCorrelationID_) imagesAvailable(icons, patterns, versionMap);
