@@ -182,13 +182,12 @@ CameraOptions cameraForLatLngs(const std::vector<LatLng>& latLngs, const Transfo
     // Calculate the bounds of the possibly rotated shape with respect to the viewport.
     ScreenCoordinate nePixel = {-INFINITY, -INFINITY};
     ScreenCoordinate swPixel = {INFINITY, INFINITY};
-    double viewportHeight = size.height;
     for (LatLng latLng : latLngs) {
         ScreenCoordinate pixel = transform.latLngToScreenCoordinate(latLng);
         swPixel.x = std::min(swPixel.x, pixel.x);
         nePixel.x = std::max(nePixel.x, pixel.x);
-        swPixel.y = std::min(swPixel.y, viewportHeight - pixel.y);
-        nePixel.y = std::max(nePixel.y, viewportHeight - pixel.y);
+        swPixel.y = std::min(swPixel.y, pixel.y);
+        nePixel.y = std::max(nePixel.y, pixel.y);
     }
     double width = nePixel.x - swPixel.x;
     double height = nePixel.y - swPixel.y;
@@ -212,21 +211,9 @@ CameraOptions cameraForLatLngs(const std::vector<LatLng>& latLngs, const Transfo
 
     // Calculate the center point of a virtual bounds that is extended in all directions by padding.
     ScreenCoordinate centerPixel = nePixel + swPixel;
-    ScreenCoordinate paddedNEPixel = {
-        padding.right() / minScale,
-        padding.top() / minScale,
-    };
-    ScreenCoordinate paddedSWPixel = {
-        padding.left() / minScale,
-        padding.bottom() / minScale,
-    };
-    centerPixel = centerPixel + paddedNEPixel - paddedSWPixel;
     centerPixel /= 2.0;
 
-    // CameraOptions origin is at the top-left corner.
-    centerPixel.y = viewportHeight - centerPixel.y;
-
-    return CameraOptions().withCenter(transform.screenCoordinateToLatLng(centerPixel)).withZoom(zoom);
+    return CameraOptions().withCenter(transform.screenCoordinateToLatLng(centerPixel)).withPadding(padding).withZoom(zoom);
 }
 
 CameraOptions Map::cameraForLatLngs(const std::vector<LatLng>& latLngs, const EdgeInsets& padding, optional<double> bearing, optional<double> pitch) const {
