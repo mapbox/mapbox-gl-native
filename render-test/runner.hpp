@@ -26,6 +26,8 @@ protected:
     virtual ~TestContext() = default;
 };
 
+using TestOperation = std::function<bool(TestContext&)>;
+
 class TestRunner {
 public:
     enum class UpdateResults { NO, DEFAULT, PLATFORM, METRICS, REBASELINE };

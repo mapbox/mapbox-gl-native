@@ -1245,7 +1245,8 @@ bool TestRunner::run(TestMetadata& metadata) {
     }
 }
 
-using InjectedProbeMap = std::map<std::string, std::function<void(TestContext&)>>;
+using InjectedProbeMap = std::map<std::string, TestOperation>;
+
 bool runInjectedProbe(const std::set<std::string>& probes, TestContext& ctx, const InjectedProbeMap& probeMap) {
     for (const auto& probe : probes) {
         auto it = probeMap.find(probe);
@@ -1253,23 +1254,24 @@ bool runInjectedProbe(const std::set<std::string>& probes, TestContext& ctx, con
             ctx.getMetadata().errorMessage = std::string("Unsupported operation: ") + probe;
             return false;
         }
-        it->second(ctx);
+        if (!it->second(ctx)) return false;
     }
     return true;
 }
 
 bool TestRunner::runInjectedProbesBegin(TestContext& ctx) {
-    const std::string mark = " - default - start";
+    static const std::string mark = " - default - start";
     static const InjectedProbeMap beginInjectedProbeMap = {
         {// Injected memory probe begin
          memoryProbeOp,
-         [&mark](TestContext& ctx) {
+         [](TestContext& ctx) {
              assert(!AllocationIndex::isActive());
              AllocationIndex::setActive(true);
              ctx.getMetadata().metrics.memory.emplace(std::piecewise_construct,
                                                       std::forward_as_tuple(memoryProbeOp + mark),
                                                       std::forward_as_tuple(AllocationIndex::getAllocatedSizePeak(),
                                                                             AllocationIndex::getAllocationsCount()));
+             return true;
          }},
         {// Injected gfx probe begin
          gfxProbeOp,
@@ -1277,27 +1279,29 @@ bool TestRunner::runInjectedProbesBegin(TestContext& ctx) {
              assert(!ctx.gfxProbeActive);
              ctx.gfxProbeActive = true;
              ctx.baselineGfxProbe = ctx.activeGfxProbe;
+             return true;
          }},
         {// Injected network probe begin
          networkProbeOp,
-         [&mark](TestContext& ctx) {
+         [](TestContext& ctx) {
              assert(!ProxyFileSource::isTrackingActive());
              ProxyFileSource::setTrackingActive(true);
              ctx.getMetadata().metrics.network.emplace(
                  std::piecewise_construct,
                  std::forward_as_tuple(networkProbeOp + mark),
                  std::forward_as_tuple(ProxyFileSource::getRequestCount(), ProxyFileSource::getTransferredSize()));
+             return true;
          }}};
 
     return runInjectedProbe(manifest.getProbes(), ctx, beginInjectedProbeMap);
 }
 
 bool TestRunner::runInjectedProbesEnd(TestContext& ctx, mbgl::gfx::RenderingStats stats) {
-    const std::string mark = " - default - end";
+    static const std::string mark = " - default - end";
     static const InjectedProbeMap endInjectedProbeMap = {
         {// Injected memory probe end
          memoryProbeOp,
-         [&mark](TestContext& ctx) {
+         [](TestContext& ctx) {
              assert(AllocationIndex::isActive());
              auto emplaced = ctx.getMetadata().metrics.memory.emplace(
                  std::piecewise_construct,
@@ -1309,10 +1313,11 @@ bool TestRunner::runInjectedProbesEnd(TestContext& ctx, mbgl::gfx::RenderingStat
              emplaced.first->second.tolerance = 0.2f;
              AllocationIndex::setActive(false);
              AllocationIndex::reset();
+             return true;
          }},
         {// Injected gfx probe end
          gfxProbeOp,
-         [&mark, &stats](TestContext& ctx) {
+         [&stats](TestContext& ctx) {
              assert(ctx.gfxProbeActive);
              ctx.activeGfxProbe = GfxProbe(stats, ctx.activeGfxProbe);
 
@@ -1324,16 +1329,18 @@ bool TestRunner::runInjectedProbesEnd(TestContext& ctx, mbgl::gfx::RenderingStat
              ctx.getMetadata().metrics.gfx.insert({gfxProbeOp + mark, metricProbe});
 
              ctx.gfxProbeActive = false;
+             return true;
          }},
         {// Injected network probe end
          networkProbeOp,
-         [&mark](TestContext& ctx) {
+         [](TestContext& ctx) {
              assert(ProxyFileSource::isTrackingActive());
              ctx.getMetadata().metrics.network.emplace(
                  std::piecewise_construct,
                  std::forward_as_tuple(networkProbeOp + mark),
                  std::forward_as_tuple(ProxyFileSource::getRequestCount(), ProxyFileSource::getTransferredSize()));
              ProxyFileSource::setTrackingActive(false);
+             return true;
          }}};
 
     return runInjectedProbe(manifest.getProbes(), ctx, endInjectedProbeMap);
