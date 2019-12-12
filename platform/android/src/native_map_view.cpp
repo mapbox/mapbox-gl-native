@@ -61,12 +61,9 @@ NativeMapView::NativeMapView(jni::JNIEnv& _env,
                              const jni::Object<NativeMapView>& _obj,
                              const jni::Object<FileSource>& jFileSource,
                              const jni::Object<MapRenderer>& jMapRenderer,
-                             jni::jfloat _pixelRatio,
-                             jni::jboolean _crossSourceCollisions)
-    : javaPeer(_env, _obj)
-    , mapRenderer(MapRenderer::getNativePeer(_env, jMapRenderer))
-    , pixelRatio(_pixelRatio) {
-
+                             jni::jfloat pixelRatio_,
+                             jni::jboolean crossSourceCollisions_)
+    : javaPeer(_env, _obj), mapRenderer(MapRenderer::getNativePeer(_env, jMapRenderer)), pixelRatio(pixelRatio_) {
     // Get a reference to the JavaVM for callbacks
     if (_env.GetJavaVM(&vm) < 0) {
         _env.ExceptionDescribe();
@@ -79,11 +76,11 @@ NativeMapView::NativeMapView(jni::JNIEnv& _env,
     // Create Map options
     MapOptions options;
     options.withMapMode(MapMode::Continuous)
-           .withSize(mbgl::Size{ static_cast<uint32_t>(width), static_cast<uint32_t>(height) })
-           .withPixelRatio(pixelRatio)
-           .withConstrainMode(ConstrainMode::HeightOnly)
-           .withViewportMode(ViewportMode::Default)
-           .withCrossSourceCollisions(_crossSourceCollisions);
+        .withSize(mbgl::Size{static_cast<uint32_t>(width), static_cast<uint32_t>(height)})
+        .withPixelRatio(pixelRatio)
+        .withConstrainMode(ConstrainMode::HeightOnly)
+        .withViewportMode(ViewportMode::Default)
+        .withCrossSourceCollisions(crossSourceCollisions_);
 
     // Create the core map
     map = std::make_unique<mbgl::Map>(
@@ -624,7 +621,7 @@ jni::Local<jni::Object<PointF>> NativeMapView::pixelForLatLng(JNIEnv& env, jdoub
 void NativeMapView::pixelsForLatLngs(JNIEnv& env,
                                      const jni::Array<jdouble>& input,
                                      jni::Array<jdouble>& output,
-                                     jfloat pixelRatio) {
+                                     jfloat pixelRatio_) {
     jni::NullCheck(env, &input);
     std::size_t len = input.Length(env);
 
@@ -640,8 +637,8 @@ void NativeMapView::pixelsForLatLngs(JNIEnv& env,
     buffer.reserve(len);
     std::vector<ScreenCoordinate> coordinates = map->pixelsForLatLngs(latLngs);
     for (std::size_t i = 0; i < len / 2; i++) {
-        buffer.push_back(coordinates[i].x * pixelRatio);
-        buffer.push_back(coordinates[i].y * pixelRatio);
+        buffer.push_back(coordinates[i].x * pixelRatio_);
+        buffer.push_back(coordinates[i].y * pixelRatio_);
     }
 
     output.SetRegion<std::vector<jdouble>>(env, 0, buffer);
@@ -654,7 +651,7 @@ jni::Local<jni::Object<LatLng>> NativeMapView::latLngForPixel(JNIEnv& env, jfloa
 void NativeMapView::latLngsForPixels(JNIEnv& env,
                                      const jni::Array<jdouble>& input,
                                      jni::Array<jdouble>& output,
-                                     jfloat pixelRatio) {
+                                     jfloat pixelRatio_) {
     jni::NullCheck(env, &input);
     std::size_t len = input.Length(env);
 
@@ -662,7 +659,7 @@ void NativeMapView::latLngsForPixels(JNIEnv& env,
     coordinates.reserve(len);
 
     for (std::size_t i = 0; i < len; i += 2) {
-        auto coordinate = mbgl::ScreenCoordinate(input.Get(env, i) / pixelRatio, input.Get(env, i + 1) / pixelRatio);
+        auto coordinate = mbgl::ScreenCoordinate(input.Get(env, i) / pixelRatio_, input.Get(env, i + 1) / pixelRatio_);
         coordinates.push_back(coordinate);
     }
 
