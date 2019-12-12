@@ -1,25 +1,40 @@
-#include <mbgl/util/logging.hpp>
+#include "parser.hpp"
+
+#include "allocation_index.hpp"
+#include "file_source.hpp"
+#include "filesystem.hpp"
+#include "metadata.hpp"
+#include "runner.hpp"
+
+#include <mbgl/map/map.hpp>
+#include <mbgl/renderer/renderer.hpp>
+#include <mbgl/style/conversion/filter.hpp>
+#include <mbgl/style/conversion/json.hpp>
+#include <mbgl/style/conversion/layer.hpp>
+#include <mbgl/style/conversion/light.hpp>
+#include <mbgl/style/conversion/source.hpp>
+#include <mbgl/style/layer.hpp>
+#include <mbgl/style/light.hpp>
+#include <mbgl/style/source.hpp>
+#include <mbgl/style/style.hpp>
+#include <mbgl/util/compression.hpp>
 #include <mbgl/util/io.hpp>
+#include <mbgl/util/logging.hpp>
 #include <mbgl/util/rapidjson.hpp>
+#include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/string.hpp>
+#include <mbgl/util/timer.hpp>
 
 #include <rapidjson/prettywriter.h>
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
 
 #include <mapbox/geojson_impl.hpp>
-#include <mbgl/style/conversion/filter.hpp>
-#include <mbgl/style/conversion/json.hpp>
 
 #include <boost/archive/iterators/base64_from_binary.hpp>
 #include <boost/archive/iterators/insert_linebreaks.hpp>
 #include <boost/archive/iterators/transform_width.hpp>
 #include <boost/archive/iterators/ostream_iterator.hpp>
-
-#include "filesystem.hpp"
-#include "metadata.hpp"
-#include "parser.hpp"
-#include "runner.hpp"
 
 #include <regex>
 #include <sstream>
@@ -569,6 +584,697 @@ TestMetadata parseTestMetadata(const TestPaths& paths, const Manifest& manifest)
     // TODO: addFakeCanvas
 
     return metadata;
+}
+
+namespace TestOperationNames {
+const std::string waitOp("wait");
+const std::string sleepOp("sleep");
+const std::string addImageOp("addImage");
+const std::string updateImageOp("updateImage");
+const std::string removeImageOp("removeImage");
+const std::string setStyleOp("setStyle");
+const std::string setCenterOp("setCenter");
+const std::string setZoomOp("setZoom");
+const std::string setBearingOp("setBearing");
+const std::string setPitchOp("setPitch");
+const std::string setFilterOp("setFilter");
+const std::string setLayerZoomRangeOp("setLayerZoomRange");
+const std::string setLightOp("setLight");
+const std::string addLayerOp("addLayer");
+const std::string removeLayerOp("removeLayer");
+const std::string addSourceOp("addSource");
+const std::string removeSourceOp("removeSource");
+const std::string setPaintPropertyOp("setPaintProperty");
+const std::string setLayoutPropertyOp("setLayoutProperty");
+const std::string fileSizeProbeOp("probeFileSize");
+const std::string memoryProbeOp("probeMemory");
+const std::string memoryProbeStartOp("probeMemoryStart");
+const std::string memoryProbeEndOp("probeMemoryEnd");
+const std::string networkProbeOp("probeNetwork");
+const std::string networkProbeStartOp("probeNetworkStart");
+const std::string networkProbeEndOp("probeNetworkEnd");
+const std::string setFeatureStateOp("setFeatureState");
+const std::string getFeatureStateOp("getFeatureState");
+const std::string removeFeatureStateOp("removeFeatureState");
+const std::string panGestureOp("panGesture");
+const std::string gfxProbeOp("probeGFX");
+const std::string gfxProbeStartOp("probeGFXStart");
+const std::string gfxProbeEndOp("probeGFXEnd");
+} // namespace TestOperationNames
+
+using namespace TestOperationNames;
+
+TestOperations parseTestOperations(TestMetadata& metadata, const Manifest& manifest) {
+    TestOperations result;
+    if (!metadata.document.HasMember("metadata") || !metadata.document["metadata"].HasMember("test") ||
+        !metadata.document["metadata"]["test"].HasMember("operations")) {
+        return result;
+    }
+    assert(metadata.document["metadata"]["test"]["operations"].IsArray());
+
+    const auto& operationsArray = metadata.document["metadata"]["test"]["operations"].GetArray();
+    if (operationsArray.Empty()) {
+        return result;
+    }
+    for (auto& operationArray : operationsArray) {
+        assert(operationArray.Size() >= 1u);
+
+        if (operationArray[0].GetString() == waitOp) {
+            // wait
+            result.emplace_back([](TestContext& ctx) {
+                try {
+                    ctx.getFrontend().render(ctx.getMap());
+                    return true;
+                } catch (const std::exception&) {
+                    return false;
+                }
+            });
+        } else if (operationArray[0].GetString() == sleepOp) {
+            // sleep
+            mbgl::Duration duration = mbgl::Seconds(3);
+            if (operationArray.Size() >= 2u) {
+                duration = mbgl::Milliseconds(operationArray[1].GetUint());
+            }
+            result.emplace_back([duration](TestContext&) {
+                mbgl::util::Timer sleepTimer;
+                bool sleeping = true;
+
+                sleepTimer.start(duration, mbgl::Duration::zero(), [&]() { sleeping = false; });
+
+                while (sleeping) {
+                    mbgl::util::RunLoop::Get()->runOnce();
+                }
+                return true;
+            });
+
+        } else if (operationArray[0].GetString() == addImageOp || operationArray[0].GetString() == updateImageOp) {
+            // addImage | updateImage
+            assert(operationArray.Size() >= 3u);
+
+            float pixelRatio = 1.0f;
+            bool sdf = false;
+
+            if (operationArray.Size() == 4u) {
+                assert(operationArray[3].IsObject());
+                const auto& imageOptions = operationArray[3].GetObject();
+                if (imageOptions.HasMember("pixelRatio")) {
+                    pixelRatio = imageOptions["pixelRatio"].GetFloat();
+                }
+                if (imageOptions.HasMember("sdf")) {
+                    sdf = imageOptions["sdf"].GetBool();
+                }
+            }
+
+            std::string imageName = operationArray[1].GetString();
+            imageName.erase(std::remove(imageName.begin(), imageName.end(), '"'), imageName.end());
+
+            std::string imagePath = operationArray[2].GetString();
+            imagePath.erase(std::remove(imagePath.begin(), imagePath.end(), '"'), imagePath.end());
+
+            const mbgl::filesystem::path filePath = (mbgl::filesystem::path(manifest.getAssetPath()) / imagePath);
+
+            result.emplace_back([filePath = filePath.string(), imageName, sdf, pixelRatio](TestContext& ctx) {
+                mbgl::optional<std::string> maybeImage = mbgl::util::readFile(filePath);
+                if (!maybeImage) {
+                    ctx.getMetadata().errorMessage = std::string("Failed to load expected image ") + filePath;
+                    return false;
+                }
+
+                ctx.getMap().getStyle().addImage(
+                    std::make_unique<mbgl::style::Image>(imageName, mbgl::decodeImage(*maybeImage), pixelRatio, sdf));
+                return true;
+            });
+
+        } else if (operationArray[0].GetString() == removeImageOp) {
+            // removeImage
+            assert(operationArray.Size() >= 2u);
+            assert(operationArray[1].IsString());
+
+            std::string imageName{operationArray[1].GetString(), operationArray[1].GetStringLength()};
+            result.emplace_back([imageName](TestContext& ctx) {
+                ctx.getMap().getStyle().removeImage(imageName);
+                return true;
+            });
+        } else if (operationArray[0].GetString() == setStyleOp) {
+            // setStyle
+            assert(operationArray.Size() >= 2u);
+            std::string json;
+            if (operationArray[1].IsString()) {
+                std::string stylePath = manifest.localizeURL(operationArray[1].GetString());
+                auto maybeStyle = readJson(stylePath);
+                if (maybeStyle.is<mbgl::JSDocument>()) {
+                    auto& style = maybeStyle.get<mbgl::JSDocument>();
+                    manifest.localizeStyleURLs(static_cast<mbgl::JSValue&>(style), style);
+                    json = serializeJsonValue(style);
+                }
+            } else {
+                manifest.localizeStyleURLs(operationArray[1], metadata.document);
+                json = serializeJsonValue(operationArray[1]);
+            }
+            result.emplace_back([json](TestContext& ctx) {
+                ctx.getMap().getStyle().loadJSON(json);
+                return true;
+            });
+        } else if (operationArray[0].GetString() == setCenterOp) {
+            // setCenter
+            assert(operationArray.Size() >= 2u);
+            assert(operationArray[1].IsArray());
+
+            const auto& centerArray = operationArray[1].GetArray();
+            assert(centerArray.Size() == 2u);
+            mbgl::LatLng center{centerArray[1].GetDouble(), centerArray[0].GetDouble()};
+            result.emplace_back([center](TestContext& ctx) {
+                ctx.getMap().jumpTo(mbgl::CameraOptions().withCenter(center));
+                return true;
+            });
+        } else if (operationArray[0].GetString() == setZoomOp) {
+            // setZoom
+            assert(operationArray.Size() >= 2u);
+            assert(operationArray[1].IsNumber());
+            double zoom = operationArray[1].GetDouble();
+            result.emplace_back([zoom](TestContext& ctx) {
+                ctx.getMap().jumpTo(mbgl::CameraOptions().withZoom(zoom));
+                return true;
+            });
+        } else if (operationArray[0].GetString() == setBearingOp) {
+            // setBearing
+            assert(operationArray.Size() >= 2u);
+            assert(operationArray[1].IsNumber());
+            double bearing = operationArray[1].GetDouble();
+            result.emplace_back([bearing](TestContext& ctx) {
+                ctx.getMap().jumpTo(mbgl::CameraOptions().withBearing(bearing));
+                return true;
+            });
+        } else if (operationArray[0].GetString() == setPitchOp) {
+            // setPitch
+            assert(operationArray.Size() >= 2u);
+            assert(operationArray[1].IsNumber());
+            double pitch = operationArray[1].GetDouble();
+            result.emplace_back([pitch](TestContext& ctx) {
+                ctx.getMap().jumpTo(mbgl::CameraOptions().withPitch(pitch));
+                return true;
+            });
+        } else if (operationArray[0].GetString() == setFilterOp) {
+            // setFilter
+            assert(operationArray.Size() >= 3u);
+            assert(operationArray[1].IsString());
+
+            std::string layerName{operationArray[1].GetString(), operationArray[1].GetStringLength()};
+            mbgl::style::conversion::Error error;
+            auto converted = mbgl::style::conversion::convert<mbgl::style::Filter>(operationArray[2], error);
+            result.emplace_back([converted, layerName, error](TestContext& ctx) {
+                if (!converted) {
+                    ctx.getMetadata().errorMessage = std::string("Unable to convert filter: ") + error.message;
+                    return false;
+                }
+                auto layer = ctx.getMap().getStyle().getLayer(layerName);
+                if (!layer) {
+                    ctx.getMetadata().errorMessage = std::string("Layer not found: ") + layerName;
+                    return false;
+                }
+                layer->setFilter(std::move(*converted));
+                return true;
+            });
+
+        } else if (operationArray[0].GetString() == setLayerZoomRangeOp) {
+            // setLayerZoomRange
+            assert(operationArray.Size() >= 4u);
+            assert(operationArray[1].IsString());
+            assert(operationArray[2].IsNumber());
+            assert(operationArray[3].IsNumber());
+
+            std::string layerName{operationArray[1].GetString(), operationArray[1].GetStringLength()};
+            float minZoom = operationArray[2].GetFloat();
+            float maxZoom = operationArray[3].GetFloat();
+            result.emplace_back([layerName, minZoom, maxZoom](TestContext& ctx) {
+                auto layer = ctx.getMap().getStyle().getLayer(layerName);
+                if (!layer) {
+                    ctx.getMetadata().errorMessage = std::string("Layer not found: ") + layerName;
+                    return false;
+                }
+                layer->setMinZoom(minZoom);
+                layer->setMaxZoom(maxZoom);
+                return true;
+            });
+        } else if (operationArray[0].GetString() == setLightOp) {
+            // setLight
+            assert(operationArray.Size() >= 2u);
+            assert(operationArray[1].IsObject());
+            mbgl::style::conversion::Error error;
+            auto converted = mbgl::style::conversion::convert<mbgl::style::Light>(operationArray[1], error);
+            if (!converted) {
+                metadata.errorMessage = std::string("Unable to convert light: ") + error.message;
+                return {};
+            }
+            result.emplace_back([impl = converted->impl](TestContext& ctx) {
+                ctx.getMap().getStyle().setLight(std::make_unique<mbgl::style::Light>(impl));
+                return true;
+            });
+        } else if (operationArray[0].GetString() == addLayerOp) {
+            // addLayer
+            assert(operationArray.Size() >= 2u);
+            assert(operationArray[1].IsObject());
+            result.emplace_back([json = serializeJsonValue(operationArray[1])](TestContext& ctx) {
+                mbgl::style::conversion::Error error;
+                auto converted = mbgl::style::conversion::convertJSON<std::unique_ptr<mbgl::style::Layer>>(json, error);
+                if (!converted) {
+                    ctx.getMetadata().errorMessage = std::string("Unable to convert layer: ") + error.message;
+                    return false;
+                }
+                ctx.getMap().getStyle().addLayer(std::move(*converted));
+                return true;
+            });
+        } else if (operationArray[0].GetString() == removeLayerOp) {
+            // removeLayer
+            assert(operationArray.Size() >= 2u);
+            assert(operationArray[1].IsString());
+            std::string layerName = operationArray[1].GetString();
+            result.emplace_back(
+                [layerName](TestContext& ctx) { return bool(ctx.getMap().getStyle().removeLayer(layerName)); });
+        } else if (operationArray[0].GetString() == addSourceOp) {
+            // addSource
+            assert(operationArray.Size() >= 3u);
+            assert(operationArray[1].IsString());
+            assert(operationArray[2].IsObject());
+            std::string sourceName = operationArray[1].GetString();
+
+            manifest.localizeSourceURLs(operationArray[2], metadata.document);
+            result.emplace_back([sourceName, json = serializeJsonValue(operationArray[2])](TestContext& ctx) {
+                mbgl::style::conversion::Error error;
+                auto converted =
+                    mbgl::style::conversion::convertJSON<std::unique_ptr<mbgl::style::Source>>(json, error, sourceName);
+                if (!converted) {
+                    ctx.getMetadata().errorMessage = std::string("Unable to convert source: ") + error.message;
+                    return false;
+                }
+                ctx.getMap().getStyle().addSource(std::move(*converted));
+                return true;
+            });
+        } else if (operationArray[0].GetString() == removeSourceOp) {
+            // removeSource
+            assert(operationArray.Size() >= 2u);
+            assert(operationArray[1].IsString());
+            std::string sourceName = operationArray[1].GetString();
+            result.emplace_back(
+                [sourceName](TestContext& ctx) { return bool(ctx.getMap().getStyle().removeSource(sourceName)); });
+        } else if (operationArray[0].GetString() == setLayoutPropertyOp ||
+                   operationArray[0].GetString() == setPaintPropertyOp) {
+            // set{Paint|Layout}Property
+            assert(operationArray.Size() >= 4u);
+            assert(operationArray[1].IsString());
+            assert(operationArray[2].IsString());
+
+            std::string layerName{operationArray[1].GetString(), operationArray[1].GetStringLength()};
+            std::string propertyName{operationArray[2].GetString(), operationArray[2].GetStringLength()};
+            result.emplace_back(
+                [layerName, propertyName, json = serializeJsonValue(operationArray[3])](TestContext& ctx) {
+                    auto layer = ctx.getMap().getStyle().getLayer(layerName);
+                    if (!layer) {
+                        ctx.getMetadata().errorMessage = std::string("Layer not found: ") + layerName;
+                        return false;
+                    }
+                    mbgl::JSDocument d;
+                    d.Parse(json.c_str(), json.length());
+                    const mbgl::JSValue* propertyValue = &d;
+                    layer->setProperty(propertyName, propertyValue);
+                    return true;
+                });
+        } else if (operationArray[0].GetString() == fileSizeProbeOp) {
+            // probeFileSize
+            assert(operationArray.Size() >= 4u);
+            assert(operationArray[1].IsString());
+            assert(operationArray[2].IsString());
+            assert(operationArray[3].IsNumber());
+
+            std::string mark = std::string(operationArray[1].GetString(), operationArray[1].GetStringLength());
+            std::string path = std::string(operationArray[2].GetString(), operationArray[2].GetStringLength());
+            assert(!path.empty());
+
+            float tolerance = operationArray[3].GetDouble();
+            mbgl::filesystem::path filePath(path);
+
+            bool compressed = false;
+            if (operationArray.Size() == 5) {
+                assert(operationArray[4].IsString());
+                assert(std::string(operationArray[4].GetString(), operationArray[4].GetStringLength()) == "compressed");
+                compressed = true;
+            }
+
+            if (!filePath.is_absolute()) {
+                filePath = metadata.paths.defaultExpectations() / filePath;
+            }
+            result.emplace_back([filePath, path, mark, tolerance, compressed](TestContext& ctx) {
+                if (!mbgl::filesystem::exists(filePath)) {
+                    ctx.getMetadata().errorMessage = std::string("File not found: ") + path;
+                    return false;
+                }
+                size_t size = 0;
+                if (compressed) {
+                    size = mbgl::util::compress(*mbgl::util::readFile(filePath)).size();
+                } else {
+                    size = mbgl::filesystem::file_size(filePath);
+                }
+
+                ctx.getMetadata().metrics.fileSize.emplace(std::piecewise_construct,
+                                                           std::forward_as_tuple(std::move(mark)),
+                                                           std::forward_as_tuple(std::move(path), size, tolerance));
+                return true;
+            });
+        } else if (operationArray[0].GetString() == memoryProbeStartOp) {
+            // probeMemoryStart
+            result.emplace_back([](TestContext&) {
+                assert(!AllocationIndex::isActive());
+                AllocationIndex::setActive(true);
+                return true;
+            });
+        } else if (operationArray[0].GetString() == memoryProbeOp) {
+            // probeMemory
+            assert(AllocationIndex::isActive());
+            assert(operationArray.Size() >= 2u);
+            assert(operationArray[1].IsString());
+            std::string mark = std::string(operationArray[1].GetString(), operationArray[1].GetStringLength());
+            float tolerance = -1.0f;
+            if (operationArray.Size() >= 3u) {
+                assert(operationArray[2].IsNumber());
+                tolerance = float(operationArray[2].GetDouble());
+            }
+            result.emplace_back([mark, tolerance](TestContext& ctx) {
+                auto emplaced = ctx.getMetadata().metrics.memory.emplace(
+                    std::piecewise_construct,
+                    std::forward_as_tuple(std::move(mark)),
+                    std::forward_as_tuple(AllocationIndex::getAllocatedSizePeak(),
+                                          AllocationIndex::getAllocationsCount()));
+                if (tolerance >= 0.0f) emplaced.first->second.tolerance = tolerance;
+                return true;
+            });
+        } else if (operationArray[0].GetString() == memoryProbeEndOp) {
+            // probeMemoryEnd
+            result.emplace_back([](TestContext&) {
+                assert(AllocationIndex::isActive());
+                AllocationIndex::setActive(false);
+                AllocationIndex::reset();
+                return true;
+            });
+        } else if (operationArray[0].GetString() == networkProbeStartOp) {
+            // probeNetworkStart
+            result.emplace_back([](TestContext&) {
+                assert(!mbgl::ProxyFileSource::isTrackingActive());
+                mbgl::ProxyFileSource::setTrackingActive(true);
+                return true;
+            });
+        } else if (operationArray[0].GetString() == networkProbeOp) {
+            // probeNetwork
+            assert(operationArray.Size() >= 2u);
+            assert(operationArray[1].IsString());
+            std::string mark = std::string(operationArray[1].GetString(), operationArray[1].GetStringLength());
+            result.emplace_back([mark](TestContext& ctx) {
+                assert(mbgl::ProxyFileSource::isTrackingActive());
+                ctx.getMetadata().metrics.network.emplace(
+                    std::piecewise_construct,
+                    std::forward_as_tuple(std::move(mark)),
+                    std::forward_as_tuple(mbgl::ProxyFileSource::getRequestCount(),
+                                          mbgl::ProxyFileSource::getTransferredSize()));
+                return true;
+            });
+        } else if (operationArray[0].GetString() == networkProbeEndOp) {
+            // probeNetworkEnd
+            result.emplace_back([](TestContext&) {
+                assert(mbgl::ProxyFileSource::isTrackingActive());
+                mbgl::ProxyFileSource::setTrackingActive(false);
+                return true;
+            });
+        } else if (operationArray[0].GetString() == setFeatureStateOp) {
+            // setFeatureState
+            assert(operationArray.Size() >= 3u);
+            assert(operationArray[1].IsObject());
+            assert(operationArray[2].IsObject());
+
+            using namespace mbgl;
+            using namespace mbgl::style::conversion;
+
+            std::string sourceID;
+            mbgl::optional<std::string> sourceLayer;
+            std::string featureID;
+            std::string stateKey;
+            Value stateValue;
+            bool valueParsed = false;
+            FeatureState parsedState;
+
+            const auto& featureOptions = operationArray[1].GetObject();
+            if (featureOptions.HasMember("source")) {
+                sourceID = featureOptions["source"].GetString();
+            }
+            if (featureOptions.HasMember("sourceLayer")) {
+                sourceLayer = {featureOptions["sourceLayer"].GetString()};
+            }
+            if (featureOptions.HasMember("id")) {
+                if (featureOptions["id"].IsString()) {
+                    featureID = featureOptions["id"].GetString();
+                } else if (featureOptions["id"].IsNumber()) {
+                    featureID = mbgl::util::toString(featureOptions["id"].GetUint64());
+                }
+            }
+            const JSValue* state = &operationArray[2];
+
+            const std::function<optional<Error>(const std::string&, const Convertible&)> convertFn =
+                [&](const std::string& k, const Convertible& v) -> optional<Error> {
+                optional<Value> value = toValue(v);
+                if (value) {
+                    stateValue = std::move(*value);
+                    valueParsed = true;
+                } else if (isArray(v)) {
+                    std::vector<Value> array;
+                    std::size_t length = arrayLength(v);
+                    array.reserve(length);
+                    for (size_t i = 0; i < length; ++i) {
+                        optional<Value> arrayVal = toValue(arrayMember(v, i));
+                        if (arrayVal) {
+                            array.emplace_back(*arrayVal);
+                        }
+                    }
+                    std::unordered_map<std::string, Value> result;
+                    result[k] = std::move(array);
+                    stateValue = std::move(result);
+                    valueParsed = true;
+                    return nullopt;
+
+                } else if (isObject(v)) {
+                    eachMember(v, convertFn);
+                }
+
+                if (!valueParsed) {
+                    metadata.errorMessage = std::string("Could not get feature state value, state key: ") + k;
+                    return nullopt;
+                }
+                stateKey = k;
+                parsedState[stateKey] = stateValue;
+                return nullopt;
+            };
+
+            eachMember(state, convertFn);
+            result.emplace_back([sourceID, sourceLayer, featureID, parsedState](TestContext& ctx) {
+                auto& frontend = ctx.getFrontend();
+                try {
+                    frontend.render(ctx.getMap());
+                } catch (const std::exception&) {
+                    return false;
+                }
+                frontend.getRenderer()->setFeatureState(sourceID, sourceLayer, featureID, parsedState);
+                return true;
+            });
+        } else if (operationArray[0].GetString() == getFeatureStateOp) {
+            // getFeatureState
+            assert(operationArray.Size() >= 2u);
+            assert(operationArray[1].IsObject());
+
+            std::string sourceID;
+            mbgl::optional<std::string> sourceLayer;
+            std::string featureID;
+
+            const auto& featureOptions = operationArray[1].GetObject();
+            if (featureOptions.HasMember("source")) {
+                sourceID = featureOptions["source"].GetString();
+            }
+            if (featureOptions.HasMember("sourceLayer")) {
+                sourceLayer = {featureOptions["sourceLayer"].GetString()};
+            }
+            if (featureOptions.HasMember("id")) {
+                if (featureOptions["id"].IsString()) {
+                    featureID = featureOptions["id"].GetString();
+                } else if (featureOptions["id"].IsNumber()) {
+                    featureID = mbgl::util::toString(featureOptions["id"].GetUint64());
+                }
+            }
+            result.emplace_back([sourceID, sourceLayer, featureID](TestContext& ctx) {
+                auto& frontend = ctx.getFrontend();
+                try {
+                    frontend.render(ctx.getMap());
+                } catch (const std::exception&) {
+                    return false;
+                }
+                mbgl::FeatureState state;
+                frontend.getRenderer()->getFeatureState(state, sourceID, sourceLayer, featureID);
+                return true;
+            });
+        } else if (operationArray[0].GetString() == removeFeatureStateOp) {
+            // removeFeatureState
+            assert(operationArray.Size() >= 2u);
+            assert(operationArray[1].IsObject());
+
+            std::string sourceID;
+            mbgl::optional<std::string> sourceLayer;
+            std::string featureID;
+            mbgl::optional<std::string> stateKey;
+
+            const auto& featureOptions = operationArray[1].GetObject();
+            if (featureOptions.HasMember("source")) {
+                sourceID = featureOptions["source"].GetString();
+            }
+            if (featureOptions.HasMember("sourceLayer")) {
+                sourceLayer = {featureOptions["sourceLayer"].GetString()};
+            }
+            if (featureOptions.HasMember("id")) {
+                if (featureOptions["id"].IsString()) {
+                    featureID = featureOptions["id"].GetString();
+                } else if (featureOptions["id"].IsNumber()) {
+                    featureID = mbgl::util::toString(featureOptions["id"].GetUint64());
+                }
+            }
+
+            if (operationArray.Size() >= 3u) {
+                assert(operationArray[2].IsString());
+                stateKey = {operationArray[2].GetString()};
+            }
+
+            result.emplace_back([sourceID, sourceLayer, featureID, stateKey](TestContext& ctx) {
+                auto& frontend = ctx.getFrontend();
+                try {
+                    frontend.render(ctx.getMap());
+                } catch (const std::exception&) {
+                    return false;
+                }
+                frontend.getRenderer()->removeFeatureState(sourceID, sourceLayer, featureID, stateKey);
+                return true;
+            });
+        } else if (operationArray[0].GetString() == panGestureOp) {
+            // benchmarkPanGesture
+            assert(operationArray.Size() >= 4u);
+            assert(operationArray[1].IsString()); // identifier
+            assert(operationArray[2].IsNumber()); // duration
+            assert(operationArray[3].IsArray());  // start [lat, lng, zoom]
+            assert(operationArray[4].IsArray());  // end [lat, lng, zoom]
+
+            if (metadata.mapMode != mbgl::MapMode::Continuous) {
+                metadata.errorMessage = "Map mode must be Continous for " + panGestureOp + " operation";
+                return {};
+            }
+
+            std::string mark = operationArray[1].GetString();
+            int duration = operationArray[2].GetFloat();
+            mbgl::LatLng startPos, endPos;
+            double startZoom, endZoom;
+
+            auto parsePosition = [](auto arr) -> std::tuple<mbgl::LatLng, double> {
+                assert(arr.Size() >= 3);
+                return {{arr[1].GetDouble(), arr[0].GetDouble()}, arr[2].GetDouble()};
+            };
+
+            std::tie(startPos, startZoom) = parsePosition(operationArray[3].GetArray());
+            std::tie(endPos, endZoom) = parsePosition(operationArray[4].GetArray());
+
+            result.emplace_back([mark, duration, startPos, endPos, startZoom, endZoom](TestContext& ctx) {
+                auto& map = ctx.getMap();
+                auto& observer = ctx.getObserver();
+                auto& frontend = ctx.getFrontend();
+                std::vector<float> samples;
+                // Jump to the starting point of the segment and make sure there's something to render
+                map.jumpTo(mbgl::CameraOptions().withCenter(startPos).withZoom(startZoom));
+
+                observer.reset();
+                while (!observer.finishRenderingMap) {
+                    frontend.renderOnce(map);
+                }
+
+                if (observer.mapLoadFailure) return false;
+
+                size_t frames = 0;
+                float totalTime = 0.0;
+                bool transitionFinished = false;
+
+                mbgl::AnimationOptions animationOptions(mbgl::Milliseconds(duration * 1000));
+                animationOptions.minZoom = mbgl::util::min(startZoom, endZoom);
+                animationOptions.transitionFinishFn = [&]() { transitionFinished = true; };
+
+                map.flyTo(mbgl::CameraOptions().withCenter(endPos).withZoom(endZoom), animationOptions);
+
+                while (!transitionFinished) {
+                    frames++;
+                    frontend.renderOnce(map);
+                    float frameTime = (float)frontend.getFrameTime();
+                    totalTime += frameTime;
+
+                    samples.push_back(frameTime);
+                }
+
+                float averageFps = totalTime > 0.0 ? frames / totalTime : 0.0;
+                float minFrameTime = 0.0;
+
+                // Use 1% of the longest frames to compute the minimum fps
+                std::sort(samples.begin(), samples.end());
+
+                int sampleCount = mbgl::util::max(1, (int)samples.size() / 100);
+                for (auto it = samples.rbegin(); it != samples.rbegin() + sampleCount; it++) minFrameTime += *it;
+
+                float minOnePcFps = sampleCount / minFrameTime;
+
+                ctx.getMetadata().metrics.fps.insert({mark, {averageFps, minOnePcFps, 0.0f}});
+                return true;
+            });
+        } else if (operationArray[0].GetString() == gfxProbeStartOp) {
+            // probeGFXStart
+            result.emplace_back([](TestContext& ctx) {
+                assert(!ctx.gfxProbeActive);
+                ctx.gfxProbeActive = true;
+                ctx.baselineGfxProbe = ctx.activeGfxProbe;
+                return true;
+            });
+        } else if (operationArray[0].GetString() == gfxProbeEndOp) {
+            // probeGFXEnd
+            result.emplace_back([](TestContext& ctx) {
+                assert(ctx.gfxProbeActive);
+                ctx.gfxProbeActive = false;
+                return true;
+            });
+        } else if (operationArray[0].GetString() == gfxProbeOp) {
+            // probeGFX
+            assert(operationArray.Size() >= 2u);
+            assert(operationArray[1].IsString());
+
+            std::string mark = std::string(operationArray[1].GetString(), operationArray[1].GetStringLength());
+            result.emplace_back([mark](TestContext& ctx) {
+                auto& frontend = ctx.getFrontend();
+                // Render the map and fetch rendering stats
+                try {
+                    mbgl::gfx::RenderingStats stats = frontend.render(ctx.getMap()).stats;
+                    ctx.activeGfxProbe = GfxProbe(stats, ctx.activeGfxProbe);
+                } catch (const std::exception&) {
+                    return false;
+                }
+                // Compare memory allocations to the baseline probe
+                GfxProbe metricProbe = ctx.activeGfxProbe;
+                metricProbe.memIndexBuffers.peak -= ctx.baselineGfxProbe.memIndexBuffers.peak;
+                metricProbe.memVertexBuffers.peak -= ctx.baselineGfxProbe.memVertexBuffers.peak;
+                metricProbe.memTextures.peak -= ctx.baselineGfxProbe.memTextures.peak;
+                ctx.getMetadata().metrics.gfx.insert({mark, metricProbe});
+                return true;
+            });
+        } else {
+            metadata.errorMessage = std::string("Unsupported operation: ") + operationArray[0].GetString();
+            return {};
+        }
+    }
+
+    return result;
 }
 
 // https://stackoverflow.com/questions/7053538/how-do-i-encode-a-string-to-base64-using-only-boost

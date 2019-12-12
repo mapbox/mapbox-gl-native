@@ -11,22 +11,27 @@
 class TestRunnerMapObserver;
 struct TestMetadata;
 
-class TestContext {
+class TestRunnerMapObserver : public mbgl::MapObserver {
 public:
-    virtual mbgl::HeadlessFrontend& getFrontend() = 0;
-    virtual mbgl::Map& getMap() = 0;
-    virtual TestRunnerMapObserver& getObserver() = 0;
-    virtual TestMetadata& getMetadata() = 0;
+    TestRunnerMapObserver() = default;
+    void onDidFailLoadingMap(mbgl::MapLoadError, const std::string&) override { mapLoadFailure = true; }
 
-    GfxProbe activeGfxProbe;
-    GfxProbe baselineGfxProbe;
-    bool gfxProbeActive = false;
+    void onDidFinishRenderingMap(RenderMode mode) override final {
+        if (!finishRenderingMap) finishRenderingMap = mode == RenderMode::Full;
+    }
 
-protected:
-    virtual ~TestContext() = default;
+    void onDidBecomeIdle() override final { idle = true; }
+
+    void reset() {
+        mapLoadFailure = false;
+        finishRenderingMap = false;
+        idle = false;
+    }
+
+    bool mapLoadFailure;
+    bool finishRenderingMap;
+    bool idle;
 };
-
-using TestOperation = std::function<bool(TestContext&)>;
 
 class TestRunner {
 public:
@@ -40,7 +45,6 @@ public:
     void doShuffle(uint32_t seed);
 
 private:
-    bool runOperations(TestContext&);
     bool runInjectedProbesBegin(TestContext&);
     bool runInjectedProbesEnd(TestContext&, mbgl::gfx::RenderingStats);
 
