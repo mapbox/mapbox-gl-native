@@ -6,35 +6,45 @@ workflows:
     jobs:
       - next-sanity-checks
       - next-android-render-test-runner
+      - next-baselines:
+          requires:
+            - next-android-arm64-v8a-release
+            - next-android-armeabi-v7a-release
+            - next-android-render-test-runner
+            - next-android-x86-release
+            - next-android-x86_64-release
+            - next-linux-clang8-release
+            - next-linux-gcc8-release
+            - next-macos-xcode11-release
       - next-build-template:
           name: next-android-armeabi-v7a-release
           executor_name: ubuntu-disco
           target_is_android: true
-          config_params: '-G Ninja -DCMAKE_INSTALL_PREFIX=workspace/$CIRCLE_JOB -DCMAKE_TOOLCHAIN_FILE=/opt/android/ndk-bundle/build/cmake/android.toolchain.cmake -DANDROID_CCACHE=/usr/bin/ccache -DANDROID_ABI=armeabi-v7a'
+          config_params: '-G Ninja -DCMAKE_INSTALL_PREFIX=/tmp/workspace/install/$CIRCLE_JOB -DCMAKE_TOOLCHAIN_FILE=/opt/android/ndk-bundle/build/cmake/android.toolchain.cmake -DANDROID_CCACHE=/usr/bin/ccache -DANDROID_ABI=armeabi-v7a'
           install: true
       - next-build-template:
           name: next-android-arm64-v8a-release
           executor_name: ubuntu-disco
           target_is_android: true
-          config_params: '-G Ninja -DCMAKE_INSTALL_PREFIX=workspace/$CIRCLE_JOB -DCMAKE_TOOLCHAIN_FILE=/opt/android/ndk-bundle/build/cmake/android.toolchain.cmake -DANDROID_CCACHE=/usr/bin/ccache -DANDROID_ABI=arm64-v8a'
+          config_params: '-G Ninja -DCMAKE_INSTALL_PREFIX=/tmp/workspace/install/$CIRCLE_JOB -DCMAKE_TOOLCHAIN_FILE=/opt/android/ndk-bundle/build/cmake/android.toolchain.cmake -DANDROID_CCACHE=/usr/bin/ccache -DANDROID_ABI=arm64-v8a'
           install: true
       - next-build-template:
           name: next-android-x86-release
           executor_name: ubuntu-disco
           target_is_android: true
-          config_params: '-G Ninja -DCMAKE_INSTALL_PREFIX=workspace/$CIRCLE_JOB -DCMAKE_TOOLCHAIN_FILE=/opt/android/ndk-bundle/build/cmake/android.toolchain.cmake -DANDROID_CCACHE=/usr/bin/ccache -DANDROID_ABI=x86'
+          config_params: '-G Ninja -DCMAKE_INSTALL_PREFIX=/tmp/workspace/install/$CIRCLE_JOB -DCMAKE_TOOLCHAIN_FILE=/opt/android/ndk-bundle/build/cmake/android.toolchain.cmake -DANDROID_CCACHE=/usr/bin/ccache -DANDROID_ABI=x86'
           install: true
       - next-build-template:
           name: next-android-x86_64-release
           executor_name: ubuntu-disco
           target_is_android: true
-          config_params: '-G Ninja -DCMAKE_INSTALL_PREFIX=workspace/$CIRCLE_JOB -DCMAKE_TOOLCHAIN_FILE=/opt/android/ndk-bundle/build/cmake/android.toolchain.cmake -DANDROID_CCACHE=/usr/bin/ccache -DANDROID_ABI=x86_64'
+          config_params: '-G Ninja -DCMAKE_INSTALL_PREFIX=/tmp/workspace/install/$CIRCLE_JOB -DCMAKE_TOOLCHAIN_FILE=/opt/android/ndk-bundle/build/cmake/android.toolchain.cmake -DANDROID_CCACHE=/usr/bin/ccache -DANDROID_ABI=x86_64'
           install: true
       - next-build-template:
           name: next-linux-gcc8-release
           executor_name: ubuntu-disco
           target_is_linux: true
-          config_params: '-G Ninja -DCMAKE_INSTALL_PREFIX=workspace/$CIRCLE_JOB -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=gcc-8 -DCMAKE_CXX_COMPILER=g++-8'
+          config_params: '-G Ninja -DCMAKE_INSTALL_PREFIX=/tmp/workspace/install/$CIRCLE_JOB -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=gcc-8 -DCMAKE_CXX_COMPILER=g++-8'
           install: true
           metrics: true
           style_tests: true
@@ -59,16 +69,8 @@ workflows:
           name: next-linux-clang8-release
           executor_name: ubuntu-disco
           target_is_linux: true
-          requires:
-            - next-android-armeabi-v7a-release
-            - next-android-arm64-v8a-release
-            - next-android-x86-release
-            - next-android-x86_64-release
-            - next-linux-gcc8-release
-            - next-macos-xcode11-release
-          config_params: '-G Ninja -DCMAKE_INSTALL_PREFIX=workspace/$CIRCLE_JOB -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8'
+          config_params: '-G Ninja -DCMAKE_INSTALL_PREFIX=/tmp/workspace/install/$CIRCLE_JOB -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8'
           install: true
-          binary_size: true
           style_tests: true
       - next-build-template:
           name: next-FIXME-linux-asan
@@ -119,7 +121,7 @@ workflows:
           name: next-macos-xcode11-release
           executor_name: macos-11_0_0
           target_is_macos: true
-          config_params: '-G Ninja -DCMAKE_INSTALL_PREFIX=workspace/$CIRCLE_JOB -DCMAKE_CXX_COMPILER_LAUNCHER=ccache'
+          config_params: '-G Ninja -DCMAKE_INSTALL_PREFIX=/tmp/workspace/install/$CIRCLE_JOB -DCMAKE_CXX_COMPILER_LAUNCHER=ccache'
           install: true
           style_tests: true
       - next-build-template:
@@ -268,10 +270,6 @@ commands:
           name: Install
           command: |
             cmake --build build --target install/strip
-      - persist_to_workspace:
-          root: workspace
-          paths:
-            - '*'
   next-test:
     parameters:
       test_params:
@@ -304,9 +302,13 @@ commands:
             - ~/.ccache
             - ~/.gradle
       - run:
-          name: Collecting artifacts
+          name: Collecting results
           when: always
           command: |
+            mkdir -p /tmp/workspace/metrics && touch /tmp/workspace/.$CIRCLE_JOB
+            if [ -d metrics/$CIRCLE_JOB ]; then cp -r metrics/$CIRCLE_JOB /tmp/workspace/metrics; fi
+            mkdir -p /tmp/tests/baselines
+            if [ -f baselines.patch ]; then cp baselines.patch /tmp/tests/baselines; fi
             mkdir -p /tmp/tests/nitpick
             if [ -f nitpick.patch ]; then cp nitpick.patch /tmp/tests/nitpick; fi
             mkdir -p /tmp/tests/render
@@ -319,6 +321,10 @@ commands:
             if ls core* 1> /dev/null 2>&1; then cp core* /tmp/tests/coredumps; fi
             mkdir -p /tmp/tests/valgrind
             if ls build/Testing/Temporary/MemoryChecker.*.log 1> /dev/null 2>&1; then cp build/Testing/Temporary/MemoryChecker.*.log /tmp/tests/valgrind; fi
+      - persist_to_workspace:
+          root: /tmp/workspace
+          paths:
+            - '*'
       - store_artifacts:
           path: /tmp/tests
           destination: tests
@@ -688,15 +694,14 @@ jobs:
             if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON}" && -z "${SKIP_FIREBASE:-}" ]]; then
               testResult=$(gsutil ls gs://test-lab-186672a0qp5bq-ycr70axads3nc/render-test-app-${CIRCLE_BUILD_NUM}/**/*.html)
               mkdir -p /tmp/tests/render-test-app
-              gsutil cp $testResult /tmp/tests/render-test-app | true
+              gsutil cp $testResult /tmp/tests/render-test-app
             fi
       - run:
           name: Retrieve Rebaselined Metrics from gcloud
-          when: on_fail
           command: |
             if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON}" && -z "${SKIP_FIREBASE:-}" ]]; then
-              metricsResult=$(gsutil ls -d gs://test-lab-186672a0qp5bq-ycr70axads3nc/render-test-app-${CIRCLE_BUILD_NUM}/*/*/sdcard/render-tests/)
-              gsutil -m cp -r $metricsResult metrics/next-android-render-test-runner/render-tests/ | true
+              metricsResult=$(gsutil ls -d gs://test-lab-186672a0qp5bq-ycr70axads3nc/render-test-app-${CIRCLE_BUILD_NUM}/*/*/sdcard/baselines/*) || true
+              gsutil -m cp -r $metricsResult metrics/next-android-render-test-runner/ || true
             fi
       - next-save
   next-sanity-checks:
@@ -734,6 +739,24 @@ jobs:
             run-clang-tidy-8 -quiet -j24 -p build $PWD/src/.*cpp $PWD/platform/.*cpp |tee clang-tidy.log
             grep -o \\[[a-z].*-.*[a-z]\] clang-tidy.log |sort |uniq -c |sort -n
       - next-save
+  next-baselines:
+    executor: ubuntu-disco
+    steps:
+      - checkout
+      - next-prepare
+      - next-prepare-linux
+      - attach_workspace:
+          at: /tmp/attach
+      - run:
+          name: 'Binary Size'
+          command: |
+            /tmp/attach/install/next-linux-gcc8-release/bin/mbgl-render-test-runner -u rebaseline -p metrics/next-binary-size.json
+      - run:
+          name: 'Matrics Baselines'
+          command: |
+            cp -r /tmp/attach/metrics .
+            git add -A && git diff --staged --exit-code | tee baselines.patch
+      - next-save
   next-build-template:
     parameters:
       config_params:
@@ -757,9 +780,6 @@ jobs:
         type: boolean
         default: false
       install:
-        type: boolean
-        default: false
-      binary_size:
         type: boolean
         default: false
       metrics:
@@ -815,14 +835,6 @@ jobs:
             - next-metrics:
                 step_name: 'Metrics'
                 metrics_params: '-u rebaseline -p metrics/$CIRCLE_JOB-metrics.json'
-      - when:
-          condition: << parameters.binary_size >>
-          steps:
-            - attach_workspace:
-                at: workspace
-            - next-metrics:
-                step_name: 'Binary Size'
-                metrics_params: '-u rebaseline -p metrics/binary-size.json'
       - next-save
 # ------------------------------------------------------------------------------
   node-linux-release:

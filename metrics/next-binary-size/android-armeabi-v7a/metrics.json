@@ -2,7 +2,7 @@
     "file-size": [
         [
             "android-armeabi-v7a",
-            "/src/workspace/next-android-armeabi-v7a-release/lib/libmapbox-gl.so",
+            "/tmp/attach/install/next-android-armeabi-v7a-release/lib/libmapbox-gl.so",
             1607847
         ]
     ]
