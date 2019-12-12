@@ -196,20 +196,22 @@ void unZipFile(JNIEnv* env, const std::string& zipFilePath, const std::string& d
             if (!(env->CallBooleanMethod(f, fileIsDirectory))) {
                 jmethodID mkdirs = env->GetMethodID(fileClass, "mkdirs", "()Z");
                 bool success = (env->CallBooleanMethod(f, mkdirs));
-                std::string fileName =
+                std::string fileNameStr =
                     jstringToStdString(env, static_cast<jstring>(env->CallObjectMethod(f, fileGetName)));
 
                 if (!success) {
                     mbgl::Log::Warning(
-                        mbgl::Event::General, "Failed to create folder entry %s from zip", fileName.c_str());
+                        mbgl::Event::General, "Failed to create folder entry %s from zip", fileNameStr.c_str());
                 }
             }
         } else if (!(env->CallBooleanMethod(f, fileExists))) {
             bool success = env->CallBooleanMethod(f, createNewFile);
-            std::string fileName = jstringToStdString(env, static_cast<jstring>(env->CallObjectMethod(f, fileGetName)));
+            std::string fileNameStr =
+                jstringToStdString(env, static_cast<jstring>(env->CallObjectMethod(f, fileGetName)));
 
             if (!success) {
-                mbgl::Log::Warning(mbgl::Event::General, "Failed to create folder entry %s from zip", fileName.c_str());
+                mbgl::Log::Warning(
+                    mbgl::Event::General, "Failed to create folder entry %s from zip", fileNameStr.c_str());
                 continue;
             }
 
