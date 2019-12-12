@@ -88,6 +88,7 @@ target_sources(
         ${MBGL_ROOT}/platform/darwin/src/run_loop.cpp
         ${MBGL_ROOT}/platform/darwin/src/string_nsstring.mm
         ${MBGL_ROOT}/platform/darwin/src/timer.cpp
+        ${MBGL_ROOT}/platform/darwin/src/native_apple_interface.m
         ${MBGL_ROOT}/platform/darwin/src/MGLNetworkIntegrationManager.m
         ${MBGL_ROOT}/platform/default/src/mbgl/gfx/headless_backend.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/gfx/headless_frontend.cpp
