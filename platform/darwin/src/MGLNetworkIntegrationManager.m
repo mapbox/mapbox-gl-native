@@ -1,4 +1,4 @@
-#import "MGLNativeInterfaceReceiver.h"
+#import "MGLNetworkIntegrationManager.h"
 
 #import "MGLLoggingConfiguration_Private.h"
 #import "MGLNetworkConfiguration_Private.h"
@@ -7,43 +7,43 @@
 #import "MGLAccountManager_Private.h"
 #endif
 
-@implementation MGLNativeInterfaceReceiver
+@implementation MGLNetworkIntegrationManager
 
-static MGLNativeInterfaceReceiver *instance = nil;
+static MGLNetworkIntegrationManager *instance = nil;
 
-+ (MGLNativeInterfaceReceiver *)shared {
++ (MGLNetworkIntegrationManager *)shared {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        instance = [[MGLNativeInterfaceReceiver alloc] init];
+        instance = [[MGLNetworkIntegrationManager alloc] init];
     });
     return instance;
 }
 
 #pragma mark - MGLNativeAppleInterfaceManager delegate -
 
-- (NSURLSessionConfiguration *)nai_sessionConfiguration {
+- (NSURLSessionConfiguration *)sessionConfiguration {
     return [MGLNetworkConfiguration sharedManager].sessionConfiguration;
 }
 
 #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
-- (NSString *)nai_accountTypeKey {
+- (NSString *)accountTypeKey {
     return MGLMapboxAccountTypeKey;
 }
 
-- (NSString *)nai_skuToken {
+- (NSString *)skuToken {
     return MGLAccountManager.skuToken;
 }
 #endif
 
-- (void)nai_startDownloadEvent:(NSString *)event type:(NSString *)type {
+- (void)startDownloadEvent:(NSString *)event type:(NSString *)type {
     [[MGLNetworkConfiguration sharedManager] startDownloadEvent:event type:@"tile"];
 }
 
-- (void)nai_cancelDownloadEventForResponse:(NSURLResponse *)response {
+- (void)cancelDownloadEventForResponse:(NSURLResponse *)response {
     [[MGLNetworkConfiguration sharedManager] cancelDownloadEventForResponse:response];
 }
 
-- (void)nai_stopDownloadEventForResponse:(NSURLResponse *)response {
+- (void)stopDownloadEventForResponse:(NSURLResponse *)response {
     [[MGLNetworkConfiguration sharedManager] stopDownloadEventForResponse:response];
 }
 
