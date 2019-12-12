@@ -10,14 +10,14 @@
 
 using Writer = rapidjson::PrettyWriter<rapidjson::StringBuffer>;
 
-class TestOperation {
+class TestOperationSerializer {
 public:
-    virtual ~TestOperation() = default;
+    virtual ~TestOperationSerializer() = default;
 
     virtual void serialize(Writer& writer) const = 0;
 };
 
-class SetCamera final : public TestOperation {
+class SetCamera final : public TestOperationSerializer {
 public:
     SetCamera(const mbgl::CameraOptions& camera_) : camera(camera_) {}
 
@@ -56,7 +56,7 @@ private:
     mbgl::CameraOptions camera;
 };
 
-class SetStyle final : public TestOperation {
+class SetStyle final : public TestOperationSerializer {
 public:
     SetStyle(const mbgl::style::Style& style) : url(style.getURL()) {}
 
@@ -71,7 +71,7 @@ private:
     std::string url;
 };
 
-class SetInitialSize final : public TestOperation {
+class SetInitialSize final : public TestOperationSerializer {
 public:
     SetInitialSize(const mbgl::Size& size) : width(size.width), height(size.height) {}
 

@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 
-class TestOperation;
+class TestOperationSerializer;
 
 class TestWriter final {
 public:
@@ -24,6 +24,6 @@ public:
 private:
     std::string serialize() const;
 
-    std::vector<std::unique_ptr<TestOperation>> operations;
-    std::unique_ptr<TestOperation> initialSize;
+    std::vector<std::unique_ptr<TestOperationSerializer>> operations;
+    std::unique_ptr<TestOperationSerializer> initialSize;
 };
