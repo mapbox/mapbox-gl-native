@@ -132,6 +132,7 @@ struct TestMetadata {
     mbgl::JSDocument document;
     bool renderTest = true;
     bool outputsImage = true;
+    bool ignoredTest = false;
 
     mbgl::Size size{ 512u, 512u };
     float pixelRatio = 1.0f;
