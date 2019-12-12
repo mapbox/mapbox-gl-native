@@ -6,7 +6,6 @@
 *~
 **/actual.png
 **/diff.png
-render-test/index.html
 offline.db
 new_offline.db
 xcuserdata
@@ -37,6 +36,9 @@ test/fixtures/storage/assets.zip
 /vendor/.cache
 buck-out
 .buckd
+
+# Generated metrics results
+metrics/*.html
 
 # Android RenderTestRunner
 render-test/android/.*

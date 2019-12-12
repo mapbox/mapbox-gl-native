@@ -121,3 +121,5 @@ target_link_libraries(
 
 add_test(NAME mbgl-benchmark-runner COMMAND mbgl-benchmark-runner WORKING_DIRECTORY ${MBGL_ROOT})
 add_test(NAME mbgl-test-runner COMMAND mbgl-test-runner WORKING_DIRECTORY ${MBGL_ROOT})
+
+install(TARGETS mbgl-render-test-runner RUNTIME DESTINATION bin)
