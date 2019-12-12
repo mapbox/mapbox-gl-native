@@ -314,16 +314,16 @@ bool TestRunner::checkRenderTestResults(mbgl::PremultipliedImage&& actualImage, 
     return true;
 }
 
-bool TestRunner::checkProbingResults(TestMetadata& metadata) {
-    if (metadata.metrics.isEmpty()) return true;
-    const auto writeMetrics = [&metadata](const mbgl::filesystem::path& path,
-                                          const std::string& message = std::string()) {
+bool TestRunner::checkProbingResults(TestMetadata& resultMetadata) {
+    if (resultMetadata.metrics.isEmpty()) return true;
+    const auto writeMetrics = [&resultMetadata](const mbgl::filesystem::path& path,
+                                                const std::string& message = std::string()) {
         mbgl::filesystem::create_directories(path);
-        mbgl::util::write_file(path / "metrics.json", serializeMetrics(metadata.metrics));
-        metadata.errorMessage += message;
+        mbgl::util::write_file(path / "metrics.json", serializeMetrics(resultMetadata.metrics));
+        resultMetadata.errorMessage += message;
     };
 
-    const std::vector<mbgl::filesystem::path>& expectedMetrics = metadata.paths.expectedMetrics;
+    const std::vector<mbgl::filesystem::path>& expectedMetrics = resultMetadata.paths.expectedMetrics;
     if (updateResults == UpdateResults::METRICS) {
         writeMetrics(expectedMetrics.back(), " Updated expected metrics.");
         return false;
@@ -344,15 +344,16 @@ bool TestRunner::checkProbingResults(TestMetadata& metadata) {
     for (const auto& entry : expectedMetricsPaths) {
         auto maybeExpectedMetrics = readExpectedMetrics(entry);
         if (maybeExpectedMetrics.isEmpty()) {
-            metadata.errorMessage = "Failed to load expected metrics " + entry;
+            resultMetadata.errorMessage = "Failed to load expected metrics " + entry;
             return false;
         }
-        metadata.expectedMetrics = maybeExpectedMetrics;
+        resultMetadata.expectedMetrics = maybeExpectedMetrics;
         break;
     }
 
-    if (metadata.expectedMetrics.isEmpty()) {
-        metadata.errorMessage = "Failed to find metric expectations for: " + metadata.paths.stylePath.string();
+    if (resultMetadata.expectedMetrics.isEmpty()) {
+        resultMetadata.errorMessage =
+            "Failed to find metric expectations for: " + resultMetadata.paths.stylePath.string();
         if (updateResults == UpdateResults::REBASELINE) {
             writeMetrics(expectedMetrics.back(), ". Created baseline for missing metrics.");
         }
@@ -577,8 +578,8 @@ bool TestRunner::checkProbingResults(TestMetadata& metadata) {
         return true;
     };
 
-    bool checkResult = checkFileSize(metadata) && checkMemory(metadata) && checkNetwork(metadata) &&
-                       checkFps(metadata) && checkGfx(metadata);
+    bool checkResult = checkFileSize(resultMetadata) && checkMemory(resultMetadata) && checkNetwork(resultMetadata) &&
+                       checkFps(resultMetadata) && checkGfx(resultMetadata);
 
     if (!checkResult && updateResults == UpdateResults::REBASELINE) {
         writeMetrics(expectedMetrics.back(), " Rebaselined expected metric for failed test.");
@@ -1248,7 +1249,7 @@ bool runInjectedProbe(TestMetadata& metadata,
     return true;
 }
 
-bool TestRunner::runInjectedProbesBegin(TestMetadata& metadata, RunContext& ctx) {
+bool TestRunner::runInjectedProbesBegin(TestMetadata& metadata_, RunContext& ctx_) {
     const std::string mark = " - default - start";
     static const InjectedProbeMap beginInjectedProbeMap = {
         {// Injected memory probe begin
@@ -1279,12 +1280,10 @@ bool TestRunner::runInjectedProbesBegin(TestMetadata& metadata, RunContext& ctx)
                  std::forward_as_tuple(ProxyFileSource::getRequestCount(), ProxyFileSource::getTransferredSize()));
          }}};
 
-    return runInjectedProbe(metadata, manifest.getProbes(), ctx, beginInjectedProbeMap);
+    return runInjectedProbe(metadata_, manifest.getProbes(), ctx_, beginInjectedProbeMap);
 }
 
-bool TestRunner::runInjectedProbesEnd(TestMetadata& metadata,
-                                      RunContext& ctx,
-                                      mbgl::gfx::RenderingStats stats) {
+bool TestRunner::runInjectedProbesEnd(TestMetadata& metadata_, RunContext& ctx_, mbgl::gfx::RenderingStats stats) {
     const std::string mark = " - default - end";
     static const InjectedProbeMap endInjectedProbeMap = {
         {// Injected memory probe end
@@ -1328,7 +1327,7 @@ bool TestRunner::runInjectedProbesEnd(TestMetadata& metadata,
              ProxyFileSource::setTrackingActive(false);
          }}};
 
-    return runInjectedProbe(metadata, manifest.getProbes(), ctx, endInjectedProbeMap);
+    return runInjectedProbe(metadata_, manifest.getProbes(), ctx_, endInjectedProbeMap);
 }
 
 void TestRunner::reset() {
