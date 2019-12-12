@@ -51,6 +51,7 @@ public:
 
     class Impl;
     Immutable<Impl> impl;
+    explicit Light(Immutable<Impl>);
     Mutable<Impl> mutableImpl() const;
 
     LightObserver* observer = nullptr;

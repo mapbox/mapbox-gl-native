@@ -17,10 +17,9 @@ namespace style {
 
 static LightObserver nullObserver;
 
-Light::Light()
-    : impl(makeMutable<Impl>()),
-      observer(&nullObserver) {
-}
+Light::Light(Immutable<Light::Impl> impl_) : impl(std::move(impl_)), observer(&nullObserver) {}
+
+Light::Light() : Light(makeMutable<Impl>()) {}
 
 Light::~Light() = default;
 
