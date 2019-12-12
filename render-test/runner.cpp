@@ -315,7 +315,7 @@ bool TestRunner::checkRenderTestResults(mbgl::PremultipliedImage&& actualImage, 
 }
 
 bool TestRunner::checkProbingResults(TestMetadata& resultMetadata) {
-    if (resultMetadata.metrics.isEmpty()) return true;
+    if (resultMetadata.metrics.isEmpty() || resultMetadata.ignoredTest) return true;
     const auto writeMetrics = [&resultMetadata](const mbgl::filesystem::path& path,
                                                 const std::string& message = std::string()) {
         mbgl::filesystem::create_directories(path);
@@ -1250,6 +1250,7 @@ bool runInjectedProbe(TestMetadata& metadata,
 }
 
 bool TestRunner::runInjectedProbesBegin(TestMetadata& metadata_, RunContext& ctx_) {
+    if (metadata_.ignoredTest) return true;
     const std::string mark = " - default - start";
     static const InjectedProbeMap beginInjectedProbeMap = {
         {// Injected memory probe begin
@@ -1284,6 +1285,7 @@ bool TestRunner::runInjectedProbesBegin(TestMetadata& metadata_, RunContext& ctx
 }
 
 bool TestRunner::runInjectedProbesEnd(TestMetadata& metadata_, RunContext& ctx_, mbgl::gfx::RenderingStats stats) {
+    if (metadata_.ignoredTest) return true;
     const std::string mark = " - default - end";
     static const InjectedProbeMap endInjectedProbeMap = {
         {// Injected memory probe end

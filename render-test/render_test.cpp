@@ -169,7 +169,7 @@ int runRenderTests(int argc, char** argv, std::function<void()> testStatus) {
         const std::string ignoreName = id;
         const auto it = std::find_if(ignores.cbegin(), ignores.cend(), [&ignoreName](auto pair) { return pair.first == ignoreName; });
         if (it != ignores.end()) {
-            shouldIgnore = true;
+            metadata.ignoredTest = shouldIgnore = true;
             ignoreReason = it->second;
             if (ignoreReason.rfind("skip", 0) == 0) {
                 printf(ANSI_COLOR_GRAY "* skipped %s (%s)" ANSI_COLOR_RESET "\n", id.c_str(), ignoreReason.c_str());
