@@ -9,14 +9,19 @@
 
 #include "filesystem.hpp"
 
+#include <list>
 #include <map>
 
 namespace mbgl {
+
+class Map;
+class HeadlessFrontend;
 namespace gfx {
 struct RenderingStats;
 }
 } // namespace mbgl
 
+class TestRunnerMapObserver;
 struct TestStatistics {
     TestStatistics() = default;
 
@@ -168,3 +173,21 @@ struct TestMetadata {
     TestMetrics metrics;
     TestMetrics expectedMetrics;
 };
+
+class TestContext {
+public:
+    virtual mbgl::HeadlessFrontend& getFrontend() = 0;
+    virtual mbgl::Map& getMap() = 0;
+    virtual TestRunnerMapObserver& getObserver() = 0;
+    virtual TestMetadata& getMetadata() = 0;
+
+    GfxProbe activeGfxProbe;
+    GfxProbe baselineGfxProbe;
+    bool gfxProbeActive = false;
+
+protected:
+    virtual ~TestContext() = default;
+};
+
+using TestOperation = std::function<bool(TestContext&)>;
+using TestOperations = std::list<TestOperation>;
