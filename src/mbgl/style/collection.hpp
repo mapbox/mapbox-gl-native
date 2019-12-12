@@ -63,12 +63,12 @@ class Collection<T, false /*persistentImplsOrder*/> : public CollectionBase<T> {
 
 public:
     T* add(std::unique_ptr<T> wrapper, const optional<std::string>& before = nullopt) {
-        std::size_t index = before ? Base::index(*before) : Base::size();
-        return Base::add(index, index, std::move(wrapper));
+        std::size_t idx = before ? Base::index(*before) : Base::size();
+        return Base::add(idx, idx, std::move(wrapper));
     }
     std::unique_ptr<T> remove(const std::string& id) {
-        std::size_t index = Base::index(id);
-        return Base::remove(index, index);
+        std::size_t idx = Base::index(id);
+        return Base::remove(idx, idx);
     }
     void update(const T& wrapper) { Base::update(Base::index(wrapper.getID()), wrapper); }
 };
