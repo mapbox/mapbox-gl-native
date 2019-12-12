@@ -1,54 +1,54 @@
 #import <Foundation/Foundation.h>
 #import <mbgl/interface/native_apple_interface.h>
 
-@implementation MGLNativeAppleInterfaceTransmitter
+@implementation MGLNativeNetworkDelegate
 
-static MGLNativeAppleInterfaceTransmitter *instance = nil;
+static MGLNativeNetworkDelegate *instance = nil;
 
-+ (MGLNativeAppleInterfaceTransmitter *)shared {
++ (MGLNativeNetworkDelegate *)shared {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        instance = [[MGLNativeAppleInterfaceTransmitter alloc] init];
+        instance = [[MGLNativeNetworkDelegate alloc] init];
     });
     return instance;
 }
 
 - (NSURLSessionConfiguration *)sessionConfiguration {
-    if (_delegate && [_delegate respondsToSelector:@selector(nai_sessionConfiguration)]) {
-        return [_delegate nai_sessionConfiguration];
+    if (_delegate && [_delegate respondsToSelector:@selector(sessionConfiguration)]) {
+        return [_delegate sessionConfiguration];
     }
     return nil;
 }
 
 - (NSString *)skuToken {
-    if(_delegate && [_delegate respondsToSelector:@selector(nai_skuToken)]) {
-        return [_delegate nai_skuToken];
+    if(_delegate && [_delegate respondsToSelector:@selector(skuToken)]) {
+        return [_delegate skuToken];
     }
     return nil;
 }
 
 - (NSString *)accountTypeKey {
-    if (_delegate && [_delegate respondsToSelector:@selector(nai_accountTypeKey)]) {
-        return [_delegate nai_accountTypeKey];
+    if (_delegate && [_delegate respondsToSelector:@selector(accountTypeKey)]) {
+        return [_delegate accountTypeKey];
     }
     return nil;
 }
 
 - (void)startDownloadEvent:(NSString *)event type:(NSString *)type {
-    if (_delegate && [_delegate respondsToSelector:@selector(nai_startDownloadEvent:type:)]) {
-        [_delegate nai_startDownloadEvent:event type:type];
+    if (_delegate && [_delegate respondsToSelector:@selector(startDownloadEvent:type:)]) {
+        [_delegate startDownloadEvent:event type:type];
     }
 }
 
 - (void)cancelDownloadEventForResponse:(NSURLResponse *)response {
-    if (_delegate && [_delegate respondsToSelector:@selector(nai_cancelDownloadEventForResponse:)]) {
-        return [_delegate nai_cancelDownloadEventForResponse:response];
+    if (_delegate && [_delegate respondsToSelector:@selector(cancelDownloadEventForResponse:)]) {
+        return [_delegate cancelDownloadEventForResponse:response];
     }
 }
 
 - (void)stopDownloadEventForResponse:(NSURLResponse *)response {
-    if (_delegate && [_delegate respondsToSelector:@selector(nai_stopDownloadEventForResponse:)]) {
-        return [_delegate nai_stopDownloadEventForResponse:response];
+    if (_delegate && [_delegate respondsToSelector:@selector(stopDownloadEventForResponse:)]) {
+        return [_delegate stopDownloadEventForResponse:response];
     }
 }
 

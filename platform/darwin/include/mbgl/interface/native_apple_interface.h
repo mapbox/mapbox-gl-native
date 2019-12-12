@@ -6,26 +6,26 @@ NS_ASSUME_NONNULL_BEGIN
 
 @optional
 
-- (NSString *)nai_skuToken;
-- (NSString *)nai_accountTypeKey;
+- (NSString *)skuToken;
+- (NSString *)accountTypeKey;
 
 @required
 
-- (NSURLSessionConfiguration *)nai_sessionConfiguration;
+- (NSURLSessionConfiguration *)sessionConfiguration;
 
-- (void)nai_startDownloadEvent:(NSString *)event type:(NSString *)type;
+- (void)startDownloadEvent:(NSString *)event type:(NSString *)type;
 
-- (void)nai_cancelDownloadEventForResponse:(NSURLResponse *)response;
+- (void)cancelDownloadEventForResponse:(NSURLResponse *)response;
 
-- (void)nai_stopDownloadEventForResponse:(NSURLResponse *)response;
+- (void)stopDownloadEventForResponse:(NSURLResponse *)response;
 
 @end
 
 #define MGL_APPLE_EXPORT __attribute__((visibility ("default")))
 
-@interface MGLNativeAppleInterfaceTransmitter: NSObject
+@interface MGLNativeNetworkDelegate: NSObject
 
-+ (MGLNativeAppleInterfaceTransmitter *)shared;
++ (MGLNativeNetworkDelegate *)shared;
 
 @property (nonatomic, weak) id<MGLNativeAppleInterfaceDelegate> delegate;
 
