@@ -3,6 +3,6 @@
 
 @interface MGLNetworkIntegrationManager : NSObject <MGLNativeAppleInterfaceDelegate>
 
-+ (MGLNetworkIntegrationManager *)shared;
++ (MGLNetworkIntegrationManager *)sharedManager;
 
 @end

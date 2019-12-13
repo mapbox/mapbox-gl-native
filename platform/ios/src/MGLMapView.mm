@@ -453,7 +453,7 @@ public:
     // setup accessibility
     //
 //    self.isAccessibilityElement = YES;
-    MGLNativeNetworkDelegate.shared.delegate = MGLNetworkIntegrationManager.shared;
+    MGLNativeNetworkDelegate.sharedManager.delegate = MGLNetworkIntegrationManager.sharedManager;
     self.accessibilityLabel = NSLocalizedStringWithDefaultValue(@"MAP_A11Y_LABEL", nil, nil, @"Map", @"Accessibility label");
     self.accessibilityTraits = UIAccessibilityTraitAllowsDirectInteraction | UIAccessibilityTraitAdjustable;
     self.backgroundColor = [UIColor clearColor];

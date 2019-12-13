@@ -2,7 +2,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol MGLNativeAppleInterfaceDelegate <NSObject>
+@protocol MGLNativeNetworkDelegate <NSObject>
 
 @optional
 
@@ -23,11 +23,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 #define MGL_APPLE_EXPORT __attribute__((visibility ("default")))
 
-@interface MGLNativeNetworkDelegate: NSObject
+@interface MGLNativeNetworkManager: NSObject
 
-+ (MGLNativeNetworkDelegate *)shared;
++ (MGLNativeNetworkManager *)sharedManager;
 
-@property (nonatomic, weak) id<MGLNativeAppleInterfaceDelegate> delegate;
+@property (nonatomic, weak) id<MGLNativeNetworkDelegate> delegate;
 
 @property (nonatomic, readonly) NSString *accountTypeKey;
 @property (nonatomic, readonly) NSString *skuToken;

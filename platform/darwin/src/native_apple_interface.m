@@ -1,14 +1,14 @@
 #import <Foundation/Foundation.h>
 #import <mbgl/interface/native_apple_interface.h>
 
-@implementation MGLNativeNetworkDelegate
+@implementation MGLNativeNetworkManager
 
-static MGLNativeNetworkDelegate *instance = nil;
+static MGLNativeNetworkManager *instance = nil;
 
-+ (MGLNativeNetworkDelegate *)shared {
++ (MGLNativeNetworkManager *)sharedManager {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        instance = [[MGLNativeNetworkDelegate alloc] init];
+        instance = [[MGLNativeNetworkManager alloc] init];
     });
     return instance;
 }

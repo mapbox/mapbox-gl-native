@@ -11,7 +11,7 @@
 
 static MGLNetworkIntegrationManager *instance = nil;
 
-+ (MGLNetworkIntegrationManager *)shared {
++ (MGLNetworkIntegrationManager *)sharedManager {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         instance = [[MGLNetworkIntegrationManager alloc] init];

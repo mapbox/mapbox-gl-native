@@ -259,7 +259,7 @@ public:
 }
 
 - (void)commonInit {
-     MGLNativeNetworkDelegate.shared.delegate = MGLNetworkIntegrationManager.shared;
+     MGLNativeNetworkManager.sharedManager.delegate = MGLNetworkIntegrationManager.sharedManager;
     _isTargetingInterfaceBuilder = NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent;
 
     // Set up cross-platform controllers and resources.
