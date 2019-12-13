@@ -177,11 +177,7 @@ int runRenderTests(int argc, char** argv, std::function<void()> testStatus) {
             }
         }
 
-        bool errored = !metadata.errorMessage.empty();
-        if (!errored) {
-            errored = !runner.run(metadata) || !metadata.errorMessage.empty();
-        }
-
+        bool errored = !metadata.errorMessage.empty() || !runner.run(metadata);
         bool passed =
             !errored && (!metadata.outputsImage || !metadata.diff.empty()) && metadata.difference <= metadata.allowed;
 
