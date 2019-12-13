@@ -207,7 +207,7 @@ NSURL *resourceURLWithAccountType(const Resource& resource) {
             [queryItems addObject:[NSURLQueryItem queryItemWithName:@"offline" value:@"true"]];
         } else {
             // Only add SKU token to requests not tagged as "offline" usage.
-            [queryItems addObject:[NSURLQueryItem queryItemWithName:@"sku" value:MGLAccountManager.skuToken]];
+            [queryItems addObject:[NSURLQueryItem queryItemWithName:@"sku" value:MGLNativeNetworkManager.sharedManager.skuToken]];
         }
         
         if (components.queryItems) {
