@@ -949,7 +949,6 @@ TestOperations parseTestOperations(TestMetadata& metadata, const Manifest& manif
             });
         } else if (operationArray[0].GetString() == memoryProbeOp) {
             // probeMemory
-            assert(AllocationIndex::isActive());
             assert(operationArray.Size() >= 2u);
             assert(operationArray[1].IsString());
             std::string mark = std::string(operationArray[1].GetString(), operationArray[1].GetStringLength());
@@ -959,6 +958,7 @@ TestOperations parseTestOperations(TestMetadata& metadata, const Manifest& manif
                 tolerance = float(operationArray[2].GetDouble());
             }
             result.emplace_back([mark, tolerance](TestContext& ctx) {
+                assert(AllocationIndex::isActive());
                 auto emplaced = ctx.getMetadata().metrics.memory.emplace(
                     std::piecewise_construct,
                     std::forward_as_tuple(std::move(mark)),
@@ -1052,9 +1052,9 @@ TestOperations parseTestOperations(TestMetadata& metadata, const Manifest& manif
                             array.emplace_back(*arrayVal);
                         }
                     }
-                    std::unordered_map<std::string, Value> result;
-                    result[k] = std::move(array);
-                    stateValue = std::move(result);
+                    std::unordered_map<std::string, Value> values;
+                    values[k] = std::move(array);
+                    stateValue = std::move(values);
                     valueParsed = true;
                     return nullopt;
 

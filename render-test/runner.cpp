@@ -688,7 +688,6 @@ bool TestRunner::run(TestMetadata& metadata) {
 
     ctx.runnerImpl = maps[key].get();
     auto& frontend = ctx.getFrontend();
-    // auto& map = ctx.getMap();
 
     resetContext(metadata, ctx);
 
@@ -711,7 +710,8 @@ bool TestRunner::run(TestMetadata& metadata) {
     }
 
     if (metadata.renderTest) {
-        return checkRenderTestResults(std::move(result.image), metadata) && checkProbingResults(metadata);
+        (void)checkProbingResults(metadata);
+        return checkRenderTestResults(std::move(result.image), metadata);
     } else {
         std::vector<mbgl::Feature> features;
         assert(metadata.document["metadata"]["test"]["queryGeometry"].IsArray());
