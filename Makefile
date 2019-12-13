@@ -458,7 +458,6 @@ endif
 .PHONY: test-node
 test-node: node
 	npm test
-	npm run test-query
 	npm run test-memory
 
 #### Miscellaneous targets #####################################################
