@@ -1,7 +1,7 @@
 #import <Foundation/Foundation.h>
 #include <mbgl/interface/native_apple_interface.h>
 
-@interface MGLNetworkIntegrationManager : NSObject <MGLNativeAppleInterfaceDelegate>
+@interface MGLNetworkIntegrationManager : NSObject <MGLNativeNetworkDelegate>
 
 + (MGLNetworkIntegrationManager *)sharedManager;
 

@@ -8,12 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-#import "MGLLoggingConfiguration_Private.h"
-#import "MGLNetworkConfiguration_Private.h"
-
-#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
-#import "MGLAccountManager_Private.h"
-#endif
+#include <mbgl/interface/native_apple_interface.h>
 
 #include <mutex>
 #include <chrono>
@@ -88,20 +83,15 @@ class HTTPFileSource::Impl {
 public:
     Impl() {
         @autoreleasepool {
-            NSURLSessionConfiguration *sessionConfig = [MGLNetworkConfiguration sharedManager].sessionConfiguration;
+            NSURLSessionConfiguration *sessionConfig = MGLNativeNetworkManager.sharedManager.sessionConfiguration;
             session = [NSURLSession sessionWithConfiguration:sessionConfig];
 
             userAgent = getUserAgent();
-
-#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
-            accountType = [[NSUserDefaults standardUserDefaults] integerForKey:MGLMapboxAccountTypeKey];
-#endif
         }
     }
 
     NSURLSession* session = nil;
     NSString* userAgent = nil;
-    NSInteger accountType = 0;
 
 private:
     NSString* getUserAgent() const;
@@ -195,7 +185,7 @@ HTTPFileSource::HTTPFileSource()
 
 HTTPFileSource::~HTTPFileSource() = default;
 
-MGL_EXPORT
+MGL_APPLE_EXPORT
 BOOL isValidMapboxEndpoint(NSURL *url) {
     return ([url.host isEqualToString:@"mapbox.com"] ||
             [url.host hasSuffix:@".mapbox.com"] ||
@@ -203,13 +193,13 @@ BOOL isValidMapboxEndpoint(NSURL *url) {
             [url.host hasSuffix:@".mapbox.cn"]);
 }
 
-MGL_EXPORT
-NSURL *resourceURLWithAccountType(const Resource& resource, NSInteger accountType) {
+MGL_APPLE_EXPORT
+NSURL *resourceURLWithAccountType(const Resource& resource) {
     
     NSURL *url = [NSURL URLWithString:@(resource.url.c_str())];
     
 #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
-    if (accountType == 0 && isValidMapboxEndpoint(url)) {
+    if (isValidMapboxEndpoint(url)) {
         NSURLComponents *components = [NSURLComponents componentsWithURL:url resolvingAgainstBaseURL:NO];
         NSMutableArray *queryItems = [NSMutableArray array];
 
@@ -227,8 +217,6 @@ NSURL *resourceURLWithAccountType(const Resource& resource, NSInteger accountTyp
         components.queryItems = queryItems;
         url = components.URL;
     }
-#else
-    (void)accountType;
 #endif
     return url;
 }
@@ -238,8 +226,8 @@ std::unique_ptr<AsyncRequest> HTTPFileSource::request(const Resource& resource, 
     auto shared = request->shared; // Explicit copy so that it also gets copied into the completion handler block below.
 
     @autoreleasepool {
-        NSURL *url = resourceURLWithAccountType(resource, impl->accountType);
-        MGLLogDebug(@"Requesting URI: %@", url.relativePath);
+        NSURL *url = resourceURLWithAccountType(resource);
+        [MGLNativeNetworkManager.sharedManager debugLog:@"Requesting URI: %@", url.relativePath];
 
         NSMutableURLRequest *req = [NSMutableURLRequest requestWithURL:url];
         if (resource.priorEtag) {
@@ -255,22 +243,22 @@ std::unique_ptr<AsyncRequest> HTTPFileSource::request(const Resource& resource, 
         const bool isTile = resource.kind == mbgl::Resource::Kind::Tile;
 
         if (isTile) {
-            [[MGLNetworkConfiguration sharedManager] startDownloadEvent:url.relativePath type:@"tile"];
+            [MGLNativeNetworkManager.sharedManager startDownloadEvent:url.relativePath type:@"tile"];
         }
         
         request->task = [impl->session
             dataTaskWithRequest:req
               completionHandler:^(NSData* data, NSURLResponse* res, NSError* error) {
                 if (error && [error code] == NSURLErrorCancelled) {
-                    [[MGLNetworkConfiguration sharedManager] cancelDownloadEventForResponse:res];
+                    [MGLNativeNetworkManager.sharedManager cancelDownloadEventForResponse:res];
                     return;
                 }
-                [[MGLNetworkConfiguration sharedManager] stopDownloadEventForResponse:res];
+                [MGLNativeNetworkManager.sharedManager stopDownloadEventForResponse:res];
                 Response response;
                 using Error = Response::Error;
 
                 if (error) {
-                    MGLLogError(@"Requesting: %@ failed with error: %@", res.URL.relativePath, error);
+                    [MGLNativeNetworkManager.sharedManager errorLog:@"Requesting: %@ failed with error: %@", res.URL.relativePath, error];
                     
                     if (data) {
                         response.data =
@@ -303,7 +291,7 @@ std::unique_ptr<AsyncRequest> HTTPFileSource::request(const Resource& resource, 
                     }
                 } else if ([res isKindOfClass:[NSHTTPURLResponse class]]) {
                     const long responseCode = [(NSHTTPURLResponse *)res statusCode];
-                    MGLLogDebug(@"Requesting %@ returned responseCode: %lu", res.URL.relativePath, responseCode);
+                    [MGLNativeNetworkManager.sharedManager debugLog:@"Requesting %@ returned responseCode: %lu", res.URL.relativePath, responseCode];
 
                     NSDictionary *headers = [(NSHTTPURLResponse *)res allHeaderFields];
                     NSString *cache_control = [headers objectForKey:@"Cache-Control"];

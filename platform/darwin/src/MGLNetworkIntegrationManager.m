@@ -26,10 +26,6 @@ static MGLNetworkIntegrationManager *instance = nil;
 }
 
 #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
-- (NSString *)accountTypeKey {
-    return MGLMapboxAccountTypeKey;
-}
-
 - (NSString *)skuToken {
     return MGLAccountManager.skuToken;
 }
@@ -45,6 +41,14 @@ static MGLNetworkIntegrationManager *instance = nil;
 
 - (void)stopDownloadEventForResponse:(NSURLResponse *)response {
     [[MGLNetworkConfiguration sharedManager] stopDownloadEventForResponse:response];
+}
+
+- (void)debugLog:(NSString *)format, ... {
+    MGLLogDebug(format);
+}
+
+- (void)errorLog:(NSString *)format, ... {
+    MGLLogError(format);
 }
 
 @end

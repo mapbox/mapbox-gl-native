@@ -7,7 +7,6 @@ NS_ASSUME_NONNULL_BEGIN
 @optional
 
 - (NSString *)skuToken;
-- (NSString *)accountTypeKey;
 
 @required
 
@@ -19,6 +18,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)stopDownloadEventForResponse:(NSURLResponse *)response;
 
+- (void)debugLog:(NSString *)format, ...;
+
+- (void)errorLog:(NSString *)format, ...;
+
 @end
 
 #define MGL_APPLE_EXPORT __attribute__((visibility ("default")))
@@ -29,7 +32,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, weak) id<MGLNativeNetworkDelegate> delegate;
 
-@property (nonatomic, readonly) NSString *accountTypeKey;
 @property (nonatomic, readonly) NSString *skuToken;
 
 @property (nonatomic, readonly) NSURLSessionConfiguration *sessionConfiguration;
@@ -40,6 +42,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)stopDownloadEventForResponse:(NSURLResponse *)response;
 
+- (void)debugLog:(NSString *)format, ...;
+
+- (void)errorLog:(NSString *)format, ...;
 
 @end
 

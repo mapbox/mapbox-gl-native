@@ -27,13 +27,6 @@ static MGLNativeNetworkManager *instance = nil;
     return nil;
 }
 
-- (NSString *)accountTypeKey {
-    if (_delegate && [_delegate respondsToSelector:@selector(accountTypeKey)]) {
-        return [_delegate accountTypeKey];
-    }
-    return nil;
-}
-
 - (void)startDownloadEvent:(NSString *)event type:(NSString *)type {
     if (_delegate && [_delegate respondsToSelector:@selector(startDownloadEvent:type:)]) {
         [_delegate startDownloadEvent:event type:type];
@@ -49,6 +42,18 @@ static MGLNativeNetworkManager *instance = nil;
 - (void)stopDownloadEventForResponse:(NSURLResponse *)response {
     if (_delegate && [_delegate respondsToSelector:@selector(stopDownloadEventForResponse:)]) {
         return [_delegate stopDownloadEventForResponse:response];
+    }
+}
+
+- (void)debugLog:(NSString *)format, ...{
+    if (_delegate && [_delegate respondsToSelector:@selector(debugLog:)]) {
+        return [_delegate debugLog:format];
+    }
+}
+
+- (void)errorLog:(NSString *)format, ...{
+    if (_delegate && [_delegate respondsToSelector:@selector(errorLog:)]) {
+        return [_delegate errorLog:format];
     }
 }
 
