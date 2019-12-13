@@ -36,7 +36,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, readonly) NSURLSessionConfiguration *sessionConfiguration;
 
-//For testing
+/*
+    For testing. Since we get a `nil` return when SDK is modualar, we use this for testing network.
+    Same as `[MGLNetworkConfiguration defaultSessionConfiguration]` in `MGLNetworkConfiguration.m`.
+ */
 @property (nonatomic, readonly) NSURLSessionConfiguration *testSessionConfiguration;
 
 - (void)startDownloadEvent:(NSString *)event type:(NSString *)type;
