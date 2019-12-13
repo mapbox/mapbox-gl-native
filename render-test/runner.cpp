@@ -550,11 +550,15 @@ TestOperations getBeforeOperations(const Manifest& manifest) {
             });
             continue;
         }
+
         if (networkProbeOp == probe) {
             result.emplace_back([](TestContext& ctx) {
-                assert(!ctx.gfxProbeActive);
-                ctx.gfxProbeActive = true;
-                ctx.baselineGfxProbe = ctx.activeGfxProbe;
+                assert(!ProxyFileSource::isTrackingActive());
+                ProxyFileSource::setTrackingActive(true);
+                ctx.getMetadata().metrics.network.emplace(
+                    std::piecewise_construct,
+                    std::forward_as_tuple(networkProbeOp + mark),
+                    std::forward_as_tuple(ProxyFileSource::getRequestCount(), ProxyFileSource::getTransferredSize()));
                 return true;
             });
             continue;
