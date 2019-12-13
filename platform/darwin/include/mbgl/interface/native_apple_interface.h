@@ -36,6 +36,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, readonly) NSURLSessionConfiguration *sessionConfiguration;
 
+//For testing
+@property (nonatomic, readonly) NSURLSessionConfiguration *testSessionConfiguration;
+
 - (void)startDownloadEvent:(NSString *)event type:(NSString *)type;
 
 - (void)cancelDownloadEventForResponse:(NSURLResponse *)response;

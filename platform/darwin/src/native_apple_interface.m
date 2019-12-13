@@ -20,6 +20,17 @@ static MGLNativeNetworkManager *instance = nil;
     return nil;
 }
 
+- (NSURLSessionConfiguration *)testSessionConfiguration {
+    NSURLSessionConfiguration* sessionConfiguration = [NSURLSessionConfiguration defaultSessionConfiguration];
+    
+    sessionConfiguration.timeoutIntervalForResource = 30;
+    sessionConfiguration.HTTPMaximumConnectionsPerHost = 8;
+    sessionConfiguration.requestCachePolicy = NSURLRequestReloadIgnoringLocalCacheData;
+    sessionConfiguration.URLCache = nil;
+    
+    return sessionConfiguration;
+}
+
 - (NSString *)skuToken {
     if(_delegate && [_delegate respondsToSelector:@selector(skuToken)]) {
         return [_delegate skuToken];
