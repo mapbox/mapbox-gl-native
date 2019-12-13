@@ -45,9 +45,6 @@ public:
     void doShuffle(uint32_t seed);
 
 private:
-    bool runInjectedProbesBegin(TestContext&);
-    bool runInjectedProbesEnd(TestContext&, mbgl::gfx::RenderingStats);
-
     bool checkQueryTestResults(mbgl::PremultipliedImage&& actualImage,
                                std::vector<mbgl::Feature>&& features,
                                TestMetadata&);
