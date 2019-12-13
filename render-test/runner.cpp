@@ -516,6 +516,121 @@ bool TestRunner::checkProbingResults(TestMetadata& resultMetadata) {
     return checkResult;
 }
 
+namespace {
+
+TestOperation unsupportedOperation(const std::string& operation) {
+    return [operation](TestContext& ctx) {
+        ctx.getMetadata().errorMessage = std::string("Unsupported operation: ") + operation;
+        return false;
+    };
+}
+
+TestOperations getBeforeOperations(const Manifest& manifest) {
+    static const std::string mark = " - default - start";
+    TestOperations result;
+    for (const std::string& probe : manifest.getProbes()) {
+        if (memoryProbeOp == probe) {
+            result.emplace_back([](TestContext& ctx) {
+                assert(!AllocationIndex::isActive());
+                AllocationIndex::setActive(true);
+                ctx.getMetadata().metrics.memory.emplace(std::piecewise_construct,
+                                                         std::forward_as_tuple(memoryProbeOp + mark),
+                                                         std::forward_as_tuple(AllocationIndex::getAllocatedSizePeak(),
+                                                                               AllocationIndex::getAllocationsCount()));
+                return true;
+            });
+            continue;
+        }
+        if (gfxProbeOp == probe) {
+            result.emplace_back([](TestContext& ctx) {
+                assert(!ctx.gfxProbeActive);
+                ctx.gfxProbeActive = true;
+                ctx.baselineGfxProbe = ctx.activeGfxProbe;
+                return true;
+            });
+            continue;
+        }
+        if (networkProbeOp == probe) {
+            result.emplace_back([](TestContext& ctx) {
+                assert(!ctx.gfxProbeActive);
+                ctx.gfxProbeActive = true;
+                ctx.baselineGfxProbe = ctx.activeGfxProbe;
+                return true;
+            });
+            continue;
+        }
+        result.emplace_back(unsupportedOperation(probe));
+    }
+    return result;
+}
+
+TestOperations getAfterOperations(const Manifest& manifest) {
+    static const std::string mark = " - default - end";
+    TestOperations result;
+    for (const std::string& probe : manifest.getProbes()) {
+        if (memoryProbeOp == probe) {
+            result.emplace_back([](TestContext& ctx) {
+                assert(AllocationIndex::isActive());
+                auto emplaced = ctx.getMetadata().metrics.memory.emplace(
+                    std::piecewise_construct,
+                    std::forward_as_tuple(memoryProbeOp + mark),
+                    std::forward_as_tuple(AllocationIndex::getAllocatedSizePeak(),
+                                          AllocationIndex::getAllocationsCount()));
+                assert(emplaced.second);
+                // TODO: Improve tolerance handling for memory tests.
+                emplaced.first->second.tolerance = 0.2f;
+                AllocationIndex::setActive(false);
+                AllocationIndex::reset();
+                return true;
+            });
+            continue;
+        }
+        if (gfxProbeOp == probe) {
+            result.emplace_back([](TestContext& ctx) {
+                // Compare memory allocations to the baseline probe
+                GfxProbe metricProbe = ctx.activeGfxProbe;
+                metricProbe.memIndexBuffers.peak -= ctx.baselineGfxProbe.memIndexBuffers.peak;
+                metricProbe.memVertexBuffers.peak -= ctx.baselineGfxProbe.memVertexBuffers.peak;
+                metricProbe.memTextures.peak -= ctx.baselineGfxProbe.memTextures.peak;
+                ctx.getMetadata().metrics.gfx.insert({gfxProbeOp + mark, metricProbe});
+
+                ctx.gfxProbeActive = false;
+                return true;
+            });
+            continue;
+        }
+        if (networkProbeOp == probe) {
+            result.emplace_back([](TestContext& ctx) {
+                assert(ProxyFileSource::isTrackingActive());
+                ctx.getMetadata().metrics.network.emplace(
+                    std::piecewise_construct,
+                    std::forward_as_tuple(networkProbeOp + mark),
+                    std::forward_as_tuple(ProxyFileSource::getRequestCount(), ProxyFileSource::getTransferredSize()));
+                ProxyFileSource::setTrackingActive(false);
+                return true;
+            });
+            continue;
+        }
+        result.emplace_back(unsupportedOperation(probe));
+    }
+    return result;
+}
+
+void resetContext(const TestMetadata& metadata, TestContext& ctx) {
+    ctx.getFrontend().setSize(metadata.size);
+    auto& map = ctx.getMap();
+    map.setSize(metadata.size);
+    map.setProjectionMode(mbgl::ProjectionMode()
+                              .withAxonometric(metadata.axonometric)
+                              .withXSkew(metadata.xSkew)
+                              .withYSkew(metadata.ySkew));
+    map.setDebug(metadata.debug);
+    map.getStyle().loadJSON(serializeJsonValue(metadata.document));
+    map.jumpTo(map.getStyle().getDefaultCamera());
+}
+
+} // namespace
+
 TestRunner::Impl::Impl(const TestMetadata& metadata)
     : observer(std::make_unique<TestRunnerMapObserver>()),
       frontend(metadata.size, metadata.pixelRatio, swapBehavior(metadata.mapMode)),
@@ -556,9 +671,11 @@ bool TestRunner::run(TestMetadata& metadata) {
     };
 
     ContextImpl ctx(metadata);
-    // Run 'begin' probes provided via command line arguments.
-    if (!metadata.ignoredTest && !runInjectedProbesBegin(ctx)) {
-        return false;
+
+    if (!metadata.ignoredTest) {
+        for (const auto& operation : getBeforeOperations(manifest)) {
+            if (!operation(ctx)) return false;
+        }
     }
 
     std::string key = mbgl::util::toString(uint32_t(metadata.mapMode)) + "/" +
@@ -571,34 +688,27 @@ bool TestRunner::run(TestMetadata& metadata) {
 
     ctx.runnerImpl = maps[key].get();
     auto& frontend = ctx.getFrontend();
-    auto& map = ctx.getMap();
+    // auto& map = ctx.getMap();
 
-    frontend.setSize(metadata.size);
-    map.setSize(metadata.size);
+    resetContext(metadata, ctx);
 
-    map.setProjectionMode(mbgl::ProjectionMode()
-                              .withAxonometric(metadata.axonometric)
-                              .withXSkew(metadata.xSkew)
-                              .withYSkew(metadata.ySkew));
-    map.setDebug(metadata.debug);
-
-    map.getStyle().loadJSON(serializeJsonValue(metadata.document));
-    map.jumpTo(map.getStyle().getDefaultCamera());
-
-    TestOperations operations = parseTestOperations(metadata, manifest);
-    for (const auto& operation : operations) {
+    for (const auto& operation : parseTestOperations(metadata, manifest)) {
         if (!operation(ctx)) return false;
     }
 
     HeadlessFrontend::RenderResult result;
     try {
-        if (metadata.outputsImage) result = frontend.render(map);
+        if (metadata.outputsImage) result = frontend.render(ctx.getMap());
     } catch (const std::exception&) {
         return false;
     }
 
-    // Run 'end' probes provided via command line arguments
-    if (!metadata.ignoredTest && !runInjectedProbesEnd(ctx, result.stats)) return false;
+    if (!metadata.ignoredTest) {
+        ctx.activeGfxProbe = GfxProbe(result.stats, ctx.activeGfxProbe);
+        for (const auto& operation : getAfterOperations(manifest)) {
+            if (!operation(ctx)) return false;
+        }
+    }
 
     if (metadata.renderTest) {
         return checkRenderTestResults(std::move(result.image), metadata) && checkProbingResults(metadata);
@@ -613,109 +723,6 @@ bool TestRunner::run(TestMetadata& metadata) {
         }
         return checkQueryTestResults(std::move(result.image), std::move(features), metadata);
     }
-}
-
-namespace {
-using InjectedProbeMap = std::map<std::string, TestOperation>;
-
-bool runInjectedProbe(const std::set<std::string>& probes, TestContext& ctx, const InjectedProbeMap& probeMap) {
-    for (const auto& probe : probes) {
-        auto it = probeMap.find(probe);
-        if (it == probeMap.end()) {
-            ctx.getMetadata().errorMessage = std::string("Unsupported operation: ") + probe;
-            return false;
-        }
-        if (!it->second(ctx)) return false;
-    }
-    return true;
-}
-} // namespace
-
-bool TestRunner::runInjectedProbesBegin(TestContext& ctx) {
-    static const std::string mark = " - default - start";
-    static const InjectedProbeMap beginInjectedProbeMap = {
-        {// Injected memory probe begin
-         memoryProbeOp,
-         [](TestContext& ctx) {
-             assert(!AllocationIndex::isActive());
-             AllocationIndex::setActive(true);
-             ctx.getMetadata().metrics.memory.emplace(std::piecewise_construct,
-                                                      std::forward_as_tuple(memoryProbeOp + mark),
-                                                      std::forward_as_tuple(AllocationIndex::getAllocatedSizePeak(),
-                                                                            AllocationIndex::getAllocationsCount()));
-             return true;
-         }},
-        {// Injected gfx probe begin
-         gfxProbeOp,
-         [](TestContext& ctx) {
-             assert(!ctx.gfxProbeActive);
-             ctx.gfxProbeActive = true;
-             ctx.baselineGfxProbe = ctx.activeGfxProbe;
-             return true;
-         }},
-        {// Injected network probe begin
-         networkProbeOp,
-         [](TestContext& ctx) {
-             assert(!ProxyFileSource::isTrackingActive());
-             ProxyFileSource::setTrackingActive(true);
-             ctx.getMetadata().metrics.network.emplace(
-                 std::piecewise_construct,
-                 std::forward_as_tuple(networkProbeOp + mark),
-                 std::forward_as_tuple(ProxyFileSource::getRequestCount(), ProxyFileSource::getTransferredSize()));
-             return true;
-         }}};
-
-    return runInjectedProbe(manifest.getProbes(), ctx, beginInjectedProbeMap);
-}
-
-bool TestRunner::runInjectedProbesEnd(TestContext& ctx, mbgl::gfx::RenderingStats stats) {
-    static const std::string mark = " - default - end";
-    static const InjectedProbeMap endInjectedProbeMap = {
-        {// Injected memory probe end
-         memoryProbeOp,
-         [](TestContext& ctx) {
-             assert(AllocationIndex::isActive());
-             auto emplaced = ctx.getMetadata().metrics.memory.emplace(
-                 std::piecewise_construct,
-                 std::forward_as_tuple(memoryProbeOp + mark),
-                 std::forward_as_tuple(AllocationIndex::getAllocatedSizePeak(),
-                                       AllocationIndex::getAllocationsCount()));
-             assert(emplaced.second);
-             // TODO: Improve tolerance handling for memory tests.
-             emplaced.first->second.tolerance = 0.2f;
-             AllocationIndex::setActive(false);
-             AllocationIndex::reset();
-             return true;
-         }},
-        {// Injected gfx probe end
-         gfxProbeOp,
-         [&stats](TestContext& ctx) {
-             assert(ctx.gfxProbeActive);
-             ctx.activeGfxProbe = GfxProbe(stats, ctx.activeGfxProbe);
-
-             // Compare memory allocations to the baseline probe
-             GfxProbe metricProbe = ctx.activeGfxProbe;
-             metricProbe.memIndexBuffers.peak -= ctx.baselineGfxProbe.memIndexBuffers.peak;
-             metricProbe.memVertexBuffers.peak -= ctx.baselineGfxProbe.memVertexBuffers.peak;
-             metricProbe.memTextures.peak -= ctx.baselineGfxProbe.memTextures.peak;
-             ctx.getMetadata().metrics.gfx.insert({gfxProbeOp + mark, metricProbe});
-
-             ctx.gfxProbeActive = false;
-             return true;
-         }},
-        {// Injected network probe end
-         networkProbeOp,
-         [](TestContext& ctx) {
-             assert(ProxyFileSource::isTrackingActive());
-             ctx.getMetadata().metrics.network.emplace(
-                 std::piecewise_construct,
-                 std::forward_as_tuple(networkProbeOp + mark),
-                 std::forward_as_tuple(ProxyFileSource::getRequestCount(), ProxyFileSource::getTransferredSize()));
-             ProxyFileSource::setTrackingActive(false);
-             return true;
-         }}};
-
-    return runInjectedProbe(manifest.getProbes(), ctx, endInjectedProbeMap);
 }
 
 void TestRunner::reset() {
