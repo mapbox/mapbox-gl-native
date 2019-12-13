@@ -17,7 +17,9 @@ static MGLNativeNetworkManager *instance = nil;
     if (_delegate && [_delegate respondsToSelector:@selector(sessionConfiguration)]) {
         return [_delegate sessionConfiguration];
     }
-    return nil;
+    // For testing. Since we get a `nil` return when SDK is modualar, we use this for testing requests.
+    // Same as `[MGLNetworkConfiguration defaultSessionConfiguration]` in `MGLNetworkConfiguration.m`.
+    return [self testSessionConfiguration];
 }
 
 - (NSURLSessionConfiguration *)testSessionConfiguration {

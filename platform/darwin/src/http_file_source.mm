@@ -84,9 +84,6 @@ public:
     Impl() {
         @autoreleasepool {
             NSURLSessionConfiguration *sessionConfig = MGLNativeNetworkManager.sharedManager.sessionConfiguration;
-            if (!sessionConfig) {
-                sessionConfig = MGLNativeNetworkManager.sharedManager.testSessionConfiguration;
-            }
             session = [NSURLSession sessionWithConfiguration:sessionConfig];
 
             userAgent = getUserAgent();
