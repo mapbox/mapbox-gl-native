@@ -214,7 +214,7 @@ commands:
             - 'ccache-v1-{{ .Environment.CIRCLE_JOB }}-{{ .Branch }}-{{ .Revision }}'
             - 'ccache-v1-{{ .Environment.CIRCLE_JOB }}-{{ .Branch }}-'
             - 'ccache-v1-{{ .Environment.CIRCLE_JOB }}-master'
-            - 'ccache-v1-{{ .Environment.CIRCLE_JOB }}-'
+            - 'ccache-v1-next-sanity-checks-master'
       - run:
           name: Prepare
           command: |
