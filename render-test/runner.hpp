@@ -36,8 +36,14 @@ public:
 class TestRunner {
 public:
     enum class UpdateResults { NO, DEFAULT, PLATFORM, METRICS, REBASELINE };
+
+    struct TestResults {
+        bool probeFailed;
+        bool renderFailed;
+    };
+
     TestRunner(Manifest, UpdateResults);
-    bool run(TestMetadata&);
+    TestResults run(TestMetadata&);
     void reset();
 
     // Manifest

@@ -243,7 +243,7 @@ bool TestRunner::checkRenderTestResults(mbgl::PremultipliedImage&& actualImage, 
 }
 
 bool TestRunner::checkProbingResults(TestMetadata& resultMetadata) {
-    if (resultMetadata.metrics.isEmpty() || resultMetadata.ignoredTest) return true;
+    if (resultMetadata.metrics.isEmpty()) return true;
     const auto writeMetrics = [&resultMetadata](const mbgl::filesystem::path& path,
                                                 const std::string& message = std::string()) {
         mbgl::filesystem::create_directories(path);
@@ -282,7 +282,7 @@ bool TestRunner::checkProbingResults(TestMetadata& resultMetadata) {
     if (resultMetadata.expectedMetrics.isEmpty()) {
         resultMetadata.errorMessage =
             "Failed to find metric expectations for: " + resultMetadata.paths.stylePath.string();
-        if (updateResults == UpdateResults::REBASELINE) {
+        if (updateResults == UpdateResults::REBASELINE && !resultMetadata.ignoredTest) {
             writeMetrics(expectedMetrics.back(), ". Created baseline for missing metrics.");
         }
         return false;
@@ -509,7 +509,7 @@ bool TestRunner::checkProbingResults(TestMetadata& resultMetadata) {
     bool checkResult = checkFileSize(resultMetadata) && checkMemory(resultMetadata) && checkNetwork(resultMetadata) &&
                        checkFps(resultMetadata) && checkGfx(resultMetadata);
 
-    if (!checkResult && updateResults == UpdateResults::REBASELINE) {
+    if (!checkResult && updateResults == UpdateResults::REBASELINE && !resultMetadata.ignoredTest) {
         writeMetrics(expectedMetrics.back(), " Rebaselined expected metric for failed test.");
     }
 
@@ -649,7 +649,7 @@ TestRunner::Impl::Impl(const TestMetadata& metadata)
 
 TestRunner::Impl::~Impl() {}
 
-bool TestRunner::run(TestMetadata& metadata) {
+TestRunner::TestResults TestRunner::run(TestMetadata& metadata) {
     AllocationIndex::setActive(false);
     AllocationIndex::reset();
     ProxyFileSource::setTrackingActive(false);
@@ -678,7 +678,7 @@ bool TestRunner::run(TestMetadata& metadata) {
 
     if (!metadata.ignoredTest) {
         for (const auto& operation : getBeforeOperations(manifest)) {
-            if (!operation(ctx)) return false;
+            if (!operation(ctx)) return {false, false};
         }
     }
 
@@ -696,26 +696,25 @@ bool TestRunner::run(TestMetadata& metadata) {
     resetContext(metadata, ctx);
 
     for (const auto& operation : parseTestOperations(metadata, manifest)) {
-        if (!operation(ctx)) return false;
+        if (!operation(ctx)) return {false, false};
     }
 
     HeadlessFrontend::RenderResult result;
     try {
         if (metadata.outputsImage) result = frontend.render(ctx.getMap());
     } catch (const std::exception&) {
-        return false;
+        return {false, false};
     }
 
     if (!metadata.ignoredTest) {
         ctx.activeGfxProbe = GfxProbe(result.stats, ctx.activeGfxProbe);
         for (const auto& operation : getAfterOperations(manifest)) {
-            if (!operation(ctx)) return false;
+            if (!operation(ctx)) return {false, false};
         }
     }
 
     if (metadata.renderTest) {
-        (void)checkProbingResults(metadata);
-        return checkRenderTestResults(std::move(result.image), metadata);
+        return {checkProbingResults(metadata), checkRenderTestResults(std::move(result.image), metadata)};
     } else {
         std::vector<mbgl::Feature> features;
         assert(metadata.document["metadata"]["test"]["queryGeometry"].IsArray());
@@ -725,7 +724,7 @@ bool TestRunner::run(TestMetadata& metadata) {
         } else {
             features = frontend.getRenderer()->queryRenderedFeatures(metadata.queryGeometryBox, metadata.queryOptions);
         }
-        return checkQueryTestResults(std::move(result.image), std::move(features), metadata);
+        return {true, checkQueryTestResults(std::move(result.image), std::move(features), metadata)};
     }
 }
 
