@@ -181,8 +181,8 @@ public:
     virtual TestRunnerMapObserver& getObserver() = 0;
     virtual TestMetadata& getMetadata() = 0;
 
-    GfxProbe activeGfxProbe;
-    GfxProbe baselineGfxProbe;
+    GfxProbe activeGfxProbe{};
+    GfxProbe baselineGfxProbe{};
     bool gfxProbeActive = false;
 
 protected:
