@@ -135,6 +135,8 @@
 		CA9461A620884CCB0015EB12 /* MGLAnnotationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CA9461A520884CCB0015EB12 /* MGLAnnotationTests.m */; };
 		CAD9D0AC22A88A32001B25EE /* MGLResourceTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = CAD9D0AB22A88A32001B25EE /* MGLResourceTests.mm */; };
 		CF762DEF22DC7EFF00338472 /* MGLLoggingConfiguration.mm in Sources */ = {isa = PBXBuildFile; fileRef = CF762DEE22DC7EFF00338472 /* MGLLoggingConfiguration.mm */; };
+		CFF9F98D23A2505700B0DE92 /* MGLNetworkIntegrationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = CFF9F98B23A2505700B0DE92 /* MGLNetworkIntegrationManager.m */; };
+		CFF9F98E23A2505700B0DE92 /* MGLNetworkIntegrationManager.h in Headers */ = {isa = PBXBuildFile; fileRef = CFF9F98C23A2505700B0DE92 /* MGLNetworkIntegrationManager.h */; };
 		DA00FC8A1D5EEAC3009AABC8 /* MGLAttributionInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = DA00FC881D5EEAC3009AABC8 /* MGLAttributionInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DA00FC8B1D5EEAC3009AABC8 /* MGLAttributionInfo.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA00FC891D5EEAC3009AABC8 /* MGLAttributionInfo.mm */; };
 		DA0CD58E1CF56F5800A5F5A5 /* MGLFeatureTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA0CD58D1CF56F5800A5F5A5 /* MGLFeatureTests.mm */; };
@@ -425,7 +427,7 @@
 		5591AC692298361600FF9ADF /* MGLMapView+Impl.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "MGLMapView+Impl.mm"; sourceTree = "<group>"; };
 		55CAF6312294407F00F17770 /* MGLMapView+OpenGL.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "MGLMapView+OpenGL.h"; sourceTree = "<group>"; };
 		55CAF6332294409B00F17770 /* MGLMapView+OpenGL.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = "MGLMapView+OpenGL.mm"; sourceTree = "<group>"; };
-		55CF7532213EDADF00ED86C4 /* libmbgl-vendor-icu.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libmbgl-vendor-icu.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		55CF7532213EDADF00ED86C4 /* libmbgl-vendor-icu.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = "libmbgl-vendor-icu.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		55D120A41F7906E6004B6D81 /* libmbgl-filesource.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = "libmbgl-filesource.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		55D9B4B01D005D3900C1CCE2 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		55E2AD101E5B0A6900E8C587 /* MGLOfflineStorageTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLOfflineStorageTests.mm; path = ../../darwin/test/MGLOfflineStorageTests.mm; sourceTree = "<group>"; };
@@ -476,6 +478,8 @@
 		CA9461A520884CCB0015EB12 /* MGLAnnotationTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLAnnotationTests.m; path = test/MGLAnnotationTests.m; sourceTree = SOURCE_ROOT; };
 		CAD9D0AB22A88A32001B25EE /* MGLResourceTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLResourceTests.mm; path = ../../darwin/test/MGLResourceTests.mm; sourceTree = "<group>"; };
 		CF762DEE22DC7EFF00338472 /* MGLLoggingConfiguration.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLLoggingConfiguration.mm; sourceTree = "<group>"; };
+		CFF9F98B23A2505700B0DE92 /* MGLNetworkIntegrationManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLNetworkIntegrationManager.m; path = ../../darwin/src/MGLNetworkIntegrationManager.m; sourceTree = "<group>"; };
+		CFF9F98C23A2505700B0DE92 /* MGLNetworkIntegrationManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MGLNetworkIntegrationManager.h; path = ../../darwin/src/MGLNetworkIntegrationManager.h; sourceTree = "<group>"; };
 		DA00FC881D5EEAC3009AABC8 /* MGLAttributionInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLAttributionInfo.h; sourceTree = "<group>"; };
 		DA00FC891D5EEAC3009AABC8 /* MGLAttributionInfo.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLAttributionInfo.mm; sourceTree = "<group>"; };
 		DA0CD58D1CF56F5800A5F5A5 /* MGLFeatureTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLFeatureTests.mm; path = ../../darwin/test/MGLFeatureTests.mm; sourceTree = "<group>"; };
@@ -880,6 +884,15 @@
 			name = "Test Helpers";
 			sourceTree = "<group>";
 		};
+		CFF9F98A23A2503300B0DE92 /* Interface */ = {
+			isa = PBXGroup;
+			children = (
+				CFF9F98C23A2505700B0DE92 /* MGLNetworkIntegrationManager.h */,
+				CFF9F98B23A2505700B0DE92 /* MGLNetworkIntegrationManager.m */,
+			);
+			name = Interface;
+			sourceTree = "<group>";
+		};
 		DA33895E1FA3E997001EA329 /* Recovered References */ = {
 			isa = PBXGroup;
 			children = (
@@ -1267,6 +1280,7 @@
 		DAE6C39E1CC31E7C00DB3429 /* Kit */ = {
 			isa = PBXGroup;
 			children = (
+				CFF9F98A23A2503300B0DE92 /* Interface */,
 				DA90B12C1DB43B180073CF55 /* Categories */,
 				DAE6C39F1CC31E9400DB3429 /* MGLAnnotationImage.h */,
 				DAC2ABC41CC6D343006D18C4 /* MGLAnnotationImage_Private.h */,
@@ -1356,6 +1370,7 @@
 				DA7DC9811DED5F5C0027472F /* MGLVectorTileSource_Private.h in Headers */,
 				DAE6C3861CC31E2A00DB3429 /* MGLGeometry_Private.h in Headers */,
 				DAE6C3841CC31E2A00DB3429 /* MGLAccountManager_Private.h in Headers */,
+				CFF9F98E23A2505700B0DE92 /* MGLNetworkIntegrationManager.h in Headers */,
 				DACA8622201920BE00E9693A /* MGLRasterDEMSource.h in Headers */,
 				DAE6C3691CC31E0400DB3429 /* MGLTypes.h in Headers */,
 				07D9474D1F67441B00E37934 /* MGLComputedShapeSource_Private.h in Headers */,
@@ -1688,6 +1703,7 @@
 				408AA86A1DAEEE5D00022900 /* NSDictionary+MGLAdditions.mm in Sources */,
 				DA8F25881D51C9E10010E6B5 /* MGLBackgroundStyleLayer.mm in Sources */,
 				DA551B841DB496AC0009AFAF /* MGLTileSource.mm in Sources */,
+				CFF9F98D23A2505700B0DE92 /* MGLNetworkIntegrationManager.m in Sources */,
 				DAE6C3B81CC31EF300DB3429 /* MGLMapView+IBAdditions.mm in Sources */,
 				DA35A2D01CCAAED300E826B2 /* NSValue+MGLAdditions.m in Sources */,
 				3538AA241D542685008EC33D /* MGLStyleLayer.mm in Sources */,

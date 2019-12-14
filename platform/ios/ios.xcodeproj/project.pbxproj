@@ -534,6 +534,10 @@
 		CAFB3C15234505D500399265 /* MGLMapSnapshotter_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = CAFB3C13234505D500399265 /* MGLMapSnapshotter_Private.h */; };
 		CF75A91522D85E860058A5C4 /* MGLLoggingConfiguration.mm in Sources */ = {isa = PBXBuildFile; fileRef = CF75A91422D85E860058A5C4 /* MGLLoggingConfiguration.mm */; };
 		CF75A91622D85E860058A5C4 /* MGLLoggingConfiguration.mm in Sources */ = {isa = PBXBuildFile; fileRef = CF75A91422D85E860058A5C4 /* MGLLoggingConfiguration.mm */; };
+		CFF9F98623A24BF500B0DE92 /* MGLNetworkIntegrationManager.h in Headers */ = {isa = PBXBuildFile; fileRef = CFF9F98423A24BF400B0DE92 /* MGLNetworkIntegrationManager.h */; };
+		CFF9F98723A24BF500B0DE92 /* MGLNetworkIntegrationManager.h in Headers */ = {isa = PBXBuildFile; fileRef = CFF9F98423A24BF400B0DE92 /* MGLNetworkIntegrationManager.h */; };
+		CFF9F98823A24BF500B0DE92 /* MGLNetworkIntegrationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = CFF9F98523A24BF400B0DE92 /* MGLNetworkIntegrationManager.m */; };
+		CFF9F98923A24BF500B0DE92 /* MGLNetworkIntegrationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = CFF9F98523A24BF400B0DE92 /* MGLNetworkIntegrationManager.m */; };
 		DA00FC8E1D5EEB0D009AABC8 /* MGLAttributionInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = DA00FC8C1D5EEB0D009AABC8 /* MGLAttributionInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DA00FC8F1D5EEB0D009AABC8 /* MGLAttributionInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = DA00FC8C1D5EEB0D009AABC8 /* MGLAttributionInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DA00FC901D5EEB0D009AABC8 /* MGLAttributionInfo.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA00FC8D1D5EEB0D009AABC8 /* MGLAttributionInfo.mm */; };
@@ -1226,6 +1230,8 @@
 		CAE7AD5420F46EF5003B6782 /* MGLMapSnapshotterSwiftTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MGLMapSnapshotterSwiftTests.swift; sourceTree = "<group>"; };
 		CAFB3C13234505D500399265 /* MGLMapSnapshotter_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLMapSnapshotter_Private.h; sourceTree = "<group>"; };
 		CF75A91422D85E860058A5C4 /* MGLLoggingConfiguration.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLLoggingConfiguration.mm; sourceTree = "<group>"; };
+		CFF9F98423A24BF400B0DE92 /* MGLNetworkIntegrationManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MGLNetworkIntegrationManager.h; path = ../../darwin/src/MGLNetworkIntegrationManager.h; sourceTree = "<group>"; };
+		CFF9F98523A24BF400B0DE92 /* MGLNetworkIntegrationManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLNetworkIntegrationManager.m; path = ../../darwin/src/MGLNetworkIntegrationManager.m; sourceTree = "<group>"; };
 		DA00FC8C1D5EEB0D009AABC8 /* MGLAttributionInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLAttributionInfo.h; sourceTree = "<group>"; };
 		DA00FC8D1D5EEB0D009AABC8 /* MGLAttributionInfo.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLAttributionInfo.mm; sourceTree = "<group>"; };
 		DA0CD58F1CF56F6A00A5F5A5 /* MGLFeatureTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLFeatureTests.mm; path = ../../darwin/test/MGLFeatureTests.mm; sourceTree = "<group>"; };
@@ -1961,6 +1967,15 @@
 			name = Annotations;
 			sourceTree = "<group>";
 		};
+		CF85C39E23A249FC00BEBFFF /* Interface */ = {
+			isa = PBXGroup;
+			children = (
+				CFF9F98423A24BF400B0DE92 /* MGLNetworkIntegrationManager.h */,
+				CFF9F98523A24BF400B0DE92 /* MGLNetworkIntegrationManager.m */,
+			);
+			name = Interface;
+			sourceTree = "<group>";
+		};
 		DA1DC9411CB6C1C2006E619F = {
 			isa = PBXGroup;
 			children = (
@@ -2188,6 +2203,7 @@
 		DA8848331CBAFB2A00AB86E3 /* Kit */ = {
 			isa = PBXGroup;
 			children = (
+				CF85C39E23A249FC00BEBFFF /* Interface */,
 				DAD165841CF4D06B001FF4B9 /* Annotations */,
 				35CE617F1D4165C2004F2359 /* Categories */,
 				DA8848881CBB036000AB86E3 /* SMCalloutView */,
@@ -2632,6 +2648,7 @@
 				55E5665B21C2A2080008B8B5 /* MMEEventLogger.h in Headers */,
 				55E5665C21C2A2080008B8B5 /* MMEEventLogReportViewController.h in Headers */,
 				55E5665D21C2A2080008B8B5 /* MMEEventsConfiguration.h in Headers */,
+				CFF9F98623A24BF500B0DE92 /* MGLNetworkIntegrationManager.h in Headers */,
 				55E5666021C2A2080008B8B5 /* MMEConfigurator.h in Headers */,
 				55E5666221C2A2080008B8B5 /* MMELocationManager.h in Headers */,
 				55E5666321C2A2080008B8B5 /* MMEMetrics.h in Headers */,
@@ -2826,6 +2843,7 @@
 				35D13AC41D3D19DD00AFB4E0 /* MGLFillStyleLayer.h in Headers */,
 				9C6E284322A982670056B7BE /* MMETypes.h in Headers */,
 				DABFB86E1CBE9A0F00D62B32 /* MGLCalloutView.h in Headers */,
+				CFF9F98723A24BF500B0DE92 /* MGLNetworkIntegrationManager.h in Headers */,
 				96E516FC20005A4400A02306 /* MGLUserLocationHeadingIndicator.h in Headers */,
 				1F7454971ECD450D00021D39 /* MGLLight_Private.h in Headers */,
 				9C6E283C22A982670056B7BE /* MMEEventsManager.h in Headers */,
@@ -3406,6 +3424,7 @@
 				35136D451D42275100C20EFD /* MGLSymbolStyleLayer.mm in Sources */,
 				CF75A91522D85E860058A5C4 /* MGLLoggingConfiguration.mm in Sources */,
 				35599DED1D46F14E0048254D /* MGLStyleValue.mm in Sources */,
+				CFF9F98823A24BF500B0DE92 /* MGLNetworkIntegrationManager.m in Sources */,
 				DA8848211CBAFA6200AB86E3 /* MGLOfflinePack.mm in Sources */,
 				0778DD441F67556C00A73B34 /* MGLComputedShapeSource.mm in Sources */,
 				3557F7B21E1D27D300CCA5E6 /* MGLDistanceFormatter.m in Sources */,
@@ -3533,6 +3552,7 @@
 				DAA4E4261CBB730400178DFB /* MGLStyle.mm in Sources */,
 				CF75A91622D85E860058A5C4 /* MGLLoggingConfiguration.mm in Sources */,
 				DAA32CC31E4C6B65006F8D24 /* MGLDistanceFormatter.m in Sources */,
+				CFF9F98923A24BF500B0DE92 /* MGLNetworkIntegrationManager.m in Sources */,
 				DAA4E41D1CBB730400178DFB /* MGLGeometry.mm in Sources */,
 				40834BFB1FE05E1800C1BD0D /* MMEAPIClient.m in Sources */,
 				1FCCEC37222605C400302E3B /* MGLSDKMetricsManager.m in Sources */,

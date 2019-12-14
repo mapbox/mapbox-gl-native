@@ -20,10 +20,12 @@
         "platform/default/src/mbgl/util/monotonic_timer.cpp",
         "platform/default/src/mbgl/util/png_writer.cpp",
         "platform/default/src/mbgl/util/thread_local.cpp",
-        "platform/default/src/mbgl/util/utf.cpp"
+        "platform/default/src/mbgl/util/utf.cpp",
+        "platform/darwin/src/native_apple_interface.m"
     ],
     "public_headers": {
         "mbgl/storage/reachability.h": "platform/darwin/include/mbgl/storage/reachability.h",
+        "mbgl/interface/native_apple_interface.h": "platform/darwin/include/mbgl/interface/native_apple_interface.h",
         "mbgl/util/image+MGLAdditions.hpp": "platform/darwin/include/mbgl/util/image+MGLAdditions.hpp",
         "mbgl/gfx/headless_backend.hpp": "platform/default/include/mbgl/gfx/headless_backend.hpp",
         "mbgl/gfx/headless_frontend.hpp": "platform/default/include/mbgl/gfx/headless_frontend.hpp",
