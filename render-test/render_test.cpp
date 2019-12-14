@@ -119,6 +119,7 @@ ArgumentsTuple parseArguments(int argc, char** argv) {
 namespace mbgl {
 
 int runRenderTests(int argc, char** argv, std::function<void()> testStatus) {
+    int returnCode = 0;
     bool recycleMap;
     bool shuffle;
     uint32_t seed;
@@ -177,9 +178,11 @@ int runRenderTests(int argc, char** argv, std::function<void()> testStatus) {
             }
         }
 
-        bool errored = !metadata.errorMessage.empty() || !runner.run(metadata);
-        bool passed =
-            !errored && (!metadata.outputsImage || !metadata.diff.empty()) && metadata.difference <= metadata.allowed;
+        auto results = runner.run(metadata);
+
+        bool errored = !metadata.errorMessage.empty() || !(results.probeFailed || results.renderFailed);
+        bool imageOK = (!metadata.outputsImage || !metadata.diff.empty()) && metadata.difference <= metadata.allowed;
+        bool passed = !errored && imageOK;
 
         if (shouldIgnore) {
             if (passed) {
@@ -194,6 +197,14 @@ int runRenderTests(int argc, char** argv, std::function<void()> testStatus) {
                 printf(ANSI_COLOR_LIGHT_GRAY "* ignore %s (%s)" ANSI_COLOR_RESET "\n", id.c_str(), ignoreReason.c_str());
             }
         } else {
+            // Only fail the bots on render errors, this is a CI limitation that we need
+            // to succeed on metrics failed so the rebaseline bot can run next in the
+            // pipeline and collect the new baselines. The rebaseline bot will ultimately
+            // report the error and block the patch from being merged.
+            if (results.renderFailed == false || !imageOK) {
+                returnCode = 1;
+            }
+
             if (passed) {
                 status = "passed";
                 color = "green";
@@ -246,7 +257,7 @@ int runRenderTests(int argc, char** argv, std::function<void()> testStatus) {
 
     printf("Results at: %s\n", mbgl::filesystem::canonical(resultPath).c_str());
 
-    return stats.failedTests + stats.erroredTests == 0 ? 0 : 1;
+    return returnCode;
 }
 
 } // namespace mbgl
