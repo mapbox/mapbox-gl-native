@@ -1311,6 +1311,10 @@ std::string createResultItem(const TestMetadata& metadata, bool hasFailedTests) 
                 html.append(" src=\"data:image/png;base64," + encodeBase64(metadata.actual) + "\">\n");
             }
         }
+
+        if (metadata.metricsFailed) {
+            html.append("<p style=\"color: red\"><strong>Error:</strong> " + metadata.errorMessage + "</p>\n");
+        }
     } else {
         // FIXME: there are several places that errorMessage is not filled
         // comment out assert(!metadata.errorMessage.empty());
