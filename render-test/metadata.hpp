@@ -167,11 +167,18 @@ struct TestMetadata {
     std::string expected;
     std::string diff;
 
+    TestMetrics metrics;
+    TestMetrics expectedMetrics;
+
+    // Results
+    unsigned metricsErroed = 0;
+    unsigned metricsFailed = 0;
+    unsigned renderErroed = 0;
+    unsigned renderFailed = 0;
+
     std::string errorMessage;
     double difference = 0.0;
 
-    TestMetrics metrics;
-    TestMetrics expectedMetrics;
 };
 
 class TestContext {

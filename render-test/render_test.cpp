@@ -178,11 +178,10 @@ int runRenderTests(int argc, char** argv, std::function<void()> testStatus) {
             }
         }
 
-        auto results = runner.run(metadata);
+        runner.run(metadata);
 
-        bool errored = !metadata.errorMessage.empty() || !(results.probeFailed || results.renderFailed);
-        bool imageOK = (!metadata.outputsImage || !metadata.diff.empty()) && metadata.difference <= metadata.allowed;
-        bool passed = !errored && imageOK;
+        bool errored = metadata.metricsErroed || metadata.renderErroed;
+        bool passed = !errored && !metadata.metricsFailed && !metadata.renderFailed;
 
         if (shouldIgnore) {
             if (passed) {
@@ -201,7 +200,7 @@ int runRenderTests(int argc, char** argv, std::function<void()> testStatus) {
             // to succeed on metrics failed so the rebaseline bot can run next in the
             // pipeline and collect the new baselines. The rebaseline bot will ultimately
             // report the error and block the patch from being merged.
-            if (results.renderFailed == false || !imageOK) {
+            if (metadata.renderErroed || metadata.renderFailed) {
                 returnCode = 1;
             }
 

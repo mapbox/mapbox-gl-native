@@ -37,13 +37,8 @@ class TestRunner {
 public:
     enum class UpdateResults { NO, DEFAULT, PLATFORM, METRICS, REBASELINE };
 
-    struct TestResults {
-        bool probeFailed;
-        bool renderFailed;
-    };
-
     TestRunner(Manifest, UpdateResults);
-    TestResults run(TestMetadata&);
+    void run(TestMetadata&);
     void reset();
 
     // Manifest
@@ -51,11 +46,11 @@ public:
     void doShuffle(uint32_t seed);
 
 private:
-    bool checkQueryTestResults(mbgl::PremultipliedImage&& actualImage,
+    void checkQueryTestResults(mbgl::PremultipliedImage&& actualImage,
                                std::vector<mbgl::Feature>&& features,
                                TestMetadata&);
-    bool checkRenderTestResults(mbgl::PremultipliedImage&& image, TestMetadata&);
-    bool checkProbingResults(TestMetadata&);
+    void checkRenderTestResults(mbgl::PremultipliedImage&& image, TestMetadata&);
+    void checkProbingResults(TestMetadata&);
 
     struct Impl {
         Impl(const TestMetadata&);
