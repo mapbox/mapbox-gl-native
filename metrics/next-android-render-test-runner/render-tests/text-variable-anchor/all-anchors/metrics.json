@@ -1,16 +1,4 @@
 {
-    "memory": [
-        [
-            "probeMemory - default - end",
-            9187963,
-            121052
-        ],
-        [
-            "probeMemory - default - start",
-            56,
-            2
-        ]
-    ],
     "network": [
         [
             "probeNetwork - default - end",
