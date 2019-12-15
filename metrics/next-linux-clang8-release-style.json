@@ -8,5 +8,10 @@
         "ignores/platform-all.json",
         "ignores/platform-linux.json"
     ],
+    "metric_path": "next-linux-clang8-release",
+    "probes": [
+        "probeGFX",
+        "probeNetwork"
+    ],
     "vendor_path": "../vendor"
 }
