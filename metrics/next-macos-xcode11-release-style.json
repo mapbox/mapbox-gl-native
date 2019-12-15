@@ -8,5 +8,10 @@
         "ignores/platform-all.json",
         "ignores/platform-macos.json"
     ],
+    "metric_path": "next-macos-xcode11-release",
+    "probes": [
+        "probeGFX",
+        "probeNetwork"
+    ],
     "vendor_path": "../vendor"
 }

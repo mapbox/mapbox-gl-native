@@ -71,6 +71,7 @@ workflows:
           target_is_linux: true
           config_params: '-G Ninja -DCMAKE_INSTALL_PREFIX=/tmp/workspace/install/$CIRCLE_JOB -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8'
           install: true
+          metrics: true
           style_tests: true
       - next-build-template:
           name: next-FIXME-linux-asan
@@ -123,6 +124,7 @@ workflows:
           target_is_macos: true
           config_params: '-G Ninja -DCMAKE_INSTALL_PREFIX=/tmp/workspace/install/$CIRCLE_JOB -DCMAKE_CXX_COMPILER_LAUNCHER=ccache'
           install: true
+          metrics: true
           style_tests: true
       - next-build-template:
           name: next-macos-xcode11-debug

@@ -1,0 +1,18 @@
+{
+    "asset_path": "../mapbox-gl-js/test/integration",
+    "base_test_path": "tests",
+    "expectation_paths": [
+        "expectations/platform-all"
+    ],
+    "ignore_paths": [
+        "ignores/platform-all.json",
+        "ignores/platform-macos.json"
+    ],
+    "metric_path": "next-macos-xcode11-release",
+    "probes": [
+        "probeGFX",
+        "probeMemory",
+        "probeNetwork"
+    ],
+    "vendor_path": "../vendor"
+}
