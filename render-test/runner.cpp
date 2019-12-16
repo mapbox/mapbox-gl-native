@@ -666,7 +666,7 @@ uint32_t getImageTileOffset(const std::set<uint32_t>& dims, uint32_t dim) {
         assert(false);
         return 0;
     }
-    return std::distance(dims.begin(), it) * kTileSizeUint;
+    return static_cast<uint32_t>(std::distance(dims.begin(), it)) * kTileSizeUint;
 }
 
 } // namespace

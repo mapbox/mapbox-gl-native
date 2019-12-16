@@ -53,7 +53,6 @@ static MGLNativeNetworkManager *instance = nil;
 }
 
 - (void)stopDownloadEventForResponse:(NSURLResponse *)response {
-
     if (_delegate && [_delegate respondsToSelector:@selector(stopDownloadEventForResponse:)]) {
         return [_delegate stopDownloadEventForResponse:response];
     }

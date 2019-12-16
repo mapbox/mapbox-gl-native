@@ -7,10 +7,12 @@ if(NOT DEFINED IOS_DEPLOYMENT_TARGET)
     set(IOS_DEPLOYMENT_TARGET "9.0")
 endif()
 
+set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64")
+
 macro(initialize_ios_target target)
     set_target_properties(${target} PROPERTIES XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET "${IOS_DEPLOYMENT_TARGET}")
-    set_target_properties(${target} PROPERTIES XCODE_ATTRIBUTE_ENABLE_BITCODE "YES")
-    set_target_properties(${target} PROPERTIES XCODE_ATTRIBUTE_BITCODE_GENERATION_MODE bitcode)
+    # set_target_properties(${target} PROPERTIES XCODE_ATTRIBUTE_ENABLE_BITCODE "YES") set_target_properties(${target} PROPERTIES
+    # XCODE_ATTRIBUTE_BITCODE_GENERATION_MODE bitcode)
     set_target_properties(${target} PROPERTIES XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH $<$<CONFIG:Debug>:YES>)
 endmacro()
 
@@ -93,62 +95,13 @@ target_link_libraries(
         z
 )
 
-# add_custom_command(
-#     TARGET RenderTestAPP PRE_BUILD
-#     COMMAND
-#         ${CMAKE_COMMAND} -E
-#         copy_directory
-#         ${MBGL_ROOT}/mapbox-gl-js/test/integration/
-#         ${MBGL_ROOT}/test-data/mapbox-gl-js/test/integration/
-#     COMMAND
-#         ${CMAKE_COMMAND}
-#         -E
-#         copy_directory
-#         ${MBGL_ROOT}/vendor/mapbox-gl-styles
-#         ${MBGL_ROOT}/test-data/vendor/mapbox-gl-styles
-#     COMMAND
-#         ${CMAKE_COMMAND}
-#         -E
-#         copy_directory
-#         ${MBGL_ROOT}/render-test/ignores
-#         ${MBGL_ROOT}/test-data/render-test/ignores
-#     COMMAND
-#         ${CMAKE_COMMAND}
-#         -E
-#         copy_directory
-#         ${MBGL_ROOT}/render-test/expected
-#         ${MBGL_ROOT}/test-data/render-test/expected
-#     COMMAND
-#         ${CMAKE_COMMAND}
-#         -E
-#         copy
-#         ${MBGL_ROOT}/platform/node/test/ignores.json 
-#         ${MBGL_ROOT}test-data/platform/node/test/ignores.json 
-#     COMMAND
-#         ${CMAKE_COMMAND}
-#         -E
-#         copy
-#         ${MBGL_ROOT}/render-test/mac-manifest.json
-#         ${MBGL_ROOT}/test-data/render-test/mac-manifest.json
-#     WORKING_DIRECTORY ${MBGL_ROOT}
-# )
+enable_testing()
+set(RESOURCES ${MBGL_ROOT}/render-test/ios/Main.storyboard ${MBGL_ROOT}/render-test/ios/LaunchScreen.storyboard ${MBGL_ROOT}/test-data)
 
-set(
-    RESOURCES
-    ${MBGL_ROOT}/render-test/ios/Main.storyboard
-    ${MBGL_ROOT}/render-test/ios/LaunchScreen.storyboard
-    # ${MBGL_ROOT}/test-data
-    ${MBGL_ROOT}/mapbox-gl-js/test/integration
-    ${MBGL_ROOT}/vendor/mapbox-gl-styles
-    ${MBGL_ROOT}/render-test/ignores
-    ${MBGL_ROOT}/render-test/expected
-    ${MBGL_ROOT}/platform/node/test/ignores.json 
-    ${MBGL_ROOT}/render-test/mac-ignores.json
-    ${MBGL_ROOT}/render-test/ios-manifest.json
-)
+set(PUBLIC_HEADER ${MBGL_ROOT}/render-test/ios/iosTestRunner.h)
 
 add_executable(
-    RenderTestAPP
+    RenderTestApp
     ${MBGL_ROOT}/render-test/ios/ios_test_runner.hpp
     ${MBGL_ROOT}/render-test/ios/ios_test_runner.cpp
     ${MBGL_ROOT}/render-test/ios/AppDelegate.h
@@ -157,27 +110,17 @@ add_executable(
     ${MBGL_ROOT}/render-test/ios/ViewController.m
     ${MBGL_ROOT}/render-test/ios/iosTestRunner.h
     ${MBGL_ROOT}/render-test/ios/iosTestRunner.mm
-    ${MBGL_ROOT}/render-test/ios/Prefix.pch
     ${MBGL_ROOT}/render-test/ios/main.m
     ${RESOURCES}
 )
 
-initialize_ios_target(RenderTestAPP)
+initialize_ios_target(RenderTestApp)
 
-set(DEPLOYMENT_TARGET 8.0)
-
-set(MACOSX_BUNDLE_INFO_STRING "com.mapbox.RenderTestAPP")
-set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.mapbox.RenderTestAPP")
-set(MACOSX_BUNDLE_BUNDLE_NAME "com.mapbox.RenderTestAPP")
-set(MACOSX_BUNDLE_ICON_FILE "")
-set(MACOSX_BUNDLE_LONG_VERSION_STRING "1.0")
-set(MACOSX_BUNDLE_SHORT_VERSION_STRING "1.0")
-set(MACOSX_BUNDLE_BUNDLE_VERSION "1.0")
-set(MACOSX_BUNDLE_COPYRIGHT "Copyright YOU")
-set(MACOSX_DEPLOYMENT_TARGET ${DEPLOYMENT_TARGET})
+# Turn on ARC
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fobjc-arc")
 
 set_target_properties(
-    RenderTestAPP
+    RenderTestApp
     PROPERTIES
         MACOSX_BUNDLE
         TRUE
@@ -190,12 +133,12 @@ set_target_properties(
 )
 
 target_include_directories(
-    RenderTestAPP
+    RenderTestApp
     PUBLIC {MBGL_ROOT}/render-test/include ${MBGL_ROOT}/include
 )
 
 target_include_directories(
-    RenderTestAPP
+    RenderTestApp
     PRIVATE
         ${MBGL_ROOT}/platform/darwin/src
         ${MBGL_ROOT}/platform/darwin/include
@@ -204,8 +147,13 @@ target_include_directories(
         ${MBGL_ROOT}/src
 )
 
+target_include_directories(
+    RenderTestApp
+    PUBLIC ${MBGL_ROOT}/render-test/ios
+)
+
 target_link_libraries(
-    RenderTestAPP
+    RenderTestApp
     PRIVATE
         "-framework CoreGraphics"
         "-framework CoreLocation"
@@ -215,5 +163,20 @@ target_link_libraries(
         "-framework UIKit"
         mbgl-render-test
 )
+
+find_package(XCTest REQUIRED)
+
+xctest_add_bundle(RenderTestAppTests RenderTestApp ${MBGL_ROOT}/render-test/ios/tests/Tests.m)
+
+initialize_ios_target(RenderTestAppTests)
+
+target_include_directories(
+    RenderTestAppTests
+    PUBLIC ${MBGL_ROOT}/render-test/ios
+)
+
+xctest_add_test(XCTest.RenderTestApp RenderTestAppTests)
+
+set_target_properties(RenderTestAppTests PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${MBGL_ROOT}/render-test/ios/tests/Info.plist)
 
 unset(IOS_DEPLOYMENT_TARGET CACHE)

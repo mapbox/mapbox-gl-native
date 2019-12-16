@@ -11,7 +11,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    i = [[IosTestRunner alloc]init];
+//    i = [[IosTestRunner alloc]init];
 }
 
 - (void)didReceiveMemoryWarning {

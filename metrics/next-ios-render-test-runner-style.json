@@ -1,0 +1,11 @@
+{
+    "base_test_path": "integration",
+    "cache_path": "cache-style.db",
+    "expectation_paths": [
+        "expectations/platform-all"
+    ],
+    "ignore_paths": [
+        "ignores/platform-all.json",
+        "ignores/platform-macos.json"
+    ]
+}

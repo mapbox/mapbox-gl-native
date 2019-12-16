@@ -1,10 +1,3 @@
-//
-//  ios_test_runner.cpp
-//  RenderTestAPP
-//
-//  Created by Miao Zhao on 12/11/19.
-//
-
 #include "ios_test_runner.hpp"
 
 #include <mbgl/render_test.hpp>
@@ -13,6 +6,9 @@
 
 #include <vector>
 
+#define EXPORT __attribute__((visibility("default")))
+
+EXPORT
 void TestRunner::startTest(const std::string& manifest) {
 
     auto runTestWithManifest = [](const std::string& manifest) -> bool {
