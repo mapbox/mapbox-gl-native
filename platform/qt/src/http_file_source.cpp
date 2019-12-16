@@ -20,7 +20,7 @@ void HTTPFileSource::Impl::request(HTTPRequest* req)
 {
     QUrl url = req->requestUrl();
 
-    QPair<QNetworkReply*, QVector<HTTPRequest*>>& data = m_pending[url];
+    QPair<QPointer<QNetworkReply>, QVector<HTTPRequest*>>& data = m_pending[url];
     QVector<HTTPRequest*>& requestsVector = data.second;
     requestsVector.append(req);
 
@@ -52,7 +52,7 @@ void HTTPFileSource::Impl::cancel(HTTPRequest* req)
         return;
     }
 
-    QPair<QNetworkReply*, QVector<HTTPRequest*>>& data = it.value();
+    QPair<QPointer<QNetworkReply>, QVector<HTTPRequest*>>& data = it.value();
     QNetworkReply* reply = data.first;
     QVector<HTTPRequest*>& requestsVector = data.second;
 
@@ -66,7 +66,7 @@ void HTTPFileSource::Impl::cancel(HTTPRequest* req)
     if (requestsVector.empty()) {
         m_pending.erase(it);
 #if QT_VERSION >= 0x050000
-        reply->abort();
+        if (reply) reply->abort();
 #else
         // XXX: We should be aborting the reply here
         // but a bug on Qt4 causes the connection of
