@@ -57,8 +57,8 @@ void HTTPFileSource::Impl::cancel(HTTPRequest* req)
     }
 
     if (requestsVector.empty()) {
-        m_pending.erase(it);
         reply->abort();
+        m_pending.erase(it);
     }
 }
 
