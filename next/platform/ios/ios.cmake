@@ -23,6 +23,7 @@ target_sources(
         ${MBGL_ROOT}/platform/darwin/src/collator.mm
         ${MBGL_ROOT}/platform/darwin/src/gl_functions.cpp
         ${MBGL_ROOT}/platform/darwin/src/headless_backend_eagl.mm
+        ${MBGL_ROOT}/platform/darwin/src/native_apple_interface.m
         ${MBGL_ROOT}/platform/darwin/src/http_file_source.mm
         ${MBGL_ROOT}/platform/darwin/src/native_apple_interface.m
         ${MBGL_ROOT}/platform/darwin/src/image.mm
@@ -56,6 +57,8 @@ target_sources(
         ${MBGL_ROOT}/platform/default/src/mbgl/util/png_writer.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/util/thread_local.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/util/utf.cpp
+        ${MBGL_ROOT}/platform/default/src/mbgl/util/thread_local.cpp
+        ${MBGL_ROOT}/platform/default/src/mbgl/layermanager/layer_manager.cpp
 )
 
 target_include_directories(
@@ -88,6 +91,129 @@ target_link_libraries(
         mbgl-vendor-icu
         sqlite3
         z
+)
+
+# add_custom_command(
+#     TARGET RenderTestAPP PRE_BUILD
+#     COMMAND
+#         ${CMAKE_COMMAND} -E
+#         copy_directory
+#         ${MBGL_ROOT}/mapbox-gl-js/test/integration/
+#         ${MBGL_ROOT}/test-data/mapbox-gl-js/test/integration/
+#     COMMAND
+#         ${CMAKE_COMMAND}
+#         -E
+#         copy_directory
+#         ${MBGL_ROOT}/vendor/mapbox-gl-styles
+#         ${MBGL_ROOT}/test-data/vendor/mapbox-gl-styles
+#     COMMAND
+#         ${CMAKE_COMMAND}
+#         -E
+#         copy_directory
+#         ${MBGL_ROOT}/render-test/ignores
+#         ${MBGL_ROOT}/test-data/render-test/ignores
+#     COMMAND
+#         ${CMAKE_COMMAND}
+#         -E
+#         copy_directory
+#         ${MBGL_ROOT}/render-test/expected
+#         ${MBGL_ROOT}/test-data/render-test/expected
+#     COMMAND
+#         ${CMAKE_COMMAND}
+#         -E
+#         copy
+#         ${MBGL_ROOT}/platform/node/test/ignores.json 
+#         ${MBGL_ROOT}test-data/platform/node/test/ignores.json 
+#     COMMAND
+#         ${CMAKE_COMMAND}
+#         -E
+#         copy
+#         ${MBGL_ROOT}/render-test/mac-manifest.json
+#         ${MBGL_ROOT}/test-data/render-test/mac-manifest.json
+#     WORKING_DIRECTORY ${MBGL_ROOT}
+# )
+
+set(
+    RESOURCES
+    ${MBGL_ROOT}/render-test/ios/Main.storyboard
+    ${MBGL_ROOT}/render-test/ios/LaunchScreen.storyboard
+    # ${MBGL_ROOT}/test-data
+    ${MBGL_ROOT}/mapbox-gl-js/test/integration
+    ${MBGL_ROOT}/vendor/mapbox-gl-styles
+    ${MBGL_ROOT}/render-test/ignores
+    ${MBGL_ROOT}/render-test/expected
+    ${MBGL_ROOT}/platform/node/test/ignores.json 
+    ${MBGL_ROOT}/render-test/mac-ignores.json
+    ${MBGL_ROOT}/render-test/ios-manifest.json
+)
+
+add_executable(
+    RenderTestAPP
+    ${MBGL_ROOT}/render-test/ios/ios_test_runner.hpp
+    ${MBGL_ROOT}/render-test/ios/ios_test_runner.cpp
+    ${MBGL_ROOT}/render-test/ios/AppDelegate.h
+    ${MBGL_ROOT}/render-test/ios/AppDelegate.m
+    ${MBGL_ROOT}/render-test/ios/ViewController.h
+    ${MBGL_ROOT}/render-test/ios/ViewController.m
+    ${MBGL_ROOT}/render-test/ios/iosTestRunner.h
+    ${MBGL_ROOT}/render-test/ios/iosTestRunner.mm
+    ${MBGL_ROOT}/render-test/ios/Prefix.pch
+    ${MBGL_ROOT}/render-test/ios/main.m
+    ${RESOURCES}
+)
+
+initialize_ios_target(RenderTestAPP)
+
+set(DEPLOYMENT_TARGET 8.0)
+
+set(MACOSX_BUNDLE_INFO_STRING "com.mapbox.RenderTestAPP")
+set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.mapbox.RenderTestAPP")
+set(MACOSX_BUNDLE_BUNDLE_NAME "com.mapbox.RenderTestAPP")
+set(MACOSX_BUNDLE_ICON_FILE "")
+set(MACOSX_BUNDLE_LONG_VERSION_STRING "1.0")
+set(MACOSX_BUNDLE_SHORT_VERSION_STRING "1.0")
+set(MACOSX_BUNDLE_BUNDLE_VERSION "1.0")
+set(MACOSX_BUNDLE_COPYRIGHT "Copyright YOU")
+set(MACOSX_DEPLOYMENT_TARGET ${DEPLOYMENT_TARGET})
+
+set_target_properties(
+    RenderTestAPP
+    PROPERTIES
+        MACOSX_BUNDLE
+        TRUE
+        MACOSX_BUNDLE_IDENTIFIER
+        com.mapbox.RenderTestAPP
+        MACOSX_BUNDLE_INFO_PLIST
+        ${MBGL_ROOT}/render-test/ios/Info.plist
+        RESOURCE
+        "${RESOURCES}"
+)
+
+target_include_directories(
+    RenderTestAPP
+    PUBLIC {MBGL_ROOT}/render-test/include ${MBGL_ROOT}/include
+)
+
+target_include_directories(
+    RenderTestAPP
+    PRIVATE
+        ${MBGL_ROOT}/platform/darwin/src
+        ${MBGL_ROOT}/platform/darwin/include
+        ${MBGL_ROOT}/platform/darwin/include/mbgl/interface/
+        ${MBGL_ROOT}/platform/default/include
+        ${MBGL_ROOT}/src
+)
+
+target_link_libraries(
+    RenderTestAPP
+    PRIVATE
+        "-framework CoreGraphics"
+        "-framework CoreLocation"
+        "-framework Foundation"
+        "-framework OpenGLES"
+        "-framework QuartzCore"
+        "-framework UIKit"
+        mbgl-render-test
 )
 
 unset(IOS_DEPLOYMENT_TARGET CACHE)
