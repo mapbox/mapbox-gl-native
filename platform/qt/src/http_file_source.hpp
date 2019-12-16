@@ -7,6 +7,7 @@
 #include <QNetworkAccessManager>
 #include <QObject>
 #include <QPair>
+#include <QPointer>
 #include <QQueue>
 #include <QUrl>
 #include <QVector>
@@ -30,7 +31,7 @@ public slots:
     void onReplyFinished();
 
 private:
-    QMap<QUrl, QPair<QNetworkReply *, QVector<HTTPRequest *>>> m_pending;
+    QMap<QUrl, QPair<QPointer<QNetworkReply>, QVector<HTTPRequest *>>> m_pending;
     QNetworkAccessManager *m_manager;
 };
 
