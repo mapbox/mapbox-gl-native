@@ -1,4 +1,5 @@
 {
+    "asset_path": "../mapbox-gl-js/test/integration",
     "base_test_path": "tests",
     "expectation_paths": [
         "expectations/platform-all",
@@ -15,5 +16,6 @@
         "probeMemory",
         "probeNetwork"
     ],
-    "result_path": "/sdcard"
+    "result_path": "/sdcard",
+    "vendor_path": "../vendor"
 }
