@@ -1294,7 +1294,8 @@ std::string createResultItem(const TestMetadata& metadata, bool hasFailedTests) 
     std::string html;
     html.append("<div class=\"test " + metadata.status + (shouldHide ? " hide" : "") + "\">\n");
     html.append(R"(<h2><span class="label" style="background: )" + metadata.color + "\">" + metadata.status + "</span> " + metadata.id + "</h2>\n");
-    if (metadata.status != "errored") {
+
+    if (!metadata.renderErrored) {
         if (metadata.outputsImage) {
             if (metadata.renderTest) {
                 html.append("<img width=" + mbgl::util::toString(metadata.size.width));
@@ -1311,15 +1312,16 @@ std::string createResultItem(const TestMetadata& metadata, bool hasFailedTests) 
                 html.append(" src=\"data:image/png;base64," + encodeBase64(metadata.actual) + "\">\n");
             }
         }
-
-        if (metadata.metricsFailed) {
-            html.append("<p style=\"color: red\"><strong>Error:</strong> " + metadata.errorMessage + "</p>\n");
-        }
     } else {
         // FIXME: there are several places that errorMessage is not filled
         // comment out assert(!metadata.errorMessage.empty());
         html.append("<p style=\"color: red\"><strong>Error:</strong> " + metadata.errorMessage + "</p>\n");
     }
+
+    if (metadata.metricsFailed || metadata.metricsErrored) {
+        html.append("<p style=\"color: red\"><strong>Error:</strong> " + metadata.errorMessage + "</p>\n");
+    }
+
     if (metadata.difference != 0.0) {
         if (metadata.renderTest) {
             html.append("<p class=\"diff\"><strong>Diff:</strong> " + mbgl::util::toString(metadata.difference) +
