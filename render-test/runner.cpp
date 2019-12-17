@@ -10,8 +10,10 @@
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/io.hpp>
+#include <mbgl/util/projection.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/string.hpp>
+#include <mbgl/util/tile_cover.hpp>
 
 #include <mapbox/pixelmatch.hpp>
 
@@ -628,7 +630,6 @@ void resetContext(const TestMetadata& metadata, TestContext& ctx) {
                               .withYSkew(metadata.ySkew));
     map.setDebug(metadata.debug);
     map.getStyle().loadJSON(serializeJsonValue(metadata.document));
-    map.jumpTo(map.getStyle().getDefaultCamera());
 }
 
 } // namespace
@@ -690,18 +691,30 @@ void TestRunner::run(TestMetadata& metadata) {
 
     ctx.runnerImpl = maps[key].get();
     auto& frontend = ctx.getFrontend();
+    auto& map = ctx.getMap();
 
     resetContext(metadata, ctx);
-
-    for (const auto& operation : parseTestOperations(metadata, manifest)) {
-        if (!operation(ctx)) return;
-    }
+    auto camera = map.getStyle().getDefaultCamera();
 
     HeadlessFrontend::RenderResult result;
-    try {
-        if (metadata.outputsImage) result = frontend.render(ctx.getMap());
-    } catch (const std::exception&) {
-        return;
+
+    if (metadata.mapMode == MapMode::Tile) {
+        assert(camera.zoom);
+        assert(camera.center);
+        auto tileIds = util::tileCover(map.latLngBoundsForCamera(camera), *camera.zoom);
+        for (const auto& tileId : tileIds) {
+            auto cameraForTile{camera};
+            double scale = (1 << tileId.canonical.z) / util::tileSize;
+            Point<double> tileCenter{tileId.canonical.x + 0.5, tileId.canonical.y + 0.5};
+            cameraForTile.withCenter(Projection::unproject(tileCenter, scale));
+
+            map.jumpTo(cameraForTile);
+            result = runTest(metadata, ctx);
+            break;
+        }
+    } else {
+        map.jumpTo(camera);
+        result = runTest(metadata, ctx);
     }
 
     if (!metadata.ignoredTest) {
@@ -725,6 +738,20 @@ void TestRunner::run(TestMetadata& metadata) {
         }
         checkQueryTestResults(std::move(result.image), std::move(features), metadata);
     }
+}
+
+mbgl::HeadlessFrontend::RenderResult TestRunner::runTest(TestMetadata& metadata, TestContext& ctx) {
+    HeadlessFrontend::RenderResult result{};
+    for (const auto& operation : parseTestOperations(metadata, manifest)) {
+        if (!operation(ctx)) return result;
+    }
+
+    try {
+        if (metadata.outputsImage) result = ctx.getFrontend().render(ctx.getMap());
+    } catch (const std::exception& e) {
+        ctx.getMetadata().errorMessage = std::string("Renering raised an exception: ") + e.what();
+    }
+    return result;
 }
 
 void TestRunner::reset() {

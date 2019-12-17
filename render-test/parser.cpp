@@ -497,9 +497,10 @@ TestMetadata parseTestMetadata(const TestPaths& paths, const Manifest& manifest)
         metadata.outputsImage = true;
         assert(testValue["mapMode"].IsString());
         std::string mapModeStr = testValue["mapMode"].GetString();
-        if (mapModeStr == "tile")
+        if (mapModeStr == "tile") {
             metadata.mapMode = mbgl::MapMode::Tile;
-        else if (mapModeStr == "continuous") {
+            metadata.size = {uint32_t(mbgl::util::tileSize), uint32_t(mbgl::util::tileSize)};
+        } else if (mapModeStr == "continuous") {
             metadata.mapMode = mbgl::MapMode::Continuous;
             metadata.outputsImage = false;
         } else if (mapModeStr == "static")
