@@ -139,6 +139,8 @@ public:
 
     void setVisibleCoordinateBounds(JNIEnv&, const jni::Array<jni::Object<LatLng>>&, const jni::Object<RectF>&, jni::jdouble, jni::jlong);
 
+    void getVisibleCoordinateBounds(JNIEnv& env, jint screenWidth, jint screenHeight, jni::Array<jdouble>& output, jfloat pixelRatio_);
+
     void scheduleSnapshot(jni::JNIEnv&);
 
     jni::Local<jni::Object<CameraPosition>> getCameraPosition(jni::JNIEnv&);
