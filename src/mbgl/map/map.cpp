@@ -213,7 +213,10 @@ CameraOptions cameraForLatLngs(const std::vector<LatLng>& latLngs, const Transfo
     ScreenCoordinate centerPixel = nePixel + swPixel;
     centerPixel /= 2.0;
 
-    return CameraOptions().withCenter(transform.screenCoordinateToLatLng(centerPixel)).withPadding(padding).withZoom(zoom);
+    return CameraOptions()
+        .withCenter(transform.screenCoordinateToLatLng(centerPixel))
+        .withPadding(padding)
+        .withZoom(zoom);
 }
 
 CameraOptions Map::cameraForLatLngs(const std::vector<LatLng>& latLngs, const EdgeInsets& padding, optional<double> bearing, optional<double> pitch) const {

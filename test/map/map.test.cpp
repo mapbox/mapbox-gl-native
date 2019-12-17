@@ -5,26 +5,27 @@
 #include <mbgl/test/fixture_log_observer.hpp>
 #include <mbgl/test/map_adapter.hpp>
 
-#include <mbgl/map/map_options.hpp>
 #include <mbgl/gfx/backend_scope.hpp>
-#include <mbgl/gl/context.hpp>
 #include <mbgl/gfx/headless_frontend.hpp>
-#include <mbgl/storage/resource_options.hpp>
-#include <mbgl/storage/network_status.hpp>
+#include <mbgl/gl/context.hpp>
+#include <mbgl/map/map_options.hpp>
+#include <mbgl/math/log2.hpp>
 #include <mbgl/storage/default_file_source.hpp>
+#include <mbgl/storage/network_status.hpp>
 #include <mbgl/storage/online_file_source.hpp>
-#include <mbgl/util/image.hpp>
-#include <mbgl/util/io.hpp>
-#include <mbgl/util/run_loop.hpp>
-#include <mbgl/util/async_task.hpp>
-#include <mbgl/style/style.hpp>
+#include <mbgl/storage/resource_options.hpp>
 #include <mbgl/style/image.hpp>
 #include <mbgl/style/layers/background_layer.hpp>
 #include <mbgl/style/layers/raster_layer.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/style/sources/geojson_source.hpp>
 #include <mbgl/style/sources/image_source.hpp>
+#include <mbgl/style/style.hpp>
+#include <mbgl/util/async_task.hpp>
 #include <mbgl/util/color.hpp>
+#include <mbgl/util/image.hpp>
+#include <mbgl/util/io.hpp>
+#include <mbgl/util/run_loop.hpp>
 
 using namespace mbgl;
 using namespace mbgl::style;
@@ -177,7 +178,7 @@ TEST(Map, LatLngBoundsToCameraWithBearing) {
     EXPECT_NEAR(virtualCamera.bearing.value_or(0), 35.0, 1e-5);
 }
 
-TEST(Map, LatLngBoundsToCameraWithBearingAndPitch) {
+TEST(Map, LatLngBoundsToCameraWithBearingPitchAndPadding) {
     MapTest<> test;
     
     test.map.jumpTo(CameraOptions().withCenter(LatLng { 40.712730, -74.005953 }).withZoom(16.0));
@@ -189,6 +190,19 @@ TEST(Map, LatLngBoundsToCameraWithBearingAndPitch) {
     EXPECT_NEAR(*virtualCamera.zoom, 13.66272, 1e-5);
     ASSERT_DOUBLE_EQ(*virtualCamera.pitch, 20.0);
     EXPECT_NEAR(virtualCamera.bearing.value_or(0), 35.0, 1e-5);
+
+    const EdgeInsets padding = EdgeInsets{10, 20, 30, 40};
+    const CameraOptions virtualCameraPadded = test.map.cameraForLatLngBounds(bounds, padding, 35, 20);
+    ASSERT_TRUE(bounds.contains(*virtualCameraPadded.center));
+    ASSERT_DOUBLE_EQ(virtualCameraPadded.center->latitude(), virtualCamera.center->latitude());
+    ASSERT_DOUBLE_EQ(virtualCameraPadded.center->longitude(), virtualCamera.center->longitude());
+
+    const Size size = test.map.getMapOptions().size();
+    const auto scaleChange = std::min((size.width - padding.left() - padding.right()) / size.width,
+                                      (size.height - padding.top() - padding.bottom()) / size.height);
+    ASSERT_DOUBLE_EQ(*virtualCameraPadded.zoom, *virtualCamera.zoom + util::log2(scaleChange));
+    ASSERT_DOUBLE_EQ(*virtualCameraPadded.pitch, *virtualCamera.pitch);
+    ASSERT_DOUBLE_EQ(*virtualCameraPadded.bearing, *virtualCamera.bearing);
 }
 
 TEST(Map, LatLngsToCamera) {
