@@ -3,6 +3,10 @@
 ## Master
 
 ### New features
+- [core] Port line-sort-key and fill-sort-key ([#15839](https://github.com/mapbox/mapbox-gl-native/pull/15839))
+
+  The new feature allows to sort line and fill layer features. Similar to `symbol-sort-key`.
+
 - [core] Add image sections to format expression ([#15937](https://github.com/mapbox/mapbox-gl-native/pull/15937))
 
   The new feature allows to embed images into labels.
