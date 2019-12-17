@@ -529,16 +529,15 @@ void NativeMapView::setVisibleCoordinateBounds(JNIEnv& env, const jni::Array<jni
     map->easeTo(cameraOptions, animationOptions);
 }
 
-void NativeMapView::getVisibleCoordinateBounds(JNIEnv& env,
-                                     jint screenWidth,
-                                     jint screenHeight,
-                                     jni::Array<jdouble>& output,
-                                     jfloat pixelRatio_) {
-    mbgl::LatLng southEast = map->latLngForPixel(mbgl::ScreenCoordinate(screenWidth / pixelRatio_, screenHeight / pixelRatio_));
+void NativeMapView::getVisibleCoordinateBounds(
+    JNIEnv& env, jint screenWidth, jint screenHeight, jni::Array<jdouble>& output, jfloat pixelRatio_) {
+    mbgl::LatLng southEast =
+        map->latLngForPixel(mbgl::ScreenCoordinate(screenWidth / pixelRatio_, screenHeight / pixelRatio_));
     mbgl::LatLng northEast = map->latLngForPixel(mbgl::ScreenCoordinate(screenWidth / pixelRatio_, 0.0));
     mbgl::LatLng southWest = map->latLngForPixel(mbgl::ScreenCoordinate(0.0, screenHeight / pixelRatio_));
     mbgl::LatLng northWest = map->latLngForPixel(mbgl::ScreenCoordinate(0.0, 0.0));
-    mbgl::LatLng center = map->latLngForPixel(mbgl::ScreenCoordinate(screenWidth / (2 * pixelRatio_), screenHeight / (2 * pixelRatio_)));
+    mbgl::LatLng center =
+        map->latLngForPixel(mbgl::ScreenCoordinate(screenWidth / (2 * pixelRatio_), screenHeight / (2 * pixelRatio_)));
 
     double latitudes[] = {southEast.latitude(), northEast.latitude(), southWest.latitude(), northWest.latitude()};
     double longitudes[] = {southEast.longitude(), northEast.longitude(), southWest.longitude(), northWest.longitude()};
