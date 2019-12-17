@@ -632,6 +632,23 @@ void resetContext(const TestMetadata& metadata, TestContext& ctx) {
     map.getStyle().loadJSON(serializeJsonValue(metadata.document));
 }
 
+LatLng getTileCenterCoordinates(const UnwrappedTileID& tileId) {
+    double scale = (1 << tileId.canonical.z);
+    Point<double> tileCenter{(tileId.canonical.x + 0.5) * util::tileSize, (tileId.canonical.y + 0.5) * util::tileSize};
+    return Projection::unproject(tileCenter, scale);
+}
+
+constexpr auto kTileSizeUint = uint32_t(util::tileSize);
+
+uint32_t getImageTileOffset(const std::set<uint32_t>& dims, uint32_t dim) {
+    auto it = dims.find(dim);
+    if (it == dims.end()) {
+        assert(false);
+        return 0;
+    }
+    return std::distance(dims.begin(), it) * kTileSizeUint;
+}
+
 } // namespace
 
 TestRunner::Impl::Impl(const TestMetadata& metadata)
@@ -696,21 +713,41 @@ void TestRunner::run(TestMetadata& metadata) {
     resetContext(metadata, ctx);
     auto camera = map.getStyle().getDefaultCamera();
 
-    HeadlessFrontend::RenderResult result;
+    HeadlessFrontend::RenderResult result{};
 
     if (metadata.mapMode == MapMode::Tile) {
         assert(camera.zoom);
         assert(camera.center);
         auto tileIds = util::tileCover(map.latLngBoundsForCamera(camera), *camera.zoom);
-        for (const auto& tileId : tileIds) {
-            auto cameraForTile{camera};
-            double scale = (1 << tileId.canonical.z) / util::tileSize;
-            Point<double> tileCenter{tileId.canonical.x + 0.5, tileId.canonical.y + 0.5};
-            cameraForTile.withCenter(Projection::unproject(tileCenter, scale));
+        assert(!tileIds.empty());
+        std::set<uint32_t> xDims;
+        std::set<uint32_t> yDims;
 
+        for (const auto& tileId : tileIds) {
+            xDims.insert(tileId.canonical.x);
+            yDims.insert(tileId.canonical.y);
+            assert(tileId.canonical.z == uint8_t(*camera.zoom));
+        }
+
+        result.image =
+            PremultipliedImage({uint32_t(xDims.size()) * kTileSizeUint, uint32_t(yDims.size()) * kTileSizeUint});
+        for (const auto& tileId : tileIds) {
+            resetContext(metadata, ctx);
+            auto cameraForTile{camera};
+            cameraForTile.withCenter(getTileCenterCoordinates(tileId));
             map.jumpTo(cameraForTile);
-            result = runTest(metadata, ctx);
-            break;
+
+            auto resultForTile = runTest(metadata, ctx);
+            if (!resultForTile.image.valid()) {
+                metadata.errorMessage = "Failed rendering tile: " + util::toString(tileId);
+                return;
+            }
+
+            auto xOffset = getImageTileOffset(xDims, tileId.canonical.x);
+            auto yOffset = getImageTileOffset(yDims, tileId.canonical.y);
+            PremultipliedImage::copy(
+                resultForTile.image, result.image, {0, 0}, {xOffset, yOffset}, resultForTile.image.size);
+            result.stats += resultForTile.stats;
         }
     } else {
         map.jumpTo(camera);
