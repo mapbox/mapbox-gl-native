@@ -1,5 +1,5 @@
 add_library(
-    mbgl-benchmark SHARED EXCLUDE_FROM_ALL
+    mbgl-benchmark STATIC EXCLUDE_FROM_ALL
     ${MBGL_ROOT}/benchmark/api/query.benchmark.cpp
     ${MBGL_ROOT}/benchmark/api/render.benchmark.cpp
     ${MBGL_ROOT}/benchmark/function/camera_function.benchmark.cpp
@@ -31,12 +31,8 @@ get_target_property(MBGL_CORE_PRIVATE_LIBRARIES mbgl-core LINK_LIBRARIES)
 
 target_link_libraries(
     mbgl-benchmark
-    PRIVATE
-        ${MBGL_CORE_PRIVATE_LIBRARIES}
-        mbgl-vendor-benchmark
-        mbgl-compiler-options
-        mbgl-core
-        $<$<PLATFORM_ID:Android>:mbgl-core-android>
+    PRIVATE ${MBGL_CORE_PRIVATE_LIBRARIES} mbgl-vendor-benchmark mbgl-compiler-options
+    PUBLIC mbgl-core
 )
 
 set_property(TARGET mbgl-benchmark PROPERTY FOLDER Core)

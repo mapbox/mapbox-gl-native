@@ -106,7 +106,11 @@ add_executable(
 
 target_link_libraries(
     mbgl-benchmark-runner
-    PRIVATE mbgl-compiler-options mbgl-benchmark
+    PRIVATE
+        mbgl-compiler-options
+        -Wl,--whole-archive
+        mbgl-benchmark
+        -Wl,--no-whole-archive
 )
 
 add_executable(
