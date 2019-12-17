@@ -46,6 +46,7 @@ public:
     void doShuffle(uint32_t seed);
 
 private:
+    mbgl::HeadlessFrontend::RenderResult runTest(TestMetadata& metadata, TestContext& ctx);
     void checkQueryTestResults(mbgl::PremultipliedImage&& actualImage,
                                std::vector<mbgl::Feature>&& features,
                                TestMetadata&);
