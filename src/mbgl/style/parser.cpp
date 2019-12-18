@@ -158,7 +158,6 @@ void Parser::parseSources(const JSValue& value) {
             continue;
         }
 
-        sourcesMap.emplace(id, (*source).get());
         sources.emplace_back(std::move(*source));
     }
 }
