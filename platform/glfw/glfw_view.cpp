@@ -180,7 +180,7 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
             glfwSetWindowShouldClose(window, true);
             break;
         case GLFW_KEY_TAB:
-            view->cycleDebugOptions();
+            view->map->cycleDebugOptions();
             break;
         case GLFW_KEY_X:
             if (!mods)
@@ -494,30 +494,6 @@ void GLFWView::updateAnimatedAnnotations() {
         const double y = std::sin(dt/ period * M_PI * 2.0) * 80;
         map->updateAnnotation(animatedAnnotationIDs[i], mbgl::SymbolAnnotation { {x, y }, "default_marker" });
     }
-}
-
-void GLFWView::cycleDebugOptions() {
-    auto debug = map->getDebug();
-#if not MBGL_USE_GLES2
-    if (debug & mbgl::MapDebugOptions::StencilClip)
-        debug = mbgl::MapDebugOptions::NoDebug;
-    else if (debug & mbgl::MapDebugOptions::Overdraw)
-        debug = mbgl::MapDebugOptions::StencilClip;
-#else
-    if (debug & mbgl::MapDebugOptions::Overdraw) debug = mbgl::MapDebugOptions::NoDebug;
-#endif // MBGL_USE_GLES2
-    else if (debug & mbgl::MapDebugOptions::Collision)
-        debug = mbgl::MapDebugOptions::Overdraw;
-    else if (debug & mbgl::MapDebugOptions::Timestamps)
-        debug = debug | mbgl::MapDebugOptions::Collision;
-    else if (debug & mbgl::MapDebugOptions::ParseStatus)
-        debug = debug | mbgl::MapDebugOptions::Timestamps;
-    else if (debug & mbgl::MapDebugOptions::TileBorders)
-        debug = debug | mbgl::MapDebugOptions::ParseStatus;
-    else
-        debug = mbgl::MapDebugOptions::TileBorders;
-
-    map->setDebug(debug);
 }
 
 void GLFWView::clearAnnotations() {

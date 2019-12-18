@@ -120,6 +120,7 @@ public:
 
     // Debug
     void setDebug(MapDebugOptions);
+    void cycleDebugOptions();
     MapDebugOptions getDebug() const;
 
     bool isFullyLoaded() const;
