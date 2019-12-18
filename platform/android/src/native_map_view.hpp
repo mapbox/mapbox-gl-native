@@ -151,6 +151,8 @@ public:
 
     void setDebug(JNIEnv&, jni::jboolean);
 
+    void cycleDebugOptions(JNIEnv&);
+
     jni::jboolean getDebug(JNIEnv&);
 
     jni::jboolean isFullyLoaded(JNIEnv&);

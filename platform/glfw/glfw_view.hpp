@@ -88,7 +88,6 @@ private:
     void updateAnimatedAnnotations();
     void toggleCustomSource();
 
-    void cycleDebugOptions();
     void clearAnnotations();
     void popAnnotation();
 

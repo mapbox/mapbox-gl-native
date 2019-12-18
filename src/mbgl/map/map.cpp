@@ -434,6 +434,30 @@ void Map::setDebug(MapDebugOptions debugOptions) {
     impl->onUpdate();
 }
 
+void Map::cycleDebugOptions() {
+#if not MBGL_USE_GLES2
+    if (impl->debugOptions & MapDebugOptions::StencilClip)
+        impl->debugOptions = MapDebugOptions::NoDebug;
+    else if (impl->debugOptions & MapDebugOptions::Overdraw)
+        impl->debugOptions = MapDebugOptions::StencilClip;
+#else
+    if (impl->debugOptions & MapDebugOptions::Overdraw)
+        impl->debugOptions = MapDebugOptions::NoDebug;
+#endif // MBGL_USE_GLES2
+    else if (impl->debugOptions & MapDebugOptions::Collision)
+        impl->debugOptions = MapDebugOptions::Overdraw;
+    else if (impl->debugOptions & MapDebugOptions::Timestamps)
+        impl->debugOptions = impl->debugOptions | MapDebugOptions::Collision;
+    else if (impl->debugOptions & MapDebugOptions::ParseStatus)
+        impl->debugOptions = impl->debugOptions | MapDebugOptions::Timestamps;
+    else if (impl->debugOptions & MapDebugOptions::TileBorders)
+        impl->debugOptions = impl->debugOptions | MapDebugOptions::ParseStatus;
+    else
+        impl->debugOptions = MapDebugOptions::TileBorders;
+
+    impl->onUpdate();
+}
+
 MapDebugOptions Map::getDebug() const {
     return impl->debugOptions;
 }

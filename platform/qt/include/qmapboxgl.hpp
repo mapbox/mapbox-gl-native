@@ -153,6 +153,8 @@ public:
               qreal pixelRatio = 1);
     virtual ~QMapboxGL();
 
+    void cycleDebugOptions();
+
     QString styleJson() const;
     QString styleUrl() const;
 

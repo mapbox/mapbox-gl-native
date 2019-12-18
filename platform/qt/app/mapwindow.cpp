@@ -400,6 +400,9 @@ void MapWindow::keyPressEvent(QKeyEvent *ev)
             }
         }
         break;
+    case Qt::Key_Tab:
+        m_map->cycleDebugOptions();
+        break;
     default:
         break;
     }
