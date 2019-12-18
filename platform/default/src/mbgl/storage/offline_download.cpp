@@ -379,6 +379,7 @@ void OfflineDownload::deactivateDownload() {
     requiredSourceURLs.clear();
     resourcesRemaining.clear();
     requests.clear();
+    buffer.clear();
 }
 
 void OfflineDownload::queueResource(Resource&& resource) {
