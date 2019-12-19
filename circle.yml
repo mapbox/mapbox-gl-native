@@ -5,6 +5,7 @@ workflows:
   mbgl-next:
     jobs:
       - next-sanity-checks
+      - next-android-benchmark-runner
       - next-android-render-test-runner
       - next-baselines:
           requires:
@@ -668,6 +669,40 @@ commands:
           fi
 
 jobs:
+  next-android-benchmark-runner:
+    executor: ubuntu-disco
+    steps:
+      - checkout
+      - next-prepare
+      - run:
+          name: Build BenchmarkRunner APK
+          command: |
+            cd benchmark/android
+            ./gradlew --parallel --max-workers=8 -Pmapbox.abis=arm64-v8a app:assembleRelease app:assembleAndroidTest
+      - login-google-cloud-platform
+      - run:
+          name: Run BenchmarkRunner on Firebase
+          no_output_timeout: 20m
+          command: |
+            if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON}" && -z "${SKIP_FIREBASE:-}" ]]; then
+              gcloud firebase test android models list
+              gcloud firebase test android run --type instrumentation \
+                --app benchmark/android/app/build/outputs/apk/release/app-release.apk \
+                --test benchmark/android/app/build/outputs/apk/androidTest/release/app-release-androidTest.apk \
+                --device-ids flame --os-version-ids 29 --locales en --orientations portrait --timeout 20m \
+                --directories-to-pull /sdcard/benchmark/results --results-dir benchmark-${CIRCLE_BUILD_NUM} \
+                --no-record-video --no-performance-metrics
+            fi
+      - run:
+          name: Retrieve TestResult from gcloud
+          when: always
+          command: |
+            if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON}" && -z "${SKIP_FIREBASE:-}" ]]; then
+              testResult=$(gsutil ls gs://test-lab-186672a0qp5bq-ycr70axads3nc/benchmark-${CIRCLE_BUILD_NUM}/**/results/results.json)
+              mkdir -p /tmp/tests/benchmark
+              gsutil cp $testResult /tmp/tests/benchmark
+            fi
+      - next-save
   next-android-render-test-runner:
     executor: ubuntu-disco
     steps:
