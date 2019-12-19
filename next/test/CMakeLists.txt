@@ -1,5 +1,5 @@
 add_library(
-    mbgl-test SHARED EXCLUDE_FROM_ALL
+    mbgl-test STATIC EXCLUDE_FROM_ALL
     ${MBGL_ROOT}/test/actor/actor.test.cpp
     ${MBGL_ROOT}/test/actor/actor_ref.test.cpp
     ${MBGL_ROOT}/test/algorithm/update_renderables.test.cpp
@@ -157,8 +157,7 @@ target_link_libraries(
         Mapbox::Base::Extras::args
         Mapbox::Base::pixelmatch-cpp
         mbgl-compiler-options
-        mbgl-core
-        $<$<PLATFORM_ID:Android>:mbgl-core-android>
+    PUBLIC mbgl-core
 )
 
 target_link_libraries(

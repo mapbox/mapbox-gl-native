@@ -96,7 +96,11 @@ target_compile_definitions(
 
 target_link_libraries(
     mbgl-test-runner
-    PRIVATE mbgl-compiler-options mbgl-test
+    PRIVATE
+        mbgl-compiler-options
+        -Wl,--whole-archive
+        mbgl-test
+        -Wl,--no-whole-archive
 )
 
 add_executable(
