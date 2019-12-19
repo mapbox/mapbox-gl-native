@@ -359,7 +359,7 @@ void SymbolLayout::prepareSymbols(const GlyphMap& glyphMap,
         const float layoutIconSize = layout->evaluate<IconSize>(zoom + 1, feature);
 
         // if feature has text, shape the text
-        if (feature.formattedText) {
+        if (feature.formattedText && layoutTextSize > 0.0f) {
             const float lineHeight = layout->get<TextLineHeight>() * util::ONE_EM;
             const float spacing = util::i18n::allowsLetterSpacing(feature.formattedText->rawText()) ? layout->evaluate<TextLetterSpacing>(zoom, feature) * util::ONE_EM : 0.0f;
 
