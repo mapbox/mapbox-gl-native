@@ -1,0 +1,3 @@
+test/results/
+test/fixtures/
+mapbox-gl-js/src/style-spec/reference/

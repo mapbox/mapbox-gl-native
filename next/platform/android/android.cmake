@@ -319,19 +319,53 @@ target_link_libraries(
         mbgl-compiler-options
 )
 
-add_executable(
-    mbgl-test-runner
-    ${MBGL_ROOT}/platform/android/src/test/runtime.cpp ${MBGL_ROOT}/platform/android/src/test/runtime.hpp
+add_library(
+    mbgl-test-runner SHARED
+    ${ANDROID_NDK}/sources/android/native_app_glue/android_native_app_glue.c
     ${MBGL_ROOT}/platform/android/src/test/test_runner.cpp
+    ${MBGL_ROOT}/platform/android/src/test/test_runner_common.cpp
+    ${MBGL_ROOT}/platform/default/src/mbgl/text/local_glyph_rasterizer.cpp
+    ${MBGL_ROOT}/platform/android/src/test/collator_test_stub.cpp
+    ${MBGL_ROOT}/platform/android/src/test/number_format_test_stub.cpp
+    ${MBGL_ROOT}/platform/default/src/mbgl/storage/file_source.cpp
+)
+
+target_include_directories(
+    mbgl-test-runner
+    PRIVATE ${ANDROID_NDK}/sources/android/native_app_glue ${MBGL_ROOT}/platform/android/src ${MBGL_ROOT}/src
 )
 
 target_link_libraries(
     mbgl-test-runner
     PRIVATE
         Mapbox::Base::jni.hpp
-        mapbox-gl
         mbgl-compiler-options
+        -Wl,--whole-archive
         mbgl-test
+        -Wl,--no-whole-archive
+)
+
+add_custom_command(
+    TARGET mbgl-test-runner PRE_BUILD
+    COMMAND
+        ${CMAKE_COMMAND}
+        -E
+        make_directory
+        ${MBGL_ROOT}/test/results
+    COMMAND
+        ${CMAKE_COMMAND}
+        -E
+        tar
+        "chf"
+        "test/android/app/src/main/assets/data.zip"
+        --format=zip
+        --files-from=test/android/app/src/main/assets/to_zip.txt
+    COMMAND
+        ${CMAKE_COMMAND}
+        -E
+        remove_directory
+        ${MBGL_ROOT}/test/results
+    WORKING_DIRECTORY ${MBGL_ROOT}
 )
 
 add_library(
@@ -343,24 +377,17 @@ add_library(
     ${MBGL_ROOT}/platform/android/src/test/collator_test_stub.cpp
     ${MBGL_ROOT}/platform/android/src/test/number_format_test_stub.cpp
     ${MBGL_ROOT}/platform/default/src/mbgl/storage/file_source.cpp
-    ${MBGL_ROOT}/platform/default/src/mbgl/storage/default_file_source.cpp
 )
 
 target_include_directories(
     mbgl-benchmark-runner
-    PRIVATE
-        ${ANDROID_NDK}/sources/android/native_app_glue
-        ${MBGL_ROOT}/platform/android/src
-        ${MBGL_ROOT}/src
-        ${MBGL_ROOT}/platform/default/include
+    PRIVATE ${ANDROID_NDK}/sources/android/native_app_glue ${MBGL_ROOT}/platform/android/src ${MBGL_ROOT}/src
 )
 
 target_link_libraries(
     mbgl-benchmark-runner
     PRIVATE
         Mapbox::Base::jni.hpp
-        android
-        log
         mbgl-compiler-options
         -Wl,--whole-archive
         mbgl-benchmark
