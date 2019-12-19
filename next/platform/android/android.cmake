@@ -338,9 +338,10 @@ add_library(
     mbgl-benchmark-runner SHARED
     ${ANDROID_NDK}/sources/android/native_app_glue/android_native_app_glue.c
     ${MBGL_ROOT}/platform/android/src/test/benchmark_runner.cpp
+    ${MBGL_ROOT}/platform/android/src/test/test_runner_common.cpp
     ${MBGL_ROOT}/platform/default/src/mbgl/text/local_glyph_rasterizer.cpp
-    ${MBGL_ROOT}/platform/android/src/test/render_test_collator.cpp
-    ${MBGL_ROOT}/platform/android/src/test/render_test_number_format.cpp
+    ${MBGL_ROOT}/platform/android/src/test/collator_test_stub.cpp
+    ${MBGL_ROOT}/platform/android/src/test/number_format_test_stub.cpp
     ${MBGL_ROOT}/platform/default/src/mbgl/storage/file_source.cpp
     ${MBGL_ROOT}/platform/default/src/mbgl/storage/default_file_source.cpp
 )
@@ -393,9 +394,10 @@ add_library(
     mbgl-render-test-runner SHARED
     ${ANDROID_NDK}/sources/android/native_app_glue/android_native_app_glue.c
     ${MBGL_ROOT}/platform/android/src/test/render_test_runner.cpp
+    ${MBGL_ROOT}/platform/android/src/test/test_runner_common.cpp
     ${MBGL_ROOT}/platform/default/src/mbgl/text/local_glyph_rasterizer.cpp
-    ${MBGL_ROOT}/platform/android/src/test/render_test_collator.cpp
-    ${MBGL_ROOT}/platform/android/src/test/render_test_number_format.cpp
+    ${MBGL_ROOT}/platform/android/src/test/collator_test_stub.cpp
+    ${MBGL_ROOT}/platform/android/src/test/number_format_test_stub.cpp
 )
 
 target_include_directories(
