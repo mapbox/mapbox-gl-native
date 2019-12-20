@@ -7,6 +7,30 @@ target_compile_definitions(
     PUBLIC MBGL_USE_GLES2
 )
 
+include(${PROJECT_SOURCE_DIR}/vendor/icu.cmake)
+include(${PROJECT_SOURCE_DIR}/vendor/sqlite.cmake)
+
+target_compile_options(mbgl-vendor-icu PRIVATE $<$<CONFIG:Release>:-Oz> $<$<CONFIG:Release>:-Qunused-arguments> $<$<CONFIG:Release>:-flto>)
+
+target_compile_options(
+    mbgl-vendor-sqlite
+    PRIVATE $<$<CONFIG:Release>:-Oz> $<$<CONFIG:Release>:-Qunused-arguments> $<$<CONFIG:Release>:-flto>
+)
+
+target_compile_options(
+    mbgl-compiler-options
+    INTERFACE $<$<CONFIG:Release>:-Oz> $<$<CONFIG:Release>:-Qunused-arguments> $<$<CONFIG:Release>:-flto>
+)
+
+target_link_libraries(
+    mbgl-compiler-options
+    INTERFACE
+        $<$<CONFIG:Release>:-O2>
+        $<$<CONFIG:Release>:-Wl,--icf=all>
+        $<$<CONFIG:Release>:-flto>
+        $<$<CONFIG:Release>:-fuse-ld=gold>
+)
+
 target_sources(
     mbgl-core
     PRIVATE
@@ -214,9 +238,6 @@ target_include_directories(
     PRIVATE ${MBGL_ROOT}/platform/default/include
 )
 
-include(${PROJECT_SOURCE_DIR}/vendor/icu.cmake)
-include(${PROJECT_SOURCE_DIR}/vendor/sqlite.cmake)
-
 target_link_libraries(
     mbgl-core
     PRIVATE
@@ -364,20 +385,5 @@ add_custom_command(
         --files-from=render-test/android/app/src/main/assets/to_zip.txt
     WORKING_DIRECTORY ${MBGL_ROOT}
 )
-
-# Android has no concept of MinSizeRel on android.toolchain.cmake and provides configurations tuned for binary size. We can push it a bit
-# more with code folding and LTO.
-set_target_properties(example-custom-layer PROPERTIES LINK_FLAGS_RELEASE "-fuse-ld=gold -O2 -flto -Wl,--icf=all")
-set_target_properties(mapbox-gl PROPERTIES LINK_FLAGS_RELEASE "-fuse-ld=gold -O2 -flto -Wl,--icf=all")
-set_target_properties(mbgl-benchmark-runner PROPERTIES LINK_FLAGS_RELEASE "-fuse-ld=gold -O2 -flto -Wl,--icf=all")
-set_target_properties(mbgl-render-test-runner PROPERTIES LINK_FLAGS_RELEASE "-fuse-ld=gold -O2 -flto -Wl,--icf=all")
-set_target_properties(mbgl-test-runner PROPERTIES LINK_FLAGS_RELEASE "-fuse-ld=gold -O2 -flto -Wl,--icf=all")
-
-target_compile_options(example-custom-layer PRIVATE $<$<CONFIG:Release>:-Oz -Qunused-arguments -flto>)
-target_compile_options(mapbox-gl PRIVATE $<$<CONFIG:Release>:-Oz -Qunused-arguments -flto>)
-target_compile_options(mbgl-core PRIVATE $<$<CONFIG:Release>:-Oz -Qunused-arguments -flto>)
-target_compile_options(mbgl-render-test-runner PRIVATE $<$<CONFIG:Release>:-Oz -Qunused-arguments -flto>)
-target_compile_options(mbgl-vendor-icu PRIVATE $<$<CONFIG:Release>:-Oz -Qunused-arguments -flto>)
-target_compile_options(mbgl-vendor-sqlite PRIVATE $<$<CONFIG:Release>:-Oz -Qunused-arguments -flto>)
 
 install(TARGETS mapbox-gl LIBRARY DESTINATION lib)
