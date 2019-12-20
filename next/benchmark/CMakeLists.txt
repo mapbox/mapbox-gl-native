@@ -39,8 +39,4 @@ target_link_libraries(
         $<$<PLATFORM_ID:Android>:mbgl-core-android>
 )
 
-if(CMAKE_SYSTEM_NAME STREQUAL Android)
-    set_target_properties(mbgl-benchmark PROPERTIES LINK_FLAGS_RELEASE "-fuse-ld=gold -O2 -flto -Wl,--icf=safe")
-endif()
-
 set_property(TARGET mbgl-benchmark PROPERTY FOLDER Core)

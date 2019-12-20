@@ -14,14 +14,6 @@ set(
 
 include(CTest)
 
-set(
-    CMAKE_CONFIGURATION_TYPES
-    Debug
-    MinSizeRel
-    RelWithDebInfo
-    Release
-)
-
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()

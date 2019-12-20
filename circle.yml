@@ -27,18 +27,21 @@ workflows:
           executor_name: ubuntu-disco
           target_is_android: true
           config_params: '-G Ninja -DCMAKE_INSTALL_PREFIX=/tmp/workspace/install/$CIRCLE_JOB -DCMAKE_TOOLCHAIN_FILE=/opt/android/ndk-bundle/build/cmake/android.toolchain.cmake -DANDROID_CCACHE=/usr/bin/ccache -DANDROID_ABI=arm64-v8a'
+          build_params: '--target libmapbox-gl.so'
           install: true
       - next-build-template:
           name: next-android-x86-release
           executor_name: ubuntu-disco
           target_is_android: true
           config_params: '-G Ninja -DCMAKE_INSTALL_PREFIX=/tmp/workspace/install/$CIRCLE_JOB -DCMAKE_TOOLCHAIN_FILE=/opt/android/ndk-bundle/build/cmake/android.toolchain.cmake -DANDROID_CCACHE=/usr/bin/ccache -DANDROID_ABI=x86'
+          build_params: '--target libmapbox-gl.so'
           install: true
       - next-build-template:
           name: next-android-x86_64-release
           executor_name: ubuntu-disco
           target_is_android: true
           config_params: '-G Ninja -DCMAKE_INSTALL_PREFIX=/tmp/workspace/install/$CIRCLE_JOB -DCMAKE_TOOLCHAIN_FILE=/opt/android/ndk-bundle/build/cmake/android.toolchain.cmake -DANDROID_CCACHE=/usr/bin/ccache -DANDROID_ABI=x86_64'
+          build_params: '--target libmapbox-gl.so'
           install: true
       - next-build-template:
           name: next-linux-gcc8-release

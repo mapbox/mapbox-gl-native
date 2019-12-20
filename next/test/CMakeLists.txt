@@ -166,8 +166,4 @@ target_link_libraries(
     PUBLIC mbgl-vendor-googletest
 )
 
-if(CMAKE_SYSTEM_NAME STREQUAL Android)
-    set_target_properties(mbgl-test PROPERTIES LINK_FLAGS_RELEASE "-fuse-ld=gold -O2 -flto -Wl,--icf=safe")
-endif()
-
 set_property(TARGET mbgl-test PROPERTY FOLDER Core)
