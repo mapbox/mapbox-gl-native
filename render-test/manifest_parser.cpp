@@ -249,7 +249,7 @@ mbgl::filesystem::path getValidPath(const std::string& manifestPath, const std::
     if (mbgl::filesystem::exists(result)) {
         return result.lexically_normal();
     }
-    mbgl::Log::Warning(mbgl::Event::General, "Invalid path is provoided inside the manifest file: %s", path.c_str());
+    mbgl::Log::Warning(mbgl::Event::General, "Invalid path is provided inside the manifest file: %s", path.c_str());
     return mbgl::filesystem::path{};
 }
 
@@ -273,7 +273,7 @@ mbgl::optional<Manifest> ManifestParser::parseManifest(const std::string& manife
         const auto& assetPathValue = document["asset_path"];
         if (!assetPathValue.IsString()) {
             mbgl::Log::Warning(
-                mbgl::Event::General, "Invalid assetPath is provoided inside the manifest file: %s", filePath.c_str());
+                mbgl::Event::General, "Invalid asset_path is provided inside the manifest file: %s", filePath.c_str());
             return mbgl::nullopt;
         }
         manifest.assetPath = (getValidPath(manifest.manifestPath, assetPathValue.GetString()) / "").string();
@@ -285,7 +285,7 @@ mbgl::optional<Manifest> ManifestParser::parseManifest(const std::string& manife
         const auto& vendorPathValue = document["vendor_path"];
         if (!vendorPathValue.IsString()) {
             mbgl::Log::Warning(
-                mbgl::Event::General, "Invalid vendorPath is provoided inside the manifest file: %s", filePath.c_str());
+                mbgl::Event::General, "Invalid vendor_path is provided inside the manifest file: %s", filePath.c_str());
             return mbgl::nullopt;
         }
         manifest.vendorPath = (getValidPath(manifest.manifestPath, vendorPathValue.GetString()) / "").string();
@@ -297,7 +297,7 @@ mbgl::optional<Manifest> ManifestParser::parseManifest(const std::string& manife
         const auto& resultPathValue = document["result_path"];
         if (!resultPathValue.IsString()) {
             mbgl::Log::Warning(
-                mbgl::Event::General, "Invalid assetPath is provoided inside the manifest file: %s", filePath.c_str());
+                mbgl::Event::General, "Invalid result_path is provided inside the manifest file: %s", filePath.c_str());
             return mbgl::nullopt;
         }
         manifest.resultPath = (getValidPath(manifest.manifestPath, resultPathValue.GetString()) / "").string();
@@ -309,8 +309,9 @@ mbgl::optional<Manifest> ManifestParser::parseManifest(const std::string& manife
     if (document.HasMember("base_test_path")) {
         const auto& testPathValue = document["base_test_path"];
         if (!testPathValue.IsString()) {
-            mbgl::Log::Warning(
-                mbgl::Event::General, "Invalid testPath is provoided inside the manifest file: %s", filePath.c_str());
+            mbgl::Log::Warning(mbgl::Event::General,
+                               "Invalid base_test_path is provided inside the manifest file: %s",
+                               filePath.c_str());
             return mbgl::nullopt;
         }
         baseTestPath = getValidPath(manifest.manifestPath, testPathValue.GetString());
@@ -318,28 +319,12 @@ mbgl::optional<Manifest> ManifestParser::parseManifest(const std::string& manife
             return mbgl::nullopt;
         }
     }
-    mbgl::filesystem::path probeTestPath;
-    bool enbaleProbeTest{false};
-    if (document.HasMember("probe_test_path")) {
-        const auto& testPathValue = document["probe_test_path"];
-        if (!testPathValue.IsString()) {
-            mbgl::Log::Warning(
-                mbgl::Event::General, "Invalid testPath is provoided inside the manifest file: %s", filePath.c_str());
-            return mbgl::nullopt;
-        }
-        probeTestPath = getValidPath(manifest.manifestPath, testPathValue.GetString());
-        if (probeTestPath.empty()) {
-            return mbgl::nullopt;
-        }
-        enbaleProbeTest = true;
-    }
     mbgl::filesystem::path expectedMetricPath;
     if (document.HasMember("metric_path")) {
         const auto& metricPathValue = document["metric_path"];
         if (!metricPathValue.IsString()) {
-            mbgl::Log::Warning(mbgl::Event::General,
-                               "Invalid metric_path is provoided inside the manifest file: %s",
-                               filePath.c_str());
+            mbgl::Log::Warning(
+                mbgl::Event::General, "Invalid metric_path is provided inside the manifest file: %s", filePath.c_str());
             return mbgl::nullopt;
         }
         expectedMetricPath = getValidPath(manifest.manifestPath, metricPathValue.GetString());
@@ -359,7 +344,7 @@ mbgl::optional<Manifest> ManifestParser::parseManifest(const std::string& manife
         for (const auto& value : expectationPathValue.GetArray()) {
             if (!value.IsString()) {
                 mbgl::Log::Warning(mbgl::Event::General,
-                                   "Invalid expectation path item is provoided inside the manifest file: %s",
+                                   "Invalid expectation path item is provided inside the manifest file: %s",
                                    filePath.c_str());
                 return mbgl::nullopt;
             }
@@ -381,7 +366,7 @@ mbgl::optional<Manifest> ManifestParser::parseManifest(const std::string& manife
         for (const auto& value : ignorePathValue.GetArray()) {
             if (!value.IsString()) {
                 mbgl::Log::Warning(mbgl::Event::General,
-                                   "Invalid ignore path item is provoided inside the manifest file: %s",
+                                   "Invalid ignore path item is provided inside the manifest file: %s",
                                    filePath.c_str());
                 return mbgl::nullopt;
             }
@@ -404,7 +389,7 @@ mbgl::optional<Manifest> ManifestParser::parseManifest(const std::string& manife
         for (const auto& value : probesValue.GetArray()) {
             if (!value.IsString()) {
                 mbgl::Log::Warning(mbgl::Event::General,
-                                   "Invalid probe type is provoided inside the manifest file: %s",
+                                   "Invalid probe type is provided inside the manifest file: %s",
                                    filePath.c_str());
                 return mbgl::nullopt;
             }
@@ -416,14 +401,14 @@ mbgl::optional<Manifest> ManifestParser::parseManifest(const std::string& manife
         const auto& filterValue = document["filter"];
         if (!filterValue.IsString()) {
             mbgl::Log::Warning(
-                mbgl::Event::General, "Invalid filter is provoided inside the manifest file: %s", filePath.c_str());
+                mbgl::Event::General, "Invalid filter is provided inside the manifest file: %s", filePath.c_str());
             return mbgl::nullopt;
         }
 
         testFilter = filterValue.GetString();
     }
 
-    manifest.testRootPath = enbaleProbeTest ? probeTestPath.string() : baseTestPath.string();
+    manifest.testRootPath = baseTestPath.string();
     if (manifest.testRootPath.back() == '/') {
         manifest.testRootPath.pop_back();
     }
