@@ -5,6 +5,7 @@
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/rapidjson.hpp>
 
+#include <cstdlib>
 #include <regex>
 #include <string>
 #include <utility>
@@ -21,6 +22,7 @@ public:
     const std::string& getManifestPath() const;
     const std::string& getResultPath() const;
     const std::string& getCachePath() const;
+    const std::string& getAccessToken() const;
     const std::set<std::string>& getProbes() const;
     void doShuffle(uint32_t seed);
 
@@ -49,6 +51,7 @@ private:
     std::string assetPath;
     std::string resultPath;
     std::string cachePath;
+    std::string accessToken;
     std::vector<std::pair<std::string, std::string>> ignores;
     std::vector<TestPaths> testPaths;
     std::set<std::string> probes;

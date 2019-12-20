@@ -22,7 +22,13 @@ std::string prependFileScheme(const std::string& url) {
 }
 } // namespace
 
-Manifest::Manifest() = default;
+Manifest::Manifest() {
+    const char* envToken = getenv("MAPBOX_ACCESS_TOKEN");
+    if (envToken != nullptr) {
+        accessToken = envToken;
+    }
+}
+
 Manifest::~Manifest() = default;
 
 const std::vector<TestPaths>& Manifest::getTestPaths() const {
@@ -46,6 +52,10 @@ const std::string& Manifest::getResultPath() const {
 
 const std::string& Manifest::getCachePath() const {
     return cachePath;
+}
+
+const std::string& Manifest::getAccessToken() const {
+    return accessToken;
 }
 
 const std::set<std::string>& Manifest::getProbes() const {
@@ -318,6 +328,19 @@ mbgl::optional<Manifest> ManifestParser::parseManifest(const std::string& manife
         }
         manifest.cachePath = (getValidPath(manifest.manifestPath, ".") / cachePathValue.GetString()).string();
         if (manifest.cachePath.empty()) {
+            return mbgl::nullopt;
+        }
+    }
+    if (document.HasMember("access_token")) {
+        const auto& accessTokenValue = document["access_token"];
+        if (!accessTokenValue.IsString()) {
+            mbgl::Log::Warning(mbgl::Event::General,
+                               "Invalid access_token is provided inside the manifest file: %s",
+                               filePath.c_str());
+            return mbgl::nullopt;
+        }
+        manifest.accessToken = accessTokenValue.GetString();
+        if (manifest.accessToken.empty()) {
             return mbgl::nullopt;
         }
     }
