@@ -1,6 +1,7 @@
 #include "allocation_index.hpp"
 
 #include <mbgl/render_test.hpp>
+#include <mbgl/storage/network_status.hpp>
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/run_loop.hpp>
@@ -41,8 +42,8 @@ void operator delete(void* ptr, size_t) noexcept {
 
 namespace {
 
-using ArgumentsTuple =
-    std::tuple<bool, bool, uint32_t, std::string, TestRunner::UpdateResults, std::vector<std::string>, std::string>;
+using ArgumentsTuple = std::
+    tuple<bool, bool, bool, uint32_t, std::string, TestRunner::UpdateResults, std::vector<std::string>, std::string>;
 ArgumentsTuple parseArguments(int argc, char** argv) {
     const static std::unordered_map<std::string, TestRunner::UpdateResults> updateResultsFlags = {
         {"default", TestRunner::UpdateResults::DEFAULT},
@@ -56,6 +57,8 @@ ArgumentsTuple parseArguments(int argc, char** argv) {
 
     args::Flag recycleMapFlag(argumentParser, "recycle map", "Toggle reusing the map object", {'r', "recycle-map"});
     args::Flag shuffleFlag(argumentParser, "shuffle", "Toggle shuffling the tests order", {'s', "shuffle"});
+    args::Flag onlineFlag(
+        argumentParser, "online", "Toggle online mode (by default tests will run offline)", {'o', "online"});
     args::ValueFlag<uint32_t> seedValue(argumentParser, "seed", "Shuffle seed (default: random)", {"seed"});
     args::ValueFlag<std::string> testPathValue(
         argumentParser, "manifestPath", "Test manifest file path", {'p', "manifestPath"});
@@ -104,11 +107,13 @@ ArgumentsTuple parseArguments(int argc, char** argv) {
     auto testNames = testNameValues ? args::get(testNameValues) : std::vector<std::string>{};
     auto testFilter = testFilterValue ? args::get(testFilterValue) : std::string{};
     const auto shuffle = shuffleFlag ? args::get(shuffleFlag) : false;
+    const auto online = onlineFlag ? args::get(onlineFlag) : false;
     const auto seed = seedValue ? args::get(seedValue) : 1u;
     TestRunner::UpdateResults updateResults =
         testUpdateResultsValue ? args::get(testUpdateResultsValue) : TestRunner::UpdateResults::NO;
     return ArgumentsTuple{recycleMapFlag ? args::get(recycleMapFlag) : false,
                           shuffle,
+                          online,
                           seed,
                           manifestPath.string(),
                           updateResults,
@@ -122,13 +127,14 @@ int runRenderTests(int argc, char** argv, std::function<void()> testStatus) {
     int returnCode = 0;
     bool recycleMap;
     bool shuffle;
+    bool online;
     uint32_t seed;
     std::string manifestPath;
     std::vector<std::string> testNames;
     std::string testFilter;
     TestRunner::UpdateResults updateResults;
 
-    std::tie(recycleMap, shuffle, seed, manifestPath, updateResults, testNames, testFilter) =
+    std::tie(recycleMap, shuffle, online, seed, manifestPath, updateResults, testNames, testFilter) =
         parseArguments(argc, argv);
     auto manifestData = ManifestParser::parseManifest(manifestPath, testNames, testFilter);
     if (!manifestData) {
@@ -140,6 +146,8 @@ int runRenderTests(int argc, char** argv, std::function<void()> testStatus) {
         printf(ANSI_COLOR_YELLOW "Shuffle seed: %d" ANSI_COLOR_RESET "\n", seed);
         runner.doShuffle(seed);
     }
+
+    NetworkStatus::Set(online ? NetworkStatus::Status::Online : NetworkStatus::Status::Offline);
 
     const auto& manifest = runner.getManifest();
     const auto& ignores = manifest.getIgnores();
