@@ -44,6 +44,10 @@ const std::string& Manifest::getResultPath() const {
     return resultPath;
 }
 
+const std::string& Manifest::getCachePath() const {
+    return cachePath;
+}
+
 const std::set<std::string>& Manifest::getProbes() const {
     return probes;
 }
@@ -302,6 +306,18 @@ mbgl::optional<Manifest> ManifestParser::parseManifest(const std::string& manife
         }
         manifest.resultPath = (getValidPath(manifest.manifestPath, resultPathValue.GetString()) / "").string();
         if (manifest.resultPath.empty()) {
+            return mbgl::nullopt;
+        }
+    }
+    if (document.HasMember("cache_path")) {
+        const auto& cachePathValue = document["cache_path"];
+        if (!cachePathValue.IsString()) {
+            mbgl::Log::Warning(
+                mbgl::Event::General, "Invalid cache_path is provided inside the manifest file: %s", filePath.c_str());
+            return mbgl::nullopt;
+        }
+        manifest.cachePath = (getValidPath(manifest.manifestPath, ".") / cachePathValue.GetString()).string();
+        if (manifest.cachePath.empty()) {
             return mbgl::nullopt;
         }
     }
