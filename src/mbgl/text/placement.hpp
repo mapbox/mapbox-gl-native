@@ -49,6 +49,8 @@ public:
         : text(text_), icon(icon_), skipFade(skipFade_)
     {}
 
+    bool placed() const { return text || icon; }
+
     const bool text;
     const bool icon;
     // skipFade = outside viewport, but within CollisionIndex::viewportPadding px of the edge
@@ -119,6 +121,7 @@ public:
     Duration getUpdatePeriod(const float zoom) const;
 
     float zoomAdjustment(const float zoom) const;
+    const JointPlacement* getSymbolPlacement(const SymbolInstance&) const;
 
     const RetainedQueryData& getQueryData(uint32_t bucketInstanceId) const;
 
