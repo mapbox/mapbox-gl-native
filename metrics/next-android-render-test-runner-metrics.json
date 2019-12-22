@@ -1,5 +1,6 @@
 {
     "base_test_path": "tests",
+    "cache_path": "cache-metrics.db",
     "expectation_paths": [
         "expectations/platform-all",
         "expectations/platform-android"

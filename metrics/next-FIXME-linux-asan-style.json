@@ -1,12 +1,11 @@
 {
-    "asset_path": "../mapbox-gl-js/test/integration",
     "base_test_path": "../mapbox-gl-js/test/integration",
+    "cache_path": "cache-style.db",
     "expectation_paths": [
         "expectations/platform-all"
     ],
     "ignore_paths": [
         "ignores/platform-all.json",
         "ignores/platform-linux.json"
-    ],
-    "vendor_path": "../vendor"
+    ]
 }
