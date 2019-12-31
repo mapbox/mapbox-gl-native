@@ -34,7 +34,7 @@ MGL_EXPORT
     and the type `String`. Alternatively, you may call this method from your
     application delegate’s `-applicationDidFinishLaunching:` method.
  */
-@property (class, assign, nullable) NSString *accessToken;
+@property (class, copy, nullable) NSString *accessToken;
 
 @end
 
