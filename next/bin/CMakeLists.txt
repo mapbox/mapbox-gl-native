@@ -1,4 +1,18 @@
 add_executable(
+    mbgl-cache
+    ${MBGL_ROOT}/bin/cache.cpp
+)
+
+target_link_libraries(
+    mbgl-cache
+    PRIVATE
+        Mapbox::Base::Extras::args
+        Mapbox::Base::io
+        mbgl-compiler-options
+        mbgl-core
+)
+
+add_executable(
     mbgl-offline
     ${MBGL_ROOT}/bin/offline.cpp
 )
