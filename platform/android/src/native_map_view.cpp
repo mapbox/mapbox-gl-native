@@ -529,50 +529,13 @@ void NativeMapView::setVisibleCoordinateBounds(JNIEnv& env, const jni::Array<jni
     map->easeTo(cameraOptions, animationOptions);
 }
 
-void NativeMapView::getVisibleCoordinateBounds(
-    JNIEnv& env, jint screenWidth, jint screenHeight, jni::Array<jdouble>& output, jfloat pixelRatio_) {
-    mbgl::LatLng southEast =
-        map->latLngForPixel(mbgl::ScreenCoordinate(screenWidth / pixelRatio_, screenHeight / pixelRatio_));
-    mbgl::LatLng northEast = map->latLngForPixel(mbgl::ScreenCoordinate(screenWidth / pixelRatio_, 0.0));
-    mbgl::LatLng southWest = map->latLngForPixel(mbgl::ScreenCoordinate(0.0, screenHeight / pixelRatio_));
-    mbgl::LatLng northWest = map->latLngForPixel(mbgl::ScreenCoordinate(0.0, 0.0));
-    mbgl::LatLng center =
-        map->latLngForPixel(mbgl::ScreenCoordinate(screenWidth / (2 * pixelRatio_), screenHeight / (2 * pixelRatio_)));
+void NativeMapView::getVisibleCoordinateBounds(JNIEnv& env, jni::Array<jdouble>& output) {
+    auto latlngBounds = map->latLngBoundsForCamera(map->getCameraOptions(mbgl::nullopt));
 
-    double latitudes[] = {southEast.latitude(), northEast.latitude(), southWest.latitude(), northWest.latitude()};
-    double longitudes[] = {southEast.longitude(), northEast.longitude(), southWest.longitude(), northWest.longitude()};
-
-    auto latitudeMinMax = std::minmax_element(std::begin(latitudes), std::end(latitudes));
-
-    double latNorth = *(latitudeMinMax.second);
-    double latSouth = *(latitudeMinMax.first);
-
-    double lonEast = -180.0;
-    double lonWest = 180.0;
-    double centerLongitude = center.longitude();
-    auto longitudeMinMax = std::minmax_element(std::begin(longitudes), std::end(longitudes));
-
-    // check if the bounds is over dateline
-    if (std::abs(centerLongitude - (*(longitudeMinMax.first) + *(longitudeMinMax.second)) / 2) > 0.1) {
-        for (int i = 0; i < 4; i++) {
-            double longitude = longitudes[i];
-            if (longitude < 0) {
-                if (lonEast < longitude) {
-                    lonEast = longitude;
-                }
-            } else {
-                if (lonWest > longitude) {
-                    lonWest = longitude;
-                }
-            }
-        }
-    } else {
-        lonEast = *(longitudeMinMax.second);
-        lonWest = *(longitudeMinMax.first);
-    }
-
-    // lonEast should be no less than lonWest
-    lonEast = lonEast > lonWest ? lonEast : lonEast + 360;
+    double latNorth = latlngBounds.north();
+    double lonEast = latlngBounds.east();
+    double latSouth = latlngBounds.south();
+    double lonWest = latlngBounds.west();
 
     std::vector<jdouble> buffer;
     buffer.reserve(4);
