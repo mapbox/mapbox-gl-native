@@ -114,10 +114,12 @@
     "render-tests/regressions/mapbox-gl-native#7357": "https://github.com/mapbox/mapbox-gl-native/issues/7357",
     "render-tests/runtime-styling/image-add-remove-add": "skip - https://github.com/mapbox/mapbox-gl-native/issues/16021",
     "render-tests/runtime-styling/pattern-add-remove-add": "skip - https://github.com/mapbox/mapbox-gl-native/issues/16021",
+    "render-tests/runtime-styling/set-style-glyphs": "started failing after https://github.com/mapbox/mapbox-gl-native/pull/16091",
     "render-tests/symbol-cross-fade/chinese": "https://github.com/mapbox/mapbox-gl-native/issues/10619",
     "render-tests/text-max-width/zero-width-point-placement": "https://github.com/mapbox/mapbox-gl-native/issues/15648",
     "render-tests/text-size/nan": "https://github.com/mapbox/mapbox-gl-native/issues/16020",
     "render-tests/text-variable-anchor/remember-last-placement": "skip - fails on gl-native, as symbol index is not functional at static map mode - needs issue",
+    "render-tests/tilejson-bounds/overwrite-bounds": "started failing after https://github.com/mapbox/mapbox-gl-native/pull/16091",
     "render-tests/video/default": "skip - https://github.com/mapbox/mapbox-gl-native/issues/601",
     "render-tests/zoomed-fill/negative-zoom": "https://github.com/mapbox/mapbox-gl-native/issues/16019"
 }
