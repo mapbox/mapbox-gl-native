@@ -441,7 +441,7 @@ TestMetrics readExpectedMetrics(const mbgl::filesystem::path& path) {
     return result;
 }
 
-TestMetadata parseTestMetadata(const TestPaths& paths, const Manifest& manifest) {
+TestMetadata parseTestMetadata(const TestPaths& paths) {
     TestMetadata metadata;
     metadata.paths = paths;
 
@@ -452,8 +452,6 @@ TestMetadata parseTestMetadata(const TestPaths& paths, const Manifest& manifest)
     }
 
     metadata.document = std::move(maybeJson.get<mbgl::JSDocument>());
-    manifest.localizeStyleURLs(metadata.document, metadata.document);
-
     if (!metadata.document.HasMember("metadata")) {
         mbgl::Log::Warning(mbgl::Event::ParseStyle, "Style has no 'metadata': %s", paths.stylePath.c_str());
         return metadata;
@@ -625,7 +623,7 @@ const std::string gfxProbeEndOp("probeGFXEnd");
 
 using namespace TestOperationNames;
 
-TestOperations parseTestOperations(TestMetadata& metadata, const Manifest& manifest) {
+TestOperations parseTestOperations(TestMetadata& metadata) {
     TestOperations result;
     if (!metadata.document.HasMember("metadata") || !metadata.document["metadata"].HasMember("test") ||
         !metadata.document["metadata"]["test"].HasMember("operations")) {
@@ -692,12 +690,10 @@ TestOperations parseTestOperations(TestMetadata& metadata, const Manifest& manif
             std::string imagePath = operationArray[2].GetString();
             imagePath.erase(std::remove(imagePath.begin(), imagePath.end(), '"'), imagePath.end());
 
-            const mbgl::filesystem::path filePath = (mbgl::filesystem::path(manifest.getAssetPath()) / imagePath);
-
-            result.emplace_back([filePath = filePath.string(), imageName, sdf, pixelRatio](TestContext& ctx) {
-                mbgl::optional<std::string> maybeImage = mbgl::util::readFile(filePath);
+            result.emplace_back([imagePath, imageName, sdf, pixelRatio](TestContext& ctx) {
+                mbgl::optional<std::string> maybeImage = mbgl::util::readFile(imagePath);
                 if (!maybeImage) {
-                    ctx.getMetadata().errorMessage = std::string("Failed to load expected image ") + filePath;
+                    ctx.getMetadata().errorMessage = std::string("Failed to load expected image ") + imagePath;
                     return false;
                 }
 
@@ -719,23 +715,21 @@ TestOperations parseTestOperations(TestMetadata& metadata, const Manifest& manif
         } else if (operationArray[0].GetString() == setStyleOp) {
             // setStyle
             assert(operationArray.Size() >= 2u);
-            std::string json;
             if (operationArray[1].IsString()) {
-                std::string stylePath = manifest.localizeURL(operationArray[1].GetString());
-                auto maybeStyle = readJson(stylePath);
-                if (maybeStyle.is<mbgl::JSDocument>()) {
-                    auto& style = maybeStyle.get<mbgl::JSDocument>();
-                    manifest.localizeStyleURLs(static_cast<mbgl::JSValue&>(style), style);
-                    json = serializeJsonValue(style);
-                }
+                std::string url = operationArray[1].GetString();
+
+                result.emplace_back([url](TestContext& ctx) {
+                    ctx.getMap().getStyle().loadURL(url);
+                    return true;
+                });
             } else {
-                manifest.localizeStyleURLs(operationArray[1], metadata.document);
-                json = serializeJsonValue(operationArray[1]);
+                std::string json = serializeJsonValue(operationArray[1]);
+
+                result.emplace_back([json](TestContext& ctx) {
+                    ctx.getMap().getStyle().loadJSON(json);
+                    return true;
+                });
             }
-            result.emplace_back([json](TestContext& ctx) {
-                ctx.getMap().getStyle().loadJSON(json);
-                return true;
-            });
         } else if (operationArray[0].GetString() == setCenterOp) {
             // setCenter
             assert(operationArray.Size() >= 2u);
@@ -859,7 +853,6 @@ TestOperations parseTestOperations(TestMetadata& metadata, const Manifest& manif
             assert(operationArray[2].IsObject());
             std::string sourceName = operationArray[1].GetString();
 
-            manifest.localizeSourceURLs(operationArray[2], metadata.document);
             result.emplace_back([sourceName, json = serializeJsonValue(operationArray[2])](TestContext& ctx) {
                 mbgl::style::conversion::Error error;
                 auto converted =

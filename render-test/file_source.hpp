@@ -6,22 +6,26 @@ namespace mbgl {
 
 class ProxyFileSource : public DefaultFileSource {
 public:
-    ProxyFileSource(const std::string& cachePath, const std::string& assetPath, bool supportCacheOnlyRequests = true);
-    ProxyFileSource(const std::string& cachePath,
-                    std::unique_ptr<FileSource>&& assetFileSource,
-                    bool supportCacheOnlyRequests = true);
+    ProxyFileSource(const std::string& cachePath, const std::string& assetPath);
     ~ProxyFileSource();
 
     std::unique_ptr<AsyncRequest> request(const Resource&, Callback);
 
     /**
+     * @brief Flag to change the networking mode of the file source.
+     */
+    static void setOffline(bool);
+
+    /**
      * @brief Starts/stops metrics tracking.
      */
     static void setTrackingActive(bool);
+
     /**
      * @brief Returns metrics tracking status.
      */
     static bool isTrackingActive();
+
     /**
      * @brief Returns the total amount of requests.
      *

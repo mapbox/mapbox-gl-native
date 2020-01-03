@@ -54,7 +54,7 @@ private:
     void checkProbingResults(TestMetadata&);
 
     struct Impl {
-        Impl(const TestMetadata&);
+        Impl(const TestMetadata&, const Manifest&);
         ~Impl();
 
         std::unique_ptr<TestRunnerMapObserver> observer;

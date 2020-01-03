@@ -7,21 +7,6 @@
 #include <algorithm>
 #include <random>
 
-namespace {
-std::string removeURLArguments(const std::string& url) {
-    std::string::size_type index = url.find('?');
-    if (index != std::string::npos) {
-        return url.substr(0, index);
-    }
-    return url;
-}
-
-std::string prependFileScheme(const std::string& url) {
-    static const std::string fileScheme("file://");
-    return fileScheme + url;
-}
-} // namespace
-
 Manifest::Manifest() {
     const char* envToken = getenv("MAPBOX_ACCESS_TOKEN");
     if (envToken != nullptr) {
@@ -39,9 +24,6 @@ const std::vector<std::pair<std::string, std::string>>& Manifest::getIgnores() c
 }
 const std::string& Manifest::getTestRootPath() const {
     return testRootPath;
-}
-const std::string& Manifest::getAssetPath() const {
-    return assetPath;
 }
 const std::string& Manifest::getManifestPath() const {
     return manifestPath;
@@ -66,161 +48,6 @@ void Manifest::doShuffle(uint32_t seed) {
     std::seed_seq sequence{seed};
     std::mt19937 shuffler(sequence);
     std::shuffle(testPaths.begin(), testPaths.end(), shuffler);
-}
-
-std::string Manifest::localizeURL(const std::string& url) const {
-    static const std::regex regex{"local://"};
-    if (auto path = getVendorPath(url, regex)) {
-        return *path;
-    }
-    return getIntegrationPath(url, "", regex).value_or(url);
-}
-
-void Manifest::localizeSourceURLs(mbgl::JSValue& root, mbgl::JSDocument& document) const {
-    if (root.HasMember("urls") && root["urls"].IsArray()) {
-        for (auto& urlValue : root["urls"].GetArray()) {
-            const std::string path =
-                prependFileScheme(localizeMapboxTilesetURL(urlValue.GetString())
-                                      .value_or(localizeLocalURL(urlValue.GetString()).value_or(urlValue.GetString())));
-            urlValue.Set<std::string>(path, document.GetAllocator());
-        }
-    }
-
-    if (root.HasMember("url")) {
-        static const std::string image("image");
-        static const std::string video("video");
-
-        mbgl::JSValue& urlValue = root["url"];
-        const std::string path =
-            prependFileScheme(localizeMapboxTilesetURL(urlValue.GetString())
-                                  .value_or(localizeLocalURL(urlValue.GetString()).value_or(urlValue.GetString())));
-        urlValue.Set<std::string>(path, document.GetAllocator());
-
-        if (root["type"].GetString() != image && root["type"].GetString() != video) {
-            const auto tilesetPath = std::string(urlValue.GetString()).erase(0u, 7u); // remove "file://"
-            auto maybeTileset = readJson(tilesetPath);
-            if (maybeTileset.is<mbgl::JSDocument>()) {
-                const auto& tileset = maybeTileset.get<mbgl::JSDocument>();
-                assert(tileset.HasMember("tiles"));
-                root.AddMember("tiles", (mbgl::JSValue&)tileset["tiles"], document.GetAllocator());
-                root.RemoveMember("url");
-            }
-        }
-    }
-
-    if (root.HasMember("tiles")) {
-        mbgl::JSValue& tilesValue = root["tiles"];
-        assert(tilesValue.IsArray());
-        for (auto& tileValue : tilesValue.GetArray()) {
-            const std::string path = prependFileScheme(
-                localizeMapboxTilesURL(tileValue.GetString())
-                    .value_or(localizeLocalURL(tileValue.GetString())
-                                  .value_or(localizeHttpURL(tileValue.GetString()).value_or(tileValue.GetString()))));
-            tileValue.Set<std::string>(path, document.GetAllocator());
-        }
-    }
-
-    if (root.HasMember("data") && root["data"].IsString()) {
-        mbgl::JSValue& dataValue = root["data"];
-        const std::string path =
-            prependFileScheme(localizeLocalURL(dataValue.GetString()).value_or(dataValue.GetString()));
-        dataValue.Set<std::string>(path, document.GetAllocator());
-    }
-}
-
-void Manifest::localizeStyleURLs(mbgl::JSValue& root, mbgl::JSDocument& document) const {
-    if (root.HasMember("sources")) {
-        mbgl::JSValue& sourcesValue = root["sources"];
-        for (auto& sourceProperty : sourcesValue.GetObject()) {
-            localizeSourceURLs(sourceProperty.value, document);
-        }
-    }
-
-    if (root.HasMember("glyphs")) {
-        mbgl::JSValue& glyphsValue = root["glyphs"];
-        const std::string path = prependFileScheme(
-            localizeMapboxFontsURL(glyphsValue.GetString())
-                .value_or(localizeLocalURL(glyphsValue.GetString(), true).value_or(glyphsValue.GetString())));
-        glyphsValue.Set<std::string>(path, document.GetAllocator());
-    }
-
-    if (root.HasMember("sprite")) {
-        mbgl::JSValue& spriteValue = root["sprite"];
-        const std::string path = prependFileScheme(
-            localizeMapboxSpriteURL(spriteValue.GetString())
-                .value_or(localizeLocalURL(spriteValue.GetString()).value_or(spriteValue.GetString())));
-        spriteValue.Set<std::string>(path, document.GetAllocator());
-    }
-}
-
-mbgl::optional<std::string> Manifest::localizeLocalURL(const std::string& url, bool glyphsPath) const {
-    static const std::regex regex{"local://"};
-    if (auto path = getVendorPath(url, regex, glyphsPath)) {
-        return path;
-    }
-    return getIntegrationPath(url, "", regex, glyphsPath);
-}
-
-mbgl::optional<std::string> Manifest::localizeHttpURL(const std::string& url) const {
-    static const std::regex regex{"http://localhost:2900"};
-    if (auto path = getVendorPath(url, regex)) {
-        return path;
-    }
-    return getIntegrationPath(url, "", regex);
-}
-
-mbgl::optional<std::string> Manifest::localizeMapboxSpriteURL(const std::string& url) const {
-    static const std::regex regex{"mapbox://"};
-    return getIntegrationPath(url, "", regex);
-}
-
-mbgl::optional<std::string> Manifest::localizeMapboxFontsURL(const std::string& url) const {
-    static const std::regex regex{"mapbox://fonts"};
-    return getIntegrationPath(url, "glyphs/", regex, true);
-}
-
-mbgl::optional<std::string> Manifest::localizeMapboxTilesURL(const std::string& url) const {
-    static const std::regex regex{"mapbox://"};
-    if (auto path = getVendorPath(url, regex)) {
-        return path;
-    }
-    return getIntegrationPath(url, "tiles/", regex);
-}
-
-mbgl::optional<std::string> Manifest::localizeMapboxTilesetURL(const std::string& url) const {
-    static const std::regex regex{"mapbox://"};
-    return getIntegrationPath(url, "tilesets/", regex);
-}
-
-mbgl::optional<std::string> Manifest::getVendorPath(const std::string& url,
-                                                    const std::regex& regex,
-                                                    bool glyphsPath) const {
-    mbgl::filesystem::path file = std::regex_replace(url, regex, vendorPath);
-    if (mbgl::filesystem::exists(file.parent_path())) {
-        return removeURLArguments(file.string());
-    }
-
-    if (glyphsPath && mbgl::filesystem::exists(file.parent_path().parent_path())) {
-        return removeURLArguments(file.string());
-    }
-
-    return mbgl::nullopt;
-}
-
-mbgl::optional<std::string> Manifest::getIntegrationPath(const std::string& url,
-                                                         const std::string& parent,
-                                                         const std::regex& regex,
-                                                         bool glyphsPath) const {
-    mbgl::filesystem::path file = std::regex_replace(url, regex, assetPath + parent);
-    if (mbgl::filesystem::exists(file.parent_path())) {
-        return removeURLArguments(file.string());
-    }
-
-    if (glyphsPath && mbgl::filesystem::exists(file.parent_path().parent_path())) {
-        return removeURLArguments(file.string());
-    }
-
-    return mbgl::nullopt;
 }
 
 namespace {
@@ -283,30 +110,6 @@ mbgl::optional<Manifest> ManifestParser::parseManifest(const std::string& manife
     }
 
     auto document = std::move(contents.get<mbgl::JSDocument>());
-    if (document.HasMember("asset_path")) {
-        const auto& assetPathValue = document["asset_path"];
-        if (!assetPathValue.IsString()) {
-            mbgl::Log::Warning(
-                mbgl::Event::General, "Invalid asset_path is provided inside the manifest file: %s", filePath.c_str());
-            return mbgl::nullopt;
-        }
-        manifest.assetPath = (getValidPath(manifest.manifestPath, assetPathValue.GetString()) / "").string();
-        if (manifest.assetPath.empty()) {
-            return mbgl::nullopt;
-        }
-    }
-    if (document.HasMember("vendor_path")) {
-        const auto& vendorPathValue = document["vendor_path"];
-        if (!vendorPathValue.IsString()) {
-            mbgl::Log::Warning(
-                mbgl::Event::General, "Invalid vendor_path is provided inside the manifest file: %s", filePath.c_str());
-            return mbgl::nullopt;
-        }
-        manifest.vendorPath = (getValidPath(manifest.manifestPath, vendorPathValue.GetString()) / "").string();
-        if (manifest.vendorPath.empty()) {
-            return mbgl::nullopt;
-        }
-    }
     if (document.HasMember("result_path")) {
         const auto& resultPathValue = document["result_path"];
         if (!resultPathValue.IsString()) {
