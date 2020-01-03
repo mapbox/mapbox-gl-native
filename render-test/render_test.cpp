@@ -8,6 +8,7 @@
 
 #include <args.hxx>
 
+#include "file_source.hpp"
 #include "manifest_parser.hpp"
 #include "metadata.hpp"
 #include "parser.hpp"
@@ -136,6 +137,9 @@ int runRenderTests(int argc, char** argv, std::function<void()> testStatus) {
 
     std::tie(recycleMap, shuffle, online, seed, manifestPath, updateResults, testNames, testFilter) =
         parseArguments(argc, argv);
+
+    ProxyFileSource::setOffline(!online);
+
     auto manifestData = ManifestParser::parseManifest(manifestPath, testNames, testFilter);
     if (!manifestData) {
         exit(5);
@@ -158,7 +162,7 @@ int runRenderTests(int argc, char** argv, std::function<void()> testStatus) {
     TestStatistics stats;
 
     for (auto& testPath : testPaths) {
-        TestMetadata metadata = parseTestMetadata(testPath, manifest);
+        TestMetadata metadata = parseTestMetadata(testPath);
 
         if (!recycleMap) {
             runner.reset();

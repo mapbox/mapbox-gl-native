@@ -1,4 +1,5 @@
 #include <mbgl/storage/resource_options.hpp>
+#include <mbgl/util/logging.hpp>
 
 #include "file_source.hpp"
 
@@ -7,21 +8,53 @@ namespace mbgl {
 std::atomic_size_t requestCount{0};
 std::atomic_size_t transferredSize{0};
 std::atomic_bool active{false};
+std::atomic_bool offline{true};
 
-ProxyFileSource::ProxyFileSource(const std::string& cachePath,
-                                 const std::string& assetPath,
-                                 bool supportCacheOnlyRequests_)
-    : DefaultFileSource(cachePath, assetPath, supportCacheOnlyRequests_) {}
-
-ProxyFileSource::ProxyFileSource(const std::string& cachePath,
-                                 std::unique_ptr<FileSource>&& assetFileSource_,
-                                 bool supportCacheOnlyRequests_)
-    : DefaultFileSource(cachePath, std::move(assetFileSource_), supportCacheOnlyRequests_) {}
+ProxyFileSource::ProxyFileSource(const std::string& cachePath, const std::string& assetPath)
+    : DefaultFileSource(cachePath, assetPath, false) {}
 
 ProxyFileSource::~ProxyFileSource() = default;
 
 std::unique_ptr<AsyncRequest> ProxyFileSource::request(const Resource& resource, Callback callback) {
-    auto result = DefaultFileSource::request(resource, [=](Response response) {
+    auto transformed = resource;
+
+    // If offline, force always loading the resource from the cache
+    // so we don't make any network request.
+    if (offline) {
+        transformed.loadingMethod = Resource::LoadingMethod::CacheOnly;
+    }
+
+    // This is needed for compatibility with the style tests that
+    // are using local:// instead of http:// which is the schema
+    // we support for cached files.
+    if (transformed.url.compare(0, 8, "local://") == 0) {
+        transformed.url.replace(0, 8, "http://");
+
+        if (transformed.kind == Resource::Kind::Tile && transformed.tileData) {
+            transformed.tileData->urlTemplate.replace(0, 8, "http://");
+        }
+    }
+
+    if (transformed.url.compare(0, 22, "http://localhost:2900/") == 0) {
+        transformed.url.replace(0, 22, "http://");
+
+        if (transformed.kind == Resource::Kind::Tile && transformed.tileData) {
+            transformed.tileData->urlTemplate.replace(0, 22, "http://");
+        }
+    }
+
+    return DefaultFileSource::request(transformed, [=](Response response) {
+        if (transformed.loadingMethod == Resource::LoadingMethod::CacheOnly && response.noContent) {
+            if (transformed.kind == Resource::Kind::Tile && transformed.tileData) {
+                mbgl::Log::Info(mbgl::Event::Database,
+                                "Resource not found in cache: %s (%s)",
+                                transformed.url.c_str(),
+                                transformed.tileData->urlTemplate.c_str());
+            } else {
+                mbgl::Log::Info(mbgl::Event::Database, "Resource not found in cache: %s", transformed.url.c_str());
+            }
+        }
+
         std::size_t size = response.data != nullptr ? response.data->size() : 0;
         if (active) {
             requestCount++;
@@ -29,15 +62,18 @@ std::unique_ptr<AsyncRequest> ProxyFileSource::request(const Resource& resource,
         }
         callback(response);
     });
-    return result;
 }
 
 std::shared_ptr<FileSource> FileSource::createPlatformFileSource(const ResourceOptions& options) {
-    auto fileSource = std::make_shared<ProxyFileSource>(
-        options.cachePath(), options.assetPath(), options.supportsCacheOnlyRequests());
+    auto fileSource = std::make_shared<ProxyFileSource>(options.cachePath(), options.assetPath());
     fileSource->setAccessToken(options.accessToken());
     fileSource->setAPIBaseURL(options.baseURL());
     return fileSource;
+}
+
+// static
+void ProxyFileSource::setOffline(bool status) {
+    offline = status;
 }
 
 // static

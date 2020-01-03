@@ -651,7 +651,7 @@ uint32_t getImageTileOffset(const std::set<uint32_t>& dims, uint32_t dim) {
 
 } // namespace
 
-TestRunner::Impl::Impl(const TestMetadata& metadata)
+TestRunner::Impl::Impl(const TestMetadata& metadata, const Manifest& manifest)
     : observer(std::make_unique<TestRunnerMapObserver>()),
       frontend(metadata.size, metadata.pixelRatio, swapBehavior(metadata.mapMode)),
       map(frontend,
@@ -661,7 +661,7 @@ TestRunner::Impl::Impl(const TestMetadata& metadata)
               .withSize(metadata.size)
               .withPixelRatio(metadata.pixelRatio)
               .withCrossSourceCollisions(metadata.crossSourceCollisions),
-          mbgl::ResourceOptions().withCacheOnlyRequestsSupport(false)) {}
+          mbgl::ResourceOptions().withCachePath(manifest.getCachePath()).withAccessToken(manifest.getAccessToken())) {}
 
 TestRunner::Impl::~Impl() {}
 
@@ -703,7 +703,7 @@ void TestRunner::run(TestMetadata& metadata) {
                       mbgl::util::toString(uint32_t(metadata.crossSourceCollisions));
 
     if (maps.find(key) == maps.end()) {
-        maps[key] = std::make_unique<TestRunner::Impl>(metadata);
+        maps[key] = std::make_unique<TestRunner::Impl>(metadata, manifest);
     }
 
     ctx.runnerImpl = maps[key].get();
@@ -779,7 +779,7 @@ void TestRunner::run(TestMetadata& metadata) {
 
 mbgl::HeadlessFrontend::RenderResult TestRunner::runTest(TestMetadata& metadata, TestContext& ctx) {
     HeadlessFrontend::RenderResult result{};
-    for (const auto& operation : parseTestOperations(metadata, manifest)) {
+    for (const auto& operation : parseTestOperations(metadata)) {
         if (!operation(ctx)) return result;
     }
 

@@ -24,8 +24,8 @@ std::vector<std::string> readExpectedJSONEntries(const mbgl::filesystem::path& b
 
 TestMetrics readExpectedMetrics(const mbgl::filesystem::path& path);
 
-TestMetadata parseTestMetadata(const TestPaths& paths, const Manifest& manifest);
-TestOperations parseTestOperations(TestMetadata& metadata, const Manifest& manifest);
+TestMetadata parseTestMetadata(const TestPaths& paths);
+TestOperations parseTestOperations(TestMetadata& metadata);
 
 std::string createResultPage(const TestStatistics&, const std::vector<TestMetadata>&, bool shuffle, uint32_t seed);
 
