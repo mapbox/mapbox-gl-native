@@ -651,9 +651,10 @@ uint32_t getImageTileOffset(const std::set<uint32_t>& dims, uint32_t dim) {
 
 } // namespace
 
-TestRunner::Impl::Impl(const TestMetadata& metadata, const Manifest& manifest)
+TestRunner::Impl::Impl(const TestMetadata& metadata, const mbgl::ResourceOptions& resourceOptions)
     : observer(std::make_unique<TestRunnerMapObserver>()),
       frontend(metadata.size, metadata.pixelRatio, swapBehavior(metadata.mapMode)),
+      fileSource(mbgl::FileSource::getSharedFileSource(resourceOptions)),
       map(frontend,
           *observer.get(),
           mbgl::MapOptions()
@@ -661,7 +662,7 @@ TestRunner::Impl::Impl(const TestMetadata& metadata, const Manifest& manifest)
               .withSize(metadata.size)
               .withPixelRatio(metadata.pixelRatio)
               .withCrossSourceCollisions(metadata.crossSourceCollisions),
-          mbgl::ResourceOptions().withCachePath(manifest.getCachePath()).withAccessToken(manifest.getAccessToken())) {}
+          resourceOptions) {}
 
 TestRunner::Impl::~Impl() {}
 
@@ -680,6 +681,12 @@ void TestRunner::run(TestMetadata& metadata) {
             assert(runnerImpl);
             return runnerImpl->map;
         }
+
+        FileSource& getFileSource() override {
+            assert(runnerImpl);
+            return *runnerImpl->fileSource;
+        }
+
         TestRunnerMapObserver& getObserver() override {
             assert(runnerImpl);
             return *runnerImpl->observer;
@@ -703,7 +710,9 @@ void TestRunner::run(TestMetadata& metadata) {
                       mbgl::util::toString(uint32_t(metadata.crossSourceCollisions));
 
     if (maps.find(key) == maps.end()) {
-        maps[key] = std::make_unique<TestRunner::Impl>(metadata, manifest);
+        maps[key] = std::make_unique<TestRunner::Impl>(
+            metadata,
+            mbgl::ResourceOptions().withCachePath(manifest.getCachePath()).withAccessToken(manifest.getAccessToken()));
     }
 
     ctx.runnerImpl = maps[key].get();

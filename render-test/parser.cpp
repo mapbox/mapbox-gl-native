@@ -688,12 +688,26 @@ TestOperations parseTestOperations(TestMetadata& metadata) {
             imageName.erase(std::remove(imageName.begin(), imageName.end(), '"'), imageName.end());
 
             std::string imagePath = operationArray[2].GetString();
-            imagePath.erase(std::remove(imagePath.begin(), imagePath.end(), '"'), imagePath.end());
 
-            result.emplace_back([imagePath, imageName, sdf, pixelRatio](TestContext& ctx) {
-                mbgl::optional<std::string> maybeImage = mbgl::util::readFile(imagePath);
+            result.emplace_back([imageName, imagePath, sdf, pixelRatio](TestContext& ctx) {
+                mbgl::optional<std::string> maybeImage;
+                bool requestCompleted = false;
+
+                auto req = ctx.getFileSource().request(mbgl::Resource::image("mapbox://render-tests/" + imagePath),
+                                                       [&](mbgl::Response response) {
+                                                           if (response.data) {
+                                                               maybeImage = *response.data;
+                                                           }
+
+                                                           requestCompleted = true;
+                                                       });
+
+                while (!requestCompleted) {
+                    mbgl::util::RunLoop::Get()->runOnce();
+                }
+
                 if (!maybeImage) {
-                    ctx.getMetadata().errorMessage = std::string("Failed to load expected image ") + imagePath;
+                    ctx.getMetadata().errorMessage += std::string("Failed to load expected image ") + imagePath;
                     return false;
                 }
 
