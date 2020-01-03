@@ -2,6 +2,7 @@
 
 #include <mbgl/gfx/headless_frontend.hpp>
 #include <mbgl/map/map.hpp>
+#include <mbgl/storage/file_source.hpp>
 
 #include "manifest_parser.hpp"
 
@@ -54,11 +55,12 @@ private:
     void checkProbingResults(TestMetadata&);
 
     struct Impl {
-        Impl(const TestMetadata&, const Manifest&);
+        Impl(const TestMetadata&, const mbgl::ResourceOptions&);
         ~Impl();
 
         std::unique_ptr<TestRunnerMapObserver> observer;
         mbgl::HeadlessFrontend frontend;
+        std::shared_ptr<mbgl::FileSource> fileSource;
         mbgl::Map map;
     };
     std::unordered_map<std::string, std::unique_ptr<Impl>> maps;
