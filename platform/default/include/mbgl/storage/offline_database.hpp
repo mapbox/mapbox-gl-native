@@ -38,8 +38,6 @@ struct MapboxTileLimitExceededException :  util::Exception {
 
 class OfflineDatabase : private util::noncopyable {
 public:
-    // Limits affect ambient caching (put) only; resources required by offline
-    // regions are exempt.
     OfflineDatabase(std::string path);
     ~OfflineDatabase();
 
@@ -96,6 +94,9 @@ public:
     std::exception_ptr pack();
     void runPackDatabaseAutomatically(bool autopack_) { autopack = autopack_; }
 
+    // For testing only
+    void reopenDatabaseReadOnlyForTesting();
+
 private:
     void initialize();
     void handleError(const mapbox::sqlite::Exception&, const char* action);
@@ -151,6 +152,7 @@ private:
 
     bool evict(uint64_t neededFreeSize);
     bool autopack = true;
+    bool readOnly = false;
 };
 
 } // namespace mbgl

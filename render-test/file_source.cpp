@@ -66,8 +66,14 @@ std::unique_ptr<AsyncRequest> ProxyFileSource::request(const Resource& resource,
 
 std::shared_ptr<FileSource> FileSource::createPlatformFileSource(const ResourceOptions& options) {
     auto fileSource = std::make_shared<ProxyFileSource>(options.cachePath(), options.assetPath());
+
     fileSource->setAccessToken(options.accessToken());
     fileSource->setAPIBaseURL(options.baseURL());
+
+    if (offline) {
+        fileSource->reopenDatabaseReadOnlyForTesting();
+    }
+
     return fileSource;
 }
 
