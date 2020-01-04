@@ -257,6 +257,7 @@ public:
 
     // For testing only.
     void setOnlineStatus(bool);
+    void reopenDatabaseReadOnlyForTesting();
     void setMaximumConcurrentRequests(uint32_t);
 
     class Impl;
