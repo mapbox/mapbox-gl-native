@@ -29,6 +29,9 @@ public:
 
     void addToMap(mbgl::Map&, mbgl::optional<std::string>);
 
+    // Release the owned view and return it
+    std::unique_ptr<mbgl::style::Layer> releaseCoreLayer();
+
     jni::Local<jni::String> getId(jni::JNIEnv&);
 
     jni::Local<jni::String> getSourceId(jni::JNIEnv&);
@@ -76,9 +79,6 @@ protected:
      * Called when a Java object was created from the jvm side
      */
     Layer(std::unique_ptr<mbgl::style::Layer>);
-
-    // Release the owned view and return it
-    std::unique_ptr<mbgl::style::Layer> releaseCoreLayer();
 
     // Owned layer is set when creating a new layer, before adding it to the map
     std::unique_ptr<mbgl::style::Layer> ownedLayer;
