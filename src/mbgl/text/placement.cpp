@@ -182,7 +182,6 @@ void Placement::placeBucket(const SymbolBucket& bucket,
                         layout.get<style::SymbolPlacement>() == style::SymbolPlacementType::Line)) {
         avoidEdges = tileBorders;
     }
-    const bool stickToFirstAnchor = tileBorders && !avoidEdges;
 
     const bool textAllowOverlap = layout.get<style::TextAllowOverlap>();
     const bool iconAllowOverlap = layout.get<style::IconAllowOverlap>();
@@ -332,6 +331,8 @@ void Placement::placeBucket(const SymbolBucket& bucket,
                 const bool doVariableIconPlacement =
                     hasIconTextFit && !iconAllowOverlap && symbolInstance.placedIconIndex;
 
+                bool stickToFirstAnchor = false;
+
                 const auto placeFeatureForVariableAnchors = [&](const CollisionFeature& textCollisionFeature,
                                                                 style::TextWritingModeType orientation,
                                                                 const CollisionFeature& iconCollisionFeature) {
@@ -344,8 +345,8 @@ void Placement::placeBucket(const SymbolBucket& bucket,
                     const size_t placementAttempts = textAllowOverlap ? anchorsSize * 2 : anchorsSize;
                     for (size_t i = 0u; i < placementAttempts; ++i) {
                         auto anchor = variableTextAnchors[i % anchorsSize];
-                        const auto& avoidEdgesForVariableAnchor =
-                            (stickToFirstAnchor && anchor != variableTextAnchors.front()) ? tileBorders : avoidEdges;
+                        const bool isFirstAnchor = (anchor == variableTextAnchors.front());
+                        if (stickToFirstAnchor && !isFirstAnchor) continue;
 
                         const bool allowOverlap = (i >= anchorsSize);
                         shift = calculateVariableLayoutOffset(anchor,
@@ -357,6 +358,13 @@ void Placement::placeBucket(const SymbolBucket& bucket,
                                                               pitchWithMap,
                                                               state.getBearing());
                         textBoxes.clear();
+
+                        if (mapMode == MapMode::Tile && isFirstAnchor) {
+                            assert(tileBorders);
+                            stickToFirstAnchor = collisionIndex.featureIntersectsTileBorders(
+                                textCollisionFeature, shift, posMatrix, pixelRatio, *tileBorders);
+                        }
+
                         placedFeature = collisionIndex.placeFeature(textCollisionFeature,
                                                                     shift,
                                                                     posMatrix,
@@ -368,7 +376,7 @@ void Placement::placeBucket(const SymbolBucket& bucket,
                                                                     allowOverlap,
                                                                     pitchWithMap,
                                                                     params.showCollisionBoxes,
-                                                                    avoidEdgesForVariableAnchor,
+                                                                    avoidEdges,
                                                                     collisionGroup.second,
                                                                     textBoxes);
 
@@ -384,7 +392,7 @@ void Placement::placeBucket(const SymbolBucket& bucket,
                                                                                  iconAllowOverlap,
                                                                                  pitchWithMap,
                                                                                  params.showCollisionBoxes,
-                                                                                 avoidEdgesForVariableAnchor,
+                                                                                 avoidEdges,
                                                                                  collisionGroup.second,
                                                                                  iconBoxes);
                             iconBoxes.clear();
@@ -553,10 +561,9 @@ void Placement::placeBucket(const SymbolBucket& bucket,
         for (auto it = sortedSymbols.rbegin(); it != sortedSymbols.rend(); ++it) {
             placeSymbol(*it);
         }
-    } else if (stickToFirstAnchor) {
+    } else if (mapMode == MapMode::Tile && !avoidEdges) {
         // In this case we first try to place symbols, which intersects the tile borders, so that
         // those symbols will remain even if each tile is handled independently.
-        assert(mapMode == MapMode::Tile);
         const auto& symbolInstances = bucket.symbolInstances;
         std::vector<std::reference_wrapper<const SymbolInstance>> sorted(symbolInstances.begin(),
                                                                          symbolInstances.end());
