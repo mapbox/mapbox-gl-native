@@ -72,6 +72,7 @@ public:
     CameraOptions cameraForLatLngs(const std::vector<LatLng>&, const EdgeInsets&, optional<double> bearing = {}, optional<double> pitch = {}) const;
     CameraOptions cameraForGeometry(const Geometry<double>&, const EdgeInsets&, optional<double> bearing = {}, optional<double> pitch = {}) const;
     LatLngBounds latLngBoundsForCamera(const CameraOptions&) const;
+    LatLngBounds latLngBoundsForCameraUnwrapped(const CameraOptions&) const;
 
     /// @name Bounds
     /// @{

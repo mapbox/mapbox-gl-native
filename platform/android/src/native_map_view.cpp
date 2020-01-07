@@ -530,7 +530,7 @@ void NativeMapView::setVisibleCoordinateBounds(JNIEnv& env, const jni::Array<jni
 }
 
 void NativeMapView::getVisibleCoordinateBounds(JNIEnv& env, jni::Array<jdouble>& output) {
-    auto latlngBounds = map->latLngBoundsForCamera(map->getCameraOptions(mbgl::nullopt));
+    auto latlngBounds = map->latLngBoundsForCameraUnwrapped(map->getCameraOptions(mbgl::nullopt));
 
     double latNorth = latlngBounds.north();
     double lonEast = latlngBounds.east();
