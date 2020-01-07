@@ -88,7 +88,7 @@ inline bool CollisionIndex::isInsideTile(
     return x1 >= tileBoundaries[0] && y1 >= tileBoundaries[1] && x2 < tileBoundaries[2] && y2 < tileBoundaries[3];
 }
 
-inline bool CollisionIndex::intersectsTileBorders(
+inline bool CollisionIndex::overlapsTile(
     float x1, float y1, float x2, float y2, const CollisionTileBoundaries& tileBoundaries) const {
     return x1 < tileBoundaries[2] && x2 > tileBoundaries[0] && y1 < tileBoundaries[3] && y2 > tileBoundaries[1];
 }
@@ -108,7 +108,7 @@ bool CollisionIndex::featureIntersectsTileBorders(const CollisionFeature& featur
     float px2 = (box.x2 + shift.x) * tileToViewport + projectedPoint.first.x;
     float py2 = (box.y2 + shift.y) * tileToViewport + projectedPoint.first.y;
 
-    return intersectsTileBorders(px1, py1, px2, py2, tileEdges);
+    return overlapsTile(px1, py1, px2, py2, tileEdges) && !isInsideTile(px1, py1, px2, py2, tileEdges);
 }
 
 std::pair<bool,bool> CollisionIndex::placeFeature(const CollisionFeature& feature,

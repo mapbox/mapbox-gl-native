@@ -54,8 +54,7 @@ private:
     bool isOffscreen(float x1, float y1, float x2, float y2) const;
     bool isInsideGrid(float x1, float y1, float x2, float y2) const;
     bool isInsideTile(float x1, float y1, float x2, float y2, const CollisionTileBoundaries& tileBoundaries) const;
-    bool intersectsTileBorders(
-        float x1, float y1, float x2, float y2, const CollisionTileBoundaries& tileBoundaries) const;
+    bool overlapsTile(float x1, float y1, float x2, float y2, const CollisionTileBoundaries& tileBoundaries) const;
 
     std::pair<bool,bool> placeLineFeature(const CollisionFeature& feature,
                                   const mat4& posMatrix,
