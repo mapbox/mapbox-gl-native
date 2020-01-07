@@ -2,8 +2,8 @@
     "network": [
         [
             "probeNetwork - default - end",
-            3,
-            100180
+            5,
+            212512
         ],
         [
             "probeNetwork - default - start",
