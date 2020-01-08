@@ -97,7 +97,6 @@ mbgl::filesystem::path getValidPath(const std::string& manifestPath, const std::
 } // namespace
 
 mbgl::optional<Manifest> ManifestParser::parseManifest(const std::string& manifestPath,
-                                                       const std::vector<std::string>& testNames,
                                                        std::string testFilter) {
     Manifest manifest;
     const auto filePath = mbgl::filesystem::path(manifestPath);
@@ -263,43 +262,28 @@ mbgl::optional<Manifest> ManifestParser::parseManifest(const std::string& manife
         manifest.resultPath.pop_back();
     }
 
-    std::vector<mbgl::filesystem::path> paths;
-    for (const auto& id : testNames) {
-        paths.emplace_back(manifest.testRootPath + "/" + id);
-    }
-    if (paths.empty()) {
-        paths.emplace_back(manifest.testRootPath);
-    }
-
-    // Recursively traverse through the test paths and collect test directories containing "style.json".
+    auto& path = manifest.testRootPath;
     auto& testPaths = manifest.testPaths;
-    testPaths.reserve(paths.size());
-    for (const auto& path : paths) {
-        if (!mbgl::filesystem::exists(path)) {
-            mbgl::Log::Warning(
-                mbgl::Event::General, "Provided test folder '%s' does not exist.", path.string().c_str());
+
+    for (auto& testPath : mbgl::filesystem::recursive_directory_iterator(path)) {
+        // Skip paths that fail regexp search.
+        if (!testFilter.empty() && !std::regex_search(testPath.path().string(), std::regex(testFilter))) {
             continue;
         }
-        for (auto& testPath : mbgl::filesystem::recursive_directory_iterator(path)) {
-            // Skip paths that fail regexp search.
-            if (!testFilter.empty() && !std::regex_search(testPath.path().string(), std::regex(testFilter))) {
-                continue;
-            }
 
-            if (testPath.path().filename() == "style.json") {
-                const auto defaultExpectationPath{std::move(mbgl::filesystem::path(testPath).remove_filename())};
-                const auto rootLength = manifest.testRootPath.length();
-                auto testId = defaultExpectationPath.string();
-                testId = testId.substr(rootLength + 1, testId.length() - rootLength - 1);
+        if (testPath.path().filename() == "style.json") {
+            const auto defaultExpectationPath{std::move(mbgl::filesystem::path(testPath).remove_filename())};
+            const auto rootLength = manifest.testRootPath.length();
+            auto testId = defaultExpectationPath.string();
+            testId = testId.substr(rootLength + 1, testId.length() - rootLength - 1);
 
-                std::vector<mbgl::filesystem::path> expectedMetricPaths{expectedMetricPath};
+            std::vector<mbgl::filesystem::path> expectedMetricPaths{expectedMetricPath};
 #if defined(__ANDROID__)
-                expectedMetricPaths.emplace_back("/sdcard/baselines/");
+            expectedMetricPaths.emplace_back("/sdcard/baselines/");
 #endif
-                testPaths.emplace_back(testPath,
-                                       getTestExpectations(defaultExpectationPath, testId, expectationPaths),
-                                       getTestExpectations(defaultExpectationPath, testId, expectedMetricPaths));
-            }
+            testPaths.emplace_back(testPath,
+                    getTestExpectations(defaultExpectationPath, testId, expectationPaths),
+                    getTestExpectations(defaultExpectationPath, testId, expectedMetricPaths));
         }
     }
 
