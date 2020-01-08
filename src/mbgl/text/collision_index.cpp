@@ -104,15 +104,7 @@ bool CollisionIndex::featureIntersectsTileBorders(const CollisionFeature& featur
     assert(!feature.alongLine);
     assert(!feature.boxes.empty());
     const CollisionBox& box = feature.boxes.front();
-    const auto projectedPoint = projectAndGetPerspectiveRatio(posMatrix, box.anchor);
-    const float tileToViewport = textPixelRatio * projectedPoint.second;
-    CollisionBoundaries collisionBoundaries{{
-        (box.x1 + shift.x) * tileToViewport + projectedPoint.first.x,
-        (box.y1 + shift.y) * tileToViewport + projectedPoint.first.y,
-        (box.x2 + shift.x) * tileToViewport + projectedPoint.first.x,
-        (box.y2 + shift.y) * tileToViewport + projectedPoint.first.y,
-    }};
-
+    auto collisionBoundaries = getProjectedCollisionBoundaries(posMatrix, shift, textPixelRatio, box);
     return overlapsTile(collisionBoundaries, tileEdges) && !isInsideTile(collisionBoundaries, tileEdges);
 }
 
@@ -134,15 +126,9 @@ std::pair<bool, bool> CollisionIndex::placeFeature(
     assert(projectedBoxes.empty());
     if (!feature.alongLine) {
         const CollisionBox& box = feature.boxes.front();
-        const auto projectedPoint = projectAndGetPerspectiveRatio(posMatrix, box.anchor);
-        const float tileToViewport = textPixelRatio * projectedPoint.second;
-        float px1 = (box.x1 + shift.x) * tileToViewport + projectedPoint.first.x;
-        float py1 = (box.y1 + shift.y) * tileToViewport + projectedPoint.first.y;
-        float px2 = (box.x2 + shift.x) * tileToViewport + projectedPoint.first.x;
-        float py2 = (box.y2 + shift.y) * tileToViewport + projectedPoint.first.y;
-        projectedBoxes.emplace_back(px1, py1, px2, py2);
-
-        CollisionBoundaries collisionBoundaries{{px1, py1, px2, py2}};
+        auto collisionBoundaries = getProjectedCollisionBoundaries(posMatrix, shift, textPixelRatio, box);
+        projectedBoxes.emplace_back(
+            collisionBoundaries[0], collisionBoundaries[1], collisionBoundaries[2], collisionBoundaries[3]);
         if ((avoidEdges && !isInsideTile(collisionBoundaries, *avoidEdges)) || !isInsideGrid(collisionBoundaries) ||
             (!allowOverlap && collisionGrid.hitTest(projectedBoxes.back().box(), collisionGroupPredicate))) {
             return { false, false };
@@ -411,6 +397,20 @@ Point<float> CollisionIndex::projectPoint(const mat4& posMatrix, const Point<flo
     return Point<float> {
         static_cast<float>((((p[0] / p[3] + 1) / 2) * size.width) + viewportPadding),
         static_cast<float>((((-p[1] / p[3] + 1) / 2) * size.height) + viewportPadding) };
+}
+
+CollisionBoundaries CollisionIndex::getProjectedCollisionBoundaries(const mat4& posMatrix,
+                                                                    Point<float> shift,
+                                                                    float textPixelRatio,
+                                                                    const CollisionBox& box) const {
+    const auto projectedPoint = projectAndGetPerspectiveRatio(posMatrix, box.anchor);
+    const float tileToViewport = textPixelRatio * projectedPoint.second;
+    return CollisionBoundaries{{
+        (box.x1 + shift.x) * tileToViewport + projectedPoint.first.x,
+        (box.y1 + shift.y) * tileToViewport + projectedPoint.first.y,
+        (box.x2 + shift.x) * tileToViewport + projectedPoint.first.x,
+        (box.y2 + shift.y) * tileToViewport + projectedPoint.first.y,
+    }};
 }
 
 } // namespace mbgl
