@@ -89,6 +89,12 @@ INSTANTIATE_TEST_CASE_P(Expression, ExpressionEqualityTest, ::testing::ValuesIn(
     if (dir != nullptr) {
         for (dirent *dp = nullptr; (dp = readdir(dir)) != nullptr;) {
             const std::string name = dp->d_name;
+#if ANDROID
+            // Android unit test uses number-format stub implementation so skip the tests
+            if (name.find("number-format") != std::string::npos) {
+                continue;
+            }
+#endif
             if (name.length() >= ending.length() && name.compare(name.length() - ending.length(), ending.length(), ending) == 0) {
                 names.push_back(name.substr(0, name.length() - ending.length()));
             }
