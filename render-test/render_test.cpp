@@ -44,7 +44,7 @@ void operator delete(void* ptr, size_t) noexcept {
 namespace {
 
 using ArgumentsTuple = std::
-    tuple<bool, bool, bool, uint32_t, std::string, TestRunner::UpdateResults, std::vector<std::string>, std::string>;
+    tuple<bool, bool, bool, uint32_t, std::string, TestRunner::UpdateResults, std::string>;
 ArgumentsTuple parseArguments(int argc, char** argv) {
     const static std::unordered_map<std::string, TestRunner::UpdateResults> updateResultsFlags = {
         {"default", TestRunner::UpdateResults::DEFAULT},
@@ -73,8 +73,6 @@ ArgumentsTuple parseArguments(int argc, char** argv) {
                                                          \n\"rebaseline\" Updates or creates expected metrics for configuration defined by a manifest.",
         {'u', "update"},
         updateResultsFlags);
-
-    args::PositionalList<std::string> testNameValues(argumentParser, "URL", "Test name(s)");
 
     try {
         argumentParser.ParseCLI(argc, argv);
@@ -105,7 +103,6 @@ ArgumentsTuple parseArguments(int argc, char** argv) {
         exit(3);
     }
 
-    auto testNames = testNameValues ? args::get(testNameValues) : std::vector<std::string>{};
     auto testFilter = testFilterValue ? args::get(testFilterValue) : std::string{};
     const auto shuffle = shuffleFlag ? args::get(shuffleFlag) : false;
     const auto online = onlineFlag ? args::get(onlineFlag) : false;
@@ -118,7 +115,6 @@ ArgumentsTuple parseArguments(int argc, char** argv) {
                           seed,
                           manifestPath.string(),
                           updateResults,
-                          std::move(testNames),
                           std::move(testFilter)};
 }
 } // namespace
@@ -131,16 +127,15 @@ int runRenderTests(int argc, char** argv, std::function<void()> testStatus) {
     bool online;
     uint32_t seed;
     std::string manifestPath;
-    std::vector<std::string> testNames;
     std::string testFilter;
     TestRunner::UpdateResults updateResults;
 
-    std::tie(recycleMap, shuffle, online, seed, manifestPath, updateResults, testNames, testFilter) =
+    std::tie(recycleMap, shuffle, online, seed, manifestPath, updateResults, testFilter) =
         parseArguments(argc, argv);
 
     ProxyFileSource::setOffline(!online);
 
-    auto manifestData = ManifestParser::parseManifest(manifestPath, testNames, testFilter);
+    auto manifestData = ManifestParser::parseManifest(manifestPath, testFilter);
     if (!manifestData) {
         exit(5);
     }
@@ -246,9 +241,8 @@ int runRenderTests(int argc, char** argv, std::function<void()> testStatus) {
         }
     }
 
-    const auto manifestName = std::string("_").append(mbgl::filesystem::path(manifestPath).stem());
-    const auto resultPath = manifest.getResultPath() + "/" + (testNames.empty() ? "render-tests" : testNames.front()) +
-                            manifestName + "_index.html";
+    const std::string manifestName = mbgl::filesystem::path(manifestPath).stem();
+    const std::string resultPath = manifest.getResultPath() + "/" + manifestName + ".html";
     std::string resultsHTML = createResultPage(stats, metadatas, shuffle, seed);
     mbgl::util::write_file(resultPath, resultsHTML);
 
