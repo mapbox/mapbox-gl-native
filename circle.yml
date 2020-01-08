@@ -8,6 +8,7 @@ workflows:
       - next-android-benchmark-runner
       - next-android-api-breakage
       - next-android-render-test-runner
+      - next-android-unit-test-runner
       - next-baselines:
           requires:
             - next-android-arm64-v8a-release
@@ -716,6 +717,40 @@ jobs:
       - run:
           name: Build SDK
           command: BUILDTYPE=Release make android-arm-v8
+      - next-save
+  next-android-unit-test-runner:
+    executor: ubuntu-disco
+    steps:
+      - checkout
+      - next-prepare
+      - run:
+          name: Build UnitTestRunner APK
+          command: |
+            cd test/android
+            ./gradlew --parallel --max-workers=8 -Pmapbox.abis=arm64-v8a app:assembleRelease app:assembleAndroidTest
+      - login-google-cloud-platform
+      - run:
+          name: Run UnitTestRunner on Firebase
+          no_output_timeout: 20m
+          command: |
+            if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON}" && -z "${SKIP_FIREBASE:-}" ]]; then
+              gcloud firebase test android models list
+              gcloud firebase test android run --type instrumentation \
+                --app test/android/app/build/outputs/apk/release/app-release.apk \
+                --test test/android/app/build/outputs/apk/androidTest/release/app-release-androidTest.apk \
+                --device-ids flame --os-version-ids 29 --locales en --orientations portrait --timeout 20m \
+                --directories-to-pull /sdcard/test/results --results-dir unit-test-${CIRCLE_BUILD_NUM} \
+                --no-record-video --no-performance-metrics
+            fi
+      - run:
+          name: Retrieve Test Result from gcloud
+          when: always
+          command: |
+            if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON}" && -z "${SKIP_FIREBASE:-}" ]]; then
+              testResult=$(gsutil ls gs://test-lab-186672a0qp5bq-ycr70axads3nc/unit-test-${CIRCLE_BUILD_NUM}/**/results/results.xml)
+              mkdir -p /tmp/tests/unit-test
+              gsutil cp $testResult /tmp/tests/unit-test
+            fi
       - next-save
   next-android-render-test-runner:
     executor: ubuntu-disco
