@@ -598,9 +598,10 @@ void Placement::placeBucket(const SymbolBucket& bucket,
             return result;
         };
 
-        std::stable_sort(sorted.begin(), sorted.end(), [&](const SymbolInstance& a, const SymbolInstance& b) {
-            return intersectsTileBorder(a) && !intersectsTileBorder(b);
-        });
+        std::stable_sort(
+            sorted.begin(), sorted.end(), [&intersectsTileBorder](const SymbolInstance& a, const SymbolInstance& b) {
+                return intersectsTileBorder(a) && !intersectsTileBorder(b);
+            });
 
         for (const SymbolInstance& symbol : sorted) {
             placeSymbol(symbol);
