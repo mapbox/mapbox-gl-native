@@ -174,8 +174,8 @@ void Placement::placeBucket(const SymbolBucket& bucket,
     auto partiallyEvaluatedTextSize = bucket.textSizeBinder->evaluateForZoom(state.getZoom());
     auto partiallyEvaluatedIconSize = bucket.iconSizeBinder->evaluateForZoom(state.getZoom());
 
-    optional<CollisionTileBoundaries> tileBorders;
-    optional<CollisionTileBoundaries> avoidEdges;
+    optional<CollisionBoundaries> tileBorders;
+    optional<CollisionBoundaries> avoidEdges;
     if (mapMode == MapMode::Tile) tileBorders = collisionIndex.projectTileBoundaries(posMatrix);
 
     if (tileBorders && (layout.get<style::SymbolAvoidEdges>() ||
