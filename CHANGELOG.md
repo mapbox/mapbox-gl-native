@@ -28,6 +28,10 @@
   This patch introduces batch conversion between LatLng and ScreenCoordinate in Gl-Native core, so for multiple conversions with single point/latLng previously now it can be done with invoking one function call by passing vector of points/latLngs.
 
 ### Bug fixes
+- [core] Stable position of labels at tile borders in tile mode ([#16040](https://github.com/mapbox/mapbox-gl-native/pull/16040))
+
+  These changes allow to avoid cutting-off labels on tile borders if the variable text placement is enabled.
+
 - [core] Fix really overscaled lines ([#16045](https://github.com/mapbox/mapbox-gl-native/pull/16045))
 
   We resample lines after sharp corners in some situations. When tiles were really overscaled, sometimes we didn't have enough precision to represent the resampled vertex because it was too close. Disabling this after a certain point prevents this ([#16018](https://github.com/mapbox/mapbox-gl-native/issues/16018)).
