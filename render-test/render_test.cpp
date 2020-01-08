@@ -43,8 +43,7 @@ void operator delete(void* ptr, size_t) noexcept {
 
 namespace {
 
-using ArgumentsTuple = std::
-    tuple<bool, bool, bool, uint32_t, std::string, TestRunner::UpdateResults, std::string>;
+using ArgumentsTuple = std::tuple<bool, bool, bool, uint32_t, std::string, TestRunner::UpdateResults, std::string>;
 ArgumentsTuple parseArguments(int argc, char** argv) {
     const static std::unordered_map<std::string, TestRunner::UpdateResults> updateResultsFlags = {
         {"default", TestRunner::UpdateResults::DEFAULT},
@@ -62,7 +61,7 @@ ArgumentsTuple parseArguments(int argc, char** argv) {
         argumentParser, "online", "Toggle online mode (by default tests will run offline)", {'o', "online"});
     args::ValueFlag<uint32_t> seedValue(argumentParser, "seed", "Shuffle seed (default: random)", {"seed"});
     args::ValueFlag<std::string> testPathValue(
-        argumentParser, "manifestPath", "Test manifest file path", {'p', "manifestPath"});
+        argumentParser, "manifestPath", "Test manifest file path", {'p', "manifestPath"}, args::Options::Required);
     args::ValueFlag<std::string> testFilterValue(argumentParser, "filter", "Test filter regex", {'f', "filter"});
     args::MapFlag<std::string, TestRunner::UpdateResults> testUpdateResultsValue(
         argumentParser,
@@ -95,7 +94,7 @@ ArgumentsTuple parseArguments(int argc, char** argv) {
         exit(2);
     }
 
-    mbgl::filesystem::path manifestPath{testPathValue ? args::get(testPathValue) : std::string{TEST_RUNNER_ROOT_PATH}};
+    mbgl::filesystem::path manifestPath = args::get(testPathValue);
     if (!mbgl::filesystem::exists(manifestPath) || !manifestPath.has_filename()) {
         mbgl::Log::Error(mbgl::Event::General,
                          "Provided test manifest file path '%s' does not exist",
@@ -130,8 +129,7 @@ int runRenderTests(int argc, char** argv, std::function<void()> testStatus) {
     std::string testFilter;
     TestRunner::UpdateResults updateResults;
 
-    std::tie(recycleMap, shuffle, online, seed, manifestPath, updateResults, testFilter) =
-        parseArguments(argc, argv);
+    std::tie(recycleMap, shuffle, online, seed, manifestPath, updateResults, testFilter) = parseArguments(argc, argv);
 
     ProxyFileSource::setOffline(!online);
 

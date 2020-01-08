@@ -282,8 +282,8 @@ mbgl::optional<Manifest> ManifestParser::parseManifest(const std::string& manife
             expectedMetricPaths.emplace_back("/sdcard/baselines/");
 #endif
             testPaths.emplace_back(testPath,
-                    getTestExpectations(defaultExpectationPath, testId, expectationPaths),
-                    getTestExpectations(defaultExpectationPath, testId, expectedMetricPaths));
+                                   getTestExpectations(defaultExpectationPath, testId, expectationPaths),
+                                   getTestExpectations(defaultExpectationPath, testId, expectedMetricPaths));
         }
     }
 

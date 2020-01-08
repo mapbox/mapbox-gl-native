@@ -18,11 +18,6 @@ add_library(
     ${MBGL_ROOT}/render-test/runner.hpp
 )
 
-target_compile_definitions(
-    mbgl-render-test
-    PRIVATE TEST_RUNNER_ROOT_PATH="${MBGL_ROOT}"
-)
-
 # FIXME: Should not use core private interface
 target_include_directories(
     mbgl-render-test
