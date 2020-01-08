@@ -30,11 +30,17 @@ Map::Map(RendererFrontend& frontend,
          MapObserver& observer,
          const MapOptions& mapOptions,
          const ResourceOptions& resourceOptions)
-    : impl(std::make_unique<Impl>(frontend, observer,
-                                  FileSource::getSharedFileSource(resourceOptions),
-                                  mapOptions)) {}
+    : impl(std::make_unique<Impl>(frontend, observer, FileSource::getSharedFileSource(resourceOptions), mapOptions)) {
+#ifndef NDEBUG
+    setDebug(MapDebugOptions::TileBorders | MapDebugOptions::ParseStatus);
+#endif
+}
 
-Map::Map(std::unique_ptr<Impl> impl_) : impl(std::move(impl_)) {}
+Map::Map(std::unique_ptr<Impl> impl_) : impl(std::move(impl_)) {
+#ifndef NDEBUG
+    setDebug(MapDebugOptions::TileBorders | MapDebugOptions::ParseStatus);
+#endif
+}
 
 Map::~Map() = default;
 
