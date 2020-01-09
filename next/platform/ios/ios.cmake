@@ -24,6 +24,7 @@ target_sources(
         ${MBGL_ROOT}/platform/darwin/src/gl_functions.cpp
         ${MBGL_ROOT}/platform/darwin/src/headless_backend_eagl.mm
         ${MBGL_ROOT}/platform/darwin/src/http_file_source.mm
+        ${MBGL_ROOT}/platform/darwin/src/native_apple_interface.m
         ${MBGL_ROOT}/platform/darwin/src/image.mm
         ${MBGL_ROOT}/platform/darwin/src/local_glyph_rasterizer.mm
         ${MBGL_ROOT}/platform/darwin/src/logging_nslog.mm
