@@ -315,8 +315,11 @@ TEST(Map, Offline) {
 
     test.map.getStyle().loadURL(prefix + "style.json");
 
+#if ANDROID
+    test::checkImage("test/fixtures/map/offline", test.frontend.render(test.map).image, 0.0045, 0.1);
+#else
     test::checkImage("test/fixtures/map/offline", test.frontend.render(test.map).image, 0.0015, 0.1);
-
+#endif
     NetworkStatus::Set(NetworkStatus::Status::Online);
 }
 
