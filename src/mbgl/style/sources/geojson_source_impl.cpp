@@ -13,19 +13,12 @@
 namespace mbgl {
 namespace style {
 
-class GeoJSONVTData : public GeoJSONData, public std::enable_shared_from_this<GeoJSONVTData> {
+class GeoJSONVTData : public GeoJSONData {
 public:
     void getTile(const CanonicalTileID& id, const std::function<void(TileFeatures)>& fn) final {
         assert(fn);
-        std::weak_ptr<GeoJSONVTData> weak = shared_from_this();
         scheduler->scheduleAndReplyValue(
-            [id, weak, this]() -> TileFeatures {
-                if (auto self = weak.lock()) {
-                    return impl.getTile(id.z, id.x, id.y).features;
-                }
-                return {};
-            },
-            fn);
+            [id, impl = this->impl]() -> TileFeatures { return impl->getTile(id.z, id.x, id.y).features; }, fn);
     }
 
     Features getChildren(const std::uint32_t) final { return {}; }
@@ -39,8 +32,10 @@ public:
 private:
     friend GeoJSONData;
     GeoJSONVTData(const GeoJSON& geoJSON, const mapbox::geojsonvt::Options& options)
-        : impl(geoJSON, options), scheduler(Scheduler::GetSequenced()) {}
-    mapbox::geojsonvt::GeoJSONVT impl;
+        : impl(std::make_shared<mapbox::geojsonvt::GeoJSONVT>(geoJSON, options)),
+          scheduler(Scheduler::GetSequenced()) {}
+
+    std::shared_ptr<mapbox::geojsonvt::GeoJSONVT> impl; // Accessed on worker thread.
     std::shared_ptr<Scheduler> scheduler;
 };
 
