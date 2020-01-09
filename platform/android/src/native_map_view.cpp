@@ -529,6 +529,26 @@ void NativeMapView::setVisibleCoordinateBounds(JNIEnv& env, const jni::Array<jni
     map->easeTo(cameraOptions, animationOptions);
 }
 
+void NativeMapView::getVisibleCoordinateBounds(JNIEnv& env, jni::Array<jdouble>& output) {
+    auto latlngBounds = map->latLngBoundsForCameraUnwrapped(map->getCameraOptions(mbgl::nullopt));
+
+    double latNorth = latlngBounds.north();
+    double lonEast = latlngBounds.east();
+    double latSouth = latlngBounds.south();
+    double lonWest = latlngBounds.west();
+
+    std::vector<jdouble> buffer;
+    buffer.reserve(4);
+
+    // Order of the LatLngBounds: double latNorth, double lonEast, double latSouth, double lonWest
+    buffer.push_back(latNorth);
+    buffer.push_back(lonEast);
+    buffer.push_back(latSouth);
+    buffer.push_back(lonWest);
+
+    output.SetRegion<std::vector<jdouble>>(env, 0, buffer);
+}
+
 void NativeMapView::scheduleSnapshot(jni::JNIEnv&) {
     mapRenderer.requestSnapshot([&](PremultipliedImage image) {
         auto _env = android::AttachEnv();
@@ -1172,6 +1192,7 @@ void NativeMapView::registerNative(jni::JNIEnv& env) {
         METHOD(&NativeMapView::projectedMetersForLatLng, "nativeProjectedMetersForLatLng"),
         METHOD(&NativeMapView::pixelForLatLng, "nativePixelForLatLng"),
         METHOD(&NativeMapView::pixelsForLatLngs, "nativePixelsForLatLngs"),
+        METHOD(&NativeMapView::getVisibleCoordinateBounds, "nativeGetVisibleCoordinateBounds"),
         METHOD(&NativeMapView::latLngForProjectedMeters, "nativeLatLngForProjectedMeters"),
         METHOD(&NativeMapView::latLngForPixel, "nativeLatLngForPixel"),
         METHOD(&NativeMapView::latLngsForPixels, "nativeLatLngsForPixels"),

@@ -252,6 +252,48 @@ TEST(Map, CameraToLatLngBounds) {
     ASSERT_NEAR(camera.center->longitude(), virtualCamera.center->longitude(), 1e-7);
 }
 
+TEST(Map, CameraToLatLngBoundsUnwrappedWithRotation) {
+    MapTest<> test;
+
+    test.map.jumpTo(CameraOptions().withCenter(LatLng{45, 90}).withZoom(16.0).withBearing(45.0));
+
+    const Size size = test.map.getMapOptions().size();
+
+    CameraOptions camera = test.map.getCameraOptions();
+
+    ASSERT_TRUE(test.map.latLngBoundsForCameraUnwrapped(camera).contains(test.map.latLngForPixel({})));
+    ASSERT_TRUE(
+        test.map.latLngBoundsForCameraUnwrapped(camera).contains(test.map.latLngForPixel({0.0, double(size.height)})));
+    ASSERT_TRUE(
+        test.map.latLngBoundsForCameraUnwrapped(camera).contains(test.map.latLngForPixel({double(size.width), 0.0})));
+    ASSERT_TRUE(test.map.latLngBoundsForCameraUnwrapped(camera).contains(
+        test.map.latLngForPixel({double(size.width), double(size.height)})));
+    ASSERT_TRUE(test.map.latLngBoundsForCameraUnwrapped(camera).contains(
+        test.map.latLngForPixel({double(size.width) / 2, double(size.height) / 2})));
+}
+
+TEST(Map, CameraToLatLngBoundsUnwrappedCrossDateLine) {
+    MapTest<> test;
+
+    test.map.jumpTo(CameraOptions().withCenter(LatLng{0, 180}).withZoom(16.0));
+
+    const Size size = test.map.getMapOptions().size();
+
+    CameraOptions camera = test.map.getCameraOptions();
+
+    ASSERT_TRUE(test.map.latLngBoundsForCameraUnwrapped(camera).contains(test.map.latLngForPixel({}), LatLng::Wrapped));
+    ASSERT_TRUE(test.map.latLngBoundsForCameraUnwrapped(camera).contains(
+        test.map.latLngForPixel({0.0, double(size.height)}), LatLng::Wrapped));
+    ASSERT_TRUE(test.map.latLngBoundsForCameraUnwrapped(camera).contains(
+        test.map.latLngForPixel({double(size.width), 0.0}), LatLng::Wrapped));
+    ASSERT_TRUE(test.map.latLngBoundsForCameraUnwrapped(camera).contains(
+        test.map.latLngForPixel({double(size.width), double(size.height)}), LatLng::Wrapped));
+    ASSERT_TRUE(test.map.latLngBoundsForCameraUnwrapped(camera).contains(
+        test.map.latLngForPixel({double(size.width) / 2, double(size.height) / 2})));
+
+    ASSERT_TRUE(test.map.latLngBoundsForCameraUnwrapped(camera).crossesAntimeridian());
+}
+
 TEST(Map, Offline) {
     MapTest<DefaultFileSource> test {":memory:", "."};
 

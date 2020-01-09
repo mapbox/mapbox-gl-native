@@ -256,6 +256,27 @@ LatLngBounds Map::latLngBoundsForCamera(const CameraOptions& camera) const {
     );
 }
 
+LatLngBounds Map::latLngBoundsForCameraUnwrapped(const CameraOptions& camera) const {
+    Transform shallow{impl->transform.getState()};
+    Size size = shallow.getState().getSize();
+
+    shallow.jumpTo(camera);
+    LatLng nw = shallow.screenCoordinateToLatLng({});
+    LatLng se = shallow.screenCoordinateToLatLng({double(size.width), double(size.height)});
+    LatLng ne = shallow.screenCoordinateToLatLng({double(size.width), 0.0});
+    LatLng sw = shallow.screenCoordinateToLatLng({0.0, double(size.height)});
+    LatLng center = shallow.screenCoordinateToLatLng({double(size.width) / 2, double(size.height) / 2});
+    nw.unwrapForShortestPath(center);
+    se.unwrapForShortestPath(center);
+    ne.unwrapForShortestPath(center);
+    sw.unwrapForShortestPath(center);
+    LatLngBounds bounds = LatLngBounds::hull(nw, se);
+    bounds.extend(ne);
+    bounds.extend(sw);
+    bounds.extend(center);
+    return bounds;
+}
+
 #pragma mark - Bounds
 
 void Map::setBounds(const BoundOptions& options) {
