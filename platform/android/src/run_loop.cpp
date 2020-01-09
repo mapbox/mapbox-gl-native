@@ -170,11 +170,10 @@ Milliseconds RunLoop::Impl::processRunnables() {
             auto const dueTime = runnable->dueTime();
             if (dueTime <= now) {
                 tmp.push_back(runnable);
-                runnables.erase(it++);
             } else {
                 nextDue = std::min(nextDue, dueTime);
-                ++it;
             }
+            ++it;
         }
     }
 
