@@ -713,7 +713,7 @@ jobs:
       - next-prepare
       - run:
           name: Update mapbox-gl-native to match PR
-          command: cd vendor/mapbox-gl-native && git checkout $CIRCLE_SHA1 && git submodule update --init --recursive
+          command: cd vendor/mapbox-gl-native && git fetch origin $CIRCLE_SHA1 && git checkout $CIRCLE_SHA1 && git submodule update --init --recursive
       - run:
           name: Build SDK
           command: BUILDTYPE=Release make android-arm-v8
