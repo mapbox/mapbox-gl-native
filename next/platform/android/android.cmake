@@ -106,7 +106,6 @@ target_sources(
         ${MBGL_ROOT}/platform/android/src/gson/json_object.hpp
         ${MBGL_ROOT}/platform/android/src/gson/json_primitive.cpp
         ${MBGL_ROOT}/platform/android/src/gson/json_primitive.hpp
-        ${MBGL_ROOT}/platform/android/src/http_file_source.cpp
         ${MBGL_ROOT}/platform/android/src/image.cpp
         ${MBGL_ROOT}/platform/android/src/java/util.cpp
         ${MBGL_ROOT}/platform/android/src/java/util.hpp
@@ -257,6 +256,7 @@ add_library(
     mbgl-core-android STATIC
     ${MBGL_ROOT}/platform/android/src/file_source.cpp
     ${MBGL_ROOT}/platform/android/src/file_source.hpp
+    ${MBGL_ROOT}/platform/android/src/http_file_source.cpp
     ${MBGL_ROOT}/platform/android/src/i18n/collator.cpp
     ${MBGL_ROOT}/platform/android/src/i18n/collator_jni.hpp
     ${MBGL_ROOT}/platform/android/src/i18n/number_format.cpp
@@ -328,6 +328,7 @@ add_library(
     ${MBGL_ROOT}/platform/android/src/test/collator_test_stub.cpp
     ${MBGL_ROOT}/platform/android/src/test/number_format_test_stub.cpp
     ${MBGL_ROOT}/platform/default/src/mbgl/storage/file_source.cpp
+    ${MBGL_ROOT}/platform/android/src/test/http_file_source_test_stub.cpp
 )
 
 target_include_directories(
@@ -377,6 +378,7 @@ add_library(
     ${MBGL_ROOT}/platform/android/src/test/collator_test_stub.cpp
     ${MBGL_ROOT}/platform/android/src/test/number_format_test_stub.cpp
     ${MBGL_ROOT}/platform/default/src/mbgl/storage/file_source.cpp
+    ${MBGL_ROOT}/platform/android/src/test/http_file_source_test_stub.cpp
 )
 
 target_include_directories(
@@ -425,6 +427,7 @@ add_library(
     ${MBGL_ROOT}/platform/default/src/mbgl/text/local_glyph_rasterizer.cpp
     ${MBGL_ROOT}/platform/android/src/test/collator_test_stub.cpp
     ${MBGL_ROOT}/platform/android/src/test/number_format_test_stub.cpp
+    ${MBGL_ROOT}/platform/android/src/test/http_file_source_test_stub.cpp
 )
 
 target_include_directories(
