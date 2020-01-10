@@ -1,5 +1,5 @@
 {
-    "base_test_path": "../mapbox-gl-js/test/integration",
+    "base_test_path": "../vendor/mapbox-gl-js/test/integration",
     "cache_path": "cache-style.db",
     "expectation_paths": [
         "expectations/platform-all",

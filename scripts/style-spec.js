@@ -1,1 +1,1 @@
-var spec = module.exports = require('../mapbox-gl-js/src/style-spec/reference/v8');
+var spec = module.exports = require('../vendor/mapbox-gl-js/src/style-spec/reference/v8');

@@ -321,7 +321,8 @@ std::tuple<filesystem::path, std::vector<filesystem::path>, bool, uint32_t> pars
         exit(2);
     }
 
-    filesystem::path rootPath {std::string(TEST_RUNNER_ROOT_PATH).append("/mapbox-gl-js/test/integration/expression-tests")};
+    filesystem::path rootPath{
+        std::string(TEST_RUNNER_ROOT_PATH).append("/vendor/mapbox-gl-js/test/integration/expression-tests")};
     if (!filesystem::exists(rootPath)) {
         Log::Error(Event::General, "Test path '%s' does not exist.", rootPath.string().c_str());
         exit(3);

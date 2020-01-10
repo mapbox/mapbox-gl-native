@@ -7,7 +7,7 @@ const outputPath = 'src/mbgl/programs';
 const zlib = require('zlib');
 const crypto = require('crypto');
 
-var shaders = require('../mapbox-gl-js/src/shaders');
+var shaders = require('../vendor/mapbox-gl-js/src/shaders');
 
 require('./style-code');
 
