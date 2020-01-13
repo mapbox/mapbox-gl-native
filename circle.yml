@@ -237,13 +237,23 @@ commands:
           command: |
             Xvfb :99 -noreset -screen 0 1280x1024x24
   next-prepare-macos:
+    parameters:
+      build-ios-test-runner:
+        type: boolean
+        default: false
     steps:
       - run:
           name: Prepare macOS
           command: |
             brew install cmake ccache glfw ninja pkgconfig qt
-            brew cask install google-cloud-sdk	
-            brew install chargepoint/xcparse/xcparse
+      - when:
+          condition: << parameters.build-ios-test-runner >>
+          steps:
+            - run:
+                name: Prepare macOS with extra environment
+                command: |
+                  brew cask install google-cloud-sdk	
+                  brew install chargepoint/xcparse/xcparse
       - run:
           name: Code Generators macOS
           command: |
@@ -686,7 +696,8 @@ jobs:
     steps:
       - checkout
       - next-prepare
-      - next-prepare-macos
+      - next-prepare-macos:
+          build-ios-test-runner: true
       - run:
           name: Prepare codesign keychain 
           command: |
