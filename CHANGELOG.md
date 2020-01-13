@@ -30,6 +30,8 @@
 
 ### 🐞 Bug fixes
 
+- [core] Fix a crash in GeoJSON source parsing, caused by `GeoJSONVTData` ownership error ([#16106](https://github.com/mapbox/mapbox-gl-native/pull/16106))
+
 - [core] Stable position of labels at tile borders in tile mode ([#16040](https://github.com/mapbox/mapbox-gl-native/pull/16040))
 
   These changes allow to avoid cutting-off labels on tile borders if the variable text placement is enabled.
