@@ -11,12 +11,12 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-//    i = [[IosTestRunner alloc]init];
+//  In order to run test runner with app itself instead of with unit test, comment out the following line.
+//  i = [[IosTestRunner alloc]init];
 }
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
 }
 
 @end

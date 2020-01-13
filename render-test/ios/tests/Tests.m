@@ -14,7 +14,7 @@
     [super tearDown];
 }
 
-- (void)testExample {
+- (void)testStartRenderTestRunner {
     IosTestRunner* runner = [[IosTestRunner alloc] init]; 
     XCTAssert(runner, @"IOSTestRunner is not initialized correctly");
     
@@ -27,7 +27,7 @@
 
     NSURL *url = [NSURL fileURLWithPath:result]; 
     XCTAttachment *attachmentURL = [XCTAttachment attachmentWithContentsOfFileAtURL: url];
-    XCTAssert(attachmentURL);
+    XCTAssert(attachmentURL, @"Failed to attach test result '%@'", result);
     attachmentURL.lifetime = XCTAttachmentLifetimeKeepAlways;
     [self addAttachment:attachmentURL];
 }

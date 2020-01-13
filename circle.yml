@@ -141,12 +141,7 @@ workflows:
             - next-macos-xcode11-release
           config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_BUILD_TYPE=Debug'
           style_tests: true
-      - next-build-template:
-          name: next-ios-xcode11-release
-          executor_name: macos-11_0_0
-          target_is_macos: true
-          config_params: '-G Xcode -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_OSX_SYSROOT=iphonesimulator'
-          test_params: '-Q -N'
+      - next-ios-xcode11-release
   mbgl-legacy:
     jobs:
       #
@@ -674,6 +669,18 @@ commands:
           fi
 
 jobs:
+  next-ios-xcode11-release:
+    executor: macos-11_0_0
+    steps:
+      - checkout
+      - next-prepare
+      - next-prepare-macos
+      - run:
+          name: Build
+          command: |
+            cmake next -B Build -G Xcode -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_OSX_SYSROOT=iphonesimulator
+            cd Build && xcodebuild -sdk iphonesimulator -project Mapbox\ GL\ Native.xcodeproj -configuration Release
+      - next-save
   next-ios-render-test-runner:
     executor: macos-11_0_0
     steps:
@@ -694,8 +701,8 @@ jobs:
             cd render-test/ios && ./setup_test_data.sh
             cmake ../../next -B Build -G Xcode -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_SYSROOT=iphoneos -DIOS_RENDER_TESTING=ON
             cd Build
-            xcodebuild -sdk iphoneos -project Mapbox\ GL\ Native.xcodeproj -scheme RenderTestApp build-for-testing -arch arm64 CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
-            xcodebuild -sdk iphoneos -project Mapbox\ GL\ Native.xcodeproj build -target RenderTestAppTests -arch arm64 CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+            xcodebuild -sdk iphoneos -project Mapbox\ GL\ Native.xcodeproj -scheme RenderTestApp build-for-testing -arch arm64 CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -configuration Release
+            xcodebuild -sdk iphoneos -project Mapbox\ GL\ Native.xcodeproj build -target RenderTestAppTests -arch arm64 CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -configuration Release
       - run:
           name: Codesign RenderTestApp for running on a physical device
           command: |
@@ -704,7 +711,7 @@ jobs:
             ls codesigning
             cd Build
             ../codesigning/codesign_all.sh
-            codesign -dv --verbose=4 Debug-iphoneos/RenderTestApp.app # for debugging that app is signed or not
+            codesign -dv --verbose=4 Release-iphoneos/RenderTestApp.app # for debugging that app is signed or not
       - run:
           name: Login to IOS Google Cloud Platform
           command: |
@@ -720,9 +727,9 @@ jobs:
             if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON_IOS}" ]]; then
               # arrange files in a way Firebase expects it, and package them in a zip file
               cd render-test/ios/Build
-              cp ../RenderTestApp_iphoneos13.2-arm64e.xctestrun .
-              zip testapp.zip -r Debug-iphoneos/RenderTestApp.app
-              zip testapp.zip RenderTestApp_iphoneos13.2-arm64e.xctestrun
+              cp ../RenderTestApp_iphoneos13.2-arm64e-release.xctestrun .
+              zip testapp.zip -r Release-iphoneos/RenderTestApp.app
+              zip testapp.zip RenderTestApp_iphoneos13.2-arm64e-release.xctestrun
               gcloud firebase test ios run \
                 --test testapp.zip \
                 --device model=iphonexs,version=12.1,locale=en,orientation=portrait --xcode-version=11.1 --timeout 20m \
