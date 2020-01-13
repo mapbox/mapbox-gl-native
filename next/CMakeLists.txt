@@ -22,6 +22,7 @@ option(MBGL_WITH_CORE_ONLY "Build only the core bits, no platform code" OFF)
 option(MBGL_WITH_COVERAGE "Enable code coverage collection" OFF)
 option(MBGL_WITH_QT "Build Mapbox GL Qt bindings" OFF)
 option(MBGL_WITH_SANITIZER "Use [address|thread|undefined] here" OFF)
+option(IOS_RENDER_TESTING "Enable ios render test runner" OFF)
 
 add_library(
     mbgl-compiler-options INTERFACE

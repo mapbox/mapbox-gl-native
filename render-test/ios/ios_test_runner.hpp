@@ -5,8 +5,8 @@
 
 class TestRunner {
 public:
-    TestRunner()=default;
-    ~TestRunner() =default;
+    TestRunner() = default;
+    ~TestRunner() = default;
 
     void startTest(const std::string& manifest);
 };

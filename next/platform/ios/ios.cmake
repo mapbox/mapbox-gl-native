@@ -7,8 +7,6 @@ if(NOT DEFINED IOS_DEPLOYMENT_TARGET)
     set(IOS_DEPLOYMENT_TARGET "9.0")
 endif()
 
-set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64")
-
 macro(initialize_ios_target target)
     set_target_properties(${target} PROPERTIES XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET "${IOS_DEPLOYMENT_TARGET}")
     # set_target_properties(${target} PROPERTIES XCODE_ATTRIBUTE_ENABLE_BITCODE "YES") set_target_properties(${target} PROPERTIES
@@ -95,88 +93,89 @@ target_link_libraries(
         z
 )
 
-enable_testing()
-set(RESOURCES ${MBGL_ROOT}/render-test/ios/Main.storyboard ${MBGL_ROOT}/render-test/ios/LaunchScreen.storyboard ${MBGL_ROOT}/test-data)
+if(IOS_RENDER_TESTING)
+    set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64")
+    set(RESOURCES ${MBGL_ROOT}/render-test/ios/Main.storyboard ${MBGL_ROOT}/render-test/ios/LaunchScreen.storyboard ${MBGL_ROOT}/test-data)
 
-set(PUBLIC_HEADER ${MBGL_ROOT}/render-test/ios/iosTestRunner.h)
+    set(PUBLIC_HEADER ${MBGL_ROOT}/render-test/ios/iosTestRunner.h)
 
-add_executable(
-    RenderTestApp
-    ${MBGL_ROOT}/render-test/ios/ios_test_runner.hpp
-    ${MBGL_ROOT}/render-test/ios/ios_test_runner.cpp
-    ${MBGL_ROOT}/render-test/ios/AppDelegate.h
-    ${MBGL_ROOT}/render-test/ios/AppDelegate.m
-    ${MBGL_ROOT}/render-test/ios/ViewController.h
-    ${MBGL_ROOT}/render-test/ios/ViewController.m
-    ${MBGL_ROOT}/render-test/ios/iosTestRunner.h
-    ${MBGL_ROOT}/render-test/ios/iosTestRunner.mm
-    ${MBGL_ROOT}/render-test/ios/main.m
-    ${RESOURCES}
-)
+    add_executable(
+        RenderTestApp
+        ${MBGL_ROOT}/render-test/ios/ios_test_runner.hpp
+        ${MBGL_ROOT}/render-test/ios/ios_test_runner.cpp
+        ${MBGL_ROOT}/render-test/ios/AppDelegate.h
+        ${MBGL_ROOT}/render-test/ios/AppDelegate.m
+        ${MBGL_ROOT}/render-test/ios/ViewController.h
+        ${MBGL_ROOT}/render-test/ios/ViewController.m
+        ${MBGL_ROOT}/render-test/ios/iosTestRunner.h
+        ${MBGL_ROOT}/render-test/ios/iosTestRunner.mm
+        ${MBGL_ROOT}/render-test/ios/main.m
+        ${RESOURCES}
+    )
 
-initialize_ios_target(RenderTestApp)
+    initialize_ios_target(RenderTestApp)
 
-# Turn on ARC
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fobjc-arc")
+    # Turn on ARC
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fobjc-arc")
 
-set_target_properties(
-    RenderTestApp
-    PROPERTIES
-        MACOSX_BUNDLE
-        TRUE
-        MACOSX_BUNDLE_IDENTIFIER
-        com.mapbox.RenderTestAPP
-        MACOSX_BUNDLE_INFO_PLIST
-        ${MBGL_ROOT}/render-test/ios/Info.plist
-        RESOURCE
-        "${RESOURCES}"
-)
+    set_target_properties(
+        RenderTestApp
+        PROPERTIES
+            MACOSX_BUNDLE
+            TRUE
+            MACOSX_BUNDLE_IDENTIFIER
+            com.mapbox.RenderTestAPP
+            MACOSX_BUNDLE_INFO_PLIST
+            ${MBGL_ROOT}/render-test/ios/Info.plist
+            RESOURCE
+            "${RESOURCES}"
+    )
 
-target_include_directories(
-    RenderTestApp
-    PUBLIC {MBGL_ROOT}/render-test/include ${MBGL_ROOT}/include
-)
+    target_include_directories(
+        RenderTestApp
+        PUBLIC {MBGL_ROOT}/render-test/include ${MBGL_ROOT}/include
+    )
 
-target_include_directories(
-    RenderTestApp
-    PRIVATE
-        ${MBGL_ROOT}/platform/darwin/src
-        ${MBGL_ROOT}/platform/darwin/include
-        ${MBGL_ROOT}/platform/darwin/include/mbgl/interface/
-        ${MBGL_ROOT}/platform/default/include
-        ${MBGL_ROOT}/src
-)
+    target_include_directories(
+        RenderTestApp
+        PRIVATE
+            ${MBGL_ROOT}/platform/darwin/src
+            ${MBGL_ROOT}/platform/darwin/include
+            ${MBGL_ROOT}/platform/darwin/include/mbgl/interface/
+            ${MBGL_ROOT}/platform/default/include
+            ${MBGL_ROOT}/src
+    )
 
-target_include_directories(
-    RenderTestApp
-    PUBLIC ${MBGL_ROOT}/render-test/ios
-)
+    target_include_directories(
+        RenderTestApp
+        PUBLIC ${MBGL_ROOT}/render-test/ios
+    )
 
-target_link_libraries(
-    RenderTestApp
-    PRIVATE
-        "-framework CoreGraphics"
-        "-framework CoreLocation"
-        "-framework Foundation"
-        "-framework OpenGLES"
-        "-framework QuartzCore"
-        "-framework UIKit"
-        mbgl-render-test
-)
+    target_link_libraries(
+        RenderTestApp
+        PRIVATE
+            "-framework CoreGraphics"
+            "-framework CoreLocation"
+            "-framework Foundation"
+            "-framework OpenGLES"
+            "-framework QuartzCore"
+            "-framework UIKit"
+            mbgl-render-test
+    )
 
-find_package(XCTest REQUIRED)
+    find_package(XCTest REQUIRED)
 
-xctest_add_bundle(RenderTestAppTests RenderTestApp ${MBGL_ROOT}/render-test/ios/tests/Tests.m)
+    xctest_add_bundle(RenderTestAppTests RenderTestApp ${MBGL_ROOT}/render-test/ios/tests/Tests.m)
 
-initialize_ios_target(RenderTestAppTests)
+    initialize_ios_target(RenderTestAppTests)
 
-target_include_directories(
-    RenderTestAppTests
-    PUBLIC ${MBGL_ROOT}/render-test/ios
-)
+    target_include_directories(
+        RenderTestAppTests
+        PUBLIC ${MBGL_ROOT}/render-test/ios
+    )
 
-xctest_add_test(XCTest.RenderTestApp RenderTestAppTests)
+    xctest_add_test(XCTest.RenderTestApp RenderTestAppTests)
 
-set_target_properties(RenderTestAppTests PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${MBGL_ROOT}/render-test/ios/tests/Info.plist)
-
+    set_target_properties(RenderTestAppTests PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${MBGL_ROOT}/render-test/ios/tests/Info.plist)
+endif()
 unset(IOS_DEPLOYMENT_TARGET CACHE)

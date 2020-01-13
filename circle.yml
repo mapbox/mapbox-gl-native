@@ -684,7 +684,6 @@ jobs:
           name: Prepare codesign keychain 
           command: |
             cd render-test/ios
-            fastlane run setup_circle_ci
             fastlane run create_keychain name:fastlane_keychain password:$FASTLANE_PASSWORD timeout:false unlock:true
             fastlane match
             security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k $FASTLANE_PASSWORD fastlane_keychain
@@ -693,21 +692,21 @@ jobs:
           name: Build IOS RenderTestApp
           command: |
             cd render-test/ios && ./setup_test_data.sh
-            cmake ../../next -B Build -G Xcode -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_SYSROOT=iphoneos
+            cmake ../../next -B Build -G Xcode -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_SYSROOT=iphoneos -DIOS_RENDER_TESTING=ON
             cd Build
             xcodebuild -sdk iphoneos -project Mapbox\ GL\ Native.xcodeproj -scheme RenderTestApp build-for-testing -arch arm64 CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
             xcodebuild -sdk iphoneos -project Mapbox\ GL\ Native.xcodeproj build -target RenderTestAppTests -arch arm64 CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
       - run:
-          name: Codesign Apps for running on a physical device
+          name: Codesign RenderTestApp for running on a physical device
           command: |
             cd render-test/ios
             ./codesigning/generate-entitlements.swift
             ls codesigning
             cd Build
             ../codesigning/codesign_all.sh
-            codesign -dv --verbose=4 Debug-iphoneos/RenderTestApp.app # for debugging
+            codesign -dv --verbose=4 Debug-iphoneos/RenderTestApp.app # for debugging that app is signed or not
       - run:
-          name: Log in to IOS Google Cloud Platform
+          name: Login to IOS Google Cloud Platform
           command: |
             if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON_IOS}" ]]; then
               echo "${GCLOUD_SERVICE_ACCOUNT_JSON_IOS}" > iosAccount.json
@@ -715,24 +714,22 @@ jobs:
               rm iosAccount.json
             fi
       - run:
-          name: Run tests on Firebase
+          name: Run IOSRenderTestApp Tests on Firebase
           no_output_timeout: 20m
           command: |
             if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON_IOS}" ]]; then
               # arrange files in a way Firebase expects it, and package them in a zip file
               cd render-test/ios/Build
               cp ../RenderTestApp_iphoneos13.2-arm64e.xctestrun .
-              # Prepare a zip file for Firebase we are standing in the build directory
-              zip ../testapp.zip -r Debug-iphoneos/RenderTestApp.app
-              zip ../testapp.zip RenderTestApp_iphoneos13.2-arm64e.xctestrun
-              cd ..
+              zip testapp.zip -r Debug-iphoneos/RenderTestApp.app
+              zip testapp.zip RenderTestApp_iphoneos13.2-arm64e.xctestrun
               gcloud firebase test ios run \
                 --test testapp.zip \
                 --device model=iphonexs,version=12.1,locale=en,orientation=portrait --xcode-version=11.1 --timeout 20m \
                 --verbosity=debug --no-record-video --results-dir ios-render-test-app-${CIRCLE_BUILD_NUM}
             fi
       - run:
-          name: Retrieve TestResult from gcloud
+          name: Retrieve Test Result from gcloud
           when: always
           command: |
             if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON_IOS}" ]]; then
@@ -742,8 +739,7 @@ jobs:
               cd render-test-app/TestLogs && ls
               xcparse attachments *.xcresult
               cd ../.. && mkdir -p /tmp/tests/ios-render-test
-              cp render-test-app/TestLogs/*.html /tmp/tests/ios-render-test 
-              ls /tmp/tests/ios-render-test 
+              cp render-test-app/TestLogs/*.html /tmp/tests/ios-render-test  
             fi
       - next-save
   next-android-benchmark-runner:
