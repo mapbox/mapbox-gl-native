@@ -18,6 +18,7 @@ public:
     Image(std::string imageID);
     explicit Image(std::string imageID, bool available);
     bool operator==(const Image&) const;
+    bool operator!=(const Image&) const;
     mbgl::Value toValue() const;
     const std::string& id() const;
     bool isAvailable() const;

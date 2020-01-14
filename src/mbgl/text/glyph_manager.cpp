@@ -141,7 +141,7 @@ void GlyphManager::notify(GlyphRequestor& requestor, const GlyphDependencies& gl
             if (it != entry.glyphs.end()) {
                 glyphs.emplace(*it);
             } else {
-                glyphs.emplace(glyphID, std::experimental::nullopt);
+                glyphs.emplace(glyphID, mbgl::nullopt);
             }
         }
     }

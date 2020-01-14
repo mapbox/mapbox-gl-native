@@ -18,6 +18,10 @@ bool Image::operator==(const Image& other) const {
     return imageID == other.imageID && available == other.available;
 }
 
+bool Image::operator!=(const Image& other) const {
+    return !(*this == other);
+}
+
 mbgl::Value Image::toValue() const {
     return mapbox::base::ValueObject{{"name", imageID}, {"available", available}};
 }

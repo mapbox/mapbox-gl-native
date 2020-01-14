@@ -26,6 +26,10 @@ bool Formatted::operator==(const Formatted& other) const {
     return true;
 }
 
+bool Formatted::operator!=(const Formatted& other) const {
+    return !(*this == other);
+}
+
 std::string Formatted::toString() const {
     std::string result;
     for (const auto& section : sections) {

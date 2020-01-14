@@ -49,6 +49,7 @@ public:
     {}
     
     bool operator==(const Formatted& ) const;
+    bool operator!=(const Formatted& ) const;
     
     std::string toString() const;
     mbgl::Value toObject() const;
