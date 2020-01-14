@@ -110,15 +110,26 @@ add_library(
     ${MBGL_ROOT}/test/util/url.test.cpp
 )
 
-find_program(MBGL_TEST_NODEJS NAMES nodejs node)
-find_program(MBGL_TEST_NPM NAMES npm)
-
-if(WIN32 OR CMAKE_SYSTEM_NAME STREQUAL Android OR NOT MBGL_TEST_NODEJS OR NOT MBGL_TEST_NPM)
+if(WIN32 OR CMAKE_SYSTEM_NAME STREQUAL Android)
     message("Target platform does not support HTTP tests or dependencies not found.")
 
     set(MBGL_TEST_HAS_TEST_SERVER 0)
 else()
     set(MBGL_TEST_HAS_TEST_SERVER 1)
+    target_sources(
+        mbgl-test
+        PRIVATE ${MBGL_ROOT}/test/src/mbgl/test/http_server.cpp
+    )
+    set_source_files_properties(
+        ${MBGL_ROOT}/test/src/mbgl/test/http_server.cpp
+        PROPERTIES
+        COMPILE_FLAGS
+        -Wno-shadow
+    )
+    target_include_directories(
+        mbgl-test
+        PRIVATE ${MBGL_ROOT}/vendor/cpp-httplib
+    )
 endif()
 
 if(NOT DEFINED ENV{CI})
@@ -129,7 +140,7 @@ endif()
 
 target_compile_definitions(
     mbgl-test
-    PRIVATE NODE_EXECUTABLE=${MBGL_TEST_NODEJS} TEST_HAS_SERVER=${MBGL_TEST_HAS_TEST_SERVER} CI_BUILD=${MBGL_TEST_BUILD_ON_CI}
+    PRIVATE TEST_HAS_SERVER=${MBGL_TEST_HAS_TEST_SERVER} CI_BUILD=${MBGL_TEST_BUILD_ON_CI}
 )
 
 target_include_directories(

@@ -54,8 +54,13 @@
 
 #include <cstdint>
 #include <memory>
+#include <thread>
 
 #include <gtest/gtest.h>
+
+namespace httplib {
+class Server;
+}
 
 namespace mbgl {
 namespace test {
@@ -67,6 +72,16 @@ public:
 
 private:
     int fd = -1;
+};
+
+class HttpServer {
+public:
+    HttpServer();
+    ~HttpServer();
+
+private:
+    std::unique_ptr<httplib::Server> server;
+    std::thread serverThread;
 };
 
 void checkImage(const std::string& base,
