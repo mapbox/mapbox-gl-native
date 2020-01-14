@@ -4,6 +4,10 @@
 
 ### ✨ New features
 
+- [core] Implement stretchable icons ([#16030](https://github.com/mapbox/mapbox-gl-native/pull/16030))
+
+  [Stretchable icons](https://github.com/mapbox/mapbox-gl-js/issues/8917) allow defining certain areas of an icon that may be stretched, leaving the remaining areas of an icon at a fixed size.
+
 - [core] Port line-sort-key and fill-sort-key ([#15839](https://github.com/mapbox/mapbox-gl-native/pull/15839))
 
   The new feature allows to sort line and fill layer features. Similar to `symbol-sort-key`.
