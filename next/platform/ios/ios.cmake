@@ -95,6 +95,12 @@ target_link_libraries(
 
 if(IOS_RENDER_TESTING)
     set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64")
+
+    set(PREPARE_CMD "${MBGL_ROOT}/render-test/ios/setup_test_data.sh")
+    message("COMMAND: ${PREPARE_CMD}")
+    execute_process(COMMAND ${PREPARE_CMD} RESULT_VARIABLE CMD_ERROR)
+    message(STATUS "CMD_ERROR:" ${CMD_ERROR})
+
     set(RESOURCES ${MBGL_ROOT}/render-test/ios/Main.storyboard ${MBGL_ROOT}/render-test/ios/LaunchScreen.storyboard ${MBGL_ROOT}/test-data)
 
     set(PUBLIC_HEADER ${MBGL_ROOT}/render-test/ios/iosTestRunner.h)
@@ -114,7 +120,6 @@ if(IOS_RENDER_TESTING)
     )
 
     initialize_ios_target(RenderTestApp)
-
     # Turn on ARC
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fobjc-arc")
 

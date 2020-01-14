@@ -49,6 +49,11 @@ render-test/android/package.json
 render-test/android/app/app.iml
 render-test/android/android.iml
 
+# IOS RenderTestRunner
+render-test/ios/codesigning/*.xcent
+render-test/ios/fastlane/README.md
+test-data/
+
 # Generated file from npm/yarn
 package-lock.json
 

@@ -709,7 +709,7 @@ jobs:
       - run:
           name: Build IOS RenderTestApp
           command: |
-            cd render-test/ios && ./setup_test_data.sh
+            cd render-test/ios
             cmake ../../next -B Build -G Xcode -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_SYSROOT=iphoneos -DIOS_RENDER_TESTING=ON
             cd Build
             xcodebuild -sdk iphoneos -project Mapbox\ GL\ Native.xcodeproj -scheme RenderTestApp build-for-testing -arch arm64 CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -configuration Release

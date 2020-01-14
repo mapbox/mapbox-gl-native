@@ -1,0 +1,12 @@
+{
+    "render-tests/icon-text-fit/enlargen-both": "Needs to be investigated and fixed.",
+    "render-tests/line-pattern/overscaled": "Needs to be investigated and fixed.",
+    "render-tests/runtime-styling/image-update-pattern": "Needs to be investigated and fixed.",
+    "render-tests/runtime-styling/image-add-pattern": "Needs to be investigated and fixed.",
+    "render-tests/text-font/chinese": "Needs to be investigated and fixed.",
+    "render-tests/regressions/mapbox-gl-native#9976": "Needs to be investigated and fixed.",
+    "render-tests/regressions/mapbox-gl-js#2305": "Needs to be investigated and fixed.",
+    "render-tests/regressions/mapbox-gl-js#5911a": "Needs to be investigated and fixed.",
+    "render-tests/text-field/formatted-images": "Needs to be investigated and fixed.",
+    "render-tests/symbol-visibility/visible": "Needs to be investigated and fixed."
+}
