@@ -10,6 +10,8 @@
 
 @property (copy, nullable) NSString *resultPath;
 
+@property BOOL testStatus;
+
 @end
 
 @implementation IosTestRunner
@@ -18,6 +20,7 @@
 {
     self = [super init];
     if (self) {
+        self.testStatus = false;
         self.runner = new TestRunner();
         NSString *path = nil;
         NSError *error;
@@ -53,7 +56,6 @@
                     if (!success){
                         NSAssert1(0, @"Failed to copy file '%@'.", [error localizedDescription]);
                         NSLog(@"Failed to copy %@ file, error %@", dirName, [error localizedDescription]);
-                    
                     }
                     else {
                         path = destinationPath;
@@ -68,17 +70,16 @@
         }
         if (path) {
             NSString *manifestPath = [path stringByAppendingPathComponent:@"/next-ios-render-test-runner-style.json"];
-            
             std::string manifest = std::string([manifestPath UTF8String]);
             
-            self.runner->startTest(manifest);
-            
+            self.testStatus = self.runner->startTest(manifest);
             self.resultPath =  [path stringByAppendingPathComponent:@"/next-ios-render-test-runner-style.html"];
             
-            BOOL success = [fileManager fileExistsAtPath: self.resultPath];
-            if (!success) {
+            BOOL fileFound = [fileManager fileExistsAtPath: self.resultPath];
+            if (!fileFound) {
                 NSLog(@"File doese not exit %@", self.resultPath);
             }
+            self.testStatus &= fileFound;
         }
 
         delete self.runner;
@@ -88,7 +89,10 @@
 }
 
 - (NSString*) getResultPath {
- 
    return self.resultPath;
+}
+
+- (BOOL) getTestStatus {
+   return self.testStatus;
 }
 @end

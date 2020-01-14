@@ -9,7 +9,7 @@
 #define EXPORT __attribute__((visibility("default")))
 
 EXPORT
-void TestRunner::startTest(const std::string& manifest) {
+bool TestRunner::startTest(const std::string& manifest) {
     auto runTestWithManifest = [](const std::string& manifest) -> bool {
         std::vector<std::string> arguments = {"mbgl-render-test-runner", "-p", manifest};
         std::vector<char*> argv;
@@ -29,10 +29,12 @@ void TestRunner::startTest(const std::string& manifest) {
         return result;
     };
 
+    auto ret = false;
     try {
-        runTestWithManifest(manifest);
+        ret = runTestWithManifest(manifest);
     } catch (...) {
         mbgl::Log::Info(mbgl::Event::General, "testFailed");
     }
     mbgl::Log::Info(mbgl::Event::General, "All tests are finished!");
+    return ret;
 }

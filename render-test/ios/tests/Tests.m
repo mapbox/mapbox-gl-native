@@ -22,14 +22,17 @@
     XCTAssert(result, @"IOSTestRunner does not produce a result file");
 
     NSFileManager *fileManager = [NSFileManager defaultManager];
-    BOOL success = [fileManager fileExistsAtPath: result];
-    XCTAssert(success, @"Test result html '%@' doese not exit", result);
+    BOOL fileFound = [fileManager fileExistsAtPath: result];
+    XCTAssert(fileFound, @"Test result html '%@' doese not exit", result);
 
     NSURL *url = [NSURL fileURLWithPath:result]; 
     XCTAttachment *attachmentURL = [XCTAttachment attachmentWithContentsOfFileAtURL: url];
     XCTAssert(attachmentURL, @"Failed to attach test result '%@'", result);
     attachmentURL.lifetime = XCTAttachmentLifetimeKeepAlways;
     [self addAttachment:attachmentURL];
+
+    BOOL success = [runner getTestStatus];
+    XCTAssert(success, @"IOSTestRunner reports error because some of the tests are not passed, please check the test report");
 }
 
 @end
