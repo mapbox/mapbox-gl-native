@@ -31,13 +31,17 @@ public:
 
 class TileLayerIndex {
 public:
-    TileLayerIndex(OverscaledTileID coord, std::vector<SymbolInstance>&, uint32_t bucketInstanceId);
+    TileLayerIndex(OverscaledTileID coord,
+                   std::vector<SymbolInstance>&,
+                   uint32_t bucketInstanceId,
+                   std::string bucketLeaderId);
 
-    Point<int64_t> getScaledCoordinates(SymbolInstance&, const OverscaledTileID&);
-    void findMatches(std::vector<SymbolInstance>&, const OverscaledTileID&, std::set<uint32_t>&);
-    
+    Point<int64_t> getScaledCoordinates(SymbolInstance&, const OverscaledTileID&) const;
+    void findMatches(SymbolBucket&, const OverscaledTileID&, std::set<uint32_t>&) const;
+
     OverscaledTileID coord;
     uint32_t bucketInstanceId;
+    std::string bucketLeaderId;
     std::map<std::u16string,std::vector<IndexedSymbolInstance>> indexedSymbolInstances;
 };
 
