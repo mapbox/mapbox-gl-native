@@ -22,6 +22,7 @@ option(MBGL_WITH_CORE_ONLY "Build only the core bits, no platform code" OFF)
 option(MBGL_WITH_COVERAGE "Enable code coverage collection" OFF)
 option(MBGL_WITH_QT "Build Mapbox GL Qt bindings" OFF)
 option(MBGL_WITH_SANITIZER "Use [address|thread|undefined] here" OFF)
+option(MBGL_CXX_17 "C++ version" OFF)
 
 add_library(
     mbgl-compiler-options INTERFACE
@@ -64,7 +65,11 @@ target_link_libraries(
 
 cmake_policy(SET CMP0063 NEW)
 set(CMAKE_CXX_EXTENSIONS OFF)
-set(CMAKE_CXX_STANDARD 14)
+if (MBGL_CXX_17)
+    set(CMAKE_CXX_STANDARD 17)
+else()
+    set(CMAKE_CXX_STANDARD 14)
+endif()
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_C_EXTENSIONS OFF)
@@ -953,12 +958,19 @@ target_link_libraries(
         Mapbox::Base::Extras::rapidjson
         Mapbox::Base::geojson.hpp
         Mapbox::Base::geometry.hpp
-        Mapbox::Base::optional
         Mapbox::Base::typewrapper
         Mapbox::Base::value
         Mapbox::Base::variant
         Mapbox::Base::weak
 )
+
+if (NOT MBGL_CXX_17)
+target_link_libraries(
+    mbgl-core
+    PUBLIC
+        Mapbox::Base::optional
+)
+endif()
 
 set_property(TARGET mbgl-core PROPERTY FOLDER Core)
 
