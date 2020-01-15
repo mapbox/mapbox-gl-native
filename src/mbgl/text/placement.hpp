@@ -116,9 +116,10 @@ public:
               MapMode,
               style::TransitionOptions,
               const bool crossSourceCollisions,
+              TimePoint commitTime,
               optional<Immutable<Placement>> prevPlacement = nullopt);
     void placeLayer(const RenderLayer&, const mat4&, bool showCollisionBoxes);
-    void commit(TimePoint, const double zoom);
+    void commit();
     void updateLayerBuckets(const RenderLayer&, const TransformState&, bool updateOpacities) const;
     float symbolFadeChange(TimePoint now) const;
     bool hasTransitions(TimePoint now) const;
@@ -151,7 +152,7 @@ private:
 
     TimePoint fadeStartTime;
     TimePoint commitTime;
-    float placementZoom;
+    const float placementZoom;
     float prevZoomAdjustment = 0;
 
     std::unordered_map<uint32_t, JointPlacement> placements;
