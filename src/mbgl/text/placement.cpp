@@ -61,7 +61,8 @@ const CollisionGroups::CollisionGroup& CollisionGroups::get(const std::string& s
 // PlacementController implemenation
 
 PlacementController::PlacementController()
-    : placement(makeMutable<Placement>(TransformState{}, MapMode::Static, style::TransitionOptions{}, true, nullopt)) {}
+    : placement(makeMutable<Placement>(
+          TransformState{}, MapMode::Static, style::TransitionOptions{}, true, TimePoint(), nullopt)) {}
 
 void PlacementController::setPlacement(Immutable<Placement> placement_) {
     placement = std::move(placement_);
@@ -94,10 +95,12 @@ Placement::Placement(const TransformState& state_,
                      MapMode mapMode_,
                      style::TransitionOptions transitionOptions_,
                      const bool crossSourceCollisions,
+                     TimePoint commitTime_,
                      optional<Immutable<Placement>> prevPlacement_)
     : collisionIndex(state_, mapMode_),
       mapMode(mapMode_),
       transitionOptions(std::move(transitionOptions_)),
+      commitTime(commitTime_),
       placementZoom(state_.getZoom()),
       collisionGroups(crossSourceCollisions),
       prevPlacement(std::move(prevPlacement_)) {
@@ -622,8 +625,7 @@ void Placement::placeBucket(const SymbolBucket& bucket,
                                 std::forward_as_tuple(bucket.bucketInstanceId, params.featureIndex, overscaledID));
 }
 
-void Placement::commit(TimePoint now, const double zoom) {
-    commitTime = now;
+void Placement::commit() {
     if (!getPrevPlacement()) {
         assert(mapMode != MapMode::Continuous);
         fadeStartTime = commitTime;
@@ -638,7 +640,7 @@ void Placement::commit(TimePoint now, const double zoom) {
 
     bool placementChanged = false;
 
-    prevZoomAdjustment = getPrevPlacement()->zoomAdjustment(zoom);
+    prevZoomAdjustment = getPrevPlacement()->zoomAdjustment(placementZoom);
     float increment = getPrevPlacement()->symbolFadeChange(commitTime);
 
     // add the opacities from the current placement, and copy their current values from the previous placement
