@@ -400,6 +400,7 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
                                                                   updateParameters.mode,
                                                                   updateParameters.transitionOptions,
                                                                   updateParameters.crossSourceCollisions,
+                                                                  updateParameters.timePoint,
                                                                   placementController.getPlacement());
 
             for (auto it = layersNeedPlacement.crbegin(); it != layersNeedPlacement.crend(); ++it) {
@@ -408,7 +409,7 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
                 placement->placeLayer(layer, renderTreeParameters->transformParams.projMatrix, updateParameters.debugOptions & MapDebugOptions::Collision);
             }
 
-            placement->commit(updateParameters.timePoint, updateParameters.transformState.getZoom());
+            placement->commit();
             crossTileSymbolIndex.pruneUnusedLayers(usedSymbolLayers);
             for (const auto& entry : renderSources) {
                 entry.second->updateFadingTiles();
@@ -427,7 +428,8 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
             Mutable<Placement> placement = makeMutable<Placement>(updateParameters.transformState,
                                                                   updateParameters.mode,
                                                                   updateParameters.transitionOptions,
-                                                                  updateParameters.crossSourceCollisions);
+                                                                  updateParameters.crossSourceCollisions,
+                                                                  updateParameters.timePoint);
             for (auto it = layersNeedPlacement.crbegin(); it != layersNeedPlacement.crend(); ++it) {
                 const RenderLayer& layer = *it;
                 crossTileSymbolIndex.addLayer(layer, updateParameters.transformState.getLatLng().longitude());
@@ -435,7 +437,7 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
                                       renderTreeParameters->transformParams.projMatrix,
                                       updateParameters.debugOptions & MapDebugOptions::Collision);
             }
-            placement->commit(updateParameters.timePoint, updateParameters.transformState.getZoom());
+            placement->commit();
             placementController.setPlacement(std::move(placement));
         }
         renderTreeParameters->symbolFadeChange = 1.0f;
