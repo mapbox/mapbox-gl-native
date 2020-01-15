@@ -25,7 +25,8 @@ void Renderer::setObserver(RendererObserver* observer) {
     impl->orchestrator.setObserver(observer);
 }
 
-void Renderer::render(const UpdateParameters& updateParameters) {
+void Renderer::render(const std::shared_ptr<UpdateParameters>& updateParameters) {
+    assert(updateParameters);
     if (auto renderTree = impl->orchestrator.createRenderTree(updateParameters)) {
         renderTree->prepare();
         impl->render(*renderTree);

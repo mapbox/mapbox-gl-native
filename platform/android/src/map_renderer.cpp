@@ -143,7 +143,7 @@ void MapRenderer::render(JNIEnv&) {
         framebufferSizeChanged = false;
     }
 
-    renderer->render(*params);
+    renderer->render(params);
 
     // Deliver the snapshot if requested
     if (snapshotCallback) {
