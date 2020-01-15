@@ -39,7 +39,7 @@ HeadlessFrontend::HeadlessFrontend(Size size_,
               // Copy the shared pointer here so that the parameters aren't destroyed while `render(...)` is
               // still using them.
               auto updateParameters_ = updateParameters;
-              renderer->render(*updateParameters_);
+              renderer->render(updateParameters_);
 
               auto endTime = mbgl::util::MonotonicTimer::now();
               frameTime = (endTime - startTime).count();

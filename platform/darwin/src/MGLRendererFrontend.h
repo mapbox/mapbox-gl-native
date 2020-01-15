@@ -54,7 +54,7 @@ public:
         // Copy the shared pointer here so that the parameters aren't destroyed while `render(...)` is
         // still using them.
         auto updateParameters_ = updateParameters;
-        renderer->render(*updateParameters_);
+        renderer->render(updateParameters_);
     }
     
     mbgl::Renderer* getRenderer() {

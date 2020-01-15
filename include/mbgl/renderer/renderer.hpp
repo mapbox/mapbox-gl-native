@@ -31,7 +31,7 @@ public:
 
     void setObserver(RendererObserver*);
 
-    void render(const UpdateParameters&);
+    void render(const std::shared_ptr<UpdateParameters>&);
 
     // Feature queries
     std::vector<Feature> queryRenderedFeatures(const ScreenLineString&, const RenderedQueryOptions& options = {}) const;
