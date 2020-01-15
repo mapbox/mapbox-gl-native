@@ -135,51 +135,49 @@ void RenderOrchestrator::setObserver(RendererObserver* observer_) {
     observer = observer_ ? observer_ : &nullObserver();
 }
 
-std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdateParameters& updateParameters) {
-    const bool isMapModeContinuous = updateParameters.mode == MapMode::Continuous;
+std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(
+    const std::shared_ptr<UpdateParameters>& updateParameters) {
+    const bool isMapModeContinuous = updateParameters->mode == MapMode::Continuous;
     if (!isMapModeContinuous) {
         // Reset zoom history state.
         zoomHistory.first = true;
     }
 
     if (LayerManager::annotationsEnabled) {
-        updateParameters.annotationManager.updateData();
+        updateParameters->annotationManager.updateData();
     }
 
-    const bool zoomChanged = zoomHistory.update(updateParameters.transformState.getZoom(), updateParameters.timePoint);
+    const bool zoomChanged =
+        zoomHistory.update(updateParameters->transformState.getZoom(), updateParameters->timePoint);
 
-    const TransitionOptions transitionOptions = isMapModeContinuous ? updateParameters.transitionOptions : TransitionOptions();
+    const TransitionOptions transitionOptions =
+        isMapModeContinuous ? updateParameters->transitionOptions : TransitionOptions();
 
-    const TransitionParameters transitionParameters {
-        updateParameters.timePoint,
-        transitionOptions
-    };
+    const TransitionParameters transitionParameters{updateParameters->timePoint, transitionOptions};
 
-    const PropertyEvaluationParameters evaluationParameters {
+    const PropertyEvaluationParameters evaluationParameters{
         zoomHistory,
-        updateParameters.timePoint,
-        transitionOptions.duration.value_or(isMapModeContinuous ? util::DEFAULT_TRANSITION_DURATION : Duration::zero())
-    };
+        updateParameters->timePoint,
+        transitionOptions.duration.value_or(isMapModeContinuous ? util::DEFAULT_TRANSITION_DURATION
+                                                                : Duration::zero())};
 
-    const TileParameters tileParameters {
-        updateParameters.pixelRatio,
-        updateParameters.debugOptions,
-        updateParameters.transformState,
-        updateParameters.fileSource,
-        updateParameters.mode,
-        updateParameters.annotationManager,
-        *imageManager,
-        *glyphManager,
-        updateParameters.prefetchZoomDelta
-    };
+    const TileParameters tileParameters{updateParameters->pixelRatio,
+                                        updateParameters->debugOptions,
+                                        updateParameters->transformState,
+                                        updateParameters->fileSource,
+                                        updateParameters->mode,
+                                        updateParameters->annotationManager,
+                                        *imageManager,
+                                        *glyphManager,
+                                        updateParameters->prefetchZoomDelta};
 
-    glyphManager->setURL(updateParameters.glyphURL);
+    glyphManager->setURL(updateParameters->glyphURL);
 
     // Update light.
-    const bool lightChanged = renderLight.impl != updateParameters.light;
+    const bool lightChanged = renderLight.impl != updateParameters->light;
 
     if (lightChanged) {
-        renderLight.impl = updateParameters.light;
+        renderLight.impl = updateParameters->light;
         renderLight.transition(transitionParameters);
     }
 
@@ -187,9 +185,8 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
         renderLight.evaluate(evaluationParameters);
     }
 
-
-    const ImageDifference imageDiff = diffImages(imageImpls, updateParameters.images);
-    imageImpls = updateParameters.images;
+    const ImageDifference imageDiff = diffImages(imageImpls, updateParameters->images);
+    imageImpls = updateParameters->images;
 
     // Only trigger tile reparse for changed images. Changed images only need a relayout when they have a different size.
     bool hasImageDiff = !imageDiff.removed.empty();
@@ -214,10 +211,10 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
     }
 
     imageManager->notifyIfMissingImageAdded();
-    imageManager->setLoaded(updateParameters.spriteLoaded);
+    imageManager->setLoaded(updateParameters->spriteLoaded);
 
-    const LayerDifference layerDiff = diffLayers(layerImpls, updateParameters.layers);
-    layerImpls = updateParameters.layers;
+    const LayerDifference layerDiff = diffLayers(layerImpls, updateParameters->layers);
+    layerImpls = updateParameters->layers;
     const bool layersAddedOrRemoved = !layerDiff.added.empty() || !layerDiff.removed.empty();
 
     // Remove render layers for removed layers.
@@ -266,8 +263,8 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
         }
     }
 
-    const SourceDifference sourceDiff = diffSources(sourceImpls, updateParameters.sources);
-    sourceImpls = updateParameters.sources;
+    const SourceDifference sourceDiff = diffSources(sourceImpls, updateParameters->sources);
+    sourceImpls = updateParameters->sources;
 
     // Remove render layers for removed sources.
     for (const auto& entry : sourceDiff.removed) {
@@ -280,15 +277,14 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
         renderSource->setObserver(this);
         renderSources.emplace(entry.first, std::move(renderSource));
     }
-    transformState = updateParameters.transformState;
+    transformState = updateParameters->transformState;
 
     // Create parameters for the render tree.
-    auto renderTreeParameters = std::make_unique<RenderTreeParameters>(
-        updateParameters.transformState,
-        updateParameters.mode,
-        updateParameters.debugOptions,
-        updateParameters.timePoint,
-        renderLight.getEvaluated());
+    auto renderTreeParameters = std::make_unique<RenderTreeParameters>(updateParameters->transformState,
+                                                                       updateParameters->mode,
+                                                                       updateParameters->debugOptions,
+                                                                       updateParameters->timePoint,
+                                                                       renderLight.getEvaluated());
 
     std::set<LayerRenderItem> layerRenderItems;
     layersNeedPlacement.clear();
@@ -349,7 +345,7 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
         filteredLayersForSource.clear();
     }
 
-    renderTreeParameters->loaded = updateParameters.styleLoaded && isLoaded();
+    renderTreeParameters->loaded = updateParameters->styleLoaded && isLoaded();
     if (!isMapModeContinuous && !renderTreeParameters->loaded) {
         return nullptr;
     }
@@ -357,14 +353,16 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
     // Prepare. Update all matrices and generate data that we should upload to the GPU.
     for (const auto& entry : renderSources) {
         if (entry.second->isEnabled()) {
-            entry.second->prepare({renderTreeParameters->transformParams, updateParameters.debugOptions, *imageManager});
+            entry.second->prepare(
+                {renderTreeParameters->transformParams, updateParameters->debugOptions, *imageManager});
         }
     }
 
     auto opaquePassCutOffEstimation = layerRenderItems.size();
     for (auto& renderItem : layerRenderItems) {
         RenderLayer& renderLayer = renderItem.layer;
-        renderLayer.prepare({renderItem.source, *imageManager, *patternAtlas, *lineAtlas, updateParameters.transformState});
+        renderLayer.prepare(
+            {renderItem.source, *imageManager, *patternAtlas, *lineAtlas, updateParameters->transformState});
         if (renderLayer.needsPlacement()) {
             layersNeedPlacement.emplace_back(renderLayer);
         }
@@ -380,7 +378,7 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
     if (isMapModeContinuous) {
         bool symbolBucketsAdded = false;
         for (auto it = layersNeedPlacement.crbegin(); it != layersNeedPlacement.crend(); ++it) {
-            auto result = crossTileSymbolIndex.addLayer(*it, updateParameters.transformState.getLatLng().longitude());
+            auto result = crossTileSymbolIndex.addLayer(*it, updateParameters->transformState.getLatLng().longitude());
             symbolBucketsAdded = symbolBucketsAdded || (result & CrossTileSymbolIndex::AddLayerResult::BucketsAdded);
             symbolBucketsChanged = symbolBucketsChanged || (result != CrossTileSymbolIndex::AddLayerResult::NoChanges);
         }
@@ -391,22 +389,24 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
         optional<Duration> maximumPlacementUpdatePeriod;
         if (symbolBucketsAdded) maximumPlacementUpdatePeriod = optional<Duration>(Milliseconds(30));
         renderTreeParameters->placementChanged = !placementController.placementIsRecent(
-            updateParameters.timePoint, updateParameters.transformState.getZoom(), maximumPlacementUpdatePeriod);
+            updateParameters->timePoint, updateParameters->transformState.getZoom(), maximumPlacementUpdatePeriod);
         symbolBucketsChanged |= renderTreeParameters->placementChanged;
 
         std::set<std::string> usedSymbolLayers;
         if (renderTreeParameters->placementChanged) {
-            Mutable<Placement> placement = makeMutable<Placement>(updateParameters.transformState,
-                                                                  updateParameters.mode,
-                                                                  updateParameters.transitionOptions,
-                                                                  updateParameters.crossSourceCollisions,
-                                                                  updateParameters.timePoint,
+            Mutable<Placement> placement = makeMutable<Placement>(updateParameters->transformState,
+                                                                  updateParameters->mode,
+                                                                  updateParameters->transitionOptions,
+                                                                  updateParameters->crossSourceCollisions,
+                                                                  updateParameters->timePoint,
                                                                   placementController.getPlacement());
 
             for (auto it = layersNeedPlacement.crbegin(); it != layersNeedPlacement.crend(); ++it) {
                 const RenderLayer& layer = *it;
                 usedSymbolLayers.insert(layer.getID());
-                placement->placeLayer(layer, renderTreeParameters->transformParams.projMatrix, updateParameters.debugOptions & MapDebugOptions::Collision);
+                placement->placeLayer(layer,
+                                      renderTreeParameters->transformParams.projMatrix,
+                                      updateParameters->debugOptions & MapDebugOptions::Collision);
             }
 
             placement->commit();
@@ -419,23 +419,23 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
             placementController.setPlacementStale();
         }
         renderTreeParameters->symbolFadeChange =
-            placementController.getPlacement()->symbolFadeChange(updateParameters.timePoint);
-        renderTreeParameters->needsRepaint = hasTransitions(updateParameters.timePoint);
+            placementController.getPlacement()->symbolFadeChange(updateParameters->timePoint);
+        renderTreeParameters->needsRepaint = hasTransitions(updateParameters->timePoint);
     } else {
         crossTileSymbolIndex.reset();
         renderTreeParameters->placementChanged = symbolBucketsChanged = !layersNeedPlacement.empty();
         if (renderTreeParameters->placementChanged) {
-            Mutable<Placement> placement = makeMutable<Placement>(updateParameters.transformState,
-                                                                  updateParameters.mode,
-                                                                  updateParameters.transitionOptions,
-                                                                  updateParameters.crossSourceCollisions,
-                                                                  updateParameters.timePoint);
+            Mutable<Placement> placement = makeMutable<Placement>(updateParameters->transformState,
+                                                                  updateParameters->mode,
+                                                                  updateParameters->transitionOptions,
+                                                                  updateParameters->crossSourceCollisions,
+                                                                  updateParameters->timePoint);
             for (auto it = layersNeedPlacement.crbegin(); it != layersNeedPlacement.crend(); ++it) {
                 const RenderLayer& layer = *it;
-                crossTileSymbolIndex.addLayer(layer, updateParameters.transformState.getLatLng().longitude());
+                crossTileSymbolIndex.addLayer(layer, updateParameters->transformState.getLatLng().longitude());
                 placement->placeLayer(layer,
                                       renderTreeParameters->transformParams.projMatrix,
-                                      updateParameters.debugOptions & MapDebugOptions::Collision);
+                                      updateParameters->debugOptions & MapDebugOptions::Collision);
             }
             placement->commit();
             placementController.setPlacement(std::move(placement));
