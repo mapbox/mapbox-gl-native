@@ -146,31 +146,35 @@ void Placement::placeBucket(const SymbolBucket& bucket,
     const auto& layout = *bucket.layout;
     const auto& renderTile = params.tile;
     const auto& state = collisionIndex.getTransformState();
-    const float pixelsToTileUnits = renderTile.id.pixelsToTileUnits(1, state.getZoom());
+    const float pixelsToTileUnits = renderTile.id.pixelsToTileUnits(1, placementZoom);
     const OverscaledTileID& overscaledID = renderTile.getOverscaledTileID();
-    const float scale = std::pow(2, state.getZoom() - overscaledID.overscaledZ);
+    const float scale = std::pow(2, placementZoom - overscaledID.overscaledZ);
     const float pixelRatio = (util::tileSize * overscaledID.overscaleFactor()) / util::EXTENT;
+
+    const bool rotateTextWithMap = layout.get<style::TextRotationAlignment>() == style::AlignmentType::Map;
+    const bool pitchTextWithMap = layout.get<style::TextPitchAlignment>() == style::AlignmentType::Map;
+
+    const bool rotateIconWithMap = layout.get<style::IconRotationAlignment>() == style::AlignmentType::Map;
+    const bool pitchIconWithMap = layout.get<style::IconPitchAlignment>() == style::AlignmentType::Map;
 
     mat4 posMatrix;
     state.matrixFor(posMatrix, renderTile.id);
     matrix::multiply(posMatrix, params.projMatrix, posMatrix);
 
     mat4 textLabelPlaneMatrix =
-        getLabelPlaneMatrix(posMatrix,
-                            layout.get<style::TextPitchAlignment>() == style::AlignmentType::Map,
-                            layout.get<style::TextRotationAlignment>() == style::AlignmentType::Map,
-                            state,
-                            pixelsToTileUnits);
+        getLabelPlaneMatrix(posMatrix, pitchTextWithMap, rotateTextWithMap, state, pixelsToTileUnits);
 
-    mat4 iconLabelPlaneMatrix = getLabelPlaneMatrix(posMatrix,
-            layout.get<style::IconPitchAlignment>() == style::AlignmentType::Map,
-            layout.get<style::IconRotationAlignment>() == style::AlignmentType::Map,
-            state,
-            pixelsToTileUnits);
+    mat4 iconLabelPlaneMatrix;
+    if (rotateTextWithMap == rotateIconWithMap && pitchTextWithMap == pitchIconWithMap) {
+        iconLabelPlaneMatrix = textLabelPlaneMatrix;
+    } else {
+        iconLabelPlaneMatrix =
+            getLabelPlaneMatrix(posMatrix, pitchIconWithMap, rotateIconWithMap, state, pixelsToTileUnits);
+    }
 
     const auto& collisionGroup = collisionGroups.get(params.sourceId);
-    auto partiallyEvaluatedTextSize = bucket.textSizeBinder->evaluateForZoom(state.getZoom());
-    auto partiallyEvaluatedIconSize = bucket.iconSizeBinder->evaluateForZoom(state.getZoom());
+    auto partiallyEvaluatedTextSize = bucket.textSizeBinder->evaluateForZoom(placementZoom);
+    auto partiallyEvaluatedIconSize = bucket.iconSizeBinder->evaluateForZoom(placementZoom);
 
     optional<CollisionBoundaries> tileBorders;
     optional<CollisionBoundaries> avoidEdges;
@@ -200,8 +204,7 @@ void Placement::placeBucket(const SymbolBucket& bucket,
     const bool alwaysShowText = textAllowOverlap && (iconAllowOverlap || !(bucket.hasIconData() || bucket.hasSdfIconData()) || layout.get<style::IconOptional>());
     const bool alwaysShowIcon = iconAllowOverlap && (textAllowOverlap || !bucket.hasTextData() || layout.get<style::TextOptional>());
     std::vector<style::TextVariableAnchorType> variableTextAnchors = layout.get<style::TextVariableAnchor>();
-    const bool rotateWithMap = layout.get<style::TextRotationAlignment>() == style::AlignmentType::Map;
-    const bool pitchWithMap = layout.get<style::TextPitchAlignment>() == style::AlignmentType::Map;
+
     const bool hasIconTextFit = layout.get<style::IconTextFit>() != style::IconTextFitType::None;
 
     const bool zOrderByViewportY = layout.get<style::SymbolZOrder>() == style::SymbolZOrderType::ViewportY;
@@ -273,8 +276,8 @@ void Placement::placeBucket(const SymbolBucket& bucket,
                                                                      placedSymbol,
                                                                      scale,
                                                                      fontSize,
-                                                                     layout.get<style::TextAllowOverlap>(),
-                                                                     pitchWithMap,
+                                                                     textAllowOverlap,
+                                                                     pitchTextWithMap,
                                                                      showCollisionBoxes,
                                                                      avoidEdges,
                                                                      collisionGroup.second,
@@ -352,8 +355,8 @@ void Placement::placeBucket(const SymbolBucket& bucket,
                                                               height,
                                                               symbolInstance.variableTextOffset,
                                                               textBoxScale,
-                                                              rotateWithMap,
-                                                              pitchWithMap,
+                                                              rotateTextWithMap,
+                                                              pitchTextWithMap,
                                                               state.getBearing());
                         textBoxes.clear();
 
@@ -372,27 +375,28 @@ void Placement::placeBucket(const SymbolBucket& bucket,
                                                                     scale,
                                                                     fontSize,
                                                                     allowOverlap,
-                                                                    pitchWithMap,
+                                                                    pitchTextWithMap,
                                                                     showCollisionBoxes,
                                                                     avoidEdges,
                                                                     collisionGroup.second,
                                                                     textBoxes);
 
                         if (doVariableIconPlacement) {
-                            auto placedIconFeature = collisionIndex.placeFeature(iconCollisionFeature,
-                                                                                 shift,
-                                                                                 posMatrix,
-                                                                                 iconLabelPlaneMatrix,
-                                                                                 pixelRatio,
-                                                                                 placedSymbol,
-                                                                                 scale,
-                                                                                 fontSize,
-                                                                                 iconAllowOverlap,
-                                                                                 pitchWithMap,
-                                                                                 showCollisionBoxes,
-                                                                                 avoidEdges,
-                                                                                 collisionGroup.second,
-                                                                                 iconBoxes);
+                            auto placedIconFeature =
+                                collisionIndex.placeFeature(iconCollisionFeature,
+                                                            shift,
+                                                            posMatrix,
+                                                            iconLabelPlaneMatrix,
+                                                            pixelRatio,
+                                                            placedSymbol,
+                                                            scale,
+                                                            fontSize,
+                                                            iconAllowOverlap,
+                                                            pitchTextWithMap, // TODO: shall it be pitchIconWithMap?
+                                                            showCollisionBoxes,
+                                                            avoidEdges,
+                                                            collisionGroup.second,
+                                                            iconBoxes);
                             iconBoxes.clear();
                             if (!placedIconFeature.first) continue;
                         }
@@ -485,8 +489,8 @@ void Placement::placeBucket(const SymbolBucket& bucket,
                                                    placedSymbol,
                                                    scale,
                                                    fontSize,
-                                                   layout.get<style::IconAllowOverlap>(),
-                                                   pitchWithMap,
+                                                   iconAllowOverlap,
+                                                   pitchTextWithMap,
                                                    showCollisionBoxes,
                                                    avoidEdges,
                                                    collisionGroup.second,
@@ -586,8 +590,8 @@ void Placement::placeBucket(const SymbolBucket& bucket,
                                                        height,
                                                        symbol.variableTextOffset,
                                                        symbol.textBoxScale,
-                                                       rotateWithMap,
-                                                       pitchWithMap,
+                                                       rotateTextWithMap,
+                                                       pitchTextWithMap,
                                                        state.getBearing());
             }
             bool result = collisionIndex.featureIntersectsTileBorders(
