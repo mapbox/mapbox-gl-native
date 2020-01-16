@@ -99,7 +99,8 @@ Placement::Placement(std::shared_ptr<const UpdateParameters> updateParameters_,
       commitTime(updateParameters->timePoint),
       placementZoom(updateParameters->transformState.getZoom()),
       collisionGroups(updateParameters->crossSourceCollisions),
-      prevPlacement(std::move(prevPlacement_)) {
+      prevPlacement(std::move(prevPlacement_)),
+      showCollisionBoxes(updateParameters->debugOptions & MapDebugOptions::Collision) {
     assert(prevPlacement || mapMode != MapMode::Continuous);
     if (prevPlacement) {
         prevPlacement->get()->prevPlacement = nullopt; // Only hold on to one placement back
@@ -108,16 +109,11 @@ Placement::Placement(std::shared_ptr<const UpdateParameters> updateParameters_,
 
 Placement::Placement() : collisionIndex({}, MapMode::Static), collisionGroups(true) {}
 
-void Placement::placeLayer(const RenderLayer& layer, const mat4& projMatrix, bool showCollisionBoxes) {
+void Placement::placeLayer(const RenderLayer& layer, const mat4& projMatrix) {
     std::set<uint32_t> seenCrossTileIDs;
     for (const auto& item : layer.getPlacementData()) {
         Bucket& bucket = item.bucket;
-        BucketPlacementParameters params{
-                item.tile,
-                projMatrix,
-                layer.baseImpl->source,
-                item.featureIndex,
-                showCollisionBoxes};
+        BucketPlacementParameters params{item.tile, projMatrix, layer.baseImpl->source, item.featureIndex};
         bucket.place(*this, params, seenCrossTileIDs);
     }
 }
@@ -146,6 +142,7 @@ Point<float> calculateVariableLayoutOffset(style::SymbolAnchorType anchor,
 void Placement::placeBucket(const SymbolBucket& bucket,
                             const BucketPlacementParameters& params,
                             std::set<uint32_t>& seenCrossTileIDs) {
+    assert(updateParameters);
     const auto& layout = *bucket.layout;
     const auto& renderTile = params.tile;
     const auto& state = collisionIndex.getTransformState();
@@ -278,7 +275,7 @@ void Placement::placeBucket(const SymbolBucket& bucket,
                                                                      fontSize,
                                                                      layout.get<style::TextAllowOverlap>(),
                                                                      pitchWithMap,
-                                                                     params.showCollisionBoxes,
+                                                                     showCollisionBoxes,
                                                                      avoidEdges,
                                                                      collisionGroup.second,
                                                                      textBoxes);
@@ -376,7 +373,7 @@ void Placement::placeBucket(const SymbolBucket& bucket,
                                                                     fontSize,
                                                                     allowOverlap,
                                                                     pitchWithMap,
-                                                                    params.showCollisionBoxes,
+                                                                    showCollisionBoxes,
                                                                     avoidEdges,
                                                                     collisionGroup.second,
                                                                     textBoxes);
@@ -392,7 +389,7 @@ void Placement::placeBucket(const SymbolBucket& bucket,
                                                                                  fontSize,
                                                                                  iconAllowOverlap,
                                                                                  pitchWithMap,
-                                                                                 params.showCollisionBoxes,
+                                                                                 showCollisionBoxes,
                                                                                  avoidEdges,
                                                                                  collisionGroup.second,
                                                                                  iconBoxes);
@@ -490,7 +487,7 @@ void Placement::placeBucket(const SymbolBucket& bucket,
                                                    fontSize,
                                                    layout.get<style::IconAllowOverlap>(),
                                                    pitchWithMap,
-                                                   params.showCollisionBoxes,
+                                                   showCollisionBoxes,
                                                    avoidEdges,
                                                    collisionGroup.second,
                                                    iconBoxes);
