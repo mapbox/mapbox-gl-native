@@ -1,11 +1,12 @@
 #include <mbgl/text/placement.hpp>
 
 #include <mbgl/layout/symbol_layout.hpp>
+#include <mbgl/renderer/bucket.hpp>
+#include <mbgl/renderer/buckets/symbol_bucket.hpp>
 #include <mbgl/renderer/render_layer.hpp>
 #include <mbgl/renderer/render_tile.hpp>
+#include <mbgl/renderer/update_parameters.hpp>
 #include <mbgl/tile/geometry_tile.hpp>
-#include <mbgl/renderer/buckets/symbol_bucket.hpp>
-#include <mbgl/renderer/bucket.hpp>
 #include <mbgl/util/math.hpp>
 #include <utility>
 
@@ -60,9 +61,7 @@ const CollisionGroups::CollisionGroup& CollisionGroups::get(const std::string& s
 
 // PlacementController implemenation
 
-PlacementController::PlacementController()
-    : placement(makeMutable<Placement>(
-          TransformState{}, MapMode::Static, style::TransitionOptions{}, true, TimePoint(), nullopt)) {}
+PlacementController::PlacementController() : placement(makeMutable<Placement>()) {}
 
 void PlacementController::setPlacement(Immutable<Placement> placement_) {
     placement = std::move(placement_);
@@ -91,24 +90,23 @@ bool PlacementController::hasTransitions(TimePoint now) const {
 
 // Placement implementation
 
-Placement::Placement(const TransformState& state_,
-                     MapMode mapMode_,
-                     style::TransitionOptions transitionOptions_,
-                     const bool crossSourceCollisions,
-                     TimePoint commitTime_,
+Placement::Placement(std::shared_ptr<const UpdateParameters> updateParameters_,
                      optional<Immutable<Placement>> prevPlacement_)
-    : collisionIndex(state_, mapMode_),
-      mapMode(mapMode_),
-      transitionOptions(std::move(transitionOptions_)),
-      commitTime(commitTime_),
-      placementZoom(state_.getZoom()),
-      collisionGroups(crossSourceCollisions),
+    : updateParameters(std::move(updateParameters_)),
+      collisionIndex(updateParameters->transformState, updateParameters->mode),
+      mapMode(updateParameters->mode),
+      transitionOptions(updateParameters->transitionOptions),
+      commitTime(updateParameters->timePoint),
+      placementZoom(updateParameters->transformState.getZoom()),
+      collisionGroups(updateParameters->crossSourceCollisions),
       prevPlacement(std::move(prevPlacement_)) {
     assert(prevPlacement || mapMode != MapMode::Continuous);
     if (prevPlacement) {
         prevPlacement->get()->prevPlacement = nullopt; // Only hold on to one placement back
     }
 }
+
+Placement::Placement() : collisionIndex({}, MapMode::Static), collisionGroups(true) {}
 
 void Placement::placeLayer(const RenderLayer& layer, const mat4& projMatrix, bool showCollisionBoxes) {
     std::set<uint32_t> seenCrossTileIDs;

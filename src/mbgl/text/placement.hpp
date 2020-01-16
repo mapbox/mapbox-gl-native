@@ -12,6 +12,7 @@ namespace mbgl {
 
 class SymbolBucket;
 class SymbolInstance;
+class UpdateParameters;
 enum class PlacedSymbolOrientation : bool;
 
 class OpacityState {
@@ -112,12 +113,9 @@ private:
 
 class Placement {
 public:
-    Placement(const TransformState&,
-              MapMode,
-              style::TransitionOptions,
-              const bool crossSourceCollisions,
-              TimePoint commitTime,
-              optional<Immutable<Placement>> prevPlacement = nullopt);
+    Placement(std::shared_ptr<const UpdateParameters>, optional<Immutable<Placement>> prevPlacement = nullopt);
+    Placement();
+
     void placeLayer(const RenderLayer&, const mat4&, bool showCollisionBoxes);
     void commit();
     void updateLayerBuckets(const RenderLayer&, const TransformState&, bool updateOpacities) const;
@@ -132,6 +130,7 @@ public:
     float zoomAdjustment(const float zoom) const;
 
     const RetainedQueryData& getQueryData(uint32_t bucketInstanceId) const;
+
 private:
     friend SymbolBucket;
     void placeBucket(const SymbolBucket&, const BucketPlacementParameters&, std::set<uint32_t>& seenCrossTileIDs);
@@ -145,15 +144,16 @@ private:
     void markUsedOrientation(SymbolBucket&, style::TextWritingModeType, const SymbolInstance&) const;
     const Placement* getPrevPlacement() const { return prevPlacement ? prevPlacement->get() : nullptr; }
 
+    std::shared_ptr<const UpdateParameters> updateParameters;
     CollisionIndex collisionIndex;
 
-    MapMode mapMode;
+    MapMode mapMode = MapMode::Static;
     style::TransitionOptions transitionOptions;
 
     TimePoint fadeStartTime;
     TimePoint commitTime;
-    const float placementZoom;
-    float prevZoomAdjustment = 0;
+    float placementZoom = 0.0f;
+    float prevZoomAdjustment = 0.0f;
 
     std::unordered_map<uint32_t, JointPlacement> placements;
     std::unordered_map<uint32_t, JointOpacityState> opacities;

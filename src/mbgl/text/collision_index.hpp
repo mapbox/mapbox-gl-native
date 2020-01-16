@@ -20,7 +20,7 @@ class CollisionIndex {
 public:
     using CollisionGrid = GridIndex<IndexedSubfeature>;
 
-    explicit CollisionIndex(const TransformState&, MapMode&);
+    explicit CollisionIndex(const TransformState&, MapMode);
     bool featureIntersectsTileBorders(const CollisionFeature& feature,
                                       Point<float> shift,
                                       const mat4& posMatrix,
