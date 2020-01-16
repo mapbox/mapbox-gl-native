@@ -67,7 +67,7 @@ void TileLayerIndex::findMatches(SymbolBucket& bucket,
     }
 }
 
-CrossTileSymbolLayerIndex::CrossTileSymbolLayerIndex() = default;
+CrossTileSymbolLayerIndex::CrossTileSymbolLayerIndex(uint32_t& maxCrossTileID_) : maxCrossTileID(maxCrossTileID_) {}
 
 /*
  * Sometimes when a user pans across the antimeridian the longitude value gets wrapped.
@@ -95,7 +95,7 @@ void CrossTileSymbolLayerIndex::handleWrapJump(float newLng) {
     lng = newLng;
 }
 
-bool CrossTileSymbolLayerIndex::addBucket(const OverscaledTileID& tileID, SymbolBucket& bucket, uint32_t& maxCrossTileID) {
+bool CrossTileSymbolLayerIndex::addBucket(const OverscaledTileID& tileID, SymbolBucket& bucket) {
     auto& thisZoomIndexes = indexes[tileID.overscaledZ];
     auto previousIndex = thisZoomIndexes.find(tileID);
     if (previousIndex != thisZoomIndexes.end()) {
@@ -177,7 +177,15 @@ bool CrossTileSymbolLayerIndex::removeStaleBuckets(const std::unordered_set<uint
 CrossTileSymbolIndex::CrossTileSymbolIndex() = default;
 
 auto CrossTileSymbolIndex::addLayer(const RenderLayer& layer, float lng) -> AddLayerResult {
-    auto& layerIndex = layerIndexes[layer.getID()];
+    auto found = layerIndexes.find(layer.getID());
+    if (found == layerIndexes.end()) {
+        found = layerIndexes
+                    .emplace(std::piecewise_construct,
+                             std::forward_as_tuple(layer.getID()),
+                             std::forward_as_tuple(maxCrossTileID))
+                    .first;
+    }
+    auto& layerIndex = found->second;
 
     AddLayerResult result = AddLayerResult::NoChanges;
     std::unordered_set<uint32_t> currentBucketIDs;
@@ -187,7 +195,7 @@ auto CrossTileSymbolIndex::addLayer(const RenderLayer& layer, float lng) -> AddL
     for (const auto& item : layer.getPlacementData()) {
         const RenderTile& renderTile = item.tile;
         Bucket& bucket = item.bucket;
-        auto pair = bucket.registerAtCrossTileIndex(layerIndex, renderTile.getOverscaledTileID(), maxCrossTileID);
+        auto pair = bucket.registerAtCrossTileIndex(layerIndex, renderTile.getOverscaledTileID());
         assert(pair.first != 0u);
         if (pair.second) result |= AddLayerResult::BucketsAdded;
         currentBucketIDs.insert(pair.first);
