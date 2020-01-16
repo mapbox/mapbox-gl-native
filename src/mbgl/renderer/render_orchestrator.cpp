@@ -394,12 +394,7 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(
 
         std::set<std::string> usedSymbolLayers;
         if (renderTreeParameters->placementChanged) {
-            Mutable<Placement> placement = makeMutable<Placement>(updateParameters->transformState,
-                                                                  updateParameters->mode,
-                                                                  updateParameters->transitionOptions,
-                                                                  updateParameters->crossSourceCollisions,
-                                                                  updateParameters->timePoint,
-                                                                  placementController.getPlacement());
+            Mutable<Placement> placement = makeMutable<Placement>(updateParameters, placementController.getPlacement());
 
             for (auto it = layersNeedPlacement.crbegin(); it != layersNeedPlacement.crend(); ++it) {
                 const RenderLayer& layer = *it;
@@ -425,11 +420,7 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(
         crossTileSymbolIndex.reset();
         renderTreeParameters->placementChanged = symbolBucketsChanged = !layersNeedPlacement.empty();
         if (renderTreeParameters->placementChanged) {
-            Mutable<Placement> placement = makeMutable<Placement>(updateParameters->transformState,
-                                                                  updateParameters->mode,
-                                                                  updateParameters->transitionOptions,
-                                                                  updateParameters->crossSourceCollisions,
-                                                                  updateParameters->timePoint);
+            Mutable<Placement> placement = makeMutable<Placement>(updateParameters);
             for (auto it = layersNeedPlacement.crbegin(); it != layersNeedPlacement.crend(); ++it) {
                 const RenderLayer& layer = *it;
                 crossTileSymbolIndex.addLayer(layer, updateParameters->transformState.getLatLng().longitude());
