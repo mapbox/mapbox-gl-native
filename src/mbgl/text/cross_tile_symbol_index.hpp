@@ -47,8 +47,8 @@ public:
 
 class CrossTileSymbolLayerIndex {
 public:
-    CrossTileSymbolLayerIndex();
-    bool addBucket(const OverscaledTileID&, SymbolBucket&, uint32_t& maxCrossTileID);
+    CrossTileSymbolLayerIndex(uint32_t& maxCrossTileID);
+    bool addBucket(const OverscaledTileID&, SymbolBucket&);
     bool removeStaleBuckets(const std::unordered_set<uint32_t>& currentIDs);
     void handleWrapJump(float newLng);
 private:
@@ -57,6 +57,7 @@ private:
     std::map<uint8_t, std::map<OverscaledTileID,TileLayerIndex>> indexes;
     std::map<uint8_t, std::set<uint32_t>> usedCrossTileIDs;
     float lng = 0;
+    uint32_t& maxCrossTileID;
 };
 
 class CrossTileSymbolIndex {
