@@ -399,9 +399,7 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(
             for (auto it = layersNeedPlacement.crbegin(); it != layersNeedPlacement.crend(); ++it) {
                 const RenderLayer& layer = *it;
                 usedSymbolLayers.insert(layer.getID());
-                placement->placeLayer(layer,
-                                      renderTreeParameters->transformParams.projMatrix,
-                                      updateParameters->debugOptions & MapDebugOptions::Collision);
+                placement->placeLayer(layer, renderTreeParameters->transformParams.projMatrix);
             }
 
             placement->commit();
@@ -424,9 +422,7 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(
             for (auto it = layersNeedPlacement.crbegin(); it != layersNeedPlacement.crend(); ++it) {
                 const RenderLayer& layer = *it;
                 crossTileSymbolIndex.addLayer(layer, updateParameters->transformState.getLatLng().longitude());
-                placement->placeLayer(layer,
-                                      renderTreeParameters->transformParams.projMatrix,
-                                      updateParameters->debugOptions & MapDebugOptions::Collision);
+                placement->placeLayer(layer, renderTreeParameters->transformParams.projMatrix);
             }
             placement->commit();
             placementController.setPlacement(std::move(placement));
