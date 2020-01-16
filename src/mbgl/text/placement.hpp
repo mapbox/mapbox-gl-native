@@ -92,7 +92,6 @@ public:
     const mat4& projMatrix;
     std::string sourceId;
     std::shared_ptr<FeatureIndex> featureIndex;
-    bool showCollisionBoxes;
 };
 
 class Placement;
@@ -116,7 +115,7 @@ public:
     Placement(std::shared_ptr<const UpdateParameters>, optional<Immutable<Placement>> prevPlacement = nullopt);
     Placement();
 
-    void placeLayer(const RenderLayer&, const mat4&, bool showCollisionBoxes);
+    void placeLayer(const RenderLayer&, const mat4&);
     void commit();
     void updateLayerBuckets(const RenderLayer&, const TransformState&, bool updateOpacities) const;
     float symbolFadeChange(TimePoint now) const;
@@ -163,6 +162,7 @@ private:
     std::unordered_map<uint32_t, RetainedQueryData> retainedQueryData;
     CollisionGroups collisionGroups;
     mutable optional<Immutable<Placement>> prevPlacement;
+    bool showCollisionBoxes = false;
 
     // Used for debug purposes.
     std::unordered_map<const CollisionFeature*, std::vector<ProjectedCollisionBox>> collisionCircles;
