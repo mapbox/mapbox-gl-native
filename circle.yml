@@ -741,9 +741,10 @@ jobs:
               cp ../RenderTestApp_iphoneos13.2-arm64e-release.xctestrun .
               zip testapp.zip -r Release-iphoneos/RenderTestApp.app
               zip testapp.zip RenderTestApp_iphoneos13.2-arm64e-release.xctestrun
+              gcloud firebase test ios models list
               gcloud firebase test ios run \
                 --test testapp.zip \
-                --device model=iphonexs,version=12.1,locale=en,orientation=portrait --xcode-version=11.1 --timeout 20m \
+                --device model=iphonexs,version=12.3,locale=en,orientation=portrait --xcode-version=11.1 --timeout 20m \
                 --verbosity=debug --no-record-video --results-dir ios-render-test-app-${CIRCLE_BUILD_NUM}
             fi
       - run:
@@ -751,13 +752,13 @@ jobs:
           when: always
           command: |
             if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON_IOS}" ]]; then
-              testResult=$(gsutil ls -d gs://test-lab-hn7kwqcz3108z-hjm4qtbqqkymk/ios-render-test-app-${CIRCLE_BUILD_NUM}/iphonexs-12.1-en-portrait/TestLogs/)
+              testResult=$(gsutil ls -d gs://test-lab-hn7kwqcz3108z-hjm4qtbqqkymk/ios-render-test-app-${CIRCLE_BUILD_NUM}/iphonexs-12.3-en-portrait/TestLogs/)
               mkdir -p render-test-app
               gsutil -m cp -r $testResult render-test-app
               cd render-test-app/TestLogs && ls
               xcparse attachments *.xcresult
               cd ../.. && mkdir -p /tmp/tests/ios-render-test
-              cp render-test-app/TestLogs/*.html /tmp/tests/ios-render-test  
+              if ls render-test-app/TestLogs/*.html 1> /dev/null 2>&1; then cp render-test-app/TestLogs/*.html /tmp/tests/ios-render-test; fi
             fi
       - next-save
   next-android-benchmark-runner:
