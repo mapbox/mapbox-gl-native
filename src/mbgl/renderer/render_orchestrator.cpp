@@ -375,10 +375,11 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(
     }
     // Symbol placement.
     bool symbolBucketsChanged = false;
+    auto longitude = updateParameters->transformState.getLatLng().longitude();
     if (isMapModeContinuous) {
         bool symbolBucketsAdded = false;
         for (auto it = layersNeedPlacement.crbegin(); it != layersNeedPlacement.crend(); ++it) {
-            auto result = crossTileSymbolIndex.addLayer(*it, updateParameters->transformState.getLatLng().longitude());
+            auto result = crossTileSymbolIndex.addLayer(*it, longitude);
             symbolBucketsAdded = symbolBucketsAdded || (result & CrossTileSymbolIndex::AddLayerResult::BucketsAdded);
             symbolBucketsChanged = symbolBucketsChanged || (result != CrossTileSymbolIndex::AddLayerResult::NoChanges);
         }
@@ -421,7 +422,7 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(
             Mutable<Placement> placement = makeMutable<Placement>(updateParameters);
             for (auto it = layersNeedPlacement.crbegin(); it != layersNeedPlacement.crend(); ++it) {
                 const RenderLayer& layer = *it;
-                crossTileSymbolIndex.addLayer(layer, updateParameters->transformState.getLatLng().longitude());
+                crossTileSymbolIndex.addLayer(layer, longitude);
                 placement->placeLayer(layer, renderTreeParameters->transformParams.projMatrix);
             }
             placement->commit();
