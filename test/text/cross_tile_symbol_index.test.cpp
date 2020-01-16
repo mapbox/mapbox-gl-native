@@ -34,7 +34,7 @@ TEST(CrossTileSymbolLayerIndex, addBucket) {
 
     uint32_t maxCrossTileID = 0;
     uint32_t maxBucketInstanceId = 0;
-    CrossTileSymbolLayerIndex index;
+    CrossTileSymbolLayerIndex index(maxCrossTileID);
 
     Immutable<style::SymbolLayoutProperties::PossiblyEvaluated> layout =
         makeMutable<style::SymbolLayoutProperties::PossiblyEvaluated>();
@@ -60,7 +60,7 @@ TEST(CrossTileSymbolLayerIndex, addBucket) {
                             {},
                             false /*iconsInText*/};
     mainBucket.bucketInstanceId = ++maxBucketInstanceId;
-    index.addBucket(mainID, mainBucket, maxCrossTileID);
+    index.addBucket(mainID, mainBucket);
 
     // Assigned new IDs
     ASSERT_EQ(mainBucket.symbolInstances.at(0).crossTileID, 1u);
@@ -87,7 +87,7 @@ TEST(CrossTileSymbolLayerIndex, addBucket) {
                              {},
                              false /*iconsInText*/};
     childBucket.bucketInstanceId = ++maxBucketInstanceId;
-    index.addBucket(childID, childBucket, maxCrossTileID);
+    index.addBucket(childID, childBucket);
 
     // matched parent tile
     ASSERT_EQ(childBucket.symbolInstances.at(0).crossTileID, 1u);
@@ -115,7 +115,7 @@ TEST(CrossTileSymbolLayerIndex, addBucket) {
                               {},
                               false /*iconsInText*/};
     parentBucket.bucketInstanceId = ++maxBucketInstanceId;
-    index.addBucket(parentID, parentBucket, maxCrossTileID);
+    index.addBucket(parentID, parentBucket);
 
     // matched child tile
     ASSERT_EQ(parentBucket.symbolInstances.at(0).crossTileID, 1u);
@@ -143,7 +143,7 @@ TEST(CrossTileSymbolLayerIndex, addBucket) {
                                   {},
                                   false /*iconsInText*/};
     grandchildBucket.bucketInstanceId = ++maxBucketInstanceId;
-    index.addBucket(grandchildID, grandchildBucket, maxCrossTileID);
+    index.addBucket(grandchildID, grandchildBucket);
 
     // Matches the symbol in `mainBucket`
     ASSERT_EQ(grandchildBucket.symbolInstances.at(0).crossTileID, 1u);
@@ -156,7 +156,7 @@ TEST(CrossTileSymbolLayerIndex, resetIDs) {
 
     uint32_t maxCrossTileID = 0;
     uint32_t maxBucketInstanceId = 0;
-    CrossTileSymbolLayerIndex index;
+    CrossTileSymbolLayerIndex index(maxCrossTileID);
 
     Immutable<style::SymbolLayoutProperties::PossiblyEvaluated> layout =
         makeMutable<style::SymbolLayoutProperties::PossiblyEvaluated>();
@@ -201,7 +201,7 @@ TEST(CrossTileSymbolLayerIndex, resetIDs) {
     childBucket.bucketInstanceId = ++maxBucketInstanceId;
 
     // assigns a new id
-    index.addBucket(mainID, mainBucket, maxCrossTileID);
+    index.addBucket(mainID, mainBucket);
     ASSERT_EQ(mainBucket.symbolInstances.at(0).crossTileID, 1u);
 
     // removes the tile
@@ -209,18 +209,18 @@ TEST(CrossTileSymbolLayerIndex, resetIDs) {
     index.removeStaleBuckets(currentIDs);
 
     // assigns a new id
-    index.addBucket(childID, childBucket, maxCrossTileID);
+    index.addBucket(childID, childBucket);
     ASSERT_EQ(childBucket.symbolInstances.at(0).crossTileID, 2u);
 
     // overwrites the old id to match the already-added tile
-    index.addBucket(mainID, mainBucket, maxCrossTileID);
+    index.addBucket(mainID, mainBucket);
     ASSERT_EQ(mainBucket.symbolInstances.at(0).crossTileID, 2u);
 }
 
 TEST(CrossTileSymbolLayerIndex, noDuplicatesWithinZoomLevel) {
     uint32_t maxCrossTileID = 0;
     uint32_t maxBucketInstanceId = 0;
-    CrossTileSymbolLayerIndex index;
+    CrossTileSymbolLayerIndex index(maxCrossTileID);
 
     Immutable<style::SymbolLayoutProperties::PossiblyEvaluated> layout =
         makeMutable<style::SymbolLayoutProperties::PossiblyEvaluated>();
@@ -268,12 +268,12 @@ TEST(CrossTileSymbolLayerIndex, noDuplicatesWithinZoomLevel) {
     childBucket.bucketInstanceId = ++maxBucketInstanceId;
 
     // assigns new ids
-    index.addBucket(mainID, mainBucket, maxCrossTileID);
+    index.addBucket(mainID, mainBucket);
     ASSERT_EQ(mainBucket.symbolInstances.at(0).crossTileID, 1u);
     ASSERT_EQ(mainBucket.symbolInstances.at(1).crossTileID, 2u);
 
     // copies parent ids without duplicate ids in this tile
-    index.addBucket(childID, childBucket, maxCrossTileID);
+    index.addBucket(childID, childBucket);
     ASSERT_EQ(childBucket.symbolInstances.at(0).crossTileID, 1u); // A' copies from A
     ASSERT_EQ(childBucket.symbolInstances.at(1).crossTileID, 2u); // B' copies from B
     ASSERT_EQ(childBucket.symbolInstances.at(2).crossTileID, 3u); // C' gets new ID
@@ -282,7 +282,7 @@ TEST(CrossTileSymbolLayerIndex, noDuplicatesWithinZoomLevel) {
 TEST(CrossTileSymbolLayerIndex, bucketReplacement) {
     uint32_t maxCrossTileID = 0;
     uint32_t maxBucketInstanceId = 0;
-    CrossTileSymbolLayerIndex index;
+    CrossTileSymbolLayerIndex index(maxCrossTileID);
 
     Immutable<style::SymbolLayoutProperties::PossiblyEvaluated> layout =
         makeMutable<style::SymbolLayoutProperties::PossiblyEvaluated>();
@@ -329,12 +329,12 @@ TEST(CrossTileSymbolLayerIndex, bucketReplacement) {
     secondBucket.bucketInstanceId = ++maxBucketInstanceId;
 
     // assigns new ids
-    index.addBucket(tileID, firstBucket, maxCrossTileID);
+    index.addBucket(tileID, firstBucket);
     ASSERT_EQ(firstBucket.symbolInstances.at(0).crossTileID, 1u);
     ASSERT_EQ(firstBucket.symbolInstances.at(1).crossTileID, 2u);
 
     // copies parent ids without duplicate ids in this tile
-    index.addBucket(tileID, secondBucket, maxCrossTileID);
+    index.addBucket(tileID, secondBucket);
     ASSERT_EQ(secondBucket.symbolInstances.at(0).crossTileID, 1u); // A' copies from A
     ASSERT_EQ(secondBucket.symbolInstances.at(1).crossTileID, 2u); // B' copies from B
     ASSERT_EQ(secondBucket.symbolInstances.at(2).crossTileID, 3u); // C' gets new ID
