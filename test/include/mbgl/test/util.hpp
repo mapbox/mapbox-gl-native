@@ -65,15 +65,6 @@ class Server;
 namespace mbgl {
 namespace test {
 
-class Server {
-public:
-    Server(const char* script);
-    ~Server();
-
-private:
-    int fd = -1;
-};
-
 class HttpServer {
 public:
     HttpServer();
