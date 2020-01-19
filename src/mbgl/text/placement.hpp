@@ -89,7 +89,6 @@ private:
 class BucketPlacementParameters {
 public:
     const RenderTile& tile;
-    const mat4& projMatrix;
     std::string sourceId;
     std::shared_ptr<FeatureIndex> featureIndex;
 };
@@ -115,7 +114,7 @@ public:
     Placement(std::shared_ptr<const UpdateParameters>, optional<Immutable<Placement>> prevPlacement = nullopt);
     Placement();
 
-    void placeLayer(const RenderLayer&, const mat4&);
+    void placeLayer(const RenderLayer&);
     void commit();
     void updateLayerBuckets(const RenderLayer&, const TransformState&, bool updateOpacities) const;
     float symbolFadeChange(TimePoint now) const;
