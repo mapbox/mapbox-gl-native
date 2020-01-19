@@ -210,6 +210,7 @@ public:
     void setLatLngZoom(const LatLng& latLng, double zoom);
 
     void constrain(double& scale, double& x, double& y) const;
+    const mat4& getProjectionMatrix() const;
 
 private:
     bool rotatedNorth() const;
@@ -236,7 +237,7 @@ private:
 
     void updateMatricesIfNeeded() const;
     bool needsMatricesUpdate() const { return requestMatricesUpdate; }
-    const mat4& getProjectionMatrix() const;
+
     const mat4& getCoordMatrix() const;
     const mat4& getInvertedMatrix() const;
 

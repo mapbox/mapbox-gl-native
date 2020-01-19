@@ -109,11 +109,11 @@ Placement::Placement(std::shared_ptr<const UpdateParameters> updateParameters_,
 
 Placement::Placement() : collisionIndex({}, MapMode::Static), collisionGroups(true) {}
 
-void Placement::placeLayer(const RenderLayer& layer, const mat4& projMatrix) {
+void Placement::placeLayer(const RenderLayer& layer) {
     std::set<uint32_t> seenCrossTileIDs;
     for (const auto& item : layer.getPlacementData()) {
         Bucket& bucket = item.bucket;
-        BucketPlacementParameters params{item.tile, projMatrix, layer.baseImpl->source, item.featureIndex};
+        BucketPlacementParameters params{item.tile, layer.baseImpl->source, item.featureIndex};
         bucket.place(*this, params, seenCrossTileIDs);
     }
 }
@@ -158,8 +158,9 @@ void Placement::placeBucket(const SymbolBucket& bucket,
     const bool pitchIconWithMap = layout.get<style::IconPitchAlignment>() == style::AlignmentType::Map;
 
     mat4 posMatrix;
+    const auto& projMatrix = state.getProjectionMatrix();
     state.matrixFor(posMatrix, renderTile.id);
-    matrix::multiply(posMatrix, params.projMatrix, posMatrix);
+    matrix::multiply(posMatrix, projMatrix, posMatrix);
 
     mat4 textLabelPlaneMatrix =
         getLabelPlaneMatrix(posMatrix, pitchTextWithMap, rotateTextWithMap, state, pixelsToTileUnits);
