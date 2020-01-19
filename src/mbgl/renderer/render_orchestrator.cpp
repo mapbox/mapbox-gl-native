@@ -400,7 +400,7 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(
             for (auto it = layersNeedPlacement.crbegin(); it != layersNeedPlacement.crend(); ++it) {
                 const RenderLayer& layer = *it;
                 usedSymbolLayers.insert(layer.getID());
-                placement->placeLayer(layer, renderTreeParameters->transformParams.projMatrix);
+                placement->placeLayer(layer);
             }
 
             placement->commit();
@@ -422,8 +422,8 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(
             Mutable<Placement> placement = makeMutable<Placement>(updateParameters);
             for (auto it = layersNeedPlacement.crbegin(); it != layersNeedPlacement.crend(); ++it) {
                 const RenderLayer& layer = *it;
-                crossTileSymbolIndex.addLayer(layer, longitude);
-                placement->placeLayer(layer, renderTreeParameters->transformParams.projMatrix);
+                crossTileSymbolIndex.addLayer(layer, updateParameters->transformState);
+                placement->placeLayer(layer);
             }
             placement->commit();
             placementController.setPlacement(std::move(placement));
