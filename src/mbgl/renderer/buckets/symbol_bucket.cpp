@@ -296,8 +296,9 @@ bool SymbolBucket::hasFormatSectionOverrides() const {
 }
 
 std::pair<uint32_t, bool> SymbolBucket::registerAtCrossTileIndex(CrossTileSymbolLayerIndex& index,
-                                                                 const OverscaledTileID& tileID) {
-    bool firstTimeAdded = index.addBucket(tileID, *this);
+                                                                 const OverscaledTileID& tileID,
+                                                                 const TransformState& transformState) {
+    bool firstTimeAdded = index.addBucket(tileID, *this, transformState);
     return std::make_pair(bucketInstanceId, firstTimeAdded);
 }
 

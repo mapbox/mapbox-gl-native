@@ -95,7 +95,9 @@ void CrossTileSymbolLayerIndex::handleWrapJump(float newLng) {
     lng = newLng;
 }
 
-bool CrossTileSymbolLayerIndex::addBucket(const OverscaledTileID& tileID, SymbolBucket& bucket) {
+bool CrossTileSymbolLayerIndex::addBucket(const OverscaledTileID& tileID,
+                                          SymbolBucket& bucket,
+                                          const TransformState& /*transformState*/) {
     auto& thisZoomIndexes = indexes[tileID.overscaledZ];
     auto previousIndex = thisZoomIndexes.find(tileID);
     if (previousIndex != thisZoomIndexes.end()) {
@@ -176,7 +178,7 @@ bool CrossTileSymbolLayerIndex::removeStaleBuckets(const std::unordered_set<uint
 
 CrossTileSymbolIndex::CrossTileSymbolIndex() = default;
 
-auto CrossTileSymbolIndex::addLayer(const RenderLayer& layer, float lng) -> AddLayerResult {
+auto CrossTileSymbolIndex::addLayer(const RenderLayer& layer, const TransformState& transformState) -> AddLayerResult {
     auto found = layerIndexes.find(layer.getID());
     if (found == layerIndexes.end()) {
         found = layerIndexes
@@ -190,12 +192,12 @@ auto CrossTileSymbolIndex::addLayer(const RenderLayer& layer, float lng) -> AddL
     AddLayerResult result = AddLayerResult::NoChanges;
     std::unordered_set<uint32_t> currentBucketIDs;
 
-    layerIndex.handleWrapJump(lng);
+    layerIndex.handleWrapJump(transformState.getLatLng().longitude());
 
     for (const auto& item : layer.getPlacementData()) {
         const RenderTile& renderTile = item.tile;
         Bucket& bucket = item.bucket;
-        auto pair = bucket.registerAtCrossTileIndex(layerIndex, renderTile.getOverscaledTileID());
+        auto pair = bucket.registerAtCrossTileIndex(layerIndex, renderTile.getOverscaledTileID(), transformState);
         assert(pair.first != 0u);
         if (pair.second) result |= AddLayerResult::BucketsAdded;
         currentBucketIDs.insert(pair.first);

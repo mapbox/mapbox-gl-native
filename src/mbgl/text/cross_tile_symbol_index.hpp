@@ -18,6 +18,7 @@ namespace mbgl {
 class SymbolInstance;
 class RenderLayer;
 class SymbolBucket;
+class TransformState;
 
 class IndexedSymbolInstance {
 public:
@@ -48,7 +49,7 @@ public:
 class CrossTileSymbolLayerIndex {
 public:
     CrossTileSymbolLayerIndex(uint32_t& maxCrossTileID);
-    bool addBucket(const OverscaledTileID&, SymbolBucket&);
+    bool addBucket(const OverscaledTileID&, SymbolBucket&, const TransformState& transformState);
     bool removeStaleBuckets(const std::unordered_set<uint32_t>& currentIDs);
     void handleWrapJump(float newLng);
 private:
@@ -70,7 +71,7 @@ public:
         BucketsRemoved = 1 << 1
     };
 
-    AddLayerResult addLayer(const RenderLayer& layer, float lng);
+    AddLayerResult addLayer(const RenderLayer& layer, const TransformState&);
     void pruneUnusedLayers(const std::set<std::string>&);
 
     void reset();

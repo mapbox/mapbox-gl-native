@@ -375,11 +375,10 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(
     }
     // Symbol placement.
     bool symbolBucketsChanged = false;
-    auto longitude = updateParameters->transformState.getLatLng().longitude();
     if (isMapModeContinuous) {
         bool symbolBucketsAdded = false;
         for (auto it = layersNeedPlacement.crbegin(); it != layersNeedPlacement.crend(); ++it) {
-            auto result = crossTileSymbolIndex.addLayer(*it, longitude);
+            auto result = crossTileSymbolIndex.addLayer(*it, updateParameters->transformState);
             symbolBucketsAdded = symbolBucketsAdded || (result & CrossTileSymbolIndex::AddLayerResult::BucketsAdded);
             symbolBucketsChanged = symbolBucketsChanged || (result != CrossTileSymbolIndex::AddLayerResult::NoChanges);
         }
