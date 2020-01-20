@@ -157,10 +157,7 @@ void Placement::placeBucket(const SymbolBucket& bucket,
     const bool rotateIconWithMap = layout.get<style::IconRotationAlignment>() == style::AlignmentType::Map;
     const bool pitchIconWithMap = layout.get<style::IconPitchAlignment>() == style::AlignmentType::Map;
 
-    mat4 posMatrix;
-    const auto& projMatrix = state.getProjectionMatrix();
-    state.matrixFor(posMatrix, renderTile.id);
-    matrix::multiply(posMatrix, projMatrix, posMatrix);
+    const mat4& posMatrix = renderTile.matrix;
 
     mat4 textLabelPlaneMatrix =
         getLabelPlaneMatrix(posMatrix, pitchTextWithMap, rotateTextWithMap, state, pixelsToTileUnits);
@@ -212,8 +209,10 @@ void Placement::placeBucket(const SymbolBucket& bucket,
     std::vector<ProjectedCollisionBox> textBoxes;
     std::vector<ProjectedCollisionBox> iconBoxes;
 
-    auto placeSymbol = [&] (const SymbolInstance& symbolInstance) {
-        if (seenCrossTileIDs.count(symbolInstance.crossTileID) != 0u) return;
+    auto placeSymbol = [&](const SymbolInstance& symbolInstance) {
+        if (symbolInstance.crossTileID == SymbolInstance::invalidCrossTileID() ||
+            seenCrossTileIDs.count(symbolInstance.crossTileID) != 0u)
+            return;
 
         if (renderTile.holdForFade()) {
             // Mark all symbols from this tile as "not placed", but don't add to seenCrossTileIDs, because we don't

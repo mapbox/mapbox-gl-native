@@ -1,6 +1,7 @@
+#include <mbgl/renderer/bucket_parameters.hpp>
 #include <mbgl/renderer/buckets/symbol_bucket.hpp>
 #include <mbgl/renderer/layers/render_symbol_layer.hpp>
-#include <mbgl/renderer/bucket_parameters.hpp>
+#include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
 #include <mbgl/text/cross_tile_symbol_index.hpp>
 #include <mbgl/text/glyph_atlas.hpp>
@@ -37,6 +38,7 @@ SymbolBucket::SymbolBucket(Immutable<style::SymbolLayoutProperties::PossiblyEval
       iconsInText(iconsInText_),
       justReloaded(false),
       hasVariablePlacement(false),
+      hasUninitializedSymbols(false),
       symbolInstances(symbolInstances_),
       textSizeBinder(SymbolSizeBinder::create(zoom, textSize, TextSize::defaultValue())),
       iconSizeBinder(SymbolSizeBinder::create(zoom, iconSize, IconSize::defaultValue())),
@@ -296,8 +298,8 @@ bool SymbolBucket::hasFormatSectionOverrides() const {
 }
 
 std::pair<uint32_t, bool> SymbolBucket::registerAtCrossTileIndex(CrossTileSymbolLayerIndex& index,
-                                                                 const OverscaledTileID& tileID) {
-    bool firstTimeAdded = index.addBucket(tileID, *this);
+                                                                 const RenderTile& renderTile) {
+    bool firstTimeAdded = index.addBucket(renderTile.getOverscaledTileID(), renderTile.matrix, *this);
     return std::make_pair(bucketInstanceId, firstTimeAdded);
 }
 

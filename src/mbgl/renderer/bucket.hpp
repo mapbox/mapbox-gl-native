@@ -56,7 +56,7 @@ public:
     // Returns a pair, the first element of which is a bucket cross-tile id
     // on success call; `0` otherwise. The second element is `true` if
     // the bucket was originally registered; `false` otherwise.
-    virtual std::pair<uint32_t, bool> registerAtCrossTileIndex(CrossTileSymbolLayerIndex&, const OverscaledTileID&) {
+    virtual std::pair<uint32_t, bool> registerAtCrossTileIndex(CrossTileSymbolLayerIndex&, const RenderTile&) {
         return std::make_pair(0u, false);
     }
     // Places this bucket to the given placement.

@@ -2,8 +2,9 @@
 
 #include <mbgl/tile/tile_id.hpp>
 #include <mbgl/util/bitmask_operations.hpp>
-#include <mbgl/util/geometry.hpp>
 #include <mbgl/util/constants.hpp>
+#include <mbgl/util/geometry.hpp>
+#include <mbgl/util/mat4.hpp>
 #include <mbgl/util/optional.hpp>
 
 #include <map>
@@ -48,7 +49,7 @@ public:
 class CrossTileSymbolLayerIndex {
 public:
     CrossTileSymbolLayerIndex(uint32_t& maxCrossTileID);
-    bool addBucket(const OverscaledTileID&, SymbolBucket&);
+    bool addBucket(const OverscaledTileID&, const mat4& tileMatrix, SymbolBucket&);
     bool removeStaleBuckets(const std::unordered_set<uint32_t>& currentIDs);
     void handleWrapJump(float newLng);
 private:
