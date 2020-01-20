@@ -12,6 +12,7 @@ TileLayerIndex::TileLayerIndex(OverscaledTileID coord_,
                                std::string bucketLeaderId_)
     : coord(coord_), bucketInstanceId(bucketInstanceId_), bucketLeaderId(std::move(bucketLeaderId_)) {
     for (SymbolInstance& symbolInstance : symbolInstances) {
+        if (symbolInstance.crossTileID == SymbolInstance::invalidCrossTileID()) continue;
         indexedSymbolInstances[symbolInstance.key].emplace_back(symbolInstance.crossTileID,
                                                                 getScaledCoordinates(symbolInstance, coord));
     }
@@ -95,11 +96,29 @@ void CrossTileSymbolLayerIndex::handleWrapJump(float newLng) {
     lng = newLng;
 }
 
-bool CrossTileSymbolLayerIndex::addBucket(const OverscaledTileID& tileID, SymbolBucket& bucket) {
+namespace {
+
+bool isInVewport(const mat4& posMatrix, const Point<float>& point) {
+    vec4 p = {{point.x, point.y, 0, 1}};
+    matrix::transformMat4(p, p, posMatrix);
+
+    // buffer covers area of the next zoom level (current zoom - 1 covered area).
+    constexpr float buffer = 1.0f;
+    constexpr float edge = 1.0f + buffer;
+    float x = p[0] / p[3];
+    float y = p[1] / p[3];
+    return (x > -edge && y > -edge && x < edge && y < edge);
+}
+
+} // namespace
+
+bool CrossTileSymbolLayerIndex::addBucket(const OverscaledTileID& tileID,
+                                          const mat4& tileMatrix,
+                                          SymbolBucket& bucket) {
     auto& thisZoomIndexes = indexes[tileID.overscaledZ];
     auto previousIndex = thisZoomIndexes.find(tileID);
     if (previousIndex != thisZoomIndexes.end()) {
-        if (previousIndex->second.bucketInstanceId == bucket.bucketInstanceId) {
+        if (previousIndex->second.bucketInstanceId == bucket.bucketInstanceId && !bucket.hasUninitializedSymbols) {
             return false;
         } else {
             // We're replacing this bucket with an updated version
@@ -110,8 +129,23 @@ bool CrossTileSymbolLayerIndex::addBucket(const OverscaledTileID& tileID, Symbol
         }
     }
 
-    for (auto& symbolInstance: bucket.symbolInstances) {
-        symbolInstance.crossTileID = 0;
+    bucket.hasUninitializedSymbols = false;
+
+    if (tileID.overscaleFactor() > 1u) {
+        // For overscaled tiles the viewport might be showing only a small part of the tile,
+        // so we filter out the off-screen symbols to improve the performance.
+        for (auto& symbolInstance : bucket.symbolInstances) {
+            if (isInVewport(tileMatrix, symbolInstance.anchor.point)) {
+                symbolInstance.crossTileID = 0u;
+            } else {
+                symbolInstance.crossTileID = SymbolInstance::invalidCrossTileID();
+                bucket.hasUninitializedSymbols = true;
+            }
+        }
+    } else {
+        for (auto& symbolInstance : bucket.symbolInstances) {
+            symbolInstance.crossTileID = 0u;
+        }
     }
 
     auto& thisZoomUsedCrossTileIDs = usedCrossTileIDs[tileID.overscaledZ];
@@ -195,7 +229,7 @@ auto CrossTileSymbolIndex::addLayer(const RenderLayer& layer, float lng) -> AddL
     for (const auto& item : layer.getPlacementData()) {
         const RenderTile& renderTile = item.tile;
         Bucket& bucket = item.bucket;
-        auto pair = bucket.registerAtCrossTileIndex(layerIndex, renderTile.getOverscaledTileID());
+        auto pair = bucket.registerAtCrossTileIndex(layerIndex, renderTile);
         assert(pair.first != 0u);
         if (pair.second) result |= AddLayerResult::BucketsAdded;
         currentBucketIDs.insert(pair.first);

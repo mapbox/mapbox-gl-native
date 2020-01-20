@@ -422,7 +422,7 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(
             Mutable<Placement> placement = makeMutable<Placement>(updateParameters);
             for (auto it = layersNeedPlacement.crbegin(); it != layersNeedPlacement.crend(); ++it) {
                 const RenderLayer& layer = *it;
-                crossTileSymbolIndex.addLayer(layer, updateParameters->transformState);
+                crossTileSymbolIndex.addLayer(layer, longitude);
                 placement->placeLayer(layer);
             }
             placement->commit();
