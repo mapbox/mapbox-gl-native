@@ -170,8 +170,8 @@ xdeploy:
 	caffeinate -i ./platform/macos/scripts/deploy-packages.sh
 
 .PHONY: xdocument
-xdocument:
-	OUTPUT=$(OUTPUT) ./platform/macos/scripts/document.sh
+#xdocument:
+#	OUTPUT=$(OUTPUT) ./platform/macos/scripts/document.sh
 
 .PHONY: genstrings
 genstrings:
@@ -346,8 +346,8 @@ ideploy:
 	caffeinate -i ./platform/ios/scripts/deploy-packages.sh
 
 .PHONY: idocument
-idocument:
-	OUTPUT=$(OUTPUT) ./platform/ios/scripts/document.sh
+#idocument:
+#	OUTPUT=$(OUTPUT) ./platform/ios/scripts/document.sh
 
 .PHONY: darwin-style-code
 darwin-style-code:
