@@ -62,6 +62,7 @@ namespace mbgl {
                 ([item.name isEqualToString:@"a"] && [item.value isEqualToString:@"one"]) ||
                 ([item.name isEqualToString:@"b"] && [item.value isEqualToString:@"two"]) || [item.name isEqualToString:@"sku"])) {
                 foundCount++;
+            }
         }
 
         XCTAssert(foundCount == 4);
