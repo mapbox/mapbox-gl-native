@@ -18,6 +18,13 @@ add_library(
     ${MBGL_ROOT}/render-test/runner.hpp
 )
 
+if(CMAKE_SYSTEM_NAME STREQUAL iOS)
+    set_target_properties(mbgl-render-test PROPERTIES XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET "${IOS_DEPLOYMENT_TARGET}")
+    set_target_properties(mbgl-render-test PROPERTIES XCODE_ATTRIBUTE_ENABLE_BITCODE "YES")
+    set_target_properties(mbgl-render-test PROPERTIES XCODE_ATTRIBUTE_BITCODE_GENERATION_MODE bitcode)
+    set_target_properties(mbgl-render-test PROPERTIES XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH $<$<CONFIG:Debug>:YES>)
+endif()
+
 # FIXME: Should not use core private interface
 target_include_directories(
     mbgl-render-test

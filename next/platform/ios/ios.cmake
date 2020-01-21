@@ -23,6 +23,7 @@ target_sources(
         ${MBGL_ROOT}/platform/darwin/src/collator.mm
         ${MBGL_ROOT}/platform/darwin/src/gl_functions.cpp
         ${MBGL_ROOT}/platform/darwin/src/headless_backend_eagl.mm
+        ${MBGL_ROOT}/platform/darwin/src/native_apple_interface.m
         ${MBGL_ROOT}/platform/darwin/src/http_file_source.mm
         ${MBGL_ROOT}/platform/darwin/src/native_apple_interface.m
         ${MBGL_ROOT}/platform/darwin/src/image.mm
@@ -56,6 +57,8 @@ target_sources(
         ${MBGL_ROOT}/platform/default/src/mbgl/util/png_writer.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/util/thread_local.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/util/utf.cpp
+        ${MBGL_ROOT}/platform/default/src/mbgl/util/thread_local.cpp
+        ${MBGL_ROOT}/platform/default/src/mbgl/layermanager/layer_manager.cpp
 )
 
 target_include_directories(
@@ -90,4 +93,101 @@ target_link_libraries(
         z
 )
 
+if(MBGL_IOS_RENDER_TEST)
+    set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64")
+
+    set(PREPARE_CMD "${MBGL_ROOT}/render-test/ios/setup_test_data.sh")
+    message("COMMAND: ${PREPARE_CMD}")
+    execute_process(COMMAND ${PREPARE_CMD} RESULT_VARIABLE CMD_ERROR)
+    message(STATUS "CMD_ERROR:" ${CMD_ERROR})
+
+    set(RESOURCES ${MBGL_ROOT}/render-test/ios/Main.storyboard ${MBGL_ROOT}/render-test/ios/LaunchScreen.storyboard ${MBGL_ROOT}/test-data)
+
+    set(PUBLIC_HEADER ${MBGL_ROOT}/render-test/ios/iosTestRunner.h)
+
+    add_executable(
+        RenderTestApp
+        ${MBGL_ROOT}/render-test/ios/ios_test_runner.hpp
+        ${MBGL_ROOT}/render-test/ios/ios_test_runner.cpp
+        ${MBGL_ROOT}/render-test/ios/AppDelegate.h
+        ${MBGL_ROOT}/render-test/ios/AppDelegate.m
+        ${MBGL_ROOT}/render-test/ios/ViewController.h
+        ${MBGL_ROOT}/render-test/ios/ViewController.m
+        ${MBGL_ROOT}/render-test/ios/iosTestRunner.h
+        ${MBGL_ROOT}/render-test/ios/iosTestRunner.mm
+        ${MBGL_ROOT}/render-test/ios/main.m
+        ${RESOURCES}
+    )
+
+    initialize_ios_target(RenderTestApp)
+    # Turn on ARC
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fobjc-arc")
+
+    set_target_properties(
+        RenderTestApp
+        PROPERTIES
+            MACOSX_BUNDLE
+            TRUE
+            MACOSX_BUNDLE_IDENTIFIER
+            com.mapbox.RenderTestAPP
+            MACOSX_BUNDLE_INFO_PLIST
+            ${MBGL_ROOT}/render-test/ios/Info.plist
+            RESOURCE
+            "${RESOURCES}"
+    )
+
+    target_include_directories(
+        RenderTestApp
+        PUBLIC {MBGL_ROOT}/render-test/include ${MBGL_ROOT}/include
+    )
+
+    target_include_directories(
+        RenderTestApp
+        PRIVATE
+            ${MBGL_ROOT}/platform/darwin/src
+            ${MBGL_ROOT}/platform/darwin/include
+            ${MBGL_ROOT}/platform/darwin/include/mbgl/interface/
+            ${MBGL_ROOT}/platform/default/include
+            ${MBGL_ROOT}/src
+    )
+
+    target_include_directories(
+        RenderTestApp
+        PUBLIC ${MBGL_ROOT}/render-test/ios
+    )
+
+    target_link_libraries(
+        RenderTestApp
+        PRIVATE
+            "-framework CoreGraphics"
+            "-framework CoreLocation"
+            "-framework Foundation"
+            "-framework OpenGLES"
+            "-framework QuartzCore"
+            "-framework UIKit"
+            mbgl-render-test
+    )
+
+    find_package(XCTest REQUIRED)
+
+    xctest_add_bundle(RenderTestAppTests RenderTestApp ${MBGL_ROOT}/render-test/ios/tests/Tests.m)
+
+    set_target_properties(
+        RenderTestAppTests
+        PROPERTIES
+            XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET
+            "${IOS_DEPLOYMENT_TARGET}"
+            XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH
+            $<$<CONFIG:Debug>:YES>
+    )
+
+    target_include_directories(
+        RenderTestAppTests
+        PUBLIC ${MBGL_ROOT}/render-test/ios
+    )
+
+    xctest_add_test(XCTest.RenderTestApp RenderTestAppTests)
+
+    set_target_properties(RenderTestAppTests PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${MBGL_ROOT}/render-test/ios/tests/Info.plist)
+endif()
 unset(IOS_DEPLOYMENT_TARGET CACHE)
