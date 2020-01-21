@@ -710,7 +710,7 @@ jobs:
           name: Build IOS RenderTestApp
           command: |
             cd render-test/ios
-            cmake ../../next -B Build -G Xcode -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_SYSROOT=iphoneos -DIOS_RENDER_TESTING=ON
+            cmake ../../next -B Build -G Xcode -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_SYSROOT=iphoneos -DMBGL_IOS_RENDER_TEST=ON
             cd Build
             xcodebuild -sdk iphoneos -project Mapbox\ GL\ Native.xcodeproj -scheme RenderTestApp build-for-testing -arch arm64 CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -configuration Release
             xcodebuild -sdk iphoneos -project Mapbox\ GL\ Native.xcodeproj build -target RenderTestAppTests -arch arm64 CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -configuration Release
@@ -744,7 +744,7 @@ jobs:
               gcloud firebase test ios models list
               gcloud firebase test ios run \
                 --test testapp.zip \
-                --device model=iphonexs,version=12.3,locale=en,orientation=portrait --xcode-version=11.1 --timeout 20m \
+                --device model=iphonexs,version=12.0,locale=en,orientation=portrait --xcode-version=11.1 --timeout 20m \
                 --verbosity=debug --no-record-video --results-dir ios-render-test-app-${CIRCLE_BUILD_NUM}
             fi
       - run:
@@ -752,7 +752,7 @@ jobs:
           when: always
           command: |
             if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON_IOS}" ]]; then
-              testResult=$(gsutil ls -d gs://test-lab-hn7kwqcz3108z-hjm4qtbqqkymk/ios-render-test-app-${CIRCLE_BUILD_NUM}/iphonexs-12.3-en-portrait/TestLogs/)
+              testResult=$(gsutil ls -d gs://test-lab-hn7kwqcz3108z-hjm4qtbqqkymk/ios-render-test-app-${CIRCLE_BUILD_NUM}/iphonexs-12.0-en-portrait/TestLogs/)
               mkdir -p render-test-app
               gsutil -m cp -r $testResult render-test-app
               cd render-test-app/TestLogs && ls

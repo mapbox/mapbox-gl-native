@@ -93,7 +93,7 @@ target_link_libraries(
         z
 )
 
-if(IOS_RENDER_TESTING)
+if(MBGL_IOS_RENDER_TEST)
     set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64")
 
     set(PREPARE_CMD "${MBGL_ROOT}/render-test/ios/setup_test_data.sh")
