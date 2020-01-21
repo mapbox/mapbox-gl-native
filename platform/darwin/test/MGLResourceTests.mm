@@ -60,7 +60,7 @@ namespace mbgl {
         for (NSURLQueryItem *item in components.queryItems) {
             if (([item.name isEqualToString:@"offline"] && [item.value isEqualToString:@"true"]) ||
                 ([item.name isEqualToString:@"a"] && [item.value isEqualToString:@"one"]) ||
-                ([item.name isEqualToString:@"b"] && [item.value isEqualToString:@"two"]) || [item.name isEqualToString:@"sku"])) {
+                ([item.name isEqualToString:@"b"] && [item.value isEqualToString:@"two"]) || [item.name isEqualToString:@"sku"]) {
                 foundCount++;
             }
         }
