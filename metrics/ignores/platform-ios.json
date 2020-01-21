@@ -1,4 +1,8 @@
 {
+    "probes/gfx/pass": "Needs to be investigated and fixed.",
+    "probes/gfx/pass-double-probe": "Needs to be investigated and fixed.",
+    "probes/gfx/pass-probe-reset": "Needs to be investigated and fixed.",
+    "probes/network/pass": "Needs to be investigated and fixed.",
     "render-tests/icon-text-fit/enlargen-both": "Needs to be investigated and fixed.",
     "render-tests/line-pattern/overscaled": "Needs to be investigated and fixed.",
     "render-tests/runtime-styling/image-update-pattern": "Needs to be investigated and fixed.",
