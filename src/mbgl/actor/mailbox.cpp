@@ -8,26 +8,25 @@ namespace mbgl {
 
 Mailbox::Mailbox() = default;
 
-Mailbox::Mailbox(Scheduler& scheduler_)
-    : scheduler(&scheduler_) {
-}
+Mailbox::Mailbox(Scheduler& scheduler_) : weakScheduler(scheduler_.makeWeakPtr()) {}
 
 void Mailbox::open(Scheduler& scheduler_) {
-    assert(!scheduler);
+    assert(!weakScheduler);
 
     // As with close(), block until neither receive() nor push() are in progress, and acquire the two
     // mutexes in the same order.
     std::lock_guard<std::recursive_mutex> receivingLock(receivingMutex);
     std::lock_guard<std::mutex> pushingLock(pushingMutex);
-    
-    scheduler = &scheduler_;
+
+    weakScheduler = scheduler_.makeWeakPtr();
 
     if (closed) {
         return;
     }
     
     if (!queue.empty()) {
-        (*scheduler)->schedule(makeClosure(shared_from_this()));
+        auto guard = weakScheduler.lock();
+        if (weakScheduler) weakScheduler->schedule(makeClosure(shared_from_this()));
     }
 }
 
@@ -43,8 +42,9 @@ void Mailbox::close() {
     closed = true;
 }
 
-bool Mailbox::isOpen() const { return bool(scheduler); }
-
+bool Mailbox::isOpen() const {
+    return bool(weakScheduler);
+}
 
 void Mailbox::push(std::unique_ptr<Message> message) {
     std::lock_guard<std::mutex> pushingLock(pushingMutex);
@@ -56,15 +56,17 @@ void Mailbox::push(std::unique_ptr<Message> message) {
     std::lock_guard<std::mutex> queueLock(queueMutex);
     bool wasEmpty = queue.empty();
     queue.push(std::move(message));
-    if (wasEmpty && scheduler) {
-        (*scheduler)->schedule(makeClosure(shared_from_this()));
+    auto guard = weakScheduler.lock();
+    if (wasEmpty && weakScheduler) {
+        weakScheduler->schedule(makeClosure(shared_from_this()));
     }
 }
 
 void Mailbox::receive() {
     std::lock_guard<std::recursive_mutex> receivingLock(receivingMutex);
-    
-    assert(scheduler);
+
+    auto guard = weakScheduler.lock();
+    assert(weakScheduler);
 
     if (closed) {
         return;
@@ -84,7 +86,7 @@ void Mailbox::receive() {
     (*message)();
 
     if (!wasEmpty) {
-        (*scheduler)->schedule(makeClosure(shared_from_this()));
+        weakScheduler->schedule(makeClosure(shared_from_this()));
     }
 }
 

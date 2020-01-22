@@ -7,6 +7,8 @@
 #include <mutex>
 #include <queue>
 
+#include <mapbox/weak.hpp>
+
 namespace mbgl {
 
 class Scheduler;
@@ -38,7 +40,7 @@ public:
     static std::function<void()> makeClosure(std::weak_ptr<Mailbox>);
 
 private:
-    optional<Scheduler*> scheduler;
+    mapbox::base::WeakPtr<Scheduler> weakScheduler;
 
     std::recursive_mutex receivingMutex;
     std::mutex pushingMutex;
