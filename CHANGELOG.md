@@ -88,6 +88,12 @@
 
 ### 🏁 Performance improvements
 
+- [core] Cross tile index performance ([#16127](https://github.com/mapbox/mapbox-gl-native/pull/16127))
+
+  For overscaled tiles, index only the symbols inside the viewport.
+
+  Find matches only among the buckets that have the same leader Id.
+
 - [core] Calculate GeoJSON tile geometries in a background thread ([#15953](https://github.com/mapbox/mapbox-gl-native/pull/15953))
 
   Call `mapbox::geojsonvt::GeoJSONVT::getTile()` in a background thread, so that the rendering thread is not blocked.
