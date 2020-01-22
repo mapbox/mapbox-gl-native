@@ -682,7 +682,7 @@ bool SymbolLayout::anchorIsTooClose(const std::u16string& text, const float repe
     if (compareText.find(text) == compareText.end()) {
         compareText.emplace(text, Anchors());
     } else {
-        auto otherAnchors = compareText.find(text)->second;
+        const auto& otherAnchors = compareText.find(text)->second;
         for (const Anchor& otherAnchor : otherAnchors) {
             if (util::dist<float>(anchor.point, otherAnchor.point) < repeatDistance) {
                 return true;
