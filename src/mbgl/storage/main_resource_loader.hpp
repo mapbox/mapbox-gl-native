@@ -19,7 +19,6 @@ public:
     void resume() override;
 
 private:
-    friend class ResourceLoaderRequestor;
     class Impl;
     const std::unique_ptr<Impl> impl;
 };
