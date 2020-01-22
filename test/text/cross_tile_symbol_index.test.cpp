@@ -1,6 +1,7 @@
-#include <mbgl/text/cross_tile_symbol_index.hpp>
+#include <mbgl/map/transform_state.hpp>
 #include <mbgl/renderer/buckets/symbol_bucket.hpp>
 #include <mbgl/test/util.hpp>
+#include <mbgl/text/cross_tile_symbol_index.hpp>
 
 using namespace mbgl;
 
@@ -342,3 +343,55 @@ TEST(CrossTileSymbolLayerIndex, bucketReplacement) {
     ASSERT_EQ(secondBucket.symbolInstances.at(2).crossTileID, 3u); // C' gets new ID
 }
 
+namespace {
+
+void populatePosMatrix(mat4& posMatrix, const OverscaledTileID& tileId, double lat, double lon, double zoom) {
+    TransformState transformState;
+    transformState.setSize({512, 512});
+    transformState.setLatLngZoom(LatLng(lat, lon), zoom);
+    transformState.matrixFor(posMatrix, tileId.toUnwrapped());
+    matrix::multiply(posMatrix, transformState.getProjectionMatrix(), posMatrix);
+}
+
+} // namespace
+
+TEST(CrossTileSymbolLayerIndex, offscreenSymbols) {
+    uint32_t maxCrossTileID = 0;
+    CrossTileSymbolLayerIndex index(maxCrossTileID);
+
+    Immutable<style::SymbolLayoutProperties::PossiblyEvaluated> layout =
+        makeMutable<style::SymbolLayoutProperties::PossiblyEvaluated>();
+    bool iconsNeedLinear = false;
+    bool sortFeaturesByY = false;
+    std::string bucketLeaderID = "test";
+
+    OverscaledTileID tileId(7, 0, 6, 18, 24);
+    std::vector<SymbolInstance> mainInstances;
+    mainInstances.push_back(makeSymbolInstance(1000, 1000, u"Washington"));
+    mainInstances.push_back(makeSymbolInstance(2000, 2000, u"Richmond"));
+    SymbolBucket symbolBucket{layout,
+                              {},
+                              16.0f,
+                              1.0f,
+                              0,
+                              iconsNeedLinear,
+                              sortFeaturesByY,
+                              bucketLeaderID,
+                              std::move(mainInstances),
+                              1.0f,
+                              false,
+                              {},
+                              false /*iconsInText*/};
+    mat4 posMatrix;
+    populatePosMatrix(posMatrix, tileId, 60.0, 25.0, 7.0);
+    index.addBucket(tileId, posMatrix, symbolBucket);
+
+    EXPECT_EQ(symbolBucket.symbolInstances.at(0).crossTileID, SymbolInstance::invalidCrossTileID());
+    EXPECT_EQ(symbolBucket.symbolInstances.at(1).crossTileID, SymbolInstance::invalidCrossTileID());
+
+    populatePosMatrix(posMatrix, tileId, 39.0, -76.0, 7.0);
+    index.addBucket(tileId, posMatrix, symbolBucket);
+
+    EXPECT_EQ(symbolBucket.symbolInstances.at(0).crossTileID, 1u);
+    EXPECT_EQ(symbolBucket.symbolInstances.at(1).crossTileID, 2u);
+}
