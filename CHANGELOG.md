@@ -34,6 +34,10 @@
 
 ### 🐞 Bug fixes
 
+- [core] Use weak scheduler inside mailbox ([#16136](https://github.com/mapbox/mapbox-gl-native/pull/16136))
+
+  If there are pending requests that are completed after main scheduler is destructed, worker threads may try to push messages to destructed scheduler's queue.
+
 - [core] Fix a crash in GeoJSON source parsing, caused by `GeoJSONVTData` ownership error ([#16106](https://github.com/mapbox/mapbox-gl-native/pull/16106))
 
 - [core] Stable position of labels at tile borders in tile mode ([#16040](https://github.com/mapbox/mapbox-gl-native/pull/16040))
