@@ -6,59 +6,23 @@
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/resource_options.hpp>
 #include <mbgl/util/stopwatch.hpp>
+#include <mbgl/util/thread.hpp>
 
 #include <cassert>
 
 namespace mbgl {
 
-class ResourceLoaderRequestor {
+class MainResourceLoaderThread {
 public:
-    explicit ResourceLoaderRequestor(MainResourceLoader::Impl& impl_);
-    void request(AsyncRequest*, Resource, ActorRef<FileSourceRequest>);
-    void cancel(AsyncRequest*);
-    void pause();
-    void resume();
-
-private:
-    MainResourceLoader::Impl& impl;
-};
-
-class MainResourceLoader::Impl {
-public:
-    Impl(std::shared_ptr<FileSource> assetFileSource_,
-         std::shared_ptr<FileSource> databaseFileSource_,
-         std::shared_ptr<FileSource> localFileSource_,
-         std::shared_ptr<FileSource> onlineFileSource_)
+    MainResourceLoaderThread(std::shared_ptr<FileSource> assetFileSource_,
+                             std::shared_ptr<FileSource> databaseFileSource_,
+                             std::shared_ptr<FileSource> localFileSource_,
+                             std::shared_ptr<FileSource> onlineFileSource_)
         : assetFileSource(std::move(assetFileSource_)),
           databaseFileSource(std::move(databaseFileSource_)),
           localFileSource(std::move(localFileSource_)),
-          onlineFileSource(std::move(onlineFileSource_)),
-          supportsCacheOnlyRequests_(bool(databaseFileSource)),
-          requestor(std::make_unique<Actor<ResourceLoaderRequestor>>(*Scheduler::GetCurrent(), *this)) {}
+          onlineFileSource(std::move(onlineFileSource_)) {}
 
-    std::unique_ptr<AsyncRequest> request(const Resource& resource, Callback callback) {
-        auto req = std::make_unique<FileSourceRequest>(std::move(callback));
-        req->onCancel([actorRef = requestor->self(), req = req.get()]() {
-            actorRef.invoke(&ResourceLoaderRequestor::cancel, req);
-        });
-        requestor->self().invoke(&ResourceLoaderRequestor::request, req.get(), resource, req->actor());
-        return std::move(req);
-    }
-
-    bool canRequest(const Resource& resource) const {
-        return (assetFileSource && assetFileSource->canRequest(resource)) ||
-               (localFileSource && localFileSource->canRequest(resource)) ||
-               (databaseFileSource && databaseFileSource->canRequest(resource)) ||
-               (onlineFileSource && onlineFileSource->canRequest(resource));
-    }
-
-    bool supportsCacheOnlyRequests() const { return supportsCacheOnlyRequests_; }
-
-    void pause() { requestor->self().invoke(&ResourceLoaderRequestor::pause); }
-
-    void resume() { requestor->self().invoke(&ResourceLoaderRequestor::resume); }
-
-private:
     void request(AsyncRequest* req, Resource resource, ActorRef<FileSourceRequest> ref) {
         auto callback = [ref](const Response& res) { ref.invoke(&FileSourceRequest::setResponse, res); };
 
@@ -142,55 +106,64 @@ private:
         }
     }
 
-    void pauseInternal() {
-        if (assetFileSource) assetFileSource->pause();
-        if (databaseFileSource) databaseFileSource->pause();
-        if (localFileSource) localFileSource->pause();
-        if (onlineFileSource) onlineFileSource->pause();
-    }
-
-    void resumeInternal() {
-        if (assetFileSource) assetFileSource->resume();
-        if (databaseFileSource) databaseFileSource->resume();
-        if (localFileSource) localFileSource->resume();
-        if (onlineFileSource) onlineFileSource->resume();
-    }
-
     void cancel(AsyncRequest* req) {
         assert(req);
         tasks.erase(req);
     }
 
 private:
-    friend class ResourceLoaderRequestor;
+    const std::shared_ptr<FileSource> assetFileSource;
+    const std::shared_ptr<FileSource> databaseFileSource;
+    const std::shared_ptr<FileSource> localFileSource;
+    const std::shared_ptr<FileSource> onlineFileSource;
+    std::unordered_map<AsyncRequest*, std::unique_ptr<AsyncRequest>> tasks;
+};
+
+class MainResourceLoader::Impl {
+public:
+    Impl(std::shared_ptr<FileSource> assetFileSource_,
+         std::shared_ptr<FileSource> databaseFileSource_,
+         std::shared_ptr<FileSource> localFileSource_,
+         std::shared_ptr<FileSource> onlineFileSource_)
+        : assetFileSource(std::move(assetFileSource_)),
+          databaseFileSource(std::move(databaseFileSource_)),
+          localFileSource(std::move(localFileSource_)),
+          onlineFileSource(std::move(onlineFileSource_)),
+          supportsCacheOnlyRequests_(bool(databaseFileSource)),
+          thread(std::make_unique<util::Thread<MainResourceLoaderThread>>(
+              "ResourceLoaderThread", assetFileSource, databaseFileSource, localFileSource, onlineFileSource)) {}
+
+    std::unique_ptr<AsyncRequest> request(const Resource& resource, Callback callback) {
+        auto req = std::make_unique<FileSourceRequest>(std::move(callback));
+
+        req->onCancel([actorRef = thread->actor(), req = req.get()]() {
+            actorRef.invoke(&MainResourceLoaderThread::cancel, req);
+        });
+        thread->actor().invoke(&MainResourceLoaderThread::request, req.get(), resource, req->actor());
+        return std::move(req);
+    }
+
+    bool canRequest(const Resource& resource) const {
+        return (assetFileSource && assetFileSource->canRequest(resource)) ||
+               (localFileSource && localFileSource->canRequest(resource)) ||
+               (databaseFileSource && databaseFileSource->canRequest(resource)) ||
+               (onlineFileSource && onlineFileSource->canRequest(resource));
+    }
+
+    bool supportsCacheOnlyRequests() const { return supportsCacheOnlyRequests_; }
+
+    void pause() { thread->pause(); }
+
+    void resume() { thread->resume(); }
+
+private:
     const std::shared_ptr<FileSource> assetFileSource;
     const std::shared_ptr<FileSource> databaseFileSource;
     const std::shared_ptr<FileSource> localFileSource;
     const std::shared_ptr<FileSource> onlineFileSource;
     const bool supportsCacheOnlyRequests_;
-    std::unique_ptr<Actor<ResourceLoaderRequestor>> requestor;
-    std::unordered_map<AsyncRequest*, std::unique_ptr<AsyncRequest>> tasks;
+    const std::unique_ptr<util::Thread<MainResourceLoaderThread>> thread;
 };
-
-ResourceLoaderRequestor::ResourceLoaderRequestor(MainResourceLoader::Impl& impl_) : impl(impl_) {}
-
-void ResourceLoaderRequestor::request(AsyncRequest* req, Resource resource, ActorRef<FileSourceRequest> ref) {
-    assert(req);
-    impl.request(req, std::move(resource), std::move(ref));
-}
-
-void ResourceLoaderRequestor::cancel(AsyncRequest* req) {
-    assert(req);
-    impl.cancel(req);
-}
-
-void ResourceLoaderRequestor::pause() {
-    impl.pauseInternal();
-}
-
-void ResourceLoaderRequestor::resume() {
-    impl.resumeInternal();
-}
 
 MainResourceLoader::MainResourceLoader(const ResourceOptions& options)
     : impl(std::make_unique<Impl>(FileSourceManager::get()->getFileSource(FileSourceType::Asset, options),
