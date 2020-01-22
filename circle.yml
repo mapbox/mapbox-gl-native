@@ -214,13 +214,21 @@ executors:
 
 commands:
   next-prepare:
+    parameters:
+      use_sanity_check_ccache:
+        type: boolean
+        default: true
     steps:
       - restore_cache:
           keys:
             - 'ccache-v1-{{ .Environment.CIRCLE_JOB }}-{{ .Branch }}-{{ .Revision }}'
             - 'ccache-v1-{{ .Environment.CIRCLE_JOB }}-{{ .Branch }}-'
             - 'ccache-v1-{{ .Environment.CIRCLE_JOB }}-master'
-            - 'ccache-v1-next-sanity-checks-master'
+      - when:
+          condition: << parameters.use_sanity_check_ccache >>
+          steps:
+            - restore_cache:
+                key: 'ccache-v1-next-sanity-checks-master'
       - run:
           name: Prepare
           command: |
@@ -683,7 +691,8 @@ jobs:
     executor: macos-11_0_0
     steps:
       - checkout
-      - next-prepare
+      - next-prepare:
+          use_sanity_check_ccache: false
       - next-prepare-macos
       - run:
           name: Build
@@ -695,7 +704,8 @@ jobs:
     executor: macos-11_0_0
     steps:
       - checkout
-      - next-prepare
+      - next-prepare:
+          use_sanity_check_ccache: false
       - next-prepare-macos:
           build-ios-test-runner: true
       - run:
@@ -970,10 +980,10 @@ jobs:
     executor: << parameters.executor_name >>
     steps:
       - checkout
-      - next-prepare
       - when:
           condition: << parameters.target_is_android >>
           steps:
+            - next-prepare
             - next-config:
                 config_params: << parameters.config_params >>
             - next-build:
@@ -981,6 +991,7 @@ jobs:
       - when:
           condition: << parameters.target_is_linux >>
           steps:
+            - next-prepare
             - next-prepare-linux
             - next-config:
                 config_params: << parameters.config_params >>
@@ -991,6 +1002,8 @@ jobs:
       - when:
           condition: << parameters.target_is_macos >>
           steps:
+            - next-prepare:
+                use_sanity_check_ccache: false
             - next-prepare-macos
             - next-config:
                 config_params: << parameters.config_params >>
