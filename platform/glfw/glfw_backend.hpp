@@ -22,7 +22,7 @@ public:
         return mbgl::gfx::Backend::Create<GLFWBackend, GLFWwindow*, bool>(window, capFrameRate);
     }
 
-    virtual mbgl::gfx::RendererBackend& getRendererBackend() = 0;
+    virtual mbgl::gfx::RendererBackend* getRendererBackend() = 0;
     virtual mbgl::Size getSize() const = 0;
     virtual void setSize(mbgl::Size) = 0;
 };

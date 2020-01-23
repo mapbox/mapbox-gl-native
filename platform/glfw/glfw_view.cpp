@@ -168,7 +168,7 @@ void GLFWView::setRenderFrontend(GLFWRendererFrontend* rendererFrontend_) {
     rendererFrontend = rendererFrontend_;
 }
 
-mbgl::gfx::RendererBackend& GLFWView::getRendererBackend() {
+mbgl::gfx::RendererBackend* GLFWView::getRendererBackend() {
     return backend->getRendererBackend();
 }
 
@@ -180,6 +180,9 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
             view->animateRouteCallback = nullptr;
 
         switch (key) {
+        case GLFW_KEY_V:
+            view->rendererFrontend->getRenderer()->setRendererBackend(view->getRendererBackend());
+            break;
         case GLFW_KEY_ESCAPE:
             glfwSetWindowShouldClose(window, true);
             break;
@@ -709,13 +712,14 @@ void GLFWView::run() {
 
             updateAnimatedAnnotations();
 
-            mbgl::gfx::BackendScope scope { backend->getRendererBackend() };
+            if (backend->getRendererBackend()) {
+                mbgl::gfx::BackendScope scope { *backend->getRendererBackend() };
+                rendererFrontend->render();
 
-            rendererFrontend->render();
-
-            report(1000 * (glfwGetTime() - started));
-            if (benchmark) {
-                invalidate();
+                report(1000 * (glfwGetTime() - started));
+                if (benchmark) {
+                    invalidate();
+                }
             }
 
         }

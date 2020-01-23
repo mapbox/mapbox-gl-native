@@ -23,13 +23,17 @@ class RendererBackend;
 
 class Renderer {
 public:
-    Renderer(gfx::RendererBackend&, float pixelRatio_,
+    Renderer(gfx::RendererBackend*, float pixelRatio_,
              const optional<std::string> localFontFamily = {});
+
+    Renderer(float pixelRatio_, bool sharedContext = false);
+
     ~Renderer();
 
     void markContextLost();
 
     void setObserver(RendererObserver*);
+    void setRendererBackend(gfx::RendererBackend*);
 
     void render(const std::shared_ptr<UpdateParameters>&);
 

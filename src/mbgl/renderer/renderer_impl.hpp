@@ -17,15 +17,21 @@ class RendererBackend;
 
 class Renderer::Impl {
 public:
-    Impl(gfx::RendererBackend&,
+    Impl(gfx::RendererBackend*,
          float pixelRatio_,
          optional<std::string> localFontFamily_);
+
+    Impl(float pixelRatio_,
+         bool sharedContext);
+
     ~Impl();
 
 private:
     friend class Renderer;
 
     void setObserver(RendererObserver*);
+
+    void setRendererBackend(gfx::RendererBackend* backend_) { backend = backend_; }
 
     void render(const RenderTree&);
 
@@ -34,7 +40,7 @@ private:
     // TODO: Move orchestrator to Map::Impl.
     RenderOrchestrator orchestrator;
 
-    gfx::RendererBackend& backend;
+    gfx::RendererBackend* backend;
 
     RendererObserver* observer;
 

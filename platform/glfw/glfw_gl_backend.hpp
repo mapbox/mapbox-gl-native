@@ -18,8 +18,8 @@ public:
 
     // GLFWRendererBackend implementation
 public:
-    mbgl::gfx::RendererBackend& getRendererBackend() override {
-        return *this;
+    mbgl::gfx::RendererBackend* getRendererBackend() override {
+        return this;
     }
     mbgl::Size getSize() const override;
     void setSize(mbgl::Size) override;

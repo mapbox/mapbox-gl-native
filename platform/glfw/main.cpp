@@ -119,7 +119,7 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    GLFWRendererFrontend rendererFrontend { std::make_unique<mbgl::Renderer>(view->getRendererBackend(), view->getPixelRatio()), *view };
+    GLFWRendererFrontend rendererFrontend { std::make_unique<mbgl::Renderer>(view->getPixelRatio()) , *view };
 
     mbgl::Map map(rendererFrontend, *view,
                   mbgl::MapOptions().withSize(view->getSize()).withPixelRatio(view->getPixelRatio()), resourceOptions);

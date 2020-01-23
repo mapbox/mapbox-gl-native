@@ -27,7 +27,7 @@ public:
     
     void setRenderFrontend(GLFWRendererFrontend*);
 
-    mbgl::gfx::RendererBackend& getRendererBackend();
+    mbgl::gfx::RendererBackend* getRendererBackend();
 
     void setTestDirectory(std::string dir) { testDirectory = std::move(dir); };
 

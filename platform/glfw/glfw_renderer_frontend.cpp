@@ -28,10 +28,11 @@ void GLFWRendererFrontend::update(std::shared_ptr<mbgl::UpdateParameters> params
 
 void GLFWRendererFrontend::render() {
     assert(renderer);
+    assert(glfwView.getRendererBackend());
     
     if (!updateParameters) return;
     
-    mbgl::gfx::BackendScope guard { glfwView.getRendererBackend(), mbgl::gfx::BackendScope::ScopeType::Implicit };
+    mbgl::gfx::BackendScope guard { *glfwView.getRendererBackend(), mbgl::gfx::BackendScope::ScopeType::Implicit };
 
     // onStyleImageMissing might be called during a render. The user implemented method
     // could trigger a call to MGLRenderFrontend#update which overwrites `updateParameters`.

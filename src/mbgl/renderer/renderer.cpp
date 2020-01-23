@@ -8,12 +8,23 @@
 
 namespace mbgl {
 
-Renderer::Renderer(gfx::RendererBackend& backend, float pixelRatio_, const optional<std::string> localFontFamily_)
+Renderer::Renderer(gfx::RendererBackend* backend, float pixelRatio_, const optional<std::string> localFontFamily_)
     : impl(std::make_unique<Impl>(backend, pixelRatio_, localFontFamily_)) {}
 
+
+Renderer::Renderer(float pixelRatio, bool sharedContext)
+  : impl(std::make_unique<Impl>(pixelRatio, sharedContext)) {
+}
+
 Renderer::~Renderer() {
-    gfx::BackendScope guard { impl->backend };
+    gfx::BackendScope guard { *impl->backend };
     impl.reset();
+}
+
+void Renderer::setRendererBackend(gfx::RendererBackend* backend) {
+    assert(backend);
+    impl->setRendererBackend(backend);
+    impl->observer->onInvalidate();
 }
 
 void Renderer::markContextLost() {
@@ -29,7 +40,7 @@ void Renderer::render(const std::shared_ptr<UpdateParameters>& updateParameters)
     assert(updateParameters);
     if (auto renderTree = impl->orchestrator.createRenderTree(updateParameters)) {
         renderTree->prepare();
-        impl->render(*renderTree);
+        if (impl->backend) impl->render(*renderTree);
     }
 }
 
@@ -126,8 +137,10 @@ void Renderer::dumpDebugLogs() {
 }
 
 void Renderer::reduceMemoryUse() {
-    gfx::BackendScope guard { impl->backend };
-    impl->reduceMemoryUse();
+    if (impl->backend) {
+        gfx::BackendScope guard { *impl->backend };
+        impl->reduceMemoryUse();
+    }
     impl->orchestrator.reduceMemoryUse();
 }
 

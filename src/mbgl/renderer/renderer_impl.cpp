@@ -24,14 +24,22 @@ static RendererObserver& nullObserver() {
     return observer;
 }
 
-Renderer::Impl::Impl(gfx::RendererBackend& backend_,
+Renderer::Impl::Impl(gfx::RendererBackend* backend_,
                      float pixelRatio_,
                      optional<std::string> localFontFamily_)
-    : orchestrator(!backend_.contextIsShared(), std::move(localFontFamily_))
+    : orchestrator(!backend_->contextIsShared(), std::move(localFontFamily_))
     , backend(backend_)
     , observer(&nullObserver())
     , pixelRatio(pixelRatio_) {
 
+}
+
+Renderer::Impl::Impl(float pixelRatio_,
+                     bool sharedContext)
+    : orchestrator(sharedContext, nullopt)
+    , backend(nullptr)
+    , observer(&nullObserver())
+    , pixelRatio(pixelRatio_) {
 }
 
 Renderer::Impl::~Impl() {
@@ -43,6 +51,7 @@ void Renderer::Impl::setObserver(RendererObserver* observer_) {
 }
 
 void Renderer::Impl::render(const RenderTree& renderTree) {
+    assert(backend);
     if (renderState == RenderState::Never) {
         observer->onWillStartRenderingMap();
     }
@@ -51,19 +60,19 @@ void Renderer::Impl::render(const RenderTree& renderTree) {
     const auto& renderTreeParameters = renderTree.getParameters();
 
     if (!staticData) {
-        staticData = std::make_unique<RenderStaticData>(backend.getContext(), pixelRatio);
+        staticData = std::make_unique<RenderStaticData>(backend->getContext(), pixelRatio);
     }
     staticData->has3D = renderTreeParameters.has3D;
 
-    auto& context = backend.getContext();
+    auto& context = backend->getContext();
 
     // Blocks execution until the renderable is available.
-    backend.getDefaultRenderable().wait();
+    backend->getDefaultRenderable().wait();
 
     PaintParameters parameters {
         context,
         pixelRatio,
-        backend,
+        *backend,
         renderTreeParameters.light,
         renderTreeParameters.mapMode,
         renderTreeParameters.debugOptions,
@@ -130,7 +139,7 @@ void Renderer::Impl::render(const RenderTree& renderTree) {
         optional<Color> color;
         if (parameters.debugOptions & MapDebugOptions::Overdraw) {
             color = Color::black();
-        } else if (!backend.contextIsShared()) {
+        } else if (!backend->contextIsShared()) {
             color = renderTreeParameters.backgroundColor;
         }
         parameters.renderPass = parameters.encoder->createRenderPass("main buffer", { parameters.backend.getDefaultRenderable(), color, 1, 0 });
@@ -223,8 +232,10 @@ void Renderer::Impl::render(const RenderTree& renderTree) {
 }
 
 void Renderer::Impl::reduceMemoryUse() {
-    assert(gfx::BackendScope::exists());
-    backend.getContext().reduceMemoryUsage();
+    if (backend) {
+        assert(gfx::BackendScope::exists());
+        backend->getContext().reduceMemoryUsage();
+    }
 }
 
 } // namespace mbgl

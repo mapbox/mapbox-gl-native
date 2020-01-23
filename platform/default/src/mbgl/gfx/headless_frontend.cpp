@@ -45,7 +45,7 @@ HeadlessFrontend::HeadlessFrontend(Size size_,
               frameTime = (endTime - startTime).count();
           }
       }),
-      renderer(std::make_unique<Renderer>(*getBackend(), pixelRatio, localFontFamily)) {}
+      renderer(std::make_unique<Renderer>(getBackend(), pixelRatio, localFontFamily)) {}
 
 HeadlessFrontend::~HeadlessFrontend() = default;
 
