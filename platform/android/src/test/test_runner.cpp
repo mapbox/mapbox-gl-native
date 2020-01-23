@@ -2,12 +2,14 @@
 #include "test_runner_common.hpp"
 
 #include <unistd.h>
+#include <mutex>
 #include <thread>
 
 using namespace mbgl;
 using namespace mbgl::android;
 
 std::atomic<bool> running{true};
+std::atomic<bool> success{false};
 std::once_flag done;
 ALooper* looper = NULL;
 
@@ -23,6 +25,7 @@ void runner() {
     int status = mbgl::runTests(argv.size(), argv.data());
     mbgl::Log::Info(mbgl::Event::General, "TestRunner finished with status: '%d'", status);
     running = false;
+    success = (status == 0);
     ALooper_wake(looper);
 }
 
@@ -39,14 +42,14 @@ void android_main(struct android_app* app) {
     if (copyFile(env, app->activity->assetManager, zipFile, storagePath, "data.zip")) {
         if (chdir("/sdcard")) {
             mbgl::Log::Error(mbgl::Event::General, "Failed to change the directory to /sdcard");
-            changeState(env, app, false);
+            changeState(env, app, success);
         } else {
             unZipFile(env, zipFile, "/sdcard/");
             runnerThread = std::thread(runner);
         }
     } else {
         mbgl::Log::Error(mbgl::Event::General, "Failed to copy zip file '%s' to external storage", zipFile.c_str());
-        changeState(env, app, false);
+        changeState(env, app, success);
     }
 
     int outFd, outEvents;
@@ -62,7 +65,7 @@ void android_main(struct android_app* app) {
             std::call_once(done, [&] {
                 mbgl::Log::Info(mbgl::Event::General, "TestRunner done");
                 runnerThread.join();
-                changeState(env, app, true);
+                changeState(env, app, success);
             });
         }
 
