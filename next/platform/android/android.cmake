@@ -329,7 +329,6 @@ add_library(
     ${MBGL_ROOT}/platform/default/src/mbgl/text/local_glyph_rasterizer.cpp
     ${MBGL_ROOT}/platform/android/src/test/collator_test_stub.cpp
     ${MBGL_ROOT}/platform/android/src/test/number_format_test_stub.cpp
-    ${MBGL_ROOT}/platform/android/src/test/http_file_source_test_stub.cpp
 )
 
 target_include_directories(
@@ -346,6 +345,29 @@ target_link_libraries(
         mbgl-test
         -Wl,--no-whole-archive
 )
+
+if(ANDROID_NATIVE_API_LEVEL VERSION_LESS 24)
+    target_sources(
+        mbgl-test-runner
+        PRIVATE ${MBGL_ROOT}/platform/android/src/test/http_file_source_test_stub.cpp
+    )
+else()
+    set(CURL_DIR ${MBGL_ROOT}/vendor/curl-android-ios/prebuilt-with-ssl/android)
+    set(CURL_LIBRARY ${CURL_DIR}/${ANDROID_ABI}/libcurl.a)
+
+    target_sources(
+        mbgl-test-runner
+        PRIVATE ${MBGL_ROOT}/platform/default/src/mbgl/storage/http_file_source.cpp
+    )
+    target_include_directories(
+        mbgl-test-runner
+        PRIVATE ${CURL_DIR}/include
+    )
+    target_link_libraries(
+        mbgl-test-runner
+        PRIVATE ${CURL_LIBRARY}
+    )
+endif()
 
 add_custom_command(
     TARGET mbgl-test-runner PRE_BUILD

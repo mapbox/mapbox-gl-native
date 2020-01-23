@@ -5,7 +5,7 @@ android {
 
     defaultConfig {
         applicationId = 'com.mapbox.mapboxsdk.maps.test_runner'
-        minSdkVersion 14
+        minSdkVersion 24
         targetSdkVersion 28
         def abi = 'all'
         if (project.hasProperty('mapbox.abis')) {

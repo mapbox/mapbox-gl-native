@@ -6,8 +6,6 @@
 
 #if ANDROID
     #define TEST_READ_ONLY 0
-    #undef TEST_HAS_SERVER
-    #define TEST_HAS_SERVER 0
 #elif TARGET_OS_IOS
     #define TEST_READ_ONLY 1
     #undef TEST_HAS_SERVER
