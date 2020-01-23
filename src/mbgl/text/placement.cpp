@@ -331,9 +331,6 @@ void Placement::placeBucket(const SymbolBucket& bucket,
 
                 const bool doVariableIconPlacement =
                     hasIconTextFit && !iconAllowOverlap && symbolInstance.placedIconIndex;
-
-                bool stickToFirstAnchor = false;
-
                 const auto placeFeatureForVariableAnchors = [&](const CollisionFeature& textCollisionFeature,
                                                                 style::TextWritingModeType orientation,
                                                                 const CollisionFeature& iconCollisionFeature) {
@@ -347,8 +344,6 @@ void Placement::placeBucket(const SymbolBucket& bucket,
                     for (size_t i = 0u; i < placementAttempts; ++i) {
                         auto anchor = variableTextAnchors[i % anchorsSize];
                         const bool isFirstAnchor = (anchor == variableTextAnchors.front());
-                        if (stickToFirstAnchor && !isFirstAnchor) continue;
-
                         const bool allowOverlap = (i >= anchorsSize);
                         shift = calculateVariableLayoutOffset(anchor,
                                                               width,
@@ -360,10 +355,10 @@ void Placement::placeBucket(const SymbolBucket& bucket,
                                                               state.getBearing());
                         textBoxes.clear();
 
-                        if (mapMode == MapMode::Tile && isFirstAnchor) {
-                            assert(tileBorders);
-                            stickToFirstAnchor = collisionIndex.featureIntersectsTileBorders(
-                                textCollisionFeature, shift, posMatrix, pixelRatio, *tileBorders);
+                        if (mapMode == MapMode::Tile && !isFirstAnchor &&
+                            collisionIndex.featureIntersectsTileBorders(
+                                textCollisionFeature, shift, posMatrix, pixelRatio, *tileBorders)) {
+                            continue;
                         }
 
                         placedFeature = collisionIndex.placeFeature(textCollisionFeature,
