@@ -76,3 +76,6 @@
 [submodule "vendor/cpp-httplib"]
 	path = vendor/cpp-httplib
 	url = https://github.com/yhirose/cpp-httplib.git
+[submodule "vendor/curl-android-ios"]
+	path = vendor/curl-android-ios
+	url = https://github.com/gcesarmza/curl-android-ios.git
