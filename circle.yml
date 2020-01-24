@@ -30,6 +30,7 @@ workflows:
             - linux-clang8-release
             - linux-gcc8-release
             - macos-xcode11-release
+            - ios-render-test-runner
       - build-template:
           name: android-armeabi-v7a-release
           executor_name: ubuntu-disco
@@ -389,6 +390,12 @@ jobs:
               xcparse attachments *.xcresult && ls
               cd ../.. && mkdir -p /tmp/tests/ios-render-test
               if ls render-test-app/TestLogs/*.html 1> /dev/null 2>&1; then cp render-test-app/TestLogs/*.html /tmp/tests/ios-render-test; fi
+              if [[ -n $(ls render-test-app/TestLogs/*.zip 2>/dev/null) ]]; then
+                cp render-test-app/TestLogs/*.zip metrics/next-ios-render-test-runner/
+                cd metrics/next-ios-render-test-runner/
+                unzip *.zip
+                rm -rf *.zip
+              fi
             fi
       - save
   android-benchmark-runner:
