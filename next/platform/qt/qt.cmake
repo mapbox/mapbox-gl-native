@@ -165,6 +165,11 @@ add_executable(
     ${MBGL_ROOT}/platform/qt/test/main.cpp
 )
 
+target_include_directories(
+    mbgl-test-runner
+    PUBLIC ${MBGL_ROOT}/include ${MBGL_ROOT}/test/include
+)
+
 target_compile_definitions(
     mbgl-test-runner
     PRIVATE WORK_DIRECTORY=${MBGL_ROOT}
@@ -176,9 +181,20 @@ target_link_libraries(
         Qt5::Gui
         Qt5::OpenGL
         mbgl-compiler-options
-        mbgl-test
         pthread
 )
+
+if(CMAKE_SYSTEM_NAME STREQUAL Darwin)
+    target_link_libraries(
+        mbgl-test-runner
+        PRIVATE -Wl,-force_load mbgl-test
+    )
+else()
+    target_link_libraries(
+        mbgl-test-runner
+        PRIVATE -Wl,--whole-archive mbgl-test -Wl,--no-whole-archive
+    )
+endif()
 
 find_program(MBGL_QDOC NAMES qdoc)
 
