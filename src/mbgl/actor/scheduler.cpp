@@ -28,17 +28,7 @@ Scheduler* Scheduler::GetCurrent() {
 
 // static
 PassRefPtr<Scheduler> Scheduler::GetBackground() {
-    static std::weak_ptr<Scheduler> weak;
-    static std::mutex mtx;
-
-    std::lock_guard<std::mutex> lock(mtx);
-    std::shared_ptr<Scheduler> scheduler = weak.lock();
-
-    if (!scheduler) {
-        weak = scheduler = std::make_shared<ThreadPool>();
-    }
-
-    return PassRefPtr<Scheduler>(std::move(scheduler));
+    return PassRefPtr<Scheduler>(std::make_shared<ParallelScheduler<2>>());
 }
 
 // static
