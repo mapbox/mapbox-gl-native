@@ -165,6 +165,11 @@ add_executable(
     ${MBGL_ROOT}/platform/default/src/mbgl/test/main.cpp
 )
 
+target_include_directories(
+    mbgl-test-runner
+    PUBLIC ${MBGL_ROOT}/include ${MBGL_ROOT}/test/include
+)
+
 target_compile_definitions(
     mbgl-test-runner
     PRIVATE WORK_DIRECTORY=${MBGL_ROOT}
@@ -172,7 +177,7 @@ target_compile_definitions(
 
 target_link_libraries(
     mbgl-test-runner
-    PRIVATE mbgl-compiler-options mbgl-test
+    PRIVATE mbgl-compiler-options -Wl,-force_load mbgl-test
 )
 
 add_executable(
@@ -180,9 +185,14 @@ add_executable(
     ${MBGL_ROOT}/platform/default/src/mbgl/benchmark/main.cpp
 )
 
+target_include_directories(
+    mbgl-benchmark-runner
+    PUBLIC ${MBGL_ROOT}/benchmark/include
+)
+
 target_link_libraries(
     mbgl-benchmark-runner
-    PRIVATE mbgl-compiler-options mbgl-benchmark
+    PRIVATE mbgl-compiler-options -Wl,-force_load mbgl-benchmark
 )
 
 add_executable(
