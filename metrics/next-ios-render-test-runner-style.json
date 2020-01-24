@@ -9,5 +9,10 @@
         "ignores/platform-all.json",
         "ignores/platform-macos.json",
         "ignores/platform-ios.json"
+    ],
+    "metric_path": "next-ios-render-test-runner",
+    "probes": [
+        "probeGFX",
+        "probeNetwork"
     ]
 }

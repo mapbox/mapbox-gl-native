@@ -246,7 +246,7 @@ void TestRunner::checkRenderTestResults(mbgl::PremultipliedImage&& actualImage, 
             mbgl::optional<std::string> maybeExpectedImage = mbgl::util::readFile(entry);
             if (!maybeExpectedImage) {
                 metadata.errorMessage = "Failed to load expected image " + entry;
-                metadata.renderErrored = true;
+                metadata.renderErrored++;
                 return;
             }
 

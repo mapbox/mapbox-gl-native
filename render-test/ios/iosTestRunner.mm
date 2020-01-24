@@ -8,7 +8,11 @@
 
 @property (nullable) TestRunner* runner;
 
-@property (copy, nullable) NSString *resultPath;
+@property (copy, nullable) NSString *styleResultPath;
+
+@property (copy, nullable) NSString *metricResultPath;
+
+@property (copy, nullable) NSString *metricPath;
 
 @property BOOL testStatus;
 
@@ -20,7 +24,7 @@
 {
     self = [super init];
     if (self) {
-        self.testStatus = false;
+        self.testStatus = NO;
         self.runner = new TestRunner();
         NSString *path = nil;
         NSError *error;
@@ -69,17 +73,23 @@
             }
         }
         if (path) {
-            NSString *manifestPath = [path stringByAppendingPathComponent:@"/next-ios-render-test-runner-style.json"];
-            std::string manifest = std::string([manifestPath UTF8String]);
-            
-            self.testStatus = self.runner->startTest(manifest);
-            self.resultPath =  [path stringByAppendingPathComponent:@"/next-ios-render-test-runner-style.html"];
-            
-            BOOL fileFound = [fileManager fileExistsAtPath: self.resultPath];
-            if (!fileFound) {
-                NSLog(@"File doese not exit %@", self.resultPath);
+
+            std::string basePath = std::string([path UTF8String]);
+            self.testStatus = self.runner->startTest(basePath) ? YES : NO;
+            self.styleResultPath =  [path stringByAppendingPathComponent:@"/next-ios-render-test-runner-style.html"];
+            self.metricResultPath =  [path stringByAppendingPathComponent:@"/next-ios-render-test-runner-metrics.html"];
+
+            BOOL fileFound = [fileManager fileExistsAtPath: self.styleResultPath];
+            if (fileFound == NO) {
+                NSLog(@"Style test result file '%@' doese not exit ", self.styleResultPath);
+                self.testStatus = NO;
             }
-            self.testStatus &= fileFound;
+
+            fileFound = [fileManager fileExistsAtPath: self.metricResultPath];
+            if (fileFound == NO) {
+                NSLog(@"Metric test result file '%@' doese not exit ", self.metricResultPath);
+                self.testStatus = NO;
+            }
         }
 
         delete self.runner;
@@ -88,8 +98,12 @@
     return self;
 }
 
-- (NSString*) getResultPath {
-   return self.resultPath;
+- (NSString*) getStyleResultPath {
+   return self.styleResultPath;
+}
+
+- (NSString*) getMetricResultPath {
+   return self.metricResultPath;
 }
 
 - (BOOL) getTestStatus {

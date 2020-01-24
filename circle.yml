@@ -749,7 +749,7 @@ jobs:
               # arrange files in a way Firebase expects it, and package them in a zip file
               cd render-test/ios/Build
               cp ../RenderTestApp_iphoneos13.2-arm64e-release.xctestrun .
-              zip testapp.zip -r Release-iphoneos/RenderTestApp.app
+              zip testapp.zip -r Release-iphoneos/RenderTestApp.app --quiet
               zip testapp.zip RenderTestApp_iphoneos13.2-arm64e-release.xctestrun
               gcloud firebase test ios models list
               gcloud firebase test ios run \
@@ -765,8 +765,8 @@ jobs:
               testResult=$(gsutil ls -d gs://test-lab-hn7kwqcz3108z-hjm4qtbqqkymk/ios-render-test-app-${CIRCLE_BUILD_NUM}/iphonexs-12.0-en-portrait/TestLogs/)
               mkdir -p render-test-app
               gsutil -m cp -r $testResult render-test-app
-              cd render-test-app/TestLogs && ls
-              xcparse attachments *.xcresult
+              cd render-test-app/TestLogs
+              xcparse attachments *.xcresult && ls
               cd ../.. && mkdir -p /tmp/tests/ios-render-test
               if ls render-test-app/TestLogs/*.html 1> /dev/null 2>&1; then cp render-test-app/TestLogs/*.html /tmp/tests/ios-render-test; fi
             fi
