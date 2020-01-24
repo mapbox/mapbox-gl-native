@@ -42,7 +42,8 @@ public:
     using TileFeatures = mapbox::feature::feature_collection<int16_t>;
     using Features = mapbox::feature::feature_collection<double>;
     static std::shared_ptr<GeoJSONData> create(const GeoJSON&,
-                                               Immutable<GeoJSONOptions> = GeoJSONOptions::defaultOptions());
+                                               Immutable<GeoJSONOptions> = GeoJSONOptions::defaultOptions(),
+                                               std::shared_ptr<Scheduler> scheduler = nullptr);
 
     virtual ~GeoJSONData() = default;
     virtual void getTile(const CanonicalTileID&, const std::function<void(TileFeatures)>&) = 0;
@@ -53,6 +54,8 @@ public:
                                const std::uint32_t limit = 10u,
                                const std::uint32_t offset = 0u) = 0;
     virtual std::uint8_t getClusterExpansionZoom(std::uint32_t) = 0;
+
+    virtual std::shared_ptr<Scheduler> getScheduler() { return nullptr; }
 };
 
 class GeoJSONSource final : public Source {

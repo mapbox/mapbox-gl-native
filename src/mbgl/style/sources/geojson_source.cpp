@@ -39,8 +39,20 @@ void GeoJSONSource::setURL(const std::string& url_) {
     }
 }
 
+namespace {
+
+inline std::shared_ptr<GeoJSONData> createGeoJSONData(const mapbox::geojson::geojson& geoJSON,
+                                                      const GeoJSONSource::Impl& impl) {
+    if (auto data = impl.getData().lock()) {
+        return GeoJSONData::create(geoJSON, impl.getOptions(), data->getScheduler());
+    }
+    return GeoJSONData::create(geoJSON, impl.getOptions());
+}
+
+} // namespace
+
 void GeoJSONSource::setGeoJSON(const mapbox::geojson::geojson& geoJSON) {
-    setGeoJSONData(GeoJSONData::create(geoJSON, impl().getOptions()));
+    setGeoJSONData(createGeoJSONData(geoJSON, impl()));
 }
 
 void GeoJSONSource::setGeoJSONData(std::shared_ptr<GeoJSONData> geoJSONData) {
@@ -83,7 +95,7 @@ void GeoJSONSource::loadDescription(FileSource& fileSource) {
                 conversion::Error error;
                 std::shared_ptr<GeoJSONData> geoJSONData;
                 if (optional<GeoJSON> geoJSON = conversion::convertJSON<GeoJSON>(*data, error)) {
-                    geoJSONData = GeoJSONData::create(*geoJSON, current.getOptions());
+                    geoJSONData = createGeoJSONData(*geoJSON, current);
                 } else {
                     // Create an empty GeoJSON VT object to make sure we're not infinitely waiting for tiles to load.
                     Log::Error(Event::ParseStyle, "Failed to parse GeoJSON data: %s", error.message.c_str());
