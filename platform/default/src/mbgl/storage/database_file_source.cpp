@@ -153,6 +153,9 @@ public:
 
     ActorRef<DatabaseFileSourceThread> actor() const { return thread->actor(); }
 
+    void pause() { thread->pause(); }
+    void resume() { thread->resume(); }
+
 private:
     const std::unique_ptr<util::Thread<DatabaseFileSourceThread>> thread;
 };
@@ -275,6 +278,14 @@ void DatabaseFileSource::setProperty(const std::string& key, const mapbox::base:
         std::string message = "Resource provider does not support property " + key;
         Log::Error(Event::General, message.c_str());
     }
+}
+
+void DatabaseFileSource::pause() {
+    impl->pause();
+}
+
+void DatabaseFileSource::resume() {
+    impl->resume();
 }
 
 } // namespace mbgl
