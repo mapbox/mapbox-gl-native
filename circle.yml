@@ -135,7 +135,6 @@ workflows:
           requires:
             - qt5-linux-gcc5-release
           config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DMBGL_WITH_QT=ON -DCMAKE_PREFIX_PATH=$(echo /usr/local/Cellar/qt/5.*/lib/cmake)'
-          test_params: '-N -Q'
       - build-template:
           name: macos-xcode11-release
           executor_name: macos-11_0_0
