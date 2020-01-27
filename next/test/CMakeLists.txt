@@ -35,6 +35,7 @@ add_library(
     ${MBGL_ROOT}/test/src/mbgl/test/test.cpp
     ${MBGL_ROOT}/test/src/mbgl/test/util.cpp
     ${MBGL_ROOT}/test/storage/asset_file_source.test.cpp
+    ${MBGL_ROOT}/test/storage/database_file_source.test.cpp
     ${MBGL_ROOT}/test/storage/headers.test.cpp
     ${MBGL_ROOT}/test/storage/http_file_source.test.cpp
     ${MBGL_ROOT}/test/storage/local_file_source.test.cpp
