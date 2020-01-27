@@ -124,6 +124,10 @@
 
 ##### ⚠️  Breaking changes
 
+- [core] Cross tile index performance (#16127)
+
+  Introduces public [mblg::Renderer::render](https://github.com/mapbox/mapbox-gl-native/pull/16127/files#diff-5a977e0401792825d7fcf522d48df11fR34) API break.
+
 - [core] Refactor DefaultFileSource codebase ([#15768](https://github.com/mapbox/mapbox-gl-native/pull/15768)) 
   - Adds `FileSourceManager` interface that provides access to `FileSource` instances and means of registering / unregistering `FileSource` factories
   - Splits `DefaultFileSource` into smaller parts
