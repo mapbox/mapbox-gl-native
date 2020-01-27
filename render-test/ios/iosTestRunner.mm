@@ -76,8 +76,8 @@
 
             std::string basePath = std::string([path UTF8String]);
             self.testStatus = self.runner->startTest(basePath) ? YES : NO;
-            self.styleResultPath =  [path stringByAppendingPathComponent:@"/next-ios-render-test-runner-style.html"];
-            self.metricResultPath =  [path stringByAppendingPathComponent:@"/next-ios-render-test-runner-metrics.html"];
+            self.styleResultPath =  [path stringByAppendingPathComponent:@"/ios-render-test-runner-style.html"];
+            self.metricResultPath =  [path stringByAppendingPathComponent:@"/ios-render-test-runner-metrics.html"];
 
             BOOL fileFound = [fileManager fileExistsAtPath: self.styleResultPath];
             if (fileFound == NO) {

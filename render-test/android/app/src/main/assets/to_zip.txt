@@ -3,8 +3,8 @@ mapbox-gl-js/test/integration/query-tests/
 metrics/expectations/
 metrics/ignores/
 metrics/tests/
-metrics/next-android-render-test-runner/
-metrics/next-android-render-test-runner-metrics.json
-metrics/next-android-render-test-runner-style.json
+metrics/android-render-test-runner/
+metrics/android-render-test-runner-metrics.json
+metrics/android-render-test-runner-style.json
 metrics/cache-metrics.db
 metrics/cache-style.db

@@ -1,0 +1,20 @@
+{
+    "base_test_path": "tests",
+    "cache_path": "cache-metrics.db",
+    "expectation_paths": [
+        "expectations/platform-all",
+        "expectations/platform-android"
+    ],
+    "ignore_paths": [
+        "ignores/platform-all.json",
+        "ignores/platform-linux.json",
+        "ignores/platform-android.json"
+    ],
+    "metric_path": "android-render-test-runner",
+    "probes": [
+        "probeGFX",
+        "probeMemory",
+        "probeNetwork"
+    ],
+    "result_path": "/sdcard"
+}
