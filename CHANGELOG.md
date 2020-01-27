@@ -1,6 +1,8 @@
 # Changelog
 
-## Master
+## master
+
+## maps-v1.0.0 (2020.01-release-unicorn)
 
 ### ✨ New features
 
@@ -33,6 +35,9 @@
   This patch introduces batch conversion between LatLng and ScreenCoordinate in Gl-Native core, so for multiple conversions with single point/latLng previously now it can be done with invoking one function call by passing vector of points/latLngs.
 
 ### 🐞 Bug fixes
+- [tile mode] Fix variable symbols placement ([#16141](https://github.com/mapbox/mapbox-gl-native/pull/16141)
+
+  This change allows the variable symbols to cross the tile border only if their anchor is the first anchor from the `text-variable-anchor` list.
 
 - [core] Use weak scheduler inside mailbox ([#16136](https://github.com/mapbox/mapbox-gl-native/pull/16136))
 
