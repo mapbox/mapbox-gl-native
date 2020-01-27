@@ -5,12 +5,12 @@ pkg_search_module(GLFW glfw3 REQUIRED)
 
 add_executable(
     mbgl-glfw
-    ${MBGL_ROOT}/platform/glfw/main.cpp
-    ${MBGL_ROOT}/platform/glfw/glfw_view.cpp
-    ${MBGL_ROOT}/platform/glfw/glfw_gl_backend.cpp
-    ${MBGL_ROOT}/platform/glfw/glfw_renderer_frontend.cpp
-    ${MBGL_ROOT}/platform/glfw/settings_json.cpp
-    ${MBGL_ROOT}/platform/glfw/test_writer.cpp
+    ${PROJECT_SOURCE_DIR}/platform/glfw/main.cpp
+    ${PROJECT_SOURCE_DIR}/platform/glfw/glfw_view.cpp
+    ${PROJECT_SOURCE_DIR}/platform/glfw/glfw_gl_backend.cpp
+    ${PROJECT_SOURCE_DIR}/platform/glfw/glfw_renderer_frontend.cpp
+    ${PROJECT_SOURCE_DIR}/platform/glfw/settings_json.cpp
+    ${PROJECT_SOURCE_DIR}/platform/glfw/test_writer.cpp
 )
 
 target_include_directories(
