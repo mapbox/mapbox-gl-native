@@ -27,6 +27,7 @@ option(WITH_OSMESA   "Use OSMesa headless backend" OFF)
 option(WITH_EGL      "Use EGL backend" OFF)
 option(WITH_NODEJS   "Download test dependencies like NPM and Node.js" ON)
 option(WITH_ERROR    "Add -Werror flag to build (turns warnings into errors)" ON)
+option(WITH_NO_RTTI  "Disable RTTI" ON)
 
 if (WITH_ERROR)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
@@ -80,7 +81,9 @@ else()
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Wshadow -Wno-variadic-macros -Wno-unknown-pragmas")
 endif()
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-rtti")
+if(WITH_NO_RTTI)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-rtti")
+endif()
 
 if(APPLE AND CMAKE_CXX_COMPILER_ID MATCHES ".*Clang")
     # -Wno-error=unused-command-line-argument is required due to https://llvm.org/bugs/show_bug.cgi?id=7798
