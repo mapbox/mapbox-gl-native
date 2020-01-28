@@ -5,6 +5,7 @@ __attribute__((visibility ("default")))
 
 - (NSString*) getStyleResultPath;
 - (NSString*) getMetricResultPath;
+- (NSString*) getMetricPath;
 - (BOOL) getTestStatus;
 
 @end

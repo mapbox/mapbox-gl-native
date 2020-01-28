@@ -95,6 +95,10 @@ target_link_libraries(
 
 if(MBGL_IOS_RENDER_TEST)
     set(CMAKE_OSX_ARCHITECTURES "armv7;i386;x86_64;arm64")
+
+    include(${PROJECT_SOURCE_DIR}/vendor/zip-archive.cmake)
+    initialize_ios_target(mbgl-vendor-zip-archive)
+
     set(PREPARE_CMD "${MBGL_ROOT}/render-test/ios/setup_test_data.sh")
     message("COMMAND: ${PREPARE_CMD}")
     execute_process(COMMAND ${PREPARE_CMD} RESULT_VARIABLE CMD_ERROR)
@@ -160,6 +164,7 @@ if(MBGL_IOS_RENDER_TEST)
             "-framework QuartzCore"
             "-framework UIKit"
             mbgl-render-test
+            mbgl-vendor-zip-archive
     )
 
     find_package(XCTest REQUIRED)

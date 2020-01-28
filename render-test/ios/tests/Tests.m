@@ -31,7 +31,7 @@
     XCTAssert(attachment1URL, @"Failed to attach test result '%@'", styleResult);
     attachment1URL.lifetime = XCTAttachmentLifetimeKeepAlways;
     [self addAttachment:attachment1URL];
-    
+
     fileFound = [fileManager fileExistsAtPath: metricResult];
     XCTAssert(fileFound, @"Test result html '%@' doese not exit", metricResult);
     NSURL *metricURL = [NSURL fileURLWithPath:metricResult];
@@ -39,6 +39,18 @@
     XCTAssert(attachment2URL, @"Failed to attach test result '%@'", metricResult);
     attachment2URL.lifetime = XCTAttachmentLifetimeKeepAlways;
     [self addAttachment:attachment2URL];
+
+    NSString* metrics = [runner getMetricPath];
+    if (metrics && [fileManager fileExistsAtPath: metrics]) {
+        NSURL *metricsURL = [NSURL fileURLWithPath:metrics];
+        XCTAttachment *attachmentMetricsURL = [XCTAttachment attachmentWithContentsOfFileAtURL: metricsURL];
+        XCTAssert(attachmentMetricsURL, @"Failed to attach test rebaselined metrics '%@'", metrics);
+        attachmentMetricsURL.lifetime = XCTAttachmentLifetimeKeepAlways;
+        [self addAttachment:attachmentMetricsURL];
+    }
+    else {
+        NSLog(@"No rebaselined metrics are found");
+    }
 
     BOOL success = [runner getTestStatus];
     XCTAssert(success, @"IOSTestRunner reports error because some of the tests are not passed, please check the test report");
