@@ -7,14 +7,20 @@ unset(CMAKE_C_VISIBILITY_PRESET)
 add_subdirectory(vendor/glfw)
 set(CMAKE_C_VISIBILITY_PRESET hidden)
 
-target_compile_options(glfw PRIVATE -Wno-shadow -Wno-unused-parameter -Wno-sign-compare -Wno-missing-field-initializers)
+target_compile_options(
+    glfw
+    PRIVATE
+        -Wno-shadow
+        -Wno-unused-parameter
+        -Wno-sign-compare
+        -Wno-missing-field-initializers
+)
 
 if(APPLE)
     # Don't show OpenGL deprecation warnings.
     target_compile_options(glfw PRIVATE -Wno-deprecated-declarations -Wno-unguarded-availability-new)
 
-    # get_target_property(DEPLOYMENT_TARGET_VERSION glfw MACOSX_DEPLOYMENT_TARGET)
-    # message(STATUS "target: ${DEPLOYMENT_TARGET_VERSION}")
+    # get_target_property(DEPLOYMENT_TARGET_VERSION glfw MACOSX_DEPLOYMENT_TARGET) message(STATUS "target: ${DEPLOYMENT_TARGET_VERSION}")
     set_target_properties(glfw PROPERTIES OSX_DEPLOYMENT_TARGET 10.11)
 endif()
 
