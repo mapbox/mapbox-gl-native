@@ -121,6 +121,7 @@ add_library(
     ${MBGL_ROOT}/include/mbgl/math/log2.hpp
     ${MBGL_ROOT}/include/mbgl/math/minmax.hpp
     ${MBGL_ROOT}/include/mbgl/math/wrap.hpp
+    ${MBGL_ROOT}/include/mbgl/platform/settings.hpp
     ${MBGL_ROOT}/include/mbgl/platform/thread.hpp
     ${MBGL_ROOT}/include/mbgl/renderer/query.hpp
     ${MBGL_ROOT}/include/mbgl/renderer/renderer.hpp
@@ -353,6 +354,7 @@ add_library(
     ${MBGL_ROOT}/src/mbgl/map/transform_state.hpp
     ${MBGL_ROOT}/src/mbgl/map/zoom_history.hpp
     ${MBGL_ROOT}/src/mbgl/math/log2.cpp
+    ${MBGL_ROOT}/src/mbgl/platform/settings.cpp
     ${MBGL_ROOT}/src/mbgl/programs/attributes.hpp
     ${MBGL_ROOT}/src/mbgl/programs/background_pattern_program.hpp
     ${MBGL_ROOT}/src/mbgl/programs/background_program.cpp
