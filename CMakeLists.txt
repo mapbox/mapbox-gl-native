@@ -1,16 +1,16 @@
-cmake_minimum_required(VERSION 3.10 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.7 FATAL_ERROR)
 project("Mapbox GL Native" LANGUAGES CXX C)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER Core)
 
 if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Release)
+    set(CMAKE_BUILD_TYPE Debug)
 endif()
 
 option(MBGL_WITH_CORE_ONLY "Build only the core bits, no platform code" OFF)
 option(MBGL_WITH_COVERAGE "Enable code coverage collection" OFF)
-option(MBGL_WITH_QT "Build Mapbox GL Qt bindings" OFF)
+option(MBGL_WITH_QT "Build Mapbox GL Qt bindings" ON)
 option(MBGL_WITH_SANITIZER "Use [address|thread|undefined] here" OFF)
 
 if(NOT CMAKE_RUNTIME_OUTPUT_DIRECTORY)
@@ -39,7 +39,6 @@ target_compile_options(
         $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<NOT:$<PLATFORM_ID:Windows>>>:-Wall>
         $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<NOT:$<PLATFORM_ID:Windows>>>:-Wshadow>
         $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<NOT:$<PLATFORM_ID:Windows>>>:-Wextra>
-        $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<NOT:$<PLATFORM_ID:Windows>>>:-Werror>
         $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<PLATFORM_ID:Android>>:-Wno-error=tautological-constant-compare>
         $<$<CXX_COMPILER_ID:GNU>:-Wno-error=maybe-uninitialized>
         $<$<CXX_COMPILER_ID:GNU>:-Wno-error=return-type>
