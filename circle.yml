@@ -236,7 +236,7 @@ commands:
           name: Build
           command: |
             ccache --zero-stats --max-size=2G
-            cmake --build build -j 8 << parameters.build_params >>
+            cmake --build build -j $(nproc) << parameters.build_params >>
             ccache --show-stats
   install:
     steps:
@@ -538,7 +538,7 @@ jobs:
       - run:
           name: Clang Tidy
           command: |
-            run-clang-tidy-8 -quiet -j24 -p build $PWD/src/.*cpp $PWD/platform/.*cpp |tee clang-tidy.log
+            run-clang-tidy-8 -quiet -j $(nproc) -p build $PWD/src/.*cpp $PWD/platform/.*cpp |tee clang-tidy.log
             grep -o \\[[a-z].*-.*[a-z]\] clang-tidy.log |sort |uniq -c |sort -n
       - save
   baselines:
