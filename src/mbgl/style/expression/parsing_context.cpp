@@ -22,6 +22,7 @@
 #include <mbgl/style/expression/match.hpp>
 #include <mbgl/style/expression/number_format.hpp>
 #include <mbgl/style/expression/step.hpp>
+#include <mbgl/style/expression/within.hpp>
 
 #include <mbgl/style/expression/find_zoom_curve.hpp>
 #include <mbgl/style/expression/dsl.hpp>
@@ -134,6 +135,7 @@ MAPBOX_ETERNAL_CONSTEXPR const auto expressionRegistry =
         {"to-number", Coercion::parse},
         {"to-string", Coercion::parse},
         {"var", Var::parse},
+        {"within", Within::parse},
     });
 
 bool isExpression(const std::string& name) {

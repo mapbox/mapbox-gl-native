@@ -1,11 +1,12 @@
 #pragma once
 
-#include <mbgl/util/optional.hpp>
-#include <mbgl/util/variant.hpp>
-#include <mbgl/util/color.hpp>
+#include <mbgl/style/expression/parsing_context.hpp>
 #include <mbgl/style/expression/type.hpp>
 #include <mbgl/style/expression/value.hpp>
-#include <mbgl/style/expression/parsing_context.hpp>
+#include <mbgl/tile/tile_id.hpp>
+#include <mbgl/util/color.hpp>
+#include <mbgl/util/optional.hpp>
+#include <mbgl/util/variant.hpp>
 
 #include <array>
 #include <vector>
@@ -53,8 +54,14 @@ public:
         return *this;
     };
 
+    EvaluationContext& withCanonicalTileID(const mbgl::CanonicalTileID& canonical_) noexcept {
+        canonical = canonical_;
+        return *this;
+    };
+
     optional<float> zoom;
     optional<mbgl::Value> accumulated;
+    optional<mbgl::CanonicalTileID> canonical;
     GeometryTileFeature const * feature = nullptr;
     optional<double> colorRampParameter;
     // Contains formatted section object, std::unordered_map<std::string, Value>.
@@ -160,7 +167,8 @@ enum class Kind : int32_t {
     FormatExpression,
     FormatSectionOverride,
     NumberFormat,
-    ImageExpression
+    ImageExpression,
+    Within
 };
 
 class Expression {

@@ -99,7 +99,7 @@ void limitHoles(GeometryCollection& polygon, uint32_t maxHoles) {
     }
 }
 
-static Feature::geometry_type convertGeometry(const GeometryTileFeature& geometryTileFeature, const CanonicalTileID& tileID) {
+Feature::geometry_type convertGeometry(const GeometryTileFeature& geometryTileFeature, const CanonicalTileID& tileID) {
     const double size = util::EXTENT * std::pow(2, tileID.z);
     const double x0 = util::EXTENT * static_cast<double>(tileID.x);
     const double y0 = util::EXTENT * static_cast<double>(tileID.y);

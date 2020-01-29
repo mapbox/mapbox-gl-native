@@ -742,7 +742,12 @@ std::vector<float> SymbolLayout::calculateTileDistances(const GeometryCoordinate
     return tileDistances;
 }
 
-void SymbolLayout::createBucket(const ImagePositions&, std::unique_ptr<FeatureIndex>&, std::unordered_map<std::string, LayerRenderData>& renderData, const bool firstLoad, const bool showCollisionBoxes) {
+void SymbolLayout::createBucket(const ImagePositions&,
+                                std::unique_ptr<FeatureIndex>&,
+                                std::unordered_map<std::string, LayerRenderData>& renderData,
+                                const bool firstLoad,
+                                const bool showCollisionBoxes,
+                                const CanonicalTileID& canonical) {
     auto bucket = std::make_shared<SymbolBucket>(layout,
                                                  layerPaintProperties,
                                                  textSize,
@@ -796,8 +801,8 @@ void SymbolLayout::createBucket(const ImagePositions&, std::unique_ptr<FeatureIn
             }
 
             for (auto& pair : bucket->paintProperties) {
-                pair.second.iconBinders.populateVertexVectors(feature, iconBuffer.vertices.elements(),
-                                                              symbolInstance.dataFeatureIndex, {}, {});
+                pair.second.iconBinders.populateVertexVectors(
+                    feature, iconBuffer.vertices.elements(), symbolInstance.dataFeatureIndex, {}, {}, canonical);
             }
         }
 
@@ -805,26 +810,61 @@ void SymbolLayout::createBucket(const ImagePositions&, std::unique_ptr<FeatureIn
             optional<std::size_t> lastAddedSection;
             if (singleLine) {
                 optional<std::size_t> placedTextIndex;
-                lastAddedSection = addSymbolGlyphQuads(*bucket, symbolInstance, feature, symbolInstance.writingModes, placedTextIndex, symbolInstance.rightJustifiedGlyphQuads(), lastAddedSection);
+                lastAddedSection = addSymbolGlyphQuads(*bucket,
+                                                       symbolInstance,
+                                                       feature,
+                                                       symbolInstance.writingModes,
+                                                       placedTextIndex,
+                                                       symbolInstance.rightJustifiedGlyphQuads(),
+                                                       canonical,
+                                                       lastAddedSection);
                 symbolInstance.placedRightTextIndex = placedTextIndex;
                 symbolInstance.placedCenterTextIndex = placedTextIndex;
                 symbolInstance.placedLeftTextIndex = placedTextIndex;
             } else {
                 if (symbolInstance.rightJustifiedGlyphQuadsSize) {
-                    lastAddedSection = addSymbolGlyphQuads(*bucket, symbolInstance, feature, symbolInstance.writingModes, symbolInstance.placedRightTextIndex, symbolInstance.rightJustifiedGlyphQuads(), lastAddedSection);
+                    lastAddedSection = addSymbolGlyphQuads(*bucket,
+                                                           symbolInstance,
+                                                           feature,
+                                                           symbolInstance.writingModes,
+                                                           symbolInstance.placedRightTextIndex,
+                                                           symbolInstance.rightJustifiedGlyphQuads(),
+                                                           canonical,
+                                                           lastAddedSection);
                 }
                 if (symbolInstance.centerJustifiedGlyphQuadsSize) {
-                    lastAddedSection = addSymbolGlyphQuads(*bucket, symbolInstance, feature, symbolInstance.writingModes, symbolInstance.placedCenterTextIndex, symbolInstance.centerJustifiedGlyphQuads(), lastAddedSection);
+                    lastAddedSection = addSymbolGlyphQuads(*bucket,
+                                                           symbolInstance,
+                                                           feature,
+                                                           symbolInstance.writingModes,
+                                                           symbolInstance.placedCenterTextIndex,
+                                                           symbolInstance.centerJustifiedGlyphQuads(),
+                                                           canonical,
+                                                           lastAddedSection);
                 }
                 if (symbolInstance.leftJustifiedGlyphQuadsSize) {
-                    lastAddedSection = addSymbolGlyphQuads(*bucket, symbolInstance, feature, symbolInstance.writingModes, symbolInstance.placedLeftTextIndex, symbolInstance.leftJustifiedGlyphQuads(), lastAddedSection);
+                    lastAddedSection = addSymbolGlyphQuads(*bucket,
+                                                           symbolInstance,
+                                                           feature,
+                                                           symbolInstance.writingModes,
+                                                           symbolInstance.placedLeftTextIndex,
+                                                           symbolInstance.leftJustifiedGlyphQuads(),
+                                                           canonical,
+                                                           lastAddedSection);
                 }
             }
             if (symbolInstance.writingModes & WritingModeType::Vertical && symbolInstance.verticalGlyphQuadsSize) {
-                lastAddedSection = addSymbolGlyphQuads(*bucket, symbolInstance, feature, WritingModeType::Vertical, symbolInstance.placedVerticalTextIndex, symbolInstance.verticalGlyphQuads(), lastAddedSection);
+                lastAddedSection = addSymbolGlyphQuads(*bucket,
+                                                       symbolInstance,
+                                                       feature,
+                                                       WritingModeType::Vertical,
+                                                       symbolInstance.placedVerticalTextIndex,
+                                                       symbolInstance.verticalGlyphQuads(),
+                                                       canonical,
+                                                       lastAddedSection);
             }
             assert(lastAddedSection); // True, as hasText == true;
-            updatePaintPropertiesForSection(*bucket, feature, *lastAddedSection);
+            updatePaintPropertiesForSection(*bucket, feature, *lastAddedSection, canonical);
         }
 
         symbolInstance.releaseSharedData();
@@ -841,16 +881,16 @@ void SymbolLayout::createBucket(const ImagePositions&, std::unique_ptr<FeatureIn
             renderData.emplace(pair.first, LayerRenderData{bucket, pair.second});
         }
     }
-
 }
 
 void SymbolLayout::updatePaintPropertiesForSection(SymbolBucket& bucket,
                                                    const SymbolFeature& feature,
-                                                   std::size_t sectionIndex) {
+                                                   std::size_t sectionIndex,
+                                                   const CanonicalTileID& canonical) {
     const auto& formattedSection = sectionOptionsToValue((*feature.formattedText).sectionAt(sectionIndex));
     for (auto& pair : bucket.paintProperties) {
-        pair.second.textBinders.populateVertexVectors(feature, bucket.text.vertices.elements(), feature.index, {}, {},
-                                                      formattedSection);
+        pair.second.textBinders.populateVertexVectors(
+            feature, bucket.text.vertices.elements(), feature.index, {}, {}, canonical, formattedSection);
     }
 }
 
@@ -860,6 +900,7 @@ std::size_t SymbolLayout::addSymbolGlyphQuads(SymbolBucket& bucket,
                                               WritingModeType writingMode,
                                               optional<size_t>& placedIndex,
                                               const SymbolQuads& glyphQuads,
+                                              const CanonicalTileID& canonical,
                                               optional<std::size_t> lastAddedSection) {
     const Range<float> sizeData = bucket.textSizeBinder->getVertexSizeData(feature);
     const bool hasFormatSectionOverrides = bucket.hasFormatSectionOverrides();
@@ -881,7 +922,7 @@ std::size_t SymbolLayout::addSymbolGlyphQuads(SymbolBucket& bucket,
     for (const auto& symbolQuad : glyphQuads) {
         if (hasFormatSectionOverrides) {
             if (lastAddedSection && *lastAddedSection != symbolQuad.sectionIndex) {
-                updatePaintPropertiesForSection(bucket, feature, *lastAddedSection);
+                updatePaintPropertiesForSection(bucket, feature, *lastAddedSection, canonical);
             }
             lastAddedSection = symbolQuad.sectionIndex;
         }
