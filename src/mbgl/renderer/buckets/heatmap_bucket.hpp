@@ -18,8 +18,12 @@ public:
     HeatmapBucket(const BucketParameters&, const std::vector<Immutable<style::LayerProperties>>&);
     ~HeatmapBucket() override;
 
-    void addFeature(const GeometryTileFeature&, const GeometryCollection&, const ImagePositions&,
-                    const PatternLayerMap&, std::size_t) override;
+    void addFeature(const GeometryTileFeature&,
+                    const GeometryCollection&,
+                    const ImagePositions&,
+                    const PatternLayerMap&,
+                    std::size_t,
+                    const CanonicalTileID&) override;
     bool hasData() const override;
 
     void upload(gfx::UploadPass&) override;

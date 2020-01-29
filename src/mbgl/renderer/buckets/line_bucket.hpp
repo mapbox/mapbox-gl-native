@@ -25,8 +25,12 @@ public:
                const uint32_t overscaling);
     ~LineBucket() override;
 
-    void addFeature(const GeometryTileFeature&, const GeometryCollection&, const mbgl::ImagePositions& patternPositions,
-                    const PatternLayerMap&, std::size_t) override;
+    void addFeature(const GeometryTileFeature&,
+                    const GeometryCollection&,
+                    const mbgl::ImagePositions& patternPositions,
+                    const PatternLayerMap&,
+                    std::size_t,
+                    const CanonicalTileID&) override;
 
     bool hasData() const override;
 

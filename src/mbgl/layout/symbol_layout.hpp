@@ -36,7 +36,12 @@ public:
                         const ImageMap&,
                         const ImagePositions&) override;
 
-    void createBucket(const ImagePositions&, std::unique_ptr<FeatureIndex>&, std::unordered_map<std::string, LayerRenderData>&, const bool firstLoad, const bool showCollisionBoxes) override;
+    void createBucket(const ImagePositions&,
+                      std::unique_ptr<FeatureIndex>&,
+                      std::unordered_map<std::string, LayerRenderData>&,
+                      const bool firstLoad,
+                      const bool showCollisionBoxes,
+                      const CanonicalTileID& canonical) override;
 
     bool hasSymbolInstances() const override;
     bool hasDependencies() const override;
@@ -96,11 +101,13 @@ private:
                                     WritingModeType,
                                     optional<size_t>& placedIndex,
                                     const SymbolQuads&,
+                                    const CanonicalTileID& canonical,
                                     optional<std::size_t> lastAddedSection = nullopt);
 
     void updatePaintPropertiesForSection(SymbolBucket&,
                                          const SymbolFeature&,
-                                         std::size_t sectionIndex);
+                                         std::size_t sectionIndex,
+                                         const CanonicalTileID& canonical);
 
     // Stores the layer so that we can hold on to GeometryTileFeature instances in SymbolFeature,
     // which may reference data from this object.
