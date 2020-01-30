@@ -22,6 +22,7 @@ add_library(
     ${MBGL_ROOT}/test/math/clamp.test.cpp
     ${MBGL_ROOT}/test/math/minmax.test.cpp
     ${MBGL_ROOT}/test/math/wrap.test.cpp
+    ${MBGL_ROOT}/test/platform/settings.test.cpp
     ${MBGL_ROOT}/test/programs/symbol_program.test.cpp
     ${MBGL_ROOT}/test/renderer/backend_scope.test.cpp
     ${MBGL_ROOT}/test/renderer/image_manager.test.cpp
