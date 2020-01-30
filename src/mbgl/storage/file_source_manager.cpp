@@ -44,7 +44,8 @@ std::shared_ptr<FileSource> FileSourceManager::getFileSource(FileSourceType type
         auto it = impl->fileSourceFactories.find(type);
         if (it != impl->fileSourceFactories.end()) {
             assert(it->second);
-            impl->fileSources[key] = fileSource = it->second(options);
+            fileSource = it->second(options);
+            impl->fileSources[key] = fileSource;
         }
     }
 

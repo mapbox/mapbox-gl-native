@@ -22,7 +22,7 @@ endif()
 target_sources(
     mbgl-core
     PRIVATE
-        ${PROJECT_SOURCE_DIR}/platform/$<IF:$<PLATFORM_ID:Windows>,qt/src/bidi.cpp,default/src/mbgl/text/bidi.cpp>
+        ${PROJECT_SOURCE_DIR}/platform/default/src/mbgl/text/bidi.cpp
         ${PROJECT_SOURCE_DIR}/platform/default/include/mbgl/gfx/headless_backend.hpp
         ${PROJECT_SOURCE_DIR}/platform/default/include/mbgl/gfx/headless_frontend.hpp
         ${PROJECT_SOURCE_DIR}/platform/default/include/mbgl/gl/headless_backend.hpp
