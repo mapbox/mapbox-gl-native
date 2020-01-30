@@ -23,6 +23,7 @@
         "test/math/clamp.test.cpp",
         "test/math/minmax.test.cpp",
         "test/math/wrap.test.cpp",
+        "test/platform/settings.test.cpp",
         "test/programs/symbol_program.test.cpp",
         "test/renderer/backend_scope.test.cpp",
         "test/renderer/image_manager.test.cpp",
