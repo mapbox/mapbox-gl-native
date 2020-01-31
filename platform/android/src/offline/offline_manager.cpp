@@ -1,7 +1,5 @@
 #include "offline_manager.hpp"
 
-#include <mbgl/storage/file_source_manager.hpp>
-#include <mbgl/storage/resource.hpp>
 #include <mbgl/util/string.hpp>
 
 #include "../attach_env.hpp"
@@ -25,12 +23,7 @@ void handleException(std::exception_ptr exception,
 
 // OfflineManager //
 OfflineManager::OfflineManager(jni::JNIEnv& env, const jni::Object<FileSource>& jFileSource)
-    : fileSource(std::static_pointer_cast<mbgl::DatabaseFileSource>(mbgl::FileSourceManager::get()->getFileSource(
-          mbgl::FileSourceType::Database, FileSource::getSharedResourceOptions(env, jFileSource)))) {
-    if (!fileSource) {
-        ThrowNew(env, jni::FindClass(env, "java/lang/IllegalStateException"), "Offline functionality is disabled.");
-    }
-}
+    : fileSource(std::static_pointer_cast<DefaultFileSource>(mbgl::FileSource::getSharedFileSource(FileSource::getSharedResourceOptions(env, jFileSource)))) {}
 
 OfflineManager::~OfflineManager() {}
 

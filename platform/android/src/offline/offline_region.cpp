@@ -1,6 +1,5 @@
 #include "offline_region.hpp"
 
-#include <mbgl/storage/file_source_manager.hpp>
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/string.hpp>
 
@@ -15,13 +14,8 @@ namespace android {
 // OfflineRegion //
 
 OfflineRegion::OfflineRegion(jni::JNIEnv& env, jni::jlong offlineRegionPtr, const jni::Object<FileSource>& jFileSource)
-    : region(reinterpret_cast<mbgl::OfflineRegion*>(offlineRegionPtr)),
-      fileSource(std::static_pointer_cast<mbgl::DatabaseFileSource>(mbgl::FileSourceManager::get()->getFileSource(
-          mbgl::FileSourceType::Database, FileSource::getSharedResourceOptions(env, jFileSource)))) {
-    if (!fileSource) {
-        ThrowNew(env, jni::FindClass(env, "java/lang/IllegalStateException"), "Offline functionality is disabled.");
-    }
-}
+    : region(reinterpret_cast<mbgl::OfflineRegion *>(offlineRegionPtr))
+    , fileSource(std::static_pointer_cast<DefaultFileSource>(mbgl::FileSource::getSharedFileSource(FileSource::getSharedResourceOptions(env, jFileSource)))) {}
 
 OfflineRegion::~OfflineRegion() {}
 
@@ -165,17 +159,15 @@ void OfflineRegion::updateOfflineRegionMetadata(jni::JNIEnv& env_, const jni::Ar
     });
 }
 
-jni::Local<jni::Object<OfflineRegion>> OfflineRegion::New(jni::JNIEnv& env,
-                                                          const jni::Object<FileSource>& jFileSource,
-                                                          mbgl::OfflineRegion region) {
+jni::Local<jni::Object<OfflineRegion>> OfflineRegion::New(jni::JNIEnv& env, const jni::Object<FileSource>& jFileSource, mbgl::OfflineRegion region) {
+
     // Definition
     auto definition = region.getDefinition().match(
-        [&](const mbgl::OfflineTilePyramidRegionDefinition def) {
-            return OfflineTilePyramidRegionDefinition::New(env, def);
-        },
-        [&](const mbgl::OfflineGeometryRegionDefinition def) {
-            return OfflineGeometryRegionDefinition::New(env, def);
-        });
+            [&](const mbgl::OfflineTilePyramidRegionDefinition def) {
+                return OfflineTilePyramidRegionDefinition::New(env, def);
+            }, [&](const mbgl::OfflineGeometryRegionDefinition def) {
+                return OfflineGeometryRegionDefinition::New(env, def);
+            });
 
     // Create region java object
     static auto& javaClass = jni::Class<OfflineRegion>::Singleton(env);

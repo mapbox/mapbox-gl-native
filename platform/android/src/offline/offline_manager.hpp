@@ -12,6 +12,8 @@
 
 namespace mbgl {
 
+class DefaultFileSource;
+
 namespace android {
 
 class OfflineManager {
@@ -104,7 +106,7 @@ public:
     void runPackDatabaseAutomatically(jni::JNIEnv&, jboolean autopack);
 
 private:
-    std::shared_ptr<mbgl::DatabaseFileSource> fileSource;
+    std::shared_ptr<mbgl::DefaultFileSource> fileSource;
 };
 
 } // namespace android

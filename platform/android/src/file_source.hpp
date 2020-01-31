@@ -1,9 +1,7 @@
 #pragma once
 
-#include <mbgl/storage/database_file_source.hpp>
-#include <mbgl/storage/online_file_source.hpp>
+#include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/resource_options.hpp>
-#include <mbgl/storage/resource_transform.hpp>
 
 #include "asset_manager.hpp"
 
@@ -12,12 +10,13 @@
 namespace mbgl {
 
 template <typename T> class Actor;
+class ResourceTransform;
+using mbgl::PathChangeCallback;
 
 namespace android {
 
 /**
- * Peer class for the Android FileSource holder. Ensures that a single core FileSource
- * of a ResourceLoader type is used.
+ * Peer class for the Android FileSource holder. Ensures that a single DefaultFileSource is used
  */
 class FileSource {
 public:
@@ -72,12 +71,11 @@ private:
     const std::string DATABASE_FILE = "/mbgl-offline.db";
     optional<int> activationCounter;
     mbgl::ResourceOptions resourceOptions;
-    std::unique_ptr<Actor<ResourceTransform::TransformCallback>> resourceTransform;
-    std::function<void()> pathChangeCallback;
-    std::shared_ptr<mbgl::DatabaseFileSource> databaseSource;
-    std::shared_ptr<mbgl::OnlineFileSource> onlineSource;
-    std::shared_ptr<mbgl::FileSource> resourceLoader;
+    std::unique_ptr<Actor<ResourceTransform>> resourceTransform;
+    std::unique_ptr<Actor<PathChangeCallback>> pathChangeCallback;
+    std::shared_ptr<mbgl::DefaultFileSource> fileSource;
 };
+
 
 } // namespace android
 } // namespace mbgl

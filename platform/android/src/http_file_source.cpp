@@ -3,11 +3,10 @@
 #include <mbgl/storage/response.hpp>
 #include <mbgl/util/logging.hpp>
 
-#include <mbgl/util/async_request.hpp>
 #include <mbgl/util/async_task.hpp>
-#include <mbgl/util/http_header.hpp>
-#include <mbgl/util/string.hpp>
 #include <mbgl/util/util.hpp>
+#include <mbgl/util/string.hpp>
+#include <mbgl/util/http_header.hpp>
 
 #include <jni/jni.hpp>
 #include "attach_env.hpp"
