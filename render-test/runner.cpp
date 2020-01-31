@@ -2,7 +2,6 @@
 #include <mbgl/map/map_observer.hpp>
 #include <mbgl/renderer/renderer.hpp>
 #include <mbgl/renderer/renderer_observer.hpp>
-#include <mbgl/storage/file_source_manager.hpp>
 #include <mbgl/style/image.hpp>
 #include <mbgl/style/layer.hpp>
 #include <mbgl/style/light.hpp>
@@ -87,26 +86,7 @@ std::string simpleDiff(const Value& result, const Value& expected) {
 }
 
 TestRunner::TestRunner(Manifest manifest_, UpdateResults updateResults_)
-    : manifest(std::move(manifest_)), updateResults(updateResults_) {
-    registerProxyFileSource();
-}
-
-void TestRunner::registerProxyFileSource() {
-    static std::once_flag registerProxyFlag;
-    std::call_once(registerProxyFlag, [] {
-        auto* fileSourceManager = mbgl::FileSourceManager::get();
-
-        auto resourceLoaderFactory =
-            fileSourceManager->unRegisterFileSourceFactory(mbgl::FileSourceType::ResourceLoader);
-        auto factory = [defaultFactory = std::move(resourceLoaderFactory)](const mbgl::ResourceOptions& options) {
-            assert(defaultFactory);
-            std::shared_ptr<FileSource> fileSource = defaultFactory(options);
-            return std::make_unique<ProxyFileSource>(std::move(fileSource), options);
-        };
-
-        fileSourceManager->registerFileSourceFactory(mbgl::FileSourceType::ResourceLoader, std::move(factory));
-    });
-}
+    : manifest(std::move(manifest_)), updateResults(updateResults_) {}
 
 const Manifest& TestRunner::getManifest() const {
     return manifest;
@@ -674,7 +654,7 @@ uint32_t getImageTileOffset(const std::set<uint32_t>& dims, uint32_t dim) {
 TestRunner::Impl::Impl(const TestMetadata& metadata, const mbgl::ResourceOptions& resourceOptions)
     : observer(std::make_unique<TestRunnerMapObserver>()),
       frontend(metadata.size, metadata.pixelRatio, swapBehavior(metadata.mapMode)),
-      fileSource(mbgl::FileSourceManager::get()->getFileSource(mbgl::FileSourceType::ResourceLoader, resourceOptions)),
+      fileSource(mbgl::FileSource::getSharedFileSource(resourceOptions)),
       map(frontend,
           *observer.get(),
           mbgl::MapOptions()

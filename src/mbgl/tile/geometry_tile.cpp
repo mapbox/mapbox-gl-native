@@ -265,9 +265,7 @@ void GeometryTile::onGlyphsAvailable(GlyphMap glyphs) {
 }
 
 void GeometryTile::getGlyphs(GlyphDependencies glyphDependencies) {
-    if (fileSource) {
-        glyphManager.getGlyphs(*this, std::move(glyphDependencies), *fileSource);
-    }
+    glyphManager.getGlyphs(*this, std::move(glyphDependencies), *fileSource);
 }
 
 void GeometryTile::onImagesAvailable(ImageMap images, ImageMap patterns, ImageVersionMap versionMap, uint64_t imageCorrelationID) {

@@ -1,8 +1,8 @@
 #pragma once
 
-#include <mbgl/storage/file_source.hpp>
 #include <mbgl/storage/offline.hpp>
 #include <mbgl/storage/resource.hpp>
+#include <mbgl/storage/online_file_source.hpp>
 
 #include <list>
 #include <unordered_set>
@@ -28,7 +28,7 @@ class Parser;
  */
 class OfflineDownload {
 public:
-    OfflineDownload(int64_t id, OfflineRegionDefinition, OfflineDatabase& offline, FileSource& online);
+    OfflineDownload(int64_t id, OfflineRegionDefinition&&, OfflineDatabase& offline, OnlineFileSource& online);
     ~OfflineDownload();
 
     void setObserver(std::unique_ptr<OfflineRegionObserver>);
@@ -53,7 +53,7 @@ private:
     int64_t id;
     OfflineRegionDefinition definition;
     OfflineDatabase& offlineDatabase;
-    FileSource& onlineFileSource;
+    OnlineFileSource& onlineFileSource;
     OfflineRegionStatus status;
     std::unique_ptr<OfflineRegionObserver> observer;
 

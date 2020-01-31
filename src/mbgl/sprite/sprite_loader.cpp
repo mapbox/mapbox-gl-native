@@ -1,18 +1,17 @@
-#include <mbgl/actor/actor.hpp>
-#include <mbgl/actor/scheduler.hpp>
 #include <mbgl/sprite/sprite_loader.hpp>
-#include <mbgl/sprite/sprite_loader_observer.hpp>
 #include <mbgl/sprite/sprite_loader_worker.hpp>
+#include <mbgl/sprite/sprite_loader_observer.hpp>
 #include <mbgl/sprite/sprite_parser.hpp>
-#include <mbgl/storage/file_source.hpp>
-#include <mbgl/storage/resource.hpp>
-#include <mbgl/storage/response.hpp>
-#include <mbgl/util/async_request.hpp>
-#include <mbgl/util/constants.hpp>
-#include <mbgl/util/exception.hpp>
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/platform.hpp>
 #include <mbgl/util/std.hpp>
+#include <mbgl/util/constants.hpp>
+#include <mbgl/util/exception.hpp>
+#include <mbgl/storage/file_source.hpp>
+#include <mbgl/storage/resource.hpp>
+#include <mbgl/storage/response.hpp>
+#include <mbgl/actor/actor.hpp>
+#include <mbgl/actor/scheduler.hpp>
 
 #include <cassert>
 

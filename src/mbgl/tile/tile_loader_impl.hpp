@@ -1,18 +1,11 @@
 #pragma once
 
-#include <mbgl/renderer/tile_parameters.hpp>
-#include <mbgl/storage/file_source.hpp>
 #include <mbgl/tile/tile_loader.hpp>
-#include <mbgl/util/async_request.hpp>
+#include <mbgl/storage/file_source.hpp>
+#include <mbgl/renderer/tile_parameters.hpp>
 #include <mbgl/util/tileset.hpp>
 
 #include <cassert>
-
-namespace {
-inline std::exception_ptr getCantLoadTileError() {
-    return std::make_exception_ptr(std::runtime_error("Can't load tile."));
-}
-} // namespace
 
 namespace mbgl {
 
@@ -33,11 +26,6 @@ TileLoader<T>::TileLoader(T& tile_,
         Resource::LoadingMethod::CacheOnly)),
       fileSource(parameters.fileSource) {
     assert(!request);
-    if (!fileSource) {
-        tile.setError(getCantLoadTileError());
-        return;
-    }
-
     if (fileSource->supportsCacheOnlyRequests()) {
         // When supported, the first request is always optional, even if the TileLoader
         // is marked as required. That way, we can let the first optional request continue
@@ -61,10 +49,6 @@ TileLoader<T>::~TileLoader() = default;
 template <typename T>
 void TileLoader<T>::loadFromCache() {
     assert(!request);
-    if (!fileSource) {
-        tile.setError(getCantLoadTileError());
-        return;
-    }
 
     resource.loadingMethod = Resource::LoadingMethod::CacheOnly;
     request = fileSource->request(resource, [this](Response res) {
@@ -129,10 +113,6 @@ void TileLoader<T>::loadedData(const Response& res) {
 template <typename T>
 void TileLoader<T>::loadFromNetwork() {
     assert(!request);
-    if (!fileSource) {
-        tile.setError(getCantLoadTileError());
-        return;
-    }
 
     // Instead of using Resource::LoadingMethod::All, we're first doing a CacheOnly, and then a
     // NetworkOnly request.

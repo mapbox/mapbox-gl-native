@@ -14,9 +14,8 @@ public:
     ~AssetFileSource() override;
 
     std::unique_ptr<AsyncRequest> request(const Resource&, Callback) override;
-    bool canRequest(const Resource&) const override;
-    void pause() override;
-    void resume() override;
+
+    static bool acceptsURL(const std::string& url);
 
 private:
     class Impl;

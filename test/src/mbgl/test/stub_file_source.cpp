@@ -1,5 +1,4 @@
 #include <mbgl/test/stub_file_source.hpp>
-#include <mbgl/util/async_request.hpp>
 
 namespace mbgl {
 

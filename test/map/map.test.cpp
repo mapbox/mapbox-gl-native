@@ -10,8 +10,7 @@
 #include <mbgl/gl/context.hpp>
 #include <mbgl/map/map_options.hpp>
 #include <mbgl/math/log2.hpp>
-#include <mbgl/storage/file_source_manager.hpp>
-#include <mbgl/storage/main_resource_loader.hpp>
+#include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/network_status.hpp>
 #include <mbgl/storage/online_file_source.hpp>
 #include <mbgl/storage/resource_options.hpp>
@@ -48,17 +47,13 @@ public:
               MapOptions().withMapMode(mode).withSize(frontend.getSize()).withPixelRatio(pixelRatio)) {}
 
     template <typename T = FileSource>
-    MapTest(const std::string& cachePath,
-            const std::string& assetPath,
-            float pixelRatio = 1,
-            MapMode mode = MapMode::Static,
-            typename std::enable_if<std::is_same<T, MainResourceLoader>::value>::type* = nullptr)
-        : fileSource(std::make_shared<T>(ResourceOptions().withCachePath(cachePath).withAssetPath(assetPath))),
-          frontend(pixelRatio),
-          map(frontend,
-              observer,
-              fileSource,
-              MapOptions().withMapMode(mode).withSize(frontend.getSize()).withPixelRatio(pixelRatio)) {}
+    MapTest(const std::string& cachePath, const std::string& assetPath,
+            float pixelRatio = 1, MapMode mode = MapMode::Static,
+            typename std::enable_if<std::is_same<T, DefaultFileSource>::value>::type* = nullptr)
+            : fileSource(std::make_shared<T>(cachePath, assetPath))
+            , frontend(pixelRatio)
+            , map(frontend, observer, fileSource,
+                  MapOptions().withMapMode(mode).withSize(frontend.getSize()).withPixelRatio(pixelRatio)) {}
 };
 
 TEST(Map, RendererState) {
@@ -300,7 +295,7 @@ TEST(Map, CameraToLatLngBoundsUnwrappedCrossDateLine) {
 }
 
 TEST(Map, Offline) {
-    MapTest<MainResourceLoader> test{":memory:", "."};
+    MapTest<DefaultFileSource> test {":memory:", "."};
 
     auto expiredItem = [] (const std::string& path) {
         Response response;
@@ -309,21 +304,19 @@ TEST(Map, Offline) {
         return response;
     };
 
-    NetworkStatus::Set(NetworkStatus::Status::Offline);
     const std::string prefix = "http://127.0.0.1:3000/";
-    auto dbfs = FileSourceManager::get()->getFileSource(FileSourceType::Database, ResourceOptions{});
-    dbfs->forward(Resource::style(prefix + "style.json"), expiredItem("style.json"));
-    dbfs->forward(Resource::source(prefix + "streets.json"), expiredItem("streets.json"));
-    dbfs->forward(Resource::spriteJSON(prefix + "sprite", 1.0), expiredItem("sprite.json"));
-    dbfs->forward(Resource::spriteImage(prefix + "sprite", 1.0), expiredItem("sprite.png"));
-    dbfs->forward(Resource::tile(prefix + "{z}-{x}-{y}.vector.pbf", 1.0, 0, 0, 0, Tileset::Scheme::XYZ),
-                  expiredItem("0-0-0.vector.pbf"));
-    dbfs->forward(Resource::glyphs(prefix + "{fontstack}/{range}.pbf", {{"Helvetica"}}, {0, 255}),
-                  expiredItem("glyph.pbf"),
-                  [&] { test.map.getStyle().loadURL(prefix + "style.json"); });
+    test.fileSource->put(Resource::style(prefix + "style.json"), expiredItem("style.json"));
+    test.fileSource->put(Resource::source(prefix + "streets.json"), expiredItem("streets.json"));
+    test.fileSource->put(Resource::spriteJSON(prefix + "sprite", 1.0), expiredItem("sprite.json"));
+    test.fileSource->put(Resource::spriteImage(prefix + "sprite", 1.0), expiredItem("sprite.png"));
+    test.fileSource->put(Resource::tile(prefix + "{z}-{x}-{y}.vector.pbf", 1.0, 0, 0, 0, Tileset::Scheme::XYZ), expiredItem("0-0-0.vector.pbf"));
+    test.fileSource->put(Resource::glyphs(prefix + "{fontstack}/{range}.pbf", {{"Helvetica"}}, {0, 255}), expiredItem("glyph.pbf"));
+    NetworkStatus::Set(NetworkStatus::Status::Offline);
+
+    test.map.getStyle().loadURL(prefix + "style.json");
 
 #if ANDROID
-    test::checkImage("test/fixtures/map/offline", test.frontend.render(test.map).image, 0.0046, 0.1);
+    test::checkImage("test/fixtures/map/offline", test.frontend.render(test.map).image, 0.0045, 0.1);
 #else
     test::checkImage("test/fixtures/map/offline", test.frontend.render(test.map).image, 0.0015, 0.1);
 #endif
@@ -679,7 +672,7 @@ TEST(Map, WithoutVAOExtension) {
         return;
     }
 
-    MapTest<MainResourceLoader> test{":memory:", "test/fixtures/api/assets"};
+    MapTest<DefaultFileSource> test { ":memory:", "test/fixtures/api/assets" };
 
     gfx::BackendScope scope { *test.frontend.getBackend() };
     static_cast<gl::Context&>(test.frontend.getBackend()->getContext()).disableVAOExtension = true;
@@ -843,7 +836,7 @@ TEST(Map, TEST_DISABLED_ON_CI(ContinuousRendering)) {
 }
 
 TEST(Map, NoContentTiles) {
-    MapTest<MainResourceLoader> test{":memory:", "."};
+    MapTest<DefaultFileSource> test {":memory:", "."};
 
     using namespace std::chrono_literals;
 
@@ -851,32 +844,33 @@ TEST(Map, NoContentTiles) {
     Response response;
     response.noContent = true;
     response.expires = util::now() + 1h;
-    auto dbfs = FileSourceManager::get()->getFileSource(FileSourceType::Database, ResourceOptions{});
-    dbfs->forward(
-        Resource::tile("http://example.com/{z}-{x}-{y}.vector.pbf", 1.0, 0, 0, 0, Tileset::Scheme::XYZ), response, [&] {
-            test.map.getStyle().loadJSON(R"STYLE({
-                        "version": 8,
-                        "name": "Water",
-                        "sources": {
-                            "mapbox": {
-                            "type": "vector",
-                            "tiles": ["http://example.com/{z}-{x}-{y}.vector.pbf"]
-                            }
-                        },
-                        "layers": [{
-                            "id": "background",
-                            "type": "background",
-                            "paint": {
-                            "background-color": "red"
-                            }
-                        }, {
-                            "id": "water",
-                            "type": "fill",
-                            "source": "mapbox",
-                            "source-layer": "water"
-                        }]
-                        })STYLE");
-        });
+    test.fileSource->put(Resource::tile("http://example.com/{z}-{x}-{y}.vector.pbf", 1.0, 0, 0, 0,
+                                       Tileset::Scheme::XYZ),
+                        response);
+
+    test.map.getStyle().loadJSON(R"STYLE({
+      "version": 8,
+      "name": "Water",
+      "sources": {
+        "mapbox": {
+          "type": "vector",
+          "tiles": ["http://example.com/{z}-{x}-{y}.vector.pbf"]
+        }
+      },
+      "layers": [{
+        "id": "background",
+        "type": "background",
+        "paint": {
+          "background-color": "red"
+        }
+      }, {
+        "id": "water",
+        "type": "fill",
+        "source": "mapbox",
+        "source-layer": "water"
+      }]
+    })STYLE");
+
     test::checkImage("test/fixtures/map/nocontent", test.frontend.render(test.map).image, 0.0015, 0.1);
 }
 

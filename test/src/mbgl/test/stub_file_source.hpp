@@ -2,7 +2,6 @@
 
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/storage/online_file_source.hpp>
-#include <mbgl/storage/resource.hpp>
 #include <mbgl/util/timer.hpp>
 
 #include <unordered_map>
@@ -20,7 +19,6 @@ public:
     ~StubFileSource() override;
 
     std::unique_ptr<AsyncRequest> request(const Resource&, Callback) override;
-    bool canRequest(const Resource&) const override { return true; }
     void remove(AsyncRequest*);
 
     using ResponseFunction = std::function<optional<Response> (const Resource&)>;
@@ -49,5 +47,16 @@ private:
     ResponseType type;
     util::Timer timer;
 };
+
+class StubOnlineFileSource : public StubFileSource, public OnlineFileSource {
+public:
+
+    StubOnlineFileSource(ResponseType t = ResponseType::Asynchronous) : StubFileSource(t) {};
+    ~StubOnlineFileSource() override = default;
+
+    std::unique_ptr<AsyncRequest> request(const Resource& r, Callback c) override { return StubFileSource::request(r, c); };
+    void remove(AsyncRequest* r) { StubFileSource::remove(r); };
+};
+
 
 } // namespace mbgl

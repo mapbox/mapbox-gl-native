@@ -35,11 +35,10 @@ add_library(
     ${MBGL_ROOT}/test/src/mbgl/test/test.cpp
     ${MBGL_ROOT}/test/src/mbgl/test/util.cpp
     ${MBGL_ROOT}/test/storage/asset_file_source.test.cpp
-    ${MBGL_ROOT}/test/storage/database_file_source.test.cpp
+    ${MBGL_ROOT}/test/storage/default_file_source.test.cpp
     ${MBGL_ROOT}/test/storage/headers.test.cpp
     ${MBGL_ROOT}/test/storage/http_file_source.test.cpp
     ${MBGL_ROOT}/test/storage/local_file_source.test.cpp
-    ${MBGL_ROOT}/test/storage/main_resource_loader.test.cpp
     ${MBGL_ROOT}/test/storage/offline.test.cpp
     ${MBGL_ROOT}/test/storage/offline_database.test.cpp
     ${MBGL_ROOT}/test/storage/offline_download.test.cpp

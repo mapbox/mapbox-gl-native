@@ -133,14 +133,6 @@
 
   Introduces public [mblg::Renderer::render](https://github.com/mapbox/mapbox-gl-native/pull/16127/files#diff-5a977e0401792825d7fcf522d48df11fR34) API break.
 
-- [core] Refactor DefaultFileSource codebase ([#15768](https://github.com/mapbox/mapbox-gl-native/pull/15768)) 
-  - Adds `FileSourceManager` interface that provides access to `FileSource` instances and means of registering / unregistering `FileSource` factories
-  - Splits `DefaultFileSource` into smaller parts
-  - Adds `DatabaseFileSource` interface and it's default implementation
-  - Removes inter-dependencies between concrete `FileSource` classes
-  - All sources operate on dedicated thread, except `MainResourceLoader` that acts as a dispatcher and works on thread that requested it.
-  - Removes `ResourceOptions::withCacheOnlyRequestsSupport` method
-
 - [core] Remove Map::cycleDebugOptions ([#16005](https://github.com/mapbox/mapbox-gl-native/pull/16005))
 
   This function was mostly used by the Android API, which is no longer necessary.

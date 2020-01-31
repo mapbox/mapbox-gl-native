@@ -1,12 +1,11 @@
-#include <mbgl/storage/network_status.hpp>
-#include <mbgl/storage/online_file_source.hpp>
-#include <mbgl/storage/resource.hpp>
 #include <mbgl/test/util.hpp>
+#include <mbgl/storage/online_file_source.hpp>
+#include <mbgl/storage/network_status.hpp>
 #include <mbgl/util/chrono.hpp>
-#include <mbgl/util/constants.hpp>
 #include <mbgl/util/run_loop.hpp>
-#include <mbgl/util/string.hpp>
 #include <mbgl/util/timer.hpp>
+#include <mbgl/util/string.hpp>
+#include <mbgl/util/constants.hpp>
 
 #include <gtest/gtest.h>
 
@@ -53,9 +52,9 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(TemporaryError)) {
     OnlineFileSource fs;
 
     const auto start = Clock::now();
-    int counter = 0;
 
     auto req = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/temporary-error" }, [&](Response res) {
+        static int counter = 0;
         switch (counter++) {
         case 0: {
             const auto duration = std::chrono::duration<const double>(Clock::now() - start).count();
@@ -93,10 +92,10 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(ConnectionError)) {
     OnlineFileSource fs;
 
     const auto start = Clock::now();
-    int counter = 0;
-    int wait = 0;
 
     std::unique_ptr<AsyncRequest> req = fs.request({ Resource::Unknown, "http://127.0.0.1:3001/" }, [&](Response res) {
+        static int counter = 0;
+        static int wait = 0;
         const auto duration = std::chrono::duration<const double>(Clock::now() - start).count();
         EXPECT_LT(wait - 0.01, duration) << "Backoff timer didn't wait 1 second";
         EXPECT_GT(wait + 0.3, duration) << "Backoff timer fired too late";
@@ -158,6 +157,10 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RetryDelayOnExpiredTile)) {
         EXPECT_EQ(nullptr, res.error);
         EXPECT_GT(util::now(), *res.expires);
         EXPECT_FALSE(res.mustRevalidate);
+    });
+
+    util::Timer timer;
+    timer.start(Milliseconds(500), Duration::zero(), [&] () {
         loop.stop();
     });
 
@@ -303,13 +306,12 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(NetworkStatusChange)) {
 TEST(OnlineFileSource, TEST_REQUIRES_SERVER(NetworkStatusChangePreempt)) {
     util::RunLoop loop;
     OnlineFileSource fs;
-    fs.pause();
 
     const auto start = Clock::now();
-    int counter = 0;
 
     const Resource resource{ Resource::Unknown, "http://127.0.0.1:3001/test" };
     std::unique_ptr<AsyncRequest> req = fs.request(resource, [&](Response res) {
+        static int counter = 0;
         const auto duration = std::chrono::duration<const double>(Clock::now() - start).count();
         if (counter == 0) {
             EXPECT_GT(0.2, duration) << "Response came in too late";
@@ -339,7 +341,6 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(NetworkStatusChangePreempt)) {
         mbgl::NetworkStatus::Reachable();
     });
 
-    fs.resume();
     loop.run();
 }
 
@@ -415,30 +416,14 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RateLimitDefault)) {
     loop.run();
 }
 
-TEST(OnlineFileSource, GetBaseURLAndAccessTokenWhilePaused) {
-    util::RunLoop loop;
-    OnlineFileSource fs;
-
-    fs.pause();
-
-    auto baseURL = "http://url";
-    auto accessToken = "access_token";
-
-    fs.setProperty(API_BASE_URL_KEY, baseURL);
-    fs.setProperty(ACCESS_TOKEN_KEY, accessToken);
-
-    EXPECT_EQ(*fs.getProperty(API_BASE_URL_KEY).getString(), baseURL);
-    EXPECT_EQ(*fs.getProperty(ACCESS_TOKEN_KEY).getString(), accessToken);
-}
-
 TEST(OnlineFileSource, ChangeAPIBaseURL){
     util::RunLoop loop;
     OnlineFileSource fs;
 
-    EXPECT_EQ(mbgl::util::API_BASE_URL, *fs.getProperty(API_BASE_URL_KEY).getString());
+    EXPECT_EQ(mbgl::util::API_BASE_URL, fs.getAPIBaseURL());
     const std::string customURL = "test.domain";
-    fs.setProperty(API_BASE_URL_KEY, customURL);
-    EXPECT_EQ(customURL, *fs.getProperty(API_BASE_URL_KEY).getString());
+    fs.setAPIBaseURL(customURL);
+    EXPECT_EQ(customURL, fs.getAPIBaseURL());
 }
 
 
@@ -448,38 +433,34 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(LowHighPriorityRequests)) {
     std::size_t response_counter = 0;
     const std::size_t NUM_REQUESTS = 3;
 
-    NetworkStatus::Set(NetworkStatus::Status::Offline);
-    fs.setProperty("max-concurrent-requests", 1u);
-    // After DefaultFileSource was split, OnlineFileSource lives on a separate
-    // thread. Pause OnlineFileSource, so that messages are queued for processing.
-    fs.pause();
+    fs.setMaximumConcurrentRequests(1);
 
-    // First regular request.
-    Resource regular1{Resource::Unknown, "http://127.0.0.1:3000/load/1"};
-    std::unique_ptr<AsyncRequest> req_0 = fs.request(regular1, [&](Response) {
+    NetworkStatus::Set(NetworkStatus::Status::Offline);
+
+    // requesting a low priority resource
+    Resource low_prio{ Resource::Unknown, "http://127.0.0.1:3000/load/1" };
+    low_prio.setPriority(Resource::Priority::Low);
+    std::unique_ptr<AsyncRequest> req_0 = fs.request(low_prio, [&](Response) {
         response_counter++;
         req_0.reset();
-    });
-
-    // Low priority request that will be queued and should be requested last.
-    Resource low_prio{Resource::Unknown, "http://127.0.0.1:3000/load/2"};
-    low_prio.setPriority(Resource::Priority::Low);
-    std::unique_ptr<AsyncRequest> req_1 = fs.request(low_prio, [&](Response) {
-        response_counter++;
-        req_1.reset();
         EXPECT_EQ(response_counter, NUM_REQUESTS); // make sure this is responded last
         loop.stop();
     });
 
-    // Second regular priority request that should de-preoritize low priority request.
+    // requesting two "regular" resources
+    Resource regular1{ Resource::Unknown, "http://127.0.0.1:3000/load/2" };
+    std::unique_ptr<AsyncRequest> req_1 = fs.request(regular1, [&](Response) {
+        response_counter++;
+        req_1.reset();
+    });
     Resource regular2{ Resource::Unknown, "http://127.0.0.1:3000/load/3" };
     std::unique_ptr<AsyncRequest> req_2 = fs.request(regular2, [&](Response) {
         response_counter++;
         req_2.reset();
     });
 
-    fs.resume();
     NetworkStatus::Set(NetworkStatus::Status::Online);
+
     loop.run();
 }
 
@@ -491,9 +472,10 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(LowHighPriorityRequestsMany)) {
     int correct_low = 0;
     int correct_regular = 0;
 
+
+    fs.setMaximumConcurrentRequests(1);
+
     NetworkStatus::Set(NetworkStatus::Status::Offline);
-    fs.setProperty("max-concurrent-requests", 1u);
-    fs.pause();
 
     std::vector<std::unique_ptr<AsyncRequest>> collector;
 
@@ -533,8 +515,8 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(LowHighPriorityRequestsMany)) {
         }
     }
 
-    fs.resume();
     NetworkStatus::Set(NetworkStatus::Status::Online);
+
     loop.run();
 }
 
@@ -542,12 +524,11 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(MaximumConcurrentRequests)) {
     util::RunLoop loop;
     OnlineFileSource fs;
 
-    ASSERT_EQ(*fs.getProperty("max-concurrent-requests").getUint(), 20u);
+    ASSERT_EQ(fs.getMaximumConcurrentRequests(), 20u);
 
-    fs.setProperty("max-concurrent-requests", 10u);
-    ASSERT_EQ(*fs.getProperty("max-concurrent-requests").getUint(), 10u);
+    fs.setMaximumConcurrentRequests(10);
+    ASSERT_EQ(fs.getMaximumConcurrentRequests(), 10u);
 }
-
 TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RequestSameUrlMultipleTimes)) {
     util::RunLoop loop;
     OnlineFileSource fs;

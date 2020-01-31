@@ -283,7 +283,7 @@ TEST(Layer, DuplicateLayer) {
     util::RunLoop loop;
 
     // Setup style
-    auto fileSource = std::make_shared<StubFileSource>();
+    StubFileSource fileSource;
     Style::Impl style { fileSource, 1.0 };
     style.loadJSON(util::read_file("test/fixtures/resources/style-unused-sources.json"));
 
@@ -304,7 +304,7 @@ TEST(Layer, IncompatibleLayer) {
     util::RunLoop loop;
 
     // Setup style
-    auto fileSource = std::make_shared<StubFileSource>();
+    StubFileSource fileSource;
     Style::Impl style{fileSource, 1.0};
     style.loadJSON(util::read_file("test/fixtures/resources/style-unused-sources.json"));
 

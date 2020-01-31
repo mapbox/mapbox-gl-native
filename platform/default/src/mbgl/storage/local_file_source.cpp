@@ -1,17 +1,15 @@
+#include <mbgl/storage/local_file_source.hpp>
 #include <mbgl/storage/file_source_request.hpp>
 #include <mbgl/storage/local_file_request.hpp>
-#include <mbgl/storage/local_file_source.hpp>
-#include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
-#include <mbgl/util/constants.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/thread.hpp>
 #include <mbgl/util/url.hpp>
 
 namespace {
-bool acceptsURL(const std::string& url) {
-    return 0 == url.rfind(mbgl::util::FILE_PROTOCOL, 0);
-}
+
+const std::string fileProtocol = "file://";
+
 } // namespace
 
 namespace mbgl {
@@ -30,7 +28,7 @@ public:
         }
 
         // Cut off the protocol and prefix with path.
-        const auto path = mbgl::util::percentDecode(url.substr(std::char_traits<char>::length(util::FILE_PROTOCOL)));
+        const auto path = mbgl::util::percentDecode(url.substr(fileProtocol.size()));
         requestLocalFile(path, std::move(req));
     }
 };
@@ -49,16 +47,8 @@ std::unique_ptr<AsyncRequest> LocalFileSource::request(const Resource& resource,
     return std::move(req);
 }
 
-bool LocalFileSource::canRequest(const Resource& resource) const {
-    return acceptsURL(resource.url);
-}
-
-void LocalFileSource::pause() {
-    impl->pause();
-}
-
-void LocalFileSource::resume() {
-    impl->resume();
+bool LocalFileSource::acceptsURL(const std::string& url) {
+    return 0 == url.rfind(fileProtocol, 0);
 }
 
 } // namespace mbgl

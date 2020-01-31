@@ -1,5 +1,4 @@
 #include <mbgl/storage/local_file_source.hpp>
-#include <mbgl/storage/resource.hpp>
 #include <mbgl/util/platform.hpp>
 #include <mbgl/util/run_loop.hpp>
 
@@ -22,13 +21,12 @@ std::string toAbsoluteURL(const std::string& fileName) {
 using namespace mbgl;
 
 TEST(LocalFileSource, AcceptsURL) {
-    LocalFileSource fs;
-    EXPECT_TRUE(fs.canRequest(Resource::style("file://empty")));
-    EXPECT_TRUE(fs.canRequest(Resource::style("file:///test")));
-    EXPECT_FALSE(fs.canRequest(Resource::style("flie://foo")));
-    EXPECT_FALSE(fs.canRequest(Resource::style("file:")));
-    EXPECT_FALSE(fs.canRequest(Resource::style("style.json")));
-    EXPECT_FALSE(fs.canRequest(Resource::style("")));
+    EXPECT_TRUE(LocalFileSource::acceptsURL("file://empty"));
+    EXPECT_TRUE(LocalFileSource::acceptsURL("file:///test"));
+    EXPECT_FALSE(LocalFileSource::acceptsURL("flie://foo"));
+    EXPECT_FALSE(LocalFileSource::acceptsURL("file:"));
+    EXPECT_FALSE(LocalFileSource::acceptsURL("style.json"));
+    EXPECT_FALSE(LocalFileSource::acceptsURL(""));
 }
 
 TEST(LocalFileSource, EmptyFile) {

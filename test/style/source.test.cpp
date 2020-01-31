@@ -58,7 +58,7 @@ public:
     StubRenderSourceObserver renderSourceObserver;
     Transform transform;
     TransformState transformState;
-    Style style{fileSource, 1};
+    Style style { *fileSource, 1 };
     AnnotationManager annotationManager { style };
     ImageManager imageManager;
     GlyphManager glyphManager;

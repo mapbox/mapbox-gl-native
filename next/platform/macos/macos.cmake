@@ -95,12 +95,11 @@ target_sources(
         ${MBGL_ROOT}/platform/default/src/mbgl/gl/headless_backend.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/map/map_snapshotter.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/storage/asset_file_source.cpp
-        ${MBGL_ROOT}/platform/default/src/mbgl/storage/database_file_source.cpp
-        ${MBGL_ROOT}/platform/default/src/mbgl/storage/file_source_manager.cpp
+        ${MBGL_ROOT}/platform/default/src/mbgl/storage/default_file_source.cpp
+        ${MBGL_ROOT}/platform/default/src/mbgl/storage/file_source.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/storage/file_source_request.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/storage/local_file_request.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/storage/local_file_source.cpp
-        ${MBGL_ROOT}/platform/default/src/mbgl/storage/main_resource_loader.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/storage/offline.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/storage/offline_database.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/storage/offline_download.cpp

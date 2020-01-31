@@ -130,9 +130,8 @@ add_library(
     ${MBGL_ROOT}/include/mbgl/renderer/renderer_frontend.hpp
     ${MBGL_ROOT}/include/mbgl/renderer/renderer_observer.hpp
     ${MBGL_ROOT}/include/mbgl/renderer/renderer_state.hpp
-    ${MBGL_ROOT}/include/mbgl/storage/database_file_source.hpp
+    ${MBGL_ROOT}/include/mbgl/storage/default_file_source.hpp
     ${MBGL_ROOT}/include/mbgl/storage/file_source.hpp
-    ${MBGL_ROOT}/include/mbgl/storage/file_source_manager.hpp
     ${MBGL_ROOT}/include/mbgl/storage/network_status.hpp
     ${MBGL_ROOT}/include/mbgl/storage/offline.hpp
     ${MBGL_ROOT}/include/mbgl/storage/online_file_source.hpp
@@ -597,10 +596,9 @@ add_library(
     ${MBGL_ROOT}/src/mbgl/sprite/sprite_parser.cpp
     ${MBGL_ROOT}/src/mbgl/sprite/sprite_parser.hpp
     ${MBGL_ROOT}/src/mbgl/storage/asset_file_source.hpp
-    ${MBGL_ROOT}/src/mbgl/storage/file_source_manager.cpp
+    ${MBGL_ROOT}/src/mbgl/storage/file_source.cpp
     ${MBGL_ROOT}/src/mbgl/storage/http_file_source.hpp
     ${MBGL_ROOT}/src/mbgl/storage/local_file_source.hpp
-    ${MBGL_ROOT}/src/mbgl/storage/main_resource_loader.hpp
     ${MBGL_ROOT}/src/mbgl/storage/network_status.cpp
     ${MBGL_ROOT}/src/mbgl/storage/resource.cpp
     ${MBGL_ROOT}/src/mbgl/storage/resource_options.cpp

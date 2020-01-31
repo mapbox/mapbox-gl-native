@@ -1,10 +1,5 @@
-#include <mbgl/storage/file_source_manager.hpp>
-#include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/resource_options.hpp>
-#include <mbgl/util/async_request.hpp>
 #include <mbgl/util/logging.hpp>
-
-#include <atomic>
 
 #include "file_source.hpp"
 
@@ -15,14 +10,8 @@ std::atomic_size_t transferredSize{0};
 std::atomic_bool active{false};
 std::atomic_bool offline{true};
 
-ProxyFileSource::ProxyFileSource(std::shared_ptr<FileSource> defaultResourceLoader_, const ResourceOptions& options)
-    : defaultResourceLoader(std::move(defaultResourceLoader_)) {
-    assert(defaultResourceLoader);
-    if (offline) {
-        auto dbfs = FileSourceManager::get()->getFileSource(FileSourceType::Database, options);
-        dbfs->setProperty("read-only-mode", true);
-    }
-}
+ProxyFileSource::ProxyFileSource(const std::string& cachePath, const std::string& assetPath)
+    : DefaultFileSource(cachePath, assetPath, false) {}
 
 ProxyFileSource::~ProxyFileSource() = default;
 
@@ -54,7 +43,7 @@ std::unique_ptr<AsyncRequest> ProxyFileSource::request(const Resource& resource,
         }
     }
 
-    return defaultResourceLoader->request(transformed, [=](Response response) {
+    return DefaultFileSource::request(transformed, [=](Response response) {
         if (transformed.loadingMethod == Resource::LoadingMethod::CacheOnly && response.noContent) {
             if (transformed.kind == Resource::Kind::Tile && transformed.tileData) {
                 mbgl::Log::Info(mbgl::Event::Database,
@@ -73,6 +62,19 @@ std::unique_ptr<AsyncRequest> ProxyFileSource::request(const Resource& resource,
         }
         callback(response);
     });
+}
+
+std::shared_ptr<FileSource> FileSource::createPlatformFileSource(const ResourceOptions& options) {
+    auto fileSource = std::make_shared<ProxyFileSource>(options.cachePath(), options.assetPath());
+
+    fileSource->setAccessToken(options.accessToken());
+    fileSource->setAPIBaseURL(options.baseURL());
+
+    if (offline) {
+        fileSource->reopenDatabaseReadOnlyForTesting();
+    }
+
+    return fileSource;
 }
 
 // static

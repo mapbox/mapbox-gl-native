@@ -1,21 +1,17 @@
 #include <mbgl/actor/actor.hpp>
-#include <mbgl/storage/database_file_source.hpp>
-#include <mbgl/storage/file_source_manager.hpp>
-#include <mbgl/storage/main_resource_loader.hpp>
+#include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/network_status.hpp>
-#include <mbgl/storage/online_file_source.hpp>
-#include <mbgl/storage/resource_options.hpp>
 #include <mbgl/storage/resource_transform.hpp>
 #include <mbgl/test/util.hpp>
 #include <mbgl/util/run_loop.hpp>
 
 using namespace mbgl;
 
-TEST(MainResourceLoader, TEST_REQUIRES_SERVER(CacheResponse)) {
+TEST(DefaultFileSource, TEST_REQUIRES_SERVER(CacheResponse)) {
     util::RunLoop loop;
-    MainResourceLoader fs(ResourceOptions{});
+    DefaultFileSource fs(":memory:", ".");
 
-    const Resource resource{Resource::Unknown, "http://127.0.0.1:3000/cache"};
+    const Resource resource { Resource::Unknown, "http://127.0.0.1:3000/cache" };
     Response response;
 
     std::unique_ptr<AsyncRequest> req1;
@@ -51,11 +47,11 @@ TEST(MainResourceLoader, TEST_REQUIRES_SERVER(CacheResponse)) {
     loop.run();
 }
 
-TEST(MainResourceLoader, TEST_REQUIRES_SERVER(CacheRevalidateSame)) {
+TEST(DefaultFileSource, TEST_REQUIRES_SERVER(CacheRevalidateSame)) {
     util::RunLoop loop;
-    MainResourceLoader fs(ResourceOptions{});
+    DefaultFileSource fs(":memory:", ".");
 
-    const Resource revalidateSame{Resource::Unknown, "http://127.0.0.1:3000/revalidate-same"};
+    const Resource revalidateSame { Resource::Unknown, "http://127.0.0.1:3000/revalidate-same" };
     std::unique_ptr<AsyncRequest> req1;
     std::unique_ptr<AsyncRequest> req2;
     bool gotResponse = false;
@@ -113,11 +109,12 @@ TEST(MainResourceLoader, TEST_REQUIRES_SERVER(CacheRevalidateSame)) {
     loop.run();
 }
 
-TEST(MainResourceLoader, TEST_REQUIRES_SERVER(CacheRevalidateModified)) {
+TEST(DefaultFileSource, TEST_REQUIRES_SERVER(CacheRevalidateModified)) {
     util::RunLoop loop;
-    MainResourceLoader fs(ResourceOptions{});
+    DefaultFileSource fs(":memory:", ".");
 
-    const Resource revalidateModified{Resource::Unknown, "http://127.0.0.1:3000/revalidate-modified"};
+    const Resource revalidateModified{ Resource::Unknown,
+                                       "http://127.0.0.1:3000/revalidate-modified" };
     std::unique_ptr<AsyncRequest> req1;
     std::unique_ptr<AsyncRequest> req2;
     bool gotResponse = false;
@@ -132,7 +129,7 @@ TEST(MainResourceLoader, TEST_REQUIRES_SERVER(CacheRevalidateModified)) {
         EXPECT_EQ("Response", *res.data);
         EXPECT_FALSE(bool(res.expires));
         EXPECT_TRUE(res.mustRevalidate);
-        EXPECT_EQ(Timestamp{Seconds(1420070400)}, *res.modified);
+        EXPECT_EQ(Timestamp{ Seconds(1420070400) }, *res.modified);
         EXPECT_FALSE(res.etag);
 
         // The first response is stored in the cache, but it has 'must-revalidate' set. This means
@@ -152,7 +149,7 @@ TEST(MainResourceLoader, TEST_REQUIRES_SERVER(CacheRevalidateModified)) {
                 EXPECT_EQ("Response", *res2.data);
                 EXPECT_TRUE(bool(res2.expires));
                 EXPECT_TRUE(res2.mustRevalidate);
-                EXPECT_EQ(Timestamp{Seconds(1420070400)}, *res2.modified);
+                EXPECT_EQ(Timestamp{ Seconds(1420070400) }, *res2.modified);
                 EXPECT_FALSE(res2.etag);
             } else {
                 // The test server sends a Cache-Control header with a max-age of 1 second. This
@@ -165,7 +162,7 @@ TEST(MainResourceLoader, TEST_REQUIRES_SERVER(CacheRevalidateModified)) {
                 EXPECT_FALSE(res2.data.get());
                 EXPECT_TRUE(bool(res2.expires));
                 EXPECT_TRUE(res2.mustRevalidate);
-                EXPECT_EQ(Timestamp{Seconds(1420070400)}, *res2.modified);
+                EXPECT_EQ(Timestamp{ Seconds(1420070400) }, *res2.modified);
                 EXPECT_FALSE(res2.etag);
                 loop.stop();
             }
@@ -175,11 +172,11 @@ TEST(MainResourceLoader, TEST_REQUIRES_SERVER(CacheRevalidateModified)) {
     loop.run();
 }
 
-TEST(MainResourceLoader, TEST_REQUIRES_SERVER(CacheRevalidateEtag)) {
+TEST(DefaultFileSource, TEST_REQUIRES_SERVER(CacheRevalidateEtag)) {
     util::RunLoop loop;
-    MainResourceLoader fs(ResourceOptions{});
+    DefaultFileSource fs(":memory:", ".");
 
-    const Resource revalidateEtag{Resource::Unknown, "http://127.0.0.1:3000/revalidate-etag"};
+    const Resource revalidateEtag { Resource::Unknown, "http://127.0.0.1:3000/revalidate-etag" };
     std::unique_ptr<AsyncRequest> req1;
     std::unique_ptr<AsyncRequest> req2;
 
@@ -225,13 +222,16 @@ TEST(MainResourceLoader, TEST_REQUIRES_SERVER(CacheRevalidateEtag)) {
 // will notify as expected, the second one will have bound a DefaultFileRequest* in the lambda that
 // gets invalidated by the first notify's pending.erase, and when it gets notified, the crash
 // occurs.
-TEST(MainResourceLoader, TEST_REQUIRES_SERVER(HTTPIssue1369)) {
+
+TEST(DefaultFileSource, TEST_REQUIRES_SERVER(HTTPIssue1369)) {
     util::RunLoop loop;
-    MainResourceLoader fs(ResourceOptions{});
+    DefaultFileSource fs(":memory:", ".");
 
-    const Resource resource{Resource::Unknown, "http://127.0.0.1:3000/test"};
+    const Resource resource { Resource::Unknown, "http://127.0.0.1:3000/test" };
 
-    auto req = fs.request(resource, [&](Response) { ADD_FAILURE() << "Callback should not be called"; });
+    auto req = fs.request(resource, [&](Response) {
+        ADD_FAILURE() << "Callback should not be called";
+    });
     req.reset();
     req = fs.request(resource, [&](Response res) {
         req.reset();
@@ -248,77 +248,87 @@ TEST(MainResourceLoader, TEST_REQUIRES_SERVER(HTTPIssue1369)) {
     loop.run();
 }
 
-TEST(MainResourceLoader, OptionalNonExpired) {
+TEST(DefaultFileSource, OptionalNonExpired) {
     util::RunLoop loop;
-    MainResourceLoader fs(ResourceOptions{});
+    DefaultFileSource fs(":memory:", ".");
 
-    const Resource optionalResource{
-        Resource::Unknown, "http://127.0.0.1:3000/test", {}, Resource::LoadingMethod::CacheOnly};
+    const Resource optionalResource { Resource::Unknown, "http://127.0.0.1:3000/test", {}, Resource::LoadingMethod::CacheOnly };
 
     using namespace std::chrono_literals;
 
     Response response;
     response.data = std::make_shared<std::string>("Cached value");
     response.expires = util::now() + 1h;
+    fs.put(optionalResource, response);
 
     std::unique_ptr<AsyncRequest> req;
-    auto dbfs = FileSourceManager::get()->getFileSource(FileSourceType::Database, ResourceOptions{});
-    dbfs->forward(optionalResource, response, [&] {
-        req = fs.request(optionalResource, [&](Response res) {
-            req.reset();
-            EXPECT_EQ(nullptr, res.error);
-            ASSERT_TRUE(res.data.get());
-            EXPECT_EQ("Cached value", *res.data);
-            ASSERT_TRUE(bool(res.expires));
-            EXPECT_EQ(*response.expires, *res.expires);
-            EXPECT_FALSE(res.mustRevalidate);
-            EXPECT_FALSE(bool(res.modified));
-            EXPECT_FALSE(bool(res.etag));
-            loop.stop();
-        });
+    req = fs.request(optionalResource, [&](Response res) {
+        req.reset();
+        EXPECT_EQ(nullptr, res.error);
+        ASSERT_TRUE(res.data.get());
+        EXPECT_EQ("Cached value", *res.data);
+        ASSERT_TRUE(bool(res.expires));
+        EXPECT_EQ(*response.expires, *res.expires);
+        EXPECT_FALSE(res.mustRevalidate);
+        EXPECT_FALSE(bool(res.modified));
+        EXPECT_FALSE(bool(res.etag));
+        loop.stop();
     });
 
     loop.run();
 }
 
-TEST(MainResourceLoader, OptionalExpired) {
+TEST(DefaultFileSource, OptionalExpired) {
     util::RunLoop loop;
-    MainResourceLoader fs(ResourceOptions{});
+    DefaultFileSource fs(":memory:", ".");
 
-    const Resource optionalResource{
-        Resource::Unknown, "http://127.0.0.1:3000/test", {}, Resource::LoadingMethod::CacheOnly};
+    const Resource optionalResource { Resource::Unknown, "http://127.0.0.1:3000/test", {}, Resource::LoadingMethod::CacheOnly };
 
     using namespace std::chrono_literals;
 
     Response response;
     response.data = std::make_shared<std::string>("Cached value");
     response.expires = util::now() - 1h;
-    auto dbfs = FileSourceManager::get()->getFileSource(FileSourceType::Database, ResourceOptions{});
+    fs.put(optionalResource, response);
+
     std::unique_ptr<AsyncRequest> req;
-    dbfs->forward(optionalResource, response, [&] {
-        req = fs.request(optionalResource, [&](Response res) {
-            req.reset();
-            EXPECT_EQ(nullptr, res.error);
-            ASSERT_TRUE(res.data.get());
-            EXPECT_EQ("Cached value", *res.data);
-            ASSERT_TRUE(bool(res.expires));
-            EXPECT_EQ(*response.expires, *res.expires);
-            EXPECT_FALSE(res.mustRevalidate);
-            EXPECT_FALSE(bool(res.modified));
-            EXPECT_FALSE(bool(res.etag));
-            loop.stop();
-        });
+    req = fs.request(optionalResource, [&](Response res) {
+        req.reset();
+        EXPECT_EQ(nullptr, res.error);
+        ASSERT_TRUE(res.data.get());
+        EXPECT_EQ("Cached value", *res.data);
+        ASSERT_TRUE(bool(res.expires));
+        EXPECT_EQ(*response.expires, *res.expires);
+        EXPECT_FALSE(res.mustRevalidate);
+        EXPECT_FALSE(bool(res.modified));
+        EXPECT_FALSE(bool(res.etag));
+        loop.stop();
     });
 
     loop.run();
 }
 
-TEST(MainResourceLoader, OptionalNotFound) {
+TEST(DefaultFileSource, GetBaseURLAndAccessTokenWhilePaused) {
     util::RunLoop loop;
-    MainResourceLoader fs(ResourceOptions{});
+    DefaultFileSource fs(":memory:", ".");
 
-    const Resource optionalResource{
-        Resource::Unknown, "http://127.0.0.1:3000/test", {}, Resource::LoadingMethod::CacheOnly};
+    fs.pause();
+
+    auto baseURL = "http://url";
+    auto accessToken = "access_token";
+
+    fs.setAPIBaseURL(baseURL);
+    fs.setAccessToken(accessToken);
+
+    EXPECT_EQ(fs.getAPIBaseURL(), baseURL);
+    EXPECT_EQ(fs.getAccessToken(), accessToken);
+}
+
+TEST(DefaultFileSource, OptionalNotFound) {
+    util::RunLoop loop;
+    DefaultFileSource fs(":memory:", ".");
+
+    const Resource optionalResource { Resource::Unknown, "http://127.0.0.1:3000/test", {}, Resource::LoadingMethod::CacheOnly };
 
     using namespace std::chrono_literals;
 
@@ -340,9 +350,9 @@ TEST(MainResourceLoader, OptionalNotFound) {
 }
 
 // Test that a network only request doesn't attempt to load data from the cache.
-TEST(MainResourceLoader, TEST_REQUIRES_SERVER(NoCacheRefreshEtagNotModified)) {
+TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshEtagNotModified)) {
     util::RunLoop loop;
-    MainResourceLoader fs(ResourceOptions{});
+    DefaultFileSource fs(":memory:", ".");
 
     Resource resource { Resource::Unknown, "http://127.0.0.1:3000/revalidate-same" };
     resource.loadingMethod = Resource::LoadingMethod::NetworkOnly;
@@ -354,31 +364,30 @@ TEST(MainResourceLoader, TEST_REQUIRES_SERVER(NoCacheRefreshEtagNotModified)) {
     Response response;
     response.data = std::make_shared<std::string>("Cached value");
     response.expires = util::now() + 1h;
+    fs.put(resource, response);
+
     std::unique_ptr<AsyncRequest> req;
-    auto dbfs = FileSourceManager::get()->getFileSource(FileSourceType::Database, ResourceOptions{});
-    dbfs->forward(resource, response, [&] {
-        req = fs.request(resource, [&](Response res) {
-            req.reset();
-            EXPECT_EQ(nullptr, res.error);
-            EXPECT_TRUE(res.notModified);
-            EXPECT_FALSE(res.data.get());
-            ASSERT_TRUE(bool(res.expires));
-            EXPECT_LT(util::now(), *res.expires);
-            EXPECT_TRUE(res.mustRevalidate);
-            EXPECT_FALSE(bool(res.modified));
-            ASSERT_TRUE(bool(res.etag));
-            EXPECT_EQ("snowfall", *res.etag);
-            loop.stop();
-        });
+    req = fs.request(resource, [&](Response res) {
+        req.reset();
+        EXPECT_EQ(nullptr, res.error);
+        EXPECT_TRUE(res.notModified);
+        EXPECT_FALSE(res.data.get());
+        ASSERT_TRUE(bool(res.expires));
+        EXPECT_LT(util::now(), *res.expires);
+        EXPECT_TRUE(res.mustRevalidate);
+        EXPECT_FALSE(bool(res.modified));
+        ASSERT_TRUE(bool(res.etag));
+        EXPECT_EQ("snowfall", *res.etag);
+        loop.stop();
     });
 
     loop.run();
 }
 
 // Test that a network only request doesn't attempt to load data from the cache.
-TEST(MainResourceLoader, TEST_REQUIRES_SERVER(NoCacheRefreshEtagModified)) {
+TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshEtagModified)) {
     util::RunLoop loop;
-    MainResourceLoader fs(ResourceOptions{});
+    DefaultFileSource fs(":memory:", ".");
 
     Resource resource { Resource::Unknown, "http://127.0.0.1:3000/revalidate-same" };
     resource.loadingMethod = Resource::LoadingMethod::NetworkOnly;
@@ -390,31 +399,30 @@ TEST(MainResourceLoader, TEST_REQUIRES_SERVER(NoCacheRefreshEtagModified)) {
     Response response;
     response.data = std::make_shared<std::string>("Cached value");
     response.expires = util::now() + 1h;
+    fs.put(resource, response);
+
     std::unique_ptr<AsyncRequest> req;
-    auto dbfs = FileSourceManager::get()->getFileSource(FileSourceType::Database, ResourceOptions{});
-    dbfs->forward(resource, response, [&] {
-        req = fs.request(resource, [&](Response res) {
-            req.reset();
-            EXPECT_EQ(nullptr, res.error);
-            EXPECT_FALSE(res.notModified);
-            ASSERT_TRUE(res.data.get());
-            EXPECT_EQ("Response", *res.data);
-            EXPECT_FALSE(bool(res.expires));
-            EXPECT_TRUE(res.mustRevalidate);
-            EXPECT_FALSE(bool(res.modified));
-            ASSERT_TRUE(bool(res.etag));
-            EXPECT_EQ("snowfall", *res.etag);
-            loop.stop();
-        });
+    req = fs.request(resource, [&](Response res) {
+        req.reset();
+        EXPECT_EQ(nullptr, res.error);
+        EXPECT_FALSE(res.notModified);
+        ASSERT_TRUE(res.data.get());
+        EXPECT_EQ("Response", *res.data);
+        EXPECT_FALSE(bool(res.expires));
+        EXPECT_TRUE(res.mustRevalidate);
+        EXPECT_FALSE(bool(res.modified));
+        ASSERT_TRUE(bool(res.etag));
+        EXPECT_EQ("snowfall", *res.etag);
+        loop.stop();
     });
 
     loop.run();
 }
 
 // Test that a network only request doesn't attempt to load data from the cache.
-TEST(MainResourceLoader, TEST_REQUIRES_SERVER(NoCacheFull)) {
+TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheFull)) {
     util::RunLoop loop;
-    MainResourceLoader fs(ResourceOptions{});
+    DefaultFileSource fs(":memory:", ".");
 
     Resource resource { Resource::Unknown, "http://127.0.0.1:3000/revalidate-same" };
     resource.loadingMethod = Resource::LoadingMethod::NetworkOnly;
@@ -425,22 +433,21 @@ TEST(MainResourceLoader, TEST_REQUIRES_SERVER(NoCacheFull)) {
     Response response;
     response.data = std::make_shared<std::string>("Cached value");
     response.expires = util::now() + 1h;
+    fs.put(resource, response);
+
     std::unique_ptr<AsyncRequest> req;
-    auto dbfs = FileSourceManager::get()->getFileSource(FileSourceType::Database, ResourceOptions{});
-    dbfs->forward(resource, response, [&] {
-        req = fs.request(resource, [&](Response res) {
-            req.reset();
-            EXPECT_EQ(nullptr, res.error);
-            EXPECT_FALSE(res.notModified);
-            ASSERT_TRUE(res.data.get());
-            EXPECT_EQ("Response", *res.data);
-            EXPECT_FALSE(bool(res.expires));
-            EXPECT_TRUE(res.mustRevalidate);
-            EXPECT_FALSE(bool(res.modified));
-            ASSERT_TRUE(bool(res.etag));
-            EXPECT_EQ("snowfall", *res.etag);
-            loop.stop();
-        });
+    req = fs.request(resource, [&](Response res) {
+        req.reset();
+        EXPECT_EQ(nullptr, res.error);
+        EXPECT_FALSE(res.notModified);
+        ASSERT_TRUE(res.data.get());
+        EXPECT_EQ("Response", *res.data);
+        EXPECT_FALSE(bool(res.expires));
+        EXPECT_TRUE(res.mustRevalidate);
+        EXPECT_FALSE(bool(res.modified));
+        ASSERT_TRUE(bool(res.etag));
+        EXPECT_EQ("snowfall", *res.etag);
+        loop.stop();
     });
 
     loop.run();
@@ -448,9 +455,9 @@ TEST(MainResourceLoader, TEST_REQUIRES_SERVER(NoCacheFull)) {
 
 // Test that we can make a request with a Modified field that doesn't first try to load
 // from cache like a regular request
-TEST(MainResourceLoader, TEST_REQUIRES_SERVER(NoCacheRefreshModifiedNotModified)) {
+TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshModifiedNotModified)) {
     util::RunLoop loop;
-    MainResourceLoader fs(ResourceOptions{});
+    DefaultFileSource fs(":memory:", ".");
 
     Resource resource { Resource::Unknown, "http://127.0.0.1:3000/revalidate-modified" };
     resource.loadingMethod = Resource::LoadingMethod::NetworkOnly;
@@ -462,22 +469,21 @@ TEST(MainResourceLoader, TEST_REQUIRES_SERVER(NoCacheRefreshModifiedNotModified)
     Response response;
     response.data = std::make_shared<std::string>("Cached value");
     response.expires = util::now() + 1h;
+    fs.put(resource, response);
+
     std::unique_ptr<AsyncRequest> req;
-    auto dbfs = FileSourceManager::get()->getFileSource(FileSourceType::Database, ResourceOptions{});
-    dbfs->forward(resource, response, [&] {
-        req = fs.request(resource, [&](Response res) {
-            req.reset();
-            EXPECT_EQ(nullptr, res.error);
-            EXPECT_TRUE(res.notModified);
-            EXPECT_FALSE(res.data.get());
-            ASSERT_TRUE(bool(res.expires));
-            EXPECT_LT(util::now(), *res.expires);
-            EXPECT_TRUE(res.mustRevalidate);
-            ASSERT_TRUE(bool(res.modified));
-            EXPECT_EQ(Timestamp{Seconds(1420070400)}, *res.modified);
-            EXPECT_FALSE(bool(res.etag));
-            loop.stop();
-        });
+    req = fs.request(resource, [&](Response res) {
+        req.reset();
+        EXPECT_EQ(nullptr, res.error);
+        EXPECT_TRUE(res.notModified);
+        EXPECT_FALSE(res.data.get());
+        ASSERT_TRUE(bool(res.expires));
+        EXPECT_LT(util::now(), *res.expires);
+        EXPECT_TRUE(res.mustRevalidate);
+        ASSERT_TRUE(bool(res.modified));
+        EXPECT_EQ(Timestamp{ Seconds(1420070400) }, *res.modified);
+        EXPECT_FALSE(bool(res.etag));
+        loop.stop();
     });
 
     loop.run();
@@ -485,9 +491,9 @@ TEST(MainResourceLoader, TEST_REQUIRES_SERVER(NoCacheRefreshModifiedNotModified)
 
 // Test that we can make a request with a Modified field that doesn't first try to load
 // from cache like a regular request
-TEST(MainResourceLoader, TEST_REQUIRES_SERVER(NoCacheRefreshModifiedModified)) {
+TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshModifiedModified)) {
     util::RunLoop loop;
-    MainResourceLoader fs(ResourceOptions{});
+    DefaultFileSource fs(":memory:", ".");
 
     Resource resource { Resource::Unknown, "http://127.0.0.1:3000/revalidate-modified" };
     resource.loadingMethod = Resource::LoadingMethod::NetworkOnly;
@@ -499,49 +505,40 @@ TEST(MainResourceLoader, TEST_REQUIRES_SERVER(NoCacheRefreshModifiedModified)) {
     Response response;
     response.data = std::make_shared<std::string>("Cached value");
     response.expires = util::now() + 1h;
+    fs.put(resource, response);
+
     std::unique_ptr<AsyncRequest> req;
-    auto dbfs = FileSourceManager::get()->getFileSource(FileSourceType::Database, ResourceOptions{});
-    dbfs->forward(resource, response, [&] {
-        req = fs.request(resource, [&](Response res) {
-            req.reset();
-            EXPECT_EQ(nullptr, res.error);
-            EXPECT_FALSE(res.notModified);
-            ASSERT_TRUE(res.data.get());
-            EXPECT_EQ("Response", *res.data);
-            EXPECT_FALSE(bool(res.expires));
-            EXPECT_TRUE(res.mustRevalidate);
-            EXPECT_EQ(Timestamp{Seconds(1420070400)}, *res.modified);
-            EXPECT_FALSE(res.etag);
-            loop.stop();
-        });
+    req = fs.request(resource, [&](Response res) {
+        req.reset();
+        EXPECT_EQ(nullptr, res.error);
+        EXPECT_FALSE(res.notModified);
+        ASSERT_TRUE(res.data.get());
+        EXPECT_EQ("Response", *res.data);
+        EXPECT_FALSE(bool(res.expires));
+        EXPECT_TRUE(res.mustRevalidate);
+        EXPECT_EQ(Timestamp{ Seconds(1420070400) }, *res.modified);
+        EXPECT_FALSE(res.etag);
+        loop.stop();
     });
 
     loop.run();
 }
 
-TEST(MainResourceLoader, TEST_REQUIRES_SERVER(SetResourceTransform)) {
+TEST(DefaultFileSource, TEST_REQUIRES_SERVER(SetResourceTransform)) {
     util::RunLoop loop;
-    MainResourceLoader fs(ResourceOptions{});
-
-    auto onlinefs = std::static_pointer_cast<OnlineFileSource>(
-        FileSourceManager::get()->getFileSource(FileSourceType::Network, ResourceOptions{}));
+    DefaultFileSource fs(":memory:", ".");
 
     // Translates the URL "localhost://test to http://127.0.0.1:3000/test
-    Actor<ResourceTransform::TransformCallback> transform(
-        loop, [](Resource::Kind, const std::string& url, ResourceTransform::FinishedCallback cb) {
-            if (url == "localhost://test") {
-                cb("http://127.0.0.1:3000/test");
-            } else {
-                cb(url);
-            }
-        });
+    Actor<ResourceTransform> transform(loop, [](Resource::Kind, const std::string& url) -> std::string {
+        if (url == "localhost://test") {
+            return "http://127.0.0.1:3000/test";
+        } else {
+            return url;
+        }
+    });
 
-    onlinefs->setResourceTransform(
-        {[actorRef = transform.self()](
-             Resource::Kind kind, const std::string& url, ResourceTransform::FinishedCallback cb) {
-            actorRef.invoke(&ResourceTransform::TransformCallback::operator(), kind, url, std::move(cb));
-        }});
-    const Resource resource1{Resource::Unknown, "localhost://test"};
+    fs.setResourceTransform(transform.self());
+    const Resource resource1 { Resource::Unknown, "localhost://test" };
 
     std::unique_ptr<AsyncRequest> req;
     req = fs.request(resource1, [&](Response res) {
@@ -558,8 +555,8 @@ TEST(MainResourceLoader, TEST_REQUIRES_SERVER(SetResourceTransform)) {
 
     loop.run();
 
-    onlinefs->setResourceTransform({});
-    const Resource resource2{Resource::Unknown, "http://127.0.0.1:3000/test"};
+    fs.setResourceTransform({});
+    const Resource resource2 { Resource::Unknown, "http://127.0.0.1:3000/test" };
 
     req = fs.request(resource2, [&](Response res) {
         req.reset();
@@ -576,19 +573,22 @@ TEST(MainResourceLoader, TEST_REQUIRES_SERVER(SetResourceTransform)) {
     loop.run();
 }
 
-TEST(MainResourceLoader, SetResourceCachePath) {
+TEST(DefaultFileSource, SetResourceCachePath) {
     util::RunLoop loop;
-    MainResourceLoader fs(ResourceOptions{});
-    auto dbfs = std::static_pointer_cast<DatabaseFileSource>(
-        FileSourceManager::get()->getFileSource(FileSourceType::Database, ResourceOptions{}));
-    dbfs->setDatabasePath("./new_offline.db", [&loop] { loop.stop(); });
+    DefaultFileSource fs(":memory:", ".");
+
+    Actor<PathChangeCallback> callback(loop, [&]() -> void {
+        loop.stop();
+    });
+
+    fs.setResourceCachePath("./new_offline.db", callback.self());
     loop.run();
 }
 
 // Test that a stale cache file that has must-revalidate set will trigger a response.
-TEST(MainResourceLoader, TEST_REQUIRES_SERVER(RespondToStaleMustRevalidate)) {
+TEST(DefaultFileSource, TEST_REQUIRES_SERVER(RespondToStaleMustRevalidate)) {
     util::RunLoop loop;
-    MainResourceLoader fs(ResourceOptions{});
+    DefaultFileSource fs(":memory:", ".");
 
     Resource resource { Resource::Unknown, "http://127.0.0.1:3000/revalidate-same" };
     resource.loadingMethod = Resource::LoadingMethod::CacheOnly;
@@ -602,38 +602,37 @@ TEST(MainResourceLoader, TEST_REQUIRES_SERVER(RespondToStaleMustRevalidate)) {
     response.expires = Timestamp(Seconds(1417392000));
     response.mustRevalidate = true;
     response.etag.emplace("snowfall");
+    fs.put(resource, response);
+
     std::unique_ptr<AsyncRequest> req;
-    auto dbfs = FileSourceManager::get()->getFileSource(FileSourceType::Database, ResourceOptions{});
-    dbfs->forward(resource, response, [&] {
-        req = fs.request(resource, [&](Response res) {
-            req.reset();
-            ASSERT_TRUE(res.error.get());
-            EXPECT_EQ(Response::Error::Reason::NotFound, res.error->reason);
-            EXPECT_EQ("Cached resource is unusable", res.error->message);
-            EXPECT_FALSE(res.notModified);
-            ASSERT_TRUE(res.data.get());
-            EXPECT_EQ("Cached value", *res.data);
-            ASSERT_TRUE(res.expires);
-            EXPECT_EQ(Timestamp{Seconds(1417392000)}, *res.expires);
-            EXPECT_TRUE(res.mustRevalidate);
-            ASSERT_TRUE(res.modified);
-            EXPECT_EQ(Timestamp{Seconds(1417392000)}, *res.modified);
-            ASSERT_TRUE(res.etag);
-            EXPECT_EQ("snowfall", *res.etag);
+    req = fs.request(resource, [&](Response res) {
+        req.reset();
+        ASSERT_TRUE(res.error.get());
+        EXPECT_EQ(Response::Error::Reason::NotFound, res.error->reason);
+        EXPECT_EQ("Cached resource is unusable", res.error->message);
+        EXPECT_FALSE(res.notModified);
+        ASSERT_TRUE(res.data.get());
+        EXPECT_EQ("Cached value", *res.data);
+        ASSERT_TRUE(res.expires);
+        EXPECT_EQ(Timestamp{ Seconds(1417392000) }, *res.expires);
+        EXPECT_TRUE(res.mustRevalidate);
+        ASSERT_TRUE(res.modified);
+        EXPECT_EQ(Timestamp{ Seconds(1417392000) }, *res.modified);
+        ASSERT_TRUE(res.etag);
+        EXPECT_EQ("snowfall", *res.etag);
 
-            resource.priorEtag = res.etag;
-            resource.priorModified = res.modified;
-            resource.priorExpires = res.expires;
-            resource.priorData = res.data;
+        resource.priorEtag = res.etag;
+        resource.priorModified = res.modified;
+        resource.priorExpires = res.expires;
+        resource.priorData = res.data;
 
-            loop.stop();
-        });
+        loop.stop();
     });
 
     loop.run();
 
     // Now run this request again, with the data we gathered from the previous stale/unusable
-    // request. We're replacing the data so that we can check that the MainResourceLoader doesn't
+    // request. We're replacing the data so that we can check that the DefaultFileSource doesn't
     // attempt another database access if we already have the value.
     resource.loadingMethod = Resource::LoadingMethod::NetworkOnly;
     resource.priorData = std::make_shared<std::string>("Prior value");
@@ -665,9 +664,9 @@ TEST(MainResourceLoader, TEST_REQUIRES_SERVER(RespondToStaleMustRevalidate)) {
 }
 
 // Test that requests for expired resources have lower priority than requests for new resources
-TEST(MainResourceLoader, TEST_REQUIRES_SERVER(CachedResourceLowPriority)) {
+TEST(DefaultFileSource, TEST_REQUIRES_SERVER(CachedResourceLowPriority)) {
     util::RunLoop loop;
-    MainResourceLoader fs(ResourceOptions{});
+    DefaultFileSource fs(":memory:", ".");
 
     Response response;
     std::size_t online_response_counter = 0;
@@ -675,20 +674,16 @@ TEST(MainResourceLoader, TEST_REQUIRES_SERVER(CachedResourceLowPriority)) {
     using namespace std::chrono_literals;
     response.expires = util::now() - 1h;
 
-    auto dbfs = FileSourceManager::get()->getFileSource(FileSourceType::Database, ResourceOptions{});
-    auto onlineFs = FileSourceManager::get()->getFileSource(FileSourceType::Network, ResourceOptions{});
-
     // Put existing values into the cache.
     Resource resource1{Resource::Unknown, "http://127.0.0.1:3000/load/3", {}, Resource::LoadingMethod::All};
     response.data = std::make_shared<std::string>("Cached Request 3");
-    dbfs->forward(resource1, response);
+    fs.put(resource1, response);
 
     Resource resource2{Resource::Unknown, "http://127.0.0.1:3000/load/4", {}, Resource::LoadingMethod::All};
     response.data = std::make_shared<std::string>("Cached Request 4");
-    dbfs->forward(resource2, response);
+    fs.put(resource2, response);
 
-    onlineFs->setProperty("max-concurrent-requests", 1u);
-    fs.pause();
+    fs.setMaximumConcurrentRequests(1);
     NetworkStatus::Set(NetworkStatus::Status::Offline);
 
     // Ensure that the online requests for new resources are processed first.
@@ -698,6 +693,14 @@ TEST(MainResourceLoader, TEST_REQUIRES_SERVER(CachedResourceLowPriority)) {
         req1.reset();
         EXPECT_EQ(online_response_counter, 1); // make sure this is responded first
         EXPECT_EQ("Request 1", *res.data);
+    });
+
+    Resource nonCached2{Resource::Unknown, "http://127.0.0.1:3000/load/2", {}, Resource::LoadingMethod::All};
+    std::unique_ptr<AsyncRequest> req2 = fs.request(nonCached2, [&](Response res) {
+        online_response_counter++;
+        req2.reset();
+        EXPECT_EQ(online_response_counter, 2); // make sure this is responded second
+        EXPECT_EQ("Request 2", *res.data);
     });
 
     bool req3CachedResponseReceived = false;
@@ -729,15 +732,6 @@ TEST(MainResourceLoader, TEST_REQUIRES_SERVER(CachedResourceLowPriority)) {
         }
     });
 
-    Resource nonCached2{Resource::Unknown, "http://127.0.0.1:3000/load/2", {}, Resource::LoadingMethod::All};
-    std::unique_ptr<AsyncRequest> req2 = fs.request(nonCached2, [&](Response res) {
-        online_response_counter++;
-        req2.reset();
-        EXPECT_EQ(online_response_counter, 2); // make sure this is responded second
-        EXPECT_EQ("Request 2", *res.data);
-    });
-
-    fs.resume();
     NetworkStatus::Set(NetworkStatus::Status::Online);
 
     loop.run();

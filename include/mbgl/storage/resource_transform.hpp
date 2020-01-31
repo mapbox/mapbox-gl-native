@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mbgl/actor/actor_ref.hpp>
 #include <mbgl/storage/resource.hpp>
 
 #include <functional>
@@ -7,14 +8,16 @@
 
 namespace mbgl {
 
+class Mailbox;
+
 class ResourceTransform {
 public:
-    using FinishedCallback = std::function<void(const std::string&)>;
-    using TransformCallback = std::function<void(Resource::Kind kind, const std::string& url, FinishedCallback)>;
+    using TransformCallback = std::function<std::string(Resource::Kind kind, const std::string& url)>;
+    using FinishedCallback = std::function<void(const std::string&&)>;
 
-    ResourceTransform(TransformCallback = {});
-    void transform(Resource::Kind, const std::string& url, FinishedCallback);
-    explicit operator bool() const { return bool(transformCallback); }
+    ResourceTransform(ActorRef<ResourceTransform>, TransformCallback&&);
+
+    void transform(Resource::Kind, const std::string& url, FinishedCallback&&);
 
 private:
     TransformCallback transformCallback;

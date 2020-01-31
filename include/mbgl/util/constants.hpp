@@ -60,9 +60,6 @@ constexpr UnitBezier DEFAULT_TRANSITION_EASE = { 0, 0, 0.25, 1 };
 constexpr int DEFAULT_RATE_LIMIT_TIMEOUT = 5;
 
 constexpr const char* API_BASE_URL = "https://api.mapbox.com";
-constexpr const char* ASSET_PROTOCOL = "asset://";
-constexpr const char* FILE_PROTOCOL = "file://";
-constexpr uint32_t DEFAULT_MAXIMUM_CONCURRENT_REQUESTS = 20;
 
 constexpr uint8_t TERRAIN_RGB_MAXZOOM = 15;
 

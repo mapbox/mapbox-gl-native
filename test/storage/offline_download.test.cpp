@@ -6,6 +6,7 @@
 #include <mbgl/test/sqlite3_test_fs.hpp>
 
 #include <mbgl/gfx/headless_frontend.hpp>
+#include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/offline.hpp>
 #include <mbgl/storage/offline_database.hpp>
 #include <mbgl/storage/offline_download.hpp>
@@ -63,7 +64,7 @@ public:
     }
 
     util::RunLoop loop;
-    StubFileSource fileSource;
+    StubOnlineFileSource fileSource;
     OfflineDatabase db;
     std::size_t size = 0;
 
@@ -385,7 +386,7 @@ TEST(OfflineDownload, DoesNotFloodTheFileSourceWithRequests) {
     fileSource.respond(Resource::Kind::Style, test.response("style.json"));
     test.loop.runOnce();
 
-    EXPECT_EQ(*fileSource.getProperty("max-concurrent-requests").getUint(), fileSource.requests.size());
+    EXPECT_EQ(fileSource.getMaximumConcurrentRequests(), fileSource.requests.size());
 }
 
 TEST(OfflineDownload, GetStatusNoResources) {
@@ -820,6 +821,7 @@ TEST(OfflineDownload, AllOfflineRequestsHaveLowPriorityAndOfflineUsage) {
 
     test.loop.run();
 }
+
 
 #ifndef __QT__ // Qt doesn't expose the ability to register virtual file system handlers.
 TEST(OfflineDownload, DiskFull) {

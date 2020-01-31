@@ -1,12 +1,11 @@
-#include <mbgl/storage/file_source.hpp>
-#include <mbgl/storage/resource.hpp>
-#include <mbgl/storage/response.hpp>
 #include <mbgl/text/glyph_manager.hpp>
 #include <mbgl/text/glyph_manager_observer.hpp>
 #include <mbgl/text/glyph_pbf.hpp>
-#include <mbgl/util/async_request.hpp>
-#include <mbgl/util/std.hpp>
+#include <mbgl/storage/file_source.hpp>
+#include <mbgl/storage/resource.hpp>
+#include <mbgl/storage/response.hpp>
 #include <mbgl/util/tiny_sdf.hpp>
+#include <mbgl/util/std.hpp>
 
 namespace mbgl {
 

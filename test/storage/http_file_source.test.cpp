@@ -1,10 +1,9 @@
-#include <mbgl/storage/http_file_source.hpp>
-#include <mbgl/storage/resource.hpp>
 #include <mbgl/test/util.hpp>
-#include <mbgl/util/chrono.hpp>
+#include <mbgl/storage/http_file_source.hpp>
 #include <mbgl/util/exception.hpp>
-#include <mbgl/util/run_loop.hpp>
+#include <mbgl/util/chrono.hpp>
 #include <mbgl/util/string.hpp>
+#include <mbgl/util/run_loop.hpp>
 
 using namespace mbgl;
 
