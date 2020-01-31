@@ -196,12 +196,11 @@ BOOL isValidMapboxEndpoint(NSURL *url) {
 }
 
 MGL_APPLE_EXPORT
-NSURL *resourceURLWithAccountType(const Resource& resource, NSInteger accountType) {
+NSURL *resourceURLWithAccountType(const Resource& resource) {
     
     NSURL *url = [NSURL URLWithString:@(resource.url.c_str())];
-    
-#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
-    if (accountType == 0 && isValidMapboxEndpoint(url)) {
+
+    if (isValidMapboxEndpoint(url)) {
         NSURLComponents *components = [NSURLComponents componentsWithURL:url resolvingAgainstBaseURL:NO];
         NSMutableArray *queryItems = [NSMutableArray array];
 
@@ -218,9 +217,7 @@ NSURL *resourceURLWithAccountType(const Resource& resource, NSInteger accountTyp
         components.queryItems = queryItems;
         url = components.URL;
     }
-#else
-    (void)accountType;
-#endif
+
     return url;
 }
     
@@ -229,7 +226,7 @@ std::unique_ptr<AsyncRequest> HTTPFileSource::request(const Resource& resource, 
     auto shared = request->shared; // Explicit copy so that it also gets copied into the completion handler block below.
 
     @autoreleasepool {
-        NSURL *url = resourceURLWithAccountType(resource, impl->accountType);
+        NSURL *url = resourceURLWithAccountType(resource);
         [MGLNativeNetworkManager.sharedManager debugLog:@"Requesting URI: %@", url.relativePath];
 
         NSMutableURLRequest *req = [NSMutableURLRequest requestWithURL:url];
