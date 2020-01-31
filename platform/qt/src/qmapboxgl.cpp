@@ -15,9 +15,8 @@
 #include <mbgl/math/log2.hpp>
 #include <mbgl/math/minmax.hpp>
 #include <mbgl/renderer/renderer.hpp>
-#include <mbgl/storage/file_source_manager.hpp>
+#include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/network_status.hpp>
-#include <mbgl/storage/online_file_source.hpp>
 #include <mbgl/storage/resource_options.hpp>
 #include <mbgl/style/conversion/filter.hpp>
 #include <mbgl/style/conversion/geojson.hpp>
@@ -1738,21 +1737,13 @@ QMapboxGLPrivate::QMapboxGLPrivate(QMapboxGL *q, const QMapboxGLSettings &settin
                                          resourceOptions);
 
      if (settings.resourceTransform()) {
-         m_resourceTransform = std::make_unique<mbgl::Actor<mbgl::ResourceTransform::TransformCallback>>(
+         m_resourceTransform = std::make_unique<mbgl::Actor<mbgl::ResourceTransform>>(
              *mbgl::Scheduler::GetCurrent(),
-             [callback = settings.resourceTransform()](
-                 mbgl::Resource::Kind, const std::string &url_, mbgl::ResourceTransform::FinishedCallback onFinished) {
-                 onFinished(callback(std::move(url_)));
+             [callback = settings.resourceTransform()](mbgl::Resource::Kind, const std::string &url_) -> std::string {
+                 return callback(std::move(url_));
              });
-
-         mbgl::ResourceTransform transform{[actorRef = m_resourceTransform->self()](
-                                               mbgl::Resource::Kind kind,
-                                               const std::string &url,
-                                               mbgl::ResourceTransform::FinishedCallback onFinished) {
-             actorRef.invoke(&mbgl::ResourceTransform::TransformCallback::operator(), kind, url, std::move(onFinished));
-         }};
-         auto fs = mbgl::FileSourceManager::get()->getFileSource(mbgl::FileSourceType::Network, resourceOptions);
-         std::static_pointer_cast<mbgl::OnlineFileSource>(fs)->setResourceTransform(std::move(transform));
+         auto fs = mbgl::FileSource::getSharedFileSource(resourceOptions);
+         std::static_pointer_cast<mbgl::DefaultFileSource>(fs)->setResourceTransform(m_resourceTransform->self());
      }
 
     // Needs to be Queued to give time to discard redundant draw calls via the `renderQueued` flag.
