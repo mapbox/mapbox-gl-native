@@ -53,9 +53,6 @@ target_include_directories(mbgl-node INTERFACE
 target_link_libraries(mbgl-node INTERFACE
     mbgl-core
     mbgl-loop-node
-    # link against default filesource code, so that the node map
-    # can register it's default resource loader.
-    mbgl-filesource
 )
 
 set_target_properties(mbgl-node.all PROPERTIES FOLDER "Node.js")
