@@ -19,7 +19,7 @@
 
 #include <mbgl/actor/actor.hpp>
 #include <mbgl/actor/scheduler.hpp>
-#include <mbgl/storage/file_source_manager.hpp>
+#include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/resource_options.hpp>
 #include <mbgl/storage/resource_transform.hpp>
 #include <mbgl/util/chrono.hpp>
@@ -45,15 +45,13 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
 @interface MGLOfflineStorage ()
 
 @property (nonatomic, strong, readwrite) NSMutableArray<MGLOfflinePack *> *packs;
-@property (nonatomic) std::shared_ptr<mbgl::DatabaseFileSource> mbglDatabaseFileSource;
-@property (nonatomic) std::shared_ptr<mbgl::OnlineFileSource> mbglOnlineFileSource;
-@property (nonatomic) std::shared_ptr<mbgl::FileSource> mbglFileSource;
+@property (nonatomic) std::shared_ptr<mbgl::DefaultFileSource> mbglFileSource;
 @property (nonatomic) std::string mbglCachePath;
 @property (nonatomic, getter=isPaused) BOOL paused;
 @end
 
 @implementation MGLOfflineStorage {
-    std::unique_ptr<mbgl::Actor<mbgl::ResourceTransform::TransformCallback>> _mbglResourceTransform;
+    std::unique_ptr<mbgl::Actor<mbgl::ResourceTransform>> _mbglResourceTransform;
 }
 
 + (instancetype)sharedOfflineStorage {
@@ -93,7 +91,7 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
     MGLLogDebug(@"Setting delegate: %@", newValue);
     _delegate = newValue;
     if ([self.delegate respondsToSelector:@selector(offlineStorage:URLForResourceOfKind:withURL:)]) {
-        _mbglResourceTransform = std::make_unique<mbgl::Actor<mbgl::ResourceTransform::TransformCallback>>(*mbgl::Scheduler::GetCurrent(), [offlineStorage = self](auto kind_, const std::string& url_, mbgl::ResourceTransform::FinishedCallback cb) {
+        _mbglResourceTransform = std::make_unique<mbgl::Actor<mbgl::ResourceTransform>>(*mbgl::Scheduler::GetCurrent(), [offlineStorage = self](auto kind_, const std::string& url_) -> std::string {
             NSURL* url =
             [NSURL URLWithString:[[NSString alloc] initWithBytes:url_.data()
                                                           length:url_.length()
@@ -129,15 +127,13 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
             url = [offlineStorage.delegate offlineStorage:offlineStorage
                                      URLForResourceOfKind:kind
                                                   withURL:url];
-            cb(url.absoluteString.UTF8String);
+            return url.absoluteString.UTF8String;
         });
 
-        _mbglOnlineFileSource->setResourceTransform({[actorRef = _mbglResourceTransform->self()](auto kind_, const std::string& url_, mbgl::ResourceTransform::FinishedCallback cb_){
-            actorRef.invoke(&mbgl::ResourceTransform::TransformCallback::operator(), kind_, url_, std::move(cb_));
-        }});
+        _mbglFileSource->setResourceTransform(_mbglResourceTransform->self());
     } else {
         _mbglResourceTransform.reset();
-        _mbglOnlineFileSource->setResourceTransform({});
+        _mbglFileSource->setResourceTransform({});
     }
 }
 
@@ -232,9 +228,7 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
         mbgl::ResourceOptions options;
         options.withCachePath(_mbglCachePath)
                .withAssetPath([NSBundle mainBundle].resourceURL.path.UTF8String);
-        _mbglFileSource = mbgl::FileSourceManager::get()->getFileSource(mbgl::FileSourceType::ResourceLoader, options);
-        _mbglOnlineFileSource = std::static_pointer_cast<mbgl::OnlineFileSource>(mbgl::FileSourceManager::get()->getFileSource(mbgl::FileSourceType::Network, options));
-        _mbglDatabaseFileSource = std::static_pointer_cast<mbgl::DatabaseFileSource>(mbgl::FileSourceManager::get()->getFileSource(mbgl::FileSourceType::Database, options));
+        _mbglFileSource = std::static_pointer_cast<mbgl::DefaultFileSource>(mbgl::FileSource::getSharedFileSource(options));
 
         // Observe for changes to the API base URL (and find out the current one).
         [[MGLAccountManager sharedManager] addObserver:self
@@ -268,14 +262,14 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
     if ([keyPath isEqualToString:@"accessToken"] && object == [MGLAccountManager sharedManager]) {
         NSString *accessToken = change[NSKeyValueChangeNewKey];
         if (![accessToken isKindOfClass:[NSNull class]]) {
-            _mbglOnlineFileSource->setProperty(mbgl::ACCESS_TOKEN_KEY, accessToken.UTF8String);
+            _mbglFileSource->setAccessToken(accessToken.UTF8String);
         }
     } else if ([keyPath isEqualToString:@"apiBaseURL"] && object == [MGLAccountManager sharedManager]) {
         NSURL *apiBaseURL = change[NSKeyValueChangeNewKey];
         if ([apiBaseURL isKindOfClass:[NSNull class]]) {
-            _mbglFileSource->setProperty(mbgl::API_BASE_URL_KEY, mbgl::util::API_BASE_URL);
+            _mbglFileSource->setAPIBaseURL(mbgl::util::API_BASE_URL);
         } else {
-            _mbglFileSource->setProperty(mbgl::API_BASE_URL_KEY, apiBaseURL.absoluteString.UTF8String);
+            _mbglFileSource->setAPIBaseURL(apiBaseURL.absoluteString.UTF8String);
         }
     } else {
         [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
@@ -341,7 +335,7 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
 }
 
 - (void)_addContentsOfFile:(NSString *)filePath withCompletionHandler:(void (^)(NSArray<MGLOfflinePack *> * _Nullable packs, NSError * _Nullable error))completion {
-    _mbglDatabaseFileSource->mergeOfflineRegions(std::string(static_cast<const char *>([filePath UTF8String])), [&, completion, filePath](mbgl::expected<mbgl::OfflineRegions, std::exception_ptr> result) {
+    _mbglFileSource->mergeOfflineRegions(std::string(static_cast<const char *>([filePath UTF8String])), [&, completion, filePath](mbgl::expected<mbgl::OfflineRegions, std::exception_ptr> result) {
         NSError *error;
         NSMutableArray *packs;
         if (!result) {
@@ -406,7 +400,7 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
     const mbgl::OfflineRegionDefinition regionDefinition = [(id <MGLOfflineRegion_Private>)region offlineRegionDefinition];
     mbgl::OfflineRegionMetadata metadata(context.length);
     [context getBytes:&metadata[0] length:metadata.size()];
-    _mbglDatabaseFileSource->createOfflineRegion(regionDefinition, metadata, [&, completion](mbgl::expected<mbgl::OfflineRegion, std::exception_ptr> mbglOfflineRegion) {
+    _mbglFileSource->createOfflineRegion(regionDefinition, metadata, [&, completion](mbgl::expected<mbgl::OfflineRegion, std::exception_ptr> mbglOfflineRegion) {
         NSError *error;
         if (!mbglOfflineRegion) {
             NSString *errorDescription = @(mbgl::util::toString(mbglOfflineRegion.error()).c_str());
@@ -447,7 +441,7 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
         return;
     }
     
-    _mbglDatabaseFileSource->deleteOfflineRegion(std::move(*mbglOfflineRegion), [&, completion](std::exception_ptr exception) {
+    _mbglFileSource->deleteOfflineRegion(std::move(*mbglOfflineRegion), [&, completion](std::exception_ptr exception) {
         NSError *error;
         if (exception) {
             error = [NSError errorWithDomain:MGLErrorDomain code:MGLErrorCodeModifyingOfflineStorageFailed userInfo:@{
@@ -474,7 +468,7 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
         return;
     }
 
-    _mbglDatabaseFileSource->invalidateOfflineRegion(region, [&](std::exception_ptr exception) {
+    _mbglFileSource->invalidateOfflineRegion(region, [&](std::exception_ptr exception) {
         if (exception) {
             error = [NSError errorWithDomain:MGLErrorDomain code:MGLErrorCodeModifyingOfflineStorageFailed userInfo:@{
                 NSLocalizedDescriptionKey: @(mbgl::util::toString(exception).c_str()),
@@ -502,7 +496,7 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
 }
 
 - (void)getPacksWithCompletionHandler:(void (^)(NSArray<MGLOfflinePack *> *packs, NSError * _Nullable error))completion {
-    _mbglDatabaseFileSource->listOfflineRegions([&, completion](mbgl::expected<mbgl::OfflineRegions, std::exception_ptr> result) {
+    _mbglFileSource->listOfflineRegions([&, completion](mbgl::expected<mbgl::OfflineRegions, std::exception_ptr> result) {
         NSError *error;
         NSMutableArray *packs;
         if (!result) {
@@ -530,13 +524,13 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
 
 - (void)setMaximumAllowedMapboxTiles:(uint64_t)maximumCount {
     MGLLogDebug(@"Setting maximumAllowedMapboxTiles: %lu", (unsigned long)maximumCount);
-    _mbglDatabaseFileSource->setOfflineMapboxTileCountLimit(maximumCount);
+    _mbglFileSource->setOfflineMapboxTileCountLimit(maximumCount);
 }
 
 #pragma mark - Ambient Cache management
 
 - (void)setMaximumAmbientCacheSize:(NSUInteger)cacheSize withCompletionHandler:(void (^)(NSError  * _Nullable))completion {
-    _mbglDatabaseFileSource->setMaximumAmbientCacheSize(cacheSize, [&, completion](std::exception_ptr exception) {
+    _mbglFileSource->setMaximumAmbientCacheSize(cacheSize, [&, completion](std::exception_ptr exception) {
         NSError *error;
         if (completion) {
             if (exception) {
@@ -555,7 +549,7 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
 }
 
 - (void)invalidateAmbientCacheWithCompletionHandler:(void (^)(NSError *_Nullable))completion {
-    _mbglDatabaseFileSource->invalidateAmbientCache([&, completion](std::exception_ptr exception){
+    _mbglFileSource->invalidateAmbientCache([&, completion](std::exception_ptr exception){
         NSError *error;
         if (completion) {
             if (exception) {
@@ -575,7 +569,7 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
 }
 
 - (void)clearAmbientCacheWithCompletionHandler:(void (^)(NSError *_Nullable error))completion {
-    _mbglDatabaseFileSource->clearAmbientCache([&, completion](std::exception_ptr exception){
+    _mbglFileSource->clearAmbientCache([&, completion](std::exception_ptr exception){
         NSError *error;
         if (completion) {
             if (exception) {
@@ -594,7 +588,7 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
 }
 
 - (void)resetDatabaseWithCompletionHandler:(void (^)(NSError *_Nullable error))completion {
-    _mbglDatabaseFileSource->resetDatabase([&, completion](std::exception_ptr exception) {
+    _mbglFileSource->resetDatabase([&, completion](std::exception_ptr exception) {
         NSError *error;
         if (completion) {
             if (exception) {
@@ -642,7 +636,7 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
         response.expires = mbgl::Timestamp() + std::chrono::duration_cast<mbgl::Seconds>(MGLDurationFromTimeInterval(expires.timeIntervalSince1970));
     }
     
-    _mbglDatabaseFileSource->put(resource, response);
+    _mbglFileSource->put(resource, response);
 }
 
 - (void)putResourceWithUrl:(NSURL *)url data:(NSData *)data modified:(nullable NSDate *)modified expires:(nullable NSDate *)expires etag:(nullable NSString *)etag mustRevalidate:(BOOL)mustRevalidate {

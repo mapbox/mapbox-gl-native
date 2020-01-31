@@ -6,7 +6,6 @@
 #import "NSDate+MGLAdditions.h"
 #import "MGLTestAssertionHandler.h"
 
-#include <mbgl/storage/resource.hpp>
 #include <mbgl/util/run_loop.hpp>
 
 #pragma clang diagnostic ignored "-Wshadow"

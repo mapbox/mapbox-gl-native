@@ -7,6 +7,7 @@
 #import <mbgl/map/map_snapshotter.hpp>
 #import <mbgl/map/camera.hpp>
 #import <mbgl/storage/resource_options.hpp>
+#import <mbgl/storage/default_file_source.hpp>
 #import <mbgl/util/string.hpp>
 
 #import "MGLOfflineStorage_Private.h"
