@@ -1,3 +1,4 @@
+#include <mbgl/platform/settings.hpp>
 #include <mbgl/storage/file_source_request.hpp>
 #include <mbgl/storage/local_file_request.hpp>
 #include <mbgl/storage/local_file_source.hpp>
@@ -36,8 +37,8 @@ public:
 };
 
 LocalFileSource::LocalFileSource()
-    : impl(std::make_unique<util::Thread<Impl>>("LocalFileSource")) {
-}
+    : impl(std::make_unique<util::Thread<Impl>>(
+          util::makeThreadPrioritySetter(platform::EXPERIMENTAL_THREAD_PRIORITY_FILE), "LocalFileSource")) {}
 
 LocalFileSource::~LocalFileSource() = default;
 

@@ -1,5 +1,6 @@
 #include "asset_manager_file_source.hpp"
 
+#include <mbgl/platform/settings.hpp>
 #include <mbgl/storage/file_source_request.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
@@ -39,11 +40,13 @@ private:
     AAssetManager* assetManager;
 };
 
-AssetManagerFileSource::AssetManagerFileSource(jni::JNIEnv& env, const jni::Object<android::AssetManager>& assetManager_)
+AssetManagerFileSource::AssetManagerFileSource(jni::JNIEnv& env,
+                                               const jni::Object<android::AssetManager>& assetManager_)
     : assetManager(jni::NewGlobal(env, assetManager_)),
-      impl(std::make_unique<util::Thread<Impl>>("AssetManagerFileSource",
-          AAssetManager_fromJava(&env, jni::Unwrap(assetManager.get())))) {
-}
+      impl(std::make_unique<util::Thread<Impl>>(
+          util::makeThreadPrioritySetter(platform::EXPERIMENTAL_THREAD_PRIORITY_FILE),
+          "AssetManagerFileSource",
+          AAssetManager_fromJava(&env, jni::Unwrap(assetManager.get())))) {}
 
 AssetManagerFileSource::~AssetManagerFileSource() = default;
 

@@ -1,8 +1,8 @@
-#include <mbgl/storage/online_file_source.hpp>
+#include <mbgl/platform/settings.hpp>
+#include <mbgl/storage/file_source_request.hpp>
 #include <mbgl/storage/http_file_source.hpp>
 #include <mbgl/storage/network_status.hpp>
-
-#include <mbgl/storage/file_source_request.hpp>
+#include <mbgl/storage/online_file_source.hpp>
 #include <mbgl/storage/resource_transform.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/util/logging.hpp>
@@ -15,6 +15,7 @@
 #include <mbgl/util/http_timeout.hpp>
 #include <mbgl/util/mapbox.hpp>
 #include <mbgl/util/noncopyable.hpp>
+#include <mbgl/util/platform.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/thread.hpp>
 #include <mbgl/util/timer.hpp>
@@ -293,7 +294,9 @@ private:
 
 class OnlineFileSource::Impl {
 public:
-    Impl() : thread(std::make_unique<util::Thread<OnlineFileSourceThread>>("OnlineFileSource")) {}
+    Impl()
+        : thread(std::make_unique<util::Thread<OnlineFileSourceThread>>(
+              util::makeThreadPrioritySetter(platform::EXPERIMENTAL_THREAD_PRIORITY_NETWORK), "OnlineFileSource")) {}
 
     std::unique_ptr<AsyncRequest> request(Callback callback, Resource res) {
         auto req = std::make_unique<FileSourceRequest>(std::move(callback));

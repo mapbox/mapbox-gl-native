@@ -1,3 +1,4 @@
+#include <mbgl/platform/settings.hpp>
 #include <mbgl/storage/asset_file_source.hpp>
 #include <mbgl/storage/file_source_request.hpp>
 #include <mbgl/storage/local_file_request.hpp>
@@ -42,8 +43,8 @@ private:
 };
 
 AssetFileSource::AssetFileSource(const std::string& root)
-    : impl(std::make_unique<util::Thread<Impl>>("AssetFileSource", root)) {
-}
+    : impl(std::make_unique<util::Thread<Impl>>(
+          util::makeThreadPrioritySetter(platform::EXPERIMENTAL_THREAD_PRIORITY_FILE), "AssetFileSource", root)) {}
 
 AssetFileSource::~AssetFileSource() = default;
 
