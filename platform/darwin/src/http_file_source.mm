@@ -93,7 +93,6 @@ public:
 
     NSURLSession* session = nil;
     NSString* userAgent = nil;
-    NSInteger accountType = 0;
 
 private:
     NSString* getUserAgent() const;
@@ -196,7 +195,7 @@ BOOL isValidMapboxEndpoint(NSURL *url) {
 }
 
 MGL_APPLE_EXPORT
-NSURL *resourceURLWithAccountType(const Resource& resource) {
+NSURL *resourceURL(const Resource& resource) {
     
     NSURL *url = [NSURL URLWithString:@(resource.url.c_str())];
 
@@ -226,7 +225,7 @@ std::unique_ptr<AsyncRequest> HTTPFileSource::request(const Resource& resource, 
     auto shared = request->shared; // Explicit copy so that it also gets copied into the completion handler block below.
 
     @autoreleasepool {
-        NSURL *url = resourceURLWithAccountType(resource);
+        NSURL *url = resourceURL(resource);
         [MGLNativeNetworkManager.sharedManager debugLog:@"Requesting URI: %@", url.relativePath];
 
         NSMutableURLRequest *req = [NSMutableURLRequest requestWithURL:url];
