@@ -191,4 +191,98 @@ if(MBGL_IOS_RENDER_TEST)
     set_target_properties(RenderTestAppTests PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${PROJECT_SOURCE_DIR}/render-test/ios/tests/Info.plist)
 endif()
 
+if(MBGL_IOS_UNIT_TEST)
+    execute_process(COMMAND ditto ${PROJECT_SOURCE_DIR}/test/fixtures ${CMAKE_CURRENT_BINARY_DIR}/test-data/test/fixtures)
+    execute_process(
+        COMMAND
+            ditto ${PROJECT_SOURCE_DIR}/mapbox-gl-js/src/style-spec/reference
+            ${CMAKE_CURRENT_BINARY_DIR}/test-data/mapbox-gl-js/src/style-spec/reference
+    )
+
+    set(
+        RESOURCES
+        ${PROJECT_SOURCE_DIR}/test/ios/Main.storyboard
+        ${PROJECT_SOURCE_DIR}/test/ios/LaunchScreen.storyboard
+        ${CMAKE_CURRENT_BINARY_DIR}/test-data
+    )
+
+    add_executable(
+        UnitTestsApp
+        ${PROJECT_SOURCE_DIR}/test/ios/ios_test_runner.hpp
+        ${PROJECT_SOURCE_DIR}/test/ios/ios_test_runner.cpp
+        ${PROJECT_SOURCE_DIR}/test/ios/AppDelegate.h
+        ${PROJECT_SOURCE_DIR}/test/ios/AppDelegate.m
+        ${PROJECT_SOURCE_DIR}/test/ios/ViewController.h
+        ${PROJECT_SOURCE_DIR}/test/ios/ViewController.m
+        ${PROJECT_SOURCE_DIR}/test/ios/iosTestRunner.h
+        ${PROJECT_SOURCE_DIR}/test/ios/iosTestRunner.mm
+        ${PROJECT_SOURCE_DIR}/test/ios/main.m
+        ${RESOURCES}
+    )
+    initialize_ios_target(UnitTestsApp)
+
+    set_target_properties(
+        UnitTestsApp
+        PROPERTIES
+            MACOSX_BUNDLE
+            TRUE
+            MACOSX_BUNDLE_IDENTIFIER
+            com.mapbox.UnitTestsApp
+            MACOSX_BUNDLE_INFO_PLIST
+            ${PROJECT_SOURCE_DIR}/test/ios/Info.plist
+            RESOURCE
+            "${RESOURCES}"
+    )
+
+    target_include_directories(
+        UnitTestsApp
+        PUBLIC {MBGL_ROOT}/test/include ${PROJECT_SOURCE_DIR}/include
+    )
+
+    target_include_directories(
+        UnitTestsApp
+        PUBLIC ${PROJECT_SOURCE_DIR}/test/ios
+    )
+
+    target_link_libraries(
+        UnitTestsApp
+        PRIVATE
+            "-framework CoreGraphics"
+            "-framework CoreLocation"
+            "-framework Foundation"
+            "-framework OpenGLES"
+            "-framework QuartzCore"
+            "-framework UIKit"
+            mbgl-compiler-options
+            -Wl,-force_load
+            mbgl-test
+    )
+
+    set_target_properties(UnitTestsApp PROPERTIES XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "")
+    set_target_properties(UnitTestsApp PROPERTIES XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED "NO")
+
+    find_package(XCTest REQUIRED)
+
+    xctest_add_bundle(UnitTestsAppTests UnitTestsApp ${PROJECT_SOURCE_DIR}/test/ios/tests/Tests.m)
+
+    set_target_properties(
+        UnitTestsAppTests
+        PROPERTIES
+            XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET
+            "${IOS_DEPLOYMENT_TARGET}"
+            XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH
+            $<$<CONFIG:Debug>:YES>
+    )
+
+    target_include_directories(
+        UnitTestsAppTests
+        PUBLIC ${PROJECT_SOURCE_DIR}/test/ios
+    )
+
+    xctest_add_test(XCTest.UnitTestsApp UnitTestsAppTests)
+
+    set_target_properties(UnitTestsAppTests PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${PROJECT_SOURCE_DIR}/test/ios/tests/Info.plist)
+    set_target_properties(UnitTestsAppTests PROPERTIES XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "")
+    set_target_properties(UnitTestsAppTests PROPERTIES XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED "NO")
+endif()
 unset(IOS_DEPLOYMENT_TARGET CACHE)
