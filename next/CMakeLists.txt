@@ -780,6 +780,7 @@ add_library(
     ${MBGL_ROOT}/src/mbgl/util/stopwatch.cpp
     ${MBGL_ROOT}/src/mbgl/util/stopwatch.hpp
     ${MBGL_ROOT}/src/mbgl/util/string.cpp
+    ${MBGL_ROOT}/src/mbgl/util/thread.cpp
     ${MBGL_ROOT}/src/mbgl/util/thread_local.hpp
     ${MBGL_ROOT}/src/mbgl/util/thread_pool.cpp
     ${MBGL_ROOT}/src/mbgl/util/thread_pool.hpp

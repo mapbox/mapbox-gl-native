@@ -3,10 +3,10 @@
 #include <mbgl/actor/actor.hpp>
 #include <mbgl/actor/mailbox.hpp>
 #include <mbgl/actor/scheduler.hpp>
+#include <mbgl/platform/thread.hpp>
 #include <mbgl/util/platform.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/util.hpp>
-#include <mbgl/platform/thread.hpp>
 
 #include <cassert>
 #include <future>
@@ -37,25 +37,20 @@ namespace util {
 // - A `RunLoop` is created for the `Object` thread.
 // - `Object` can use `Timer` and do asynchronous I/O, like wait for sockets events.
 //
-template<class Object>
+template <typename Object>
 class Thread {
 public:
-    template <class... Args>
-    Thread(const std::string& name, Args&&... args) {
-
+    template <typename TupleArgs>
+    Thread(std::function<void()> prioritySetter_, const std::string& name, TupleArgs&& args) {
         std::promise<void> running_;
         running = running_.get_future();
-
-        auto capturedArgs = std::make_tuple(std::forward<Args>(args)...);
-
-        thread = std::thread([
-            this,
-            name,
-            capturedArgs = std::move(capturedArgs),
-            runningPromise = std::move(running_)
-        ] () mutable {
+        thread = std::thread([this,
+                              name,
+                              capturedArgs = std::forward<TupleArgs>(args),
+                              runningPromise = std::move(running_),
+                              prioritySetter = std::move(prioritySetter_)]() mutable {
             platform::setCurrentThreadName(name);
-            platform::makeThreadLowPriority();
+            if (prioritySetter) prioritySetter();
             platform::attachThread();
 
             // narrowing the scope to release the Object before we detach the thread
@@ -76,6 +71,14 @@ public:
             platform::detachThread();
         });
     }
+
+    template <typename... Args>
+    Thread(const std::string& name, Args&&... args)
+        : Thread([] { platform::makeThreadLowPriority(); }, name, std::make_tuple(std::forward<Args>(args)...)) {}
+
+    template <typename... Args>
+    Thread(std::function<void()> prioritySetter, const std::string& name, Args&&... args)
+        : Thread(std::move(prioritySetter), name, std::make_tuple(std::forward<Args>(args)...)) {}
 
     ~Thread() {
         if (paused) {
@@ -157,6 +160,11 @@ private:
 
     util::RunLoop* loop = nullptr;
 };
+
+// Returns function, that once invoked, will set a thread priority for
+// a thread `threadType` based on a setting provided by corresponding
+// Settings' platform::EXPERIMENTAL_THREAD_PRIORITY_* value.
+std::function<void()> makeThreadPrioritySetter(std::string threadType);
 
 } // namespace util
 } // namespace mbgl
