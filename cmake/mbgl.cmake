@@ -6,6 +6,10 @@ if (NOT MBGL_PLATFORM)
     endif()
 endif()
 
+if(MBGL_WITH_OPENGL)
+    add_definitions(-DMBGL_RENDER_BACKEND_OPENGL=1)
+endif()
+
 if(WITH_NODEJS)
     find_program(NodeJS_EXECUTABLE NAMES nodejs node)
     if (NOT NodeJS_EXECUTABLE)

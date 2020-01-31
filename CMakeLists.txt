@@ -163,6 +163,8 @@ endif()
 
 include(platform/${MBGL_PLATFORM}/config.cmake)
 
+add_definitions(-DMBGL_RENDER_BACKEND_OPENGL=1)
+
 if(WITH_EGL)
     add_definitions(-DMBGL_WITH_EGL=1)
 endif()

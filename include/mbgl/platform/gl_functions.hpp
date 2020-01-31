@@ -14,6 +14,8 @@
 namespace mbgl {
 namespace platform {
 
+#ifdef MBGL_RENDER_BACKEND_OPENGL
+
 using GLbitfield = unsigned int;
 using GLboolean = unsigned char;
 using GLchar = char;
@@ -328,10 +330,12 @@ extern void (* const glPointSize)(GLfloat);
 extern void (* const glRasterPos4d)(GLdouble, GLdouble, GLdouble, GLdouble);
 #endif
 
+#endif // MBGL_RENDER_BACKEND_OPENGL
+
 #ifndef NDEBUG
 /// Check for GL errors and print on the console.
 void glCheckError(const char *cmd, const char *file, int line);
 #endif
 
 }  // namespace platform
-}  // namespace mbgl
+} // namespace mbgl

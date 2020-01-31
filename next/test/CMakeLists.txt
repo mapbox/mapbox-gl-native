@@ -110,6 +110,13 @@ add_library(
     ${MBGL_ROOT}/test/util/url.test.cpp
 )
 
+if(MBGL_WITH_OPENGL)
+    target_compile_definitions(
+        mbgl-test
+        PRIVATE MBGL_RENDER_BACKEND_OPENGL=1
+    )
+endif()
+
 if(WIN32 OR CMAKE_SYSTEM_NAME STREQUAL Android)
     message("Target platform does not support HTTP tests or dependencies not found.")
 
