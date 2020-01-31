@@ -22,5 +22,9 @@ void setCurrentThreadName(const std::string& name);
 // Makes the current thread low priority.
 void makeThreadLowPriority();
 
+// Sets priority of a current thread. Platform implementation
+// must validate provided value.
+void setCurrentThreadPriority(double priority);
+
 } // namespace platform
 } // namespace mbgl

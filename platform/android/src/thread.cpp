@@ -40,6 +40,14 @@ void makeThreadLowPriority() {
     setpriority(PRIO_PROCESS, 0, 19);
 }
 
+void setCurrentThreadPriority(double priority) {
+    if (priority < -20 || priority > 19) {
+        Log::Warning(Event::General, "Couldn't set thread priority");
+        return;
+    }
+    setpriority(PRIO_PROCESS, 0, int(priority));
+}
+
 void attachThread() {
     using namespace android;
     assert(env == nullptr);

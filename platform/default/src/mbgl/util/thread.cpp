@@ -6,6 +6,7 @@
 
 #include <pthread.h>
 #include <sched.h>
+#include <sys/resource.h>
 
 namespace mbgl {
 namespace platform {
@@ -40,11 +41,23 @@ void makeThreadLowPriority() {
 #endif
 }
 
-void attachThread() {
+void setCurrentThreadPriority(double priority) {
+    if (setpriority(PRIO_PROCESS, 0, int(priority)) < 0) {
+        Log::Warning(Event::General, "Couldn't set thread priority");
+    }
+
+#ifdef SCHED_OTHER
+    struct sched_param param;
+    param.sched_priority = 0;
+    if (sched_setscheduler(0, SCHED_OTHER, &param) != 0) {
+        Log::Warning(Event::General, "Couldn't set thread scheduling policy");
+    }
+#endif
 }
 
-void detachThread() {
-}
+void attachThread() {}
+
+void detachThread() {}
 
 } // namespace platform
 } // namespace mbgl
