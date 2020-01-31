@@ -21,12 +21,11 @@ public:
     using CollisionGrid = GridIndex<IndexedSubfeature>;
 
     explicit CollisionIndex(const TransformState&, MapMode);
-    bool featureIntersectsTileBorders(const CollisionFeature& feature,
-                                      Point<float> shift,
-                                      const mat4& posMatrix,
-                                      const float textPixelRatio,
-                                      const CollisionBoundaries& tileEdges) const;
-
+    bool intercectsTileEdges(const CollisionBox&,
+                             Point<float> shift,
+                             const mat4& posMatrix,
+                             const float textPixelRatio,
+                             const CollisionBoundaries& tileEdges) const;
     std::pair<bool, bool> placeFeature(
         const CollisionFeature& feature,
         Point<float> shift,

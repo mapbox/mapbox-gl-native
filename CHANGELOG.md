@@ -8,6 +8,14 @@
 
   Factory 'get' method can be invoked recursively and stable iterators are required to guarantee safety.
 
+- [tile mode] Improvements in symbol placement on tile borders ([#16159](https://github.com/mapbox/mapbox-gl-native/pull/16159))
+
+  In tile mode, the placement order of two symbols crossing a tile border is defined by their anchor Y values.
+
+  Symbols crossing the borders between two neighboring tiles are placed with priority.
+
+  It improves symbol placement stability in the tile map mode.
+
 ## maps-v1.0.0 (2020.01-release-unicorn)
 
 ### ✨ New features
