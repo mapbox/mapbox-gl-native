@@ -2,16 +2,26 @@
 #include <mbgl/storage/resource_options.hpp>
 #include <mbgl/util/string.hpp>
 
+#include <algorithm>
+#include <list>
 #include <map>
 #include <mutex>
 #include <tuple>
 
 namespace mbgl {
 
+struct FileSourceInfo {
+    FileSourceInfo(FileSourceType type_, std::string id_, std::weak_ptr<FileSource> fileSource_)
+        : type(type_), id(std::move(id_)), fileSource(std::move(fileSource_)) {}
+
+    FileSourceType type;
+    std::string id;
+    std::weak_ptr<FileSource> fileSource;
+};
+
 class FileSourceManager::Impl {
 public:
-    using Key = std::tuple<FileSourceType, std::string>;
-    std::map<Key, std::weak_ptr<FileSource>> fileSources;
+    std::list<FileSourceInfo> fileSources;
     std::map<FileSourceType, FileSourceFactory> fileSourceFactories;
     std::recursive_mutex mutex;
 };
@@ -26,25 +36,27 @@ std::shared_ptr<FileSource> FileSourceManager::getFileSource(FileSourceType type
 
     // Remove released file sources.
     for (auto it = impl->fileSources.begin(); it != impl->fileSources.end();) {
-        it = it->second.expired() ? impl->fileSources.erase(it) : ++it;
+        it = it->fileSource.expired() ? impl->fileSources.erase(it) : ++it;
     }
 
     const auto context = reinterpret_cast<uint64_t>(options.platformContext());
-    const std::string optionsKey =
+    std::string id =
         options.baseURL() + '|' + options.accessToken() + '|' + options.cachePath() + '|' + util::toString(context);
-    const auto key = std::tie(type, optionsKey);
 
     std::shared_ptr<FileSource> fileSource;
-    auto tuple = impl->fileSources.find(key);
-    if (tuple != impl->fileSources.end()) {
-        fileSource = tuple->second.lock();
+    auto fileSourceIt = std::find_if(impl->fileSources.begin(), impl->fileSources.end(), [type, &id](const auto& info) {
+        return info.type == type && info.id == id;
+    });
+    if (fileSourceIt != impl->fileSources.end()) {
+        fileSource = fileSourceIt->fileSource.lock();
     }
 
     if (!fileSource) {
         auto it = impl->fileSourceFactories.find(type);
         if (it != impl->fileSourceFactories.end()) {
             assert(it->second);
-            impl->fileSources[key] = fileSource = it->second(options);
+            fileSource = it->second(options);
+            impl->fileSources.emplace_back(type, std::move(id), fileSource);
         }
     }
 
