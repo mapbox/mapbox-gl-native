@@ -30,8 +30,7 @@ workflows:
             - linux-clang8-release
             - linux-gcc8-release
             - macos-xcode11-release
-            # Temporarily disable, auth is failing.
-            # - ios-render-test-runner
+            - ios-render-test-runner
       - build-template:
           name: android-armeabi-v7a-release
           executor_name: ubuntu-disco
