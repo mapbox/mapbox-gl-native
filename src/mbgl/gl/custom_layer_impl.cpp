@@ -1,4 +1,4 @@
-#include <mbgl/style/layers/custom_layer_impl.hpp>
+#include <mbgl/gl/custom_layer_impl.hpp>
 
 namespace mbgl {
 namespace style {

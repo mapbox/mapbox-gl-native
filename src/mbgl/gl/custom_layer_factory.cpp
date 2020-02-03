@@ -1,8 +1,7 @@
-#include <mbgl/layermanager/custom_layer_factory.hpp>
-
-#include <mbgl/renderer/layers/render_custom_layer.hpp>
-#include <mbgl/style/layers/custom_layer.hpp>
-#include <mbgl/style/layers/custom_layer_impl.hpp>
+#include <mbgl/gl/custom_layer.hpp>
+#include <mbgl/gl/custom_layer_factory.hpp>
+#include <mbgl/gl/custom_layer_impl.hpp>
+#include <mbgl/gl/render_custom_layer.hpp>
 
 namespace mbgl {
 

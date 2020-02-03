@@ -100,7 +100,6 @@ add_library(
     ${MBGL_ROOT}/include/mbgl/gfx/rendering_stats.hpp
     ${MBGL_ROOT}/include/mbgl/layermanager/background_layer_factory.hpp
     ${MBGL_ROOT}/include/mbgl/layermanager/circle_layer_factory.hpp
-    ${MBGL_ROOT}/include/mbgl/layermanager/custom_layer_factory.hpp
     ${MBGL_ROOT}/include/mbgl/layermanager/fill_extrusion_layer_factory.hpp
     ${MBGL_ROOT}/include/mbgl/layermanager/fill_layer_factory.hpp
     ${MBGL_ROOT}/include/mbgl/layermanager/heatmap_layer_factory.hpp
@@ -197,7 +196,6 @@ add_library(
     ${MBGL_ROOT}/include/mbgl/style/layer_properties.hpp
     ${MBGL_ROOT}/include/mbgl/style/layers/background_layer.hpp
     ${MBGL_ROOT}/include/mbgl/style/layers/circle_layer.hpp
-    ${MBGL_ROOT}/include/mbgl/style/layers/custom_layer.hpp
     ${MBGL_ROOT}/include/mbgl/style/layers/fill_extrusion_layer.hpp
     ${MBGL_ROOT}/include/mbgl/style/layers/fill_layer.hpp
     ${MBGL_ROOT}/include/mbgl/style/layers/heatmap_layer.hpp
@@ -323,7 +321,6 @@ add_library(
     ${MBGL_ROOT}/src/mbgl/gfx/vertex_vector.hpp
     ${MBGL_ROOT}/src/mbgl/layermanager/background_layer_factory.cpp
     ${MBGL_ROOT}/src/mbgl/layermanager/circle_layer_factory.cpp
-    ${MBGL_ROOT}/src/mbgl/layermanager/custom_layer_factory.cpp
     ${MBGL_ROOT}/src/mbgl/layermanager/fill_extrusion_layer_factory.cpp
     ${MBGL_ROOT}/src/mbgl/layermanager/fill_layer_factory.cpp
     ${MBGL_ROOT}/src/mbgl/layermanager/heatmap_layer_factory.cpp
@@ -442,8 +439,6 @@ add_library(
     ${MBGL_ROOT}/src/mbgl/renderer/layers/render_background_layer.hpp
     ${MBGL_ROOT}/src/mbgl/renderer/layers/render_circle_layer.cpp
     ${MBGL_ROOT}/src/mbgl/renderer/layers/render_circle_layer.hpp
-    ${MBGL_ROOT}/src/mbgl/renderer/layers/render_custom_layer.cpp
-    ${MBGL_ROOT}/src/mbgl/renderer/layers/render_custom_layer.hpp
     ${MBGL_ROOT}/src/mbgl/renderer/layers/render_fill_extrusion_layer.cpp
     ${MBGL_ROOT}/src/mbgl/renderer/layers/render_fill_extrusion_layer.hpp
     ${MBGL_ROOT}/src/mbgl/renderer/layers/render_fill_layer.cpp
@@ -602,9 +597,6 @@ add_library(
     ${MBGL_ROOT}/src/mbgl/style/layers/circle_layer_impl.hpp
     ${MBGL_ROOT}/src/mbgl/style/layers/circle_layer_properties.cpp
     ${MBGL_ROOT}/src/mbgl/style/layers/circle_layer_properties.hpp
-    ${MBGL_ROOT}/src/mbgl/style/layers/custom_layer.cpp
-    ${MBGL_ROOT}/src/mbgl/style/layers/custom_layer_impl.cpp
-    ${MBGL_ROOT}/src/mbgl/style/layers/custom_layer_impl.hpp
     ${MBGL_ROOT}/src/mbgl/style/layers/fill_extrusion_layer.cpp
     ${MBGL_ROOT}/src/mbgl/style/layers/fill_extrusion_layer_impl.cpp
     ${MBGL_ROOT}/src/mbgl/style/layers/fill_extrusion_layer_impl.hpp
@@ -806,8 +798,6 @@ add_library(
     ${MBGL_ROOT}/src/mbgl/util/work_request.cpp
     ${MBGL_ROOT}/src/parsedate/parsedate.cpp
     ${MBGL_ROOT}/src/parsedate/parsedate.hpp
-    ${MBGL_ROOT}/src/mbgl/platform/gl_functions.cpp
-    ${MBGL_ROOT}/include/mbgl/platform/gl_functions.hpp
 )
 
 if(MBGL_WITH_OPENGL)
@@ -820,14 +810,21 @@ if(MBGL_WITH_OPENGL)
         mbgl-core
         PRIVATE
             ${MBGL_ROOT}/include/mbgl/gfx/backend.hpp
+            ${MBGL_ROOT}/include/mbgl/gl/custom_layer.hpp
+            ${MBGL_ROOT}/include/mbgl/gl/custom_layer_factory.hpp
             ${MBGL_ROOT}/include/mbgl/gl/renderable_resource.hpp
             ${MBGL_ROOT}/include/mbgl/gl/renderer_backend.hpp
+            ${MBGL_ROOT}/include/mbgl/platform/gl_functions.hpp
             ${MBGL_ROOT}/src/mbgl/gl/attribute.cpp
             ${MBGL_ROOT}/src/mbgl/gl/attribute.hpp
             ${MBGL_ROOT}/src/mbgl/gl/command_encoder.cpp
             ${MBGL_ROOT}/src/mbgl/gl/command_encoder.hpp
             ${MBGL_ROOT}/src/mbgl/gl/context.cpp
             ${MBGL_ROOT}/src/mbgl/gl/context.hpp
+            ${MBGL_ROOT}/src/mbgl/gl/custom_layer.cpp
+            ${MBGL_ROOT}/src/mbgl/gl/custom_layer_factory.cpp
+            ${MBGL_ROOT}/src/mbgl/gl/custom_layer_impl.cpp
+            ${MBGL_ROOT}/src/mbgl/gl/custom_layer_impl.hpp
             ${MBGL_ROOT}/src/mbgl/gl/debugging_extension.cpp
             ${MBGL_ROOT}/src/mbgl/gl/debugging_extension.hpp
             ${MBGL_ROOT}/src/mbgl/gl/defines.hpp
@@ -847,6 +844,8 @@ if(MBGL_WITH_OPENGL)
             ${MBGL_ROOT}/src/mbgl/gl/render_pass.hpp
             ${MBGL_ROOT}/src/mbgl/gl/renderbuffer_resource.hpp
             ${MBGL_ROOT}/src/mbgl/gl/renderer_backend.cpp
+            ${MBGL_ROOT}/src/mbgl/gl/render_custom_layer.cpp
+            ${MBGL_ROOT}/src/mbgl/gl/render_custom_layer.hpp
             ${MBGL_ROOT}/src/mbgl/gl/state.hpp
             ${MBGL_ROOT}/src/mbgl/gl/texture.cpp
             ${MBGL_ROOT}/src/mbgl/gl/texture.hpp
@@ -864,6 +863,7 @@ if(MBGL_WITH_OPENGL)
             ${MBGL_ROOT}/src/mbgl/gl/vertex_array_extension.hpp
             ${MBGL_ROOT}/src/mbgl/gl/vertex_buffer_resource.cpp
             ${MBGL_ROOT}/src/mbgl/gl/vertex_buffer_resource.hpp
+            ${MBGL_ROOT}/src/mbgl/platform/gl_functions.cpp
             ${MBGL_ROOT}/src/mbgl/programs/gl/background.cpp
             ${MBGL_ROOT}/src/mbgl/programs/gl/background_pattern.cpp
             ${MBGL_ROOT}/src/mbgl/programs/gl/circle.cpp

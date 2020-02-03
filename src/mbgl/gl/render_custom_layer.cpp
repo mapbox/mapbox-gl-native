@@ -1,15 +1,13 @@
 #include <mbgl/gfx/backend_scope.hpp>
 #include <mbgl/gfx/renderer_backend.hpp>
+#include <mbgl/gl/context.hpp>
+#include <mbgl/gl/custom_layer_impl.hpp>
+#include <mbgl/gl/render_custom_layer.hpp>
+#include <mbgl/gl/renderable_resource.hpp>
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/platform/gl_functions.hpp>
 #include <mbgl/renderer/bucket.hpp>
-#include <mbgl/renderer/layers/render_custom_layer.hpp>
 #include <mbgl/renderer/paint_parameters.hpp>
-#include <mbgl/style/layers/custom_layer_impl.hpp>
-#ifdef MBGL_RENDER_BACKEND_OPENGL
-#include <mbgl/gl/context.hpp>
-#include <mbgl/gl/renderable_resource.hpp>
-#endif
 #include <mbgl/util/mat4.hpp>
 
 namespace mbgl {
@@ -70,19 +68,17 @@ void RenderCustomLayer::render(PaintParameters& paintParameters) {
         MBGL_CHECK_ERROR(host->initialize());
     }
 
-    const TransformState& state = paintParameters.state;
-#ifdef MBGL_RENDER_BACKEND_OPENGL
     // TODO: remove cast
     auto& glContext = static_cast<gl::Context&>(paintParameters.context);
-    if (gfx::Backend::GetType() == gfx::Backend::Type::OpenGL) {
-        // Reset GL state to a known state so the CustomLayer always has a clean slate.
-        glContext.bindVertexArray = 0;
-        glContext.setDepthMode(paintParameters.depthModeForSublayer(0, gfx::DepthMaskType::ReadOnly));
-        glContext.setStencilMode(gfx::StencilMode::disabled());
-        glContext.setColorMode(paintParameters.colorModeForRenderPass());
-        glContext.setCullFaceMode(gfx::CullFaceMode::disabled());
-    }
-#endif
+    const TransformState& state = paintParameters.state;
+
+    // Reset GL state to a known state so the CustomLayer always has a clean slate.
+    glContext.bindVertexArray = 0;
+    glContext.setDepthMode(paintParameters.depthModeForSublayer(0, gfx::DepthMaskType::ReadOnly));
+    glContext.setStencilMode(gfx::StencilMode::disabled());
+    glContext.setColorMode(paintParameters.colorModeForRenderPass());
+    glContext.setCullFaceMode(gfx::CullFaceMode::disabled());
+
     CustomLayerRenderParameters parameters;
 
     parameters.width = state.getSize().width;
@@ -98,16 +94,11 @@ void RenderCustomLayer::render(PaintParameters& paintParameters) {
     parameters.projectionMatrix = projMatrix;
 
     MBGL_CHECK_ERROR(host->render(parameters));
-#ifdef MBGL_RENDER_BACKEND_OPENGL
-    if (gfx::Backend::GetType() == gfx::Backend::Type::OpenGL) {
-        // Reset the view back to our original one, just in case the CustomLayer changed
-        // the viewport or Framebuffer.
-        paintParameters.backend.getDefaultRenderable().getResource<gl::RenderableResource>().bind();
-        glContext.setDirtyState();
-    }
-#else
-    (void)&paintParameters;
-#endif
+
+    // Reset the view back to our original one, just in case the CustomLayer changed
+    // the viewport or Framebuffer.
+    paintParameters.backend.getDefaultRenderable().getResource<gl::RenderableResource>().bind();
+    glContext.setDirtyState();
 }
 
 } // namespace mbgl
