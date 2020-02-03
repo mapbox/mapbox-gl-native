@@ -20,7 +20,7 @@ target_sources(
         ${MBGL_ROOT}/platform/default/src/mbgl/layermanager/layer_manager.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/storage/asset_file_source.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/storage/database_file_source.cpp
-        ${MBGL_ROOT}/platform/default/src/mbgl/storage/file_source_manager.cpp
+        ${MBGL_ROOT}/platform/custom/file_source_manager.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/storage/file_source_request.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/storage/http_file_source.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/storage/local_file_request.cpp
