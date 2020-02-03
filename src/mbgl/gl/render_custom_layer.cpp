@@ -1,13 +1,13 @@
-#include <mbgl/renderer/layers/render_custom_layer.hpp>
-#include <mbgl/renderer/paint_parameters.hpp>
-#include <mbgl/gfx/renderer_backend.hpp>
 #include <mbgl/gfx/backend_scope.hpp>
-#include <mbgl/renderer/bucket.hpp>
-#include <mbgl/platform/gl_functions.hpp>
-#include <mbgl/style/layers/custom_layer_impl.hpp>
-#include <mbgl/map/transform_state.hpp>
+#include <mbgl/gfx/renderer_backend.hpp>
 #include <mbgl/gl/context.hpp>
+#include <mbgl/gl/custom_layer_impl.hpp>
+#include <mbgl/gl/render_custom_layer.hpp>
 #include <mbgl/gl/renderable_resource.hpp>
+#include <mbgl/map/transform_state.hpp>
+#include <mbgl/platform/gl_functions.hpp>
+#include <mbgl/renderer/bucket.hpp>
+#include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/util/mat4.hpp>
 
 namespace mbgl {

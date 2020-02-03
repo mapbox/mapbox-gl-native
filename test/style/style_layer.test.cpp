@@ -1,3 +1,5 @@
+#include <mbgl/gl/custom_layer.hpp>
+#include <mbgl/gl/custom_layer_impl.hpp>
 #include <mbgl/style/expression/dsl.hpp>
 #include <mbgl/style/expression/format_expression.hpp>
 #include <mbgl/style/expression/image.hpp>
@@ -6,8 +8,6 @@
 #include <mbgl/style/layers/background_layer_impl.hpp>
 #include <mbgl/style/layers/circle_layer.hpp>
 #include <mbgl/style/layers/circle_layer_impl.hpp>
-#include <mbgl/style/layers/custom_layer.hpp>
-#include <mbgl/style/layers/custom_layer_impl.hpp>
 #include <mbgl/style/layers/fill_layer.hpp>
 #include <mbgl/style/layers/fill_layer_impl.hpp>
 #include <mbgl/style/layers/line_layer.hpp>

@@ -9,6 +9,7 @@
 
 #include <mbgl/actor/scheduler.hpp>
 #include <mbgl/annotation/annotation.hpp>
+#include <mbgl/gl/custom_layer.hpp>
 #include <mbgl/map/camera.hpp>
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/map_options.hpp>
@@ -28,7 +29,6 @@
 #include <mbgl/style/image.hpp>
 #include <mbgl/style/layers/background_layer.hpp>
 #include <mbgl/style/layers/circle_layer.hpp>
-#include <mbgl/style/layers/custom_layer.hpp>
 #include <mbgl/style/layers/fill_extrusion_layer.hpp>
 #include <mbgl/style/layers/fill_layer.hpp>
 #include <mbgl/style/layers/line_layer.hpp>

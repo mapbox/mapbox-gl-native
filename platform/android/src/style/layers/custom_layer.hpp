@@ -1,9 +1,9 @@
 #pragma once
 
-#include "layer.hpp"
-#include <mbgl/layermanager/custom_layer_factory.hpp>
-#include <mbgl/style/layers/custom_layer.hpp>
 #include <jni/jni.hpp>
+#include <mbgl/gl/custom_layer.hpp>
+#include <mbgl/gl/custom_layer_factory.hpp>
+#include "layer.hpp"
 
 namespace mbgl {
 namespace android {
