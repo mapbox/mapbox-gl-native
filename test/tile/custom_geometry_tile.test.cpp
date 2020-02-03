@@ -26,7 +26,7 @@ public:
     TransformState transformState;
     util::RunLoop loop;
     style::Style style{fileSource, 1};
-    AnnotationManager annotationManager { style };
+    AnnotationManager annotationManager { *style.impl };
     ImageManager imageManager;
     GlyphManager glyphManager;
 

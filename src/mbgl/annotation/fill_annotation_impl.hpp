@@ -9,7 +9,7 @@ class FillAnnotationImpl : public ShapeAnnotationImpl {
 public:
     FillAnnotationImpl(AnnotationID, FillAnnotation);
 
-    void updateStyle(style::Style::Impl&) const final;
+    void updateStyle(style::StyleImpl&) const final;
     const ShapeAnnotationGeometry& geometry() const final;
 
 private:

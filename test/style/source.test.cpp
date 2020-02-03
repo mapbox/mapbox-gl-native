@@ -59,7 +59,7 @@ public:
     Transform transform;
     TransformState transformState;
     Style style{fileSource, 1};
-    AnnotationManager annotationManager { style };
+    AnnotationManager annotationManager { *style.impl };
     ImageManager imageManager;
     GlyphManager glyphManager;
 

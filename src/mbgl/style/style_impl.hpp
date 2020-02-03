@@ -11,6 +11,7 @@
 #include <mbgl/style/source.hpp>
 #include <mbgl/style/layer.hpp>
 #include <mbgl/style/collection.hpp>
+#include <mbgl/annotation/annotation_manager.hpp>
 
 #include <mbgl/map/camera.hpp>
 
@@ -22,6 +23,7 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include <set>
 
 namespace mbgl {
 
@@ -31,14 +33,14 @@ class SpriteLoader;
 
 namespace style {
 
-class Style::Impl : public SpriteLoaderObserver,
+class StyleImpl : public SpriteLoaderObserver,
                     public SourceObserver,
                     public LayerObserver,
                     public LightObserver,
                     public util::noncopyable {
 public:
-    Impl(std::shared_ptr<FileSource>, float pixelRatio);
-    ~Impl() override;
+    StyleImpl(std::shared_ptr<FileSource>, float pixelRatio);
+    ~StyleImpl() override;
 
     void loadJSON(const std::string&);
     void loadURL(const std::string&);
@@ -46,7 +48,8 @@ public:
     std::string getJSON() const;
     std::string getURL() const;
 
-    void setObserver(Observer*);
+    void addObserver(Observer* observer);
+    void removeObserver(Observer* observer);
 
     bool isLoaded() const;
 
@@ -90,31 +93,8 @@ public:
 
     void dumpDebugLogs() const;
 
-    bool mutated = false;
-    bool loaded = false;
-    bool spriteLoaded = false;
-
 private:
     void parse(const std::string&);
-
-    std::shared_ptr<FileSource> fileSource;
-
-    std::string url;
-    std::string json;
-
-    std::unique_ptr<AsyncRequest> styleRequest;
-    std::unique_ptr<SpriteLoader> spriteLoader;
-
-    std::string glyphURL;
-    CollectionWithPersistentOrder<style::Image> images;
-    CollectionWithPersistentOrder<Source> sources;
-    Collection<Layer> layers;
-    TransitionOptions transitionOptions;
-    std::unique_ptr<Light> light;
-
-    // Defaults
-    std::string name;
-    CameraOptions defaultCamera;
 
     // SpriteLoaderObserver implementation.
     void onSpriteLoaded(std::vector<std::unique_ptr<Image>>&&) override;
@@ -132,9 +112,32 @@ private:
     // LightObserver implementation.
     void onLightChanged(const Light&) override;
 
-    Observer nullObserver;
-    Observer* observer = &nullObserver;
+public:
+    bool mutated = false;
+    bool loaded = false;
+    bool spriteLoaded = false;
+    AnnotationManager annotationManager; // ToDo: move annotations into an own style, stackable inside the View (=Map), so that
+                                         // they can change independently of the rest of the style and be combined with different styles arbitrarily.
+    std::shared_ptr<FileSource> fileSource;
 
+private:
+    std::string url;
+    std::string json;
+
+    std::unique_ptr<AsyncRequest> styleRequest;
+    std::unique_ptr<SpriteLoader> spriteLoader;
+
+    std::string glyphURL;
+    CollectionWithPersistentOrder<style::Image> images;
+    CollectionWithPersistentOrder<Source> sources;
+    Collection<Layer> layers;
+    TransitionOptions transitionOptions;
+    std::unique_ptr<Light> light;
+
+    // Defaults
+    std::string name;
+    CameraOptions defaultCamera;
+    std::set<Observer*> observers;
     std::exception_ptr lastError;
 };
 

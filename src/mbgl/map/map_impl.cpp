@@ -9,7 +9,7 @@ namespace mbgl {
 
 Map::Impl::Impl(RendererFrontend& frontend_,
                 MapObserver& observer_,
-                std::shared_ptr<FileSource> fileSource_,
+                const ResourceOptions &resourceOptions_,
                 const MapOptions& mapOptions)
     : observer(observer_),
       rendererFrontend(frontend_),
@@ -17,11 +17,27 @@ Map::Impl::Impl(RendererFrontend& frontend_,
       mode(mapOptions.mapMode()),
       pixelRatio(mapOptions.pixelRatio()),
       crossSourceCollisions(mapOptions.crossSourceCollisions()),
-      fileSource(std::move(fileSource_)),
-      style(std::make_unique<style::Style>(fileSource, pixelRatio)),
-      annotationManager(*style) {
+      style(std::make_shared<style::Style>(resourceOptions_, pixelRatio)) {
+    init(mapOptions);
+}
+
+Map::Impl::Impl(RendererFrontend &frontend_,
+                MapObserver &observer_,
+                std::shared_ptr<FileSource> fileSource_,
+                const MapOptions &mapOptions)
+    : observer(observer_),
+      rendererFrontend(frontend_),
+      transform(observer, mapOptions.constrainMode(), mapOptions.viewportMode()),
+      mode(mapOptions.mapMode()),
+      pixelRatio(mapOptions.pixelRatio()),
+      crossSourceCollisions(mapOptions.crossSourceCollisions()),
+      style(std::make_shared<style::Style>(fileSource_, pixelRatio)) {
+    init(mapOptions);
+}
+
+void Map::Impl::init(const MapOptions& mapOptions) {
     transform.setNorthOrientation(mapOptions.northOrientation());
-    style->impl->setObserver(this);
+    style->impl->addObserver(this);
     rendererFrontend.setObserver(*this);
     transform.resize(mapOptions.size());
 }
@@ -62,8 +78,8 @@ void Map::Impl::onUpdate() {
         style->impl->getImageImpls(),
         style->impl->getSourceImpls(),
         style->impl->getLayerImpls(),
-        annotationManager,
-        fileSource,
+        style->impl->annotationManager,
+        style->impl->fileSource,
         prefetchZoomDelta,
         bool(stillImageRequest),
         crossSourceCollisions
@@ -82,9 +98,7 @@ void Map::Impl::onStyleLoaded() {
     if (!cameraMutated) {
         jumpTo(style->getDefaultCamera());
     }
-    if (LayerManager::annotationsEnabled) {
-        annotationManager.onStyleLoaded();
-    }
+
     observer.onDidFinishLoadingStyle();
 }
 
@@ -167,6 +181,18 @@ void Map::Impl::jumpTo(const CameraOptions& camera) {
     cameraMutated = true;
     transform.jumpTo(camera);
     onUpdate();
+}
+
+void Map::Impl::setStyle(const std::shared_ptr<style::Style>& style_)
+{
+    onStyleLoading();
+    style->impl->removeObserver(this);
+    style = style_;
+    style->impl->addObserver(this);
+    if (style->impl->isLoaded())
+        onStyleLoaded();
+    else if (style->impl->getLastError())
+        onStyleError(style->impl->getLastError());
 }
 
 void Map::Impl::onStyleImageMissing(const std::string& id, std::function<void()> done) {

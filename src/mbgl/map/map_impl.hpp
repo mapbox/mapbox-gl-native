@@ -1,6 +1,5 @@
 #pragma once
 
-#include <mbgl/annotation/annotation_manager.hpp>
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/map_observer.hpp>
 #include <mbgl/map/map_options.hpp>
@@ -28,7 +27,14 @@ struct StillImageRequest {
 
 class Map::Impl : public style::Observer, public RendererObserver {
 public:
-    Impl(RendererFrontend&, MapObserver&, std::shared_ptr<FileSource>, const MapOptions&);
+    Impl(RendererFrontend&,
+         MapObserver&,
+         const ResourceOptions&,
+         const MapOptions&);
+    Impl(RendererFrontend&,
+         MapObserver&,
+         std::shared_ptr<FileSource>,
+         const MapOptions&); // Used in tests
     ~Impl() final;
 
     // StyleObserver
@@ -50,6 +56,7 @@ public:
 
     // Map
     void jumpTo(const CameraOptions&);
+    void setStyle(const std::shared_ptr<style::Style>& style);
 
     MapObserver& observer;
     RendererFrontend& rendererFrontend;
@@ -62,10 +69,7 @@ public:
 
     MapDebugOptions debugOptions { MapDebugOptions::NoDebug };
 
-    std::shared_ptr<FileSource> fileSource;
-
-    std::unique_ptr<style::Style> style;
-    AnnotationManager annotationManager;
+    std::shared_ptr<style::Style> style;
 
     bool cameraMutated = false;
 
@@ -74,6 +78,9 @@ public:
     bool loading = false;
     bool rendererFullyLoaded;
     std::unique_ptr<StillImageRequest> stillImageRequest;
+
+private:
+    void init(const MapOptions&);
 };
 
 } // namespace mbgl

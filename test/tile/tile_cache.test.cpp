@@ -29,7 +29,7 @@ public:
     TransformState transformState;
     util::RunLoop loop;
     style::Style style{fileSource, 1};
-    AnnotationManager annotationManager{style};
+    AnnotationManager annotationManager { *style.impl };
     ImageManager imageManager;
     GlyphManager glyphManager;
     Tileset tileset{{"https://example.com"}, {0, 22}, "none"};

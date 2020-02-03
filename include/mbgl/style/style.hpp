@@ -11,6 +11,7 @@
 namespace mbgl {
 
 class FileSource;
+class ResourceOptions;
 
 namespace style {
 
@@ -18,10 +19,12 @@ class Light;
 class Image;
 class Source;
 class Layer;
+class StyleImpl;
 
 class Style {
 public:
     Style(std::shared_ptr<FileSource>, float pixelRatio);
+    Style(const ResourceOptions& resourceOptions, float pixelRatio);
     ~Style();
 
     void loadJSON(const std::string&);
@@ -70,8 +73,7 @@ public:
     std::unique_ptr<Layer> removeLayer(const std::string& layerID);
 
     // Private implementation
-    class Impl;
-    const std::unique_ptr<Impl> impl;
+    const std::unique_ptr<StyleImpl> impl;
 };
 
 } // namespace style

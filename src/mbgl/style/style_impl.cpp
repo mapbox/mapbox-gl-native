@@ -30,34 +30,38 @@ namespace style {
 
 static Observer nullObserver;
 
-Style::Impl::Impl(std::shared_ptr<FileSource> fileSource_, float pixelRatio)
-    : fileSource(std::move(fileSource_)),
+StyleImpl::StyleImpl(std::shared_ptr<FileSource> fileSource_, float pixelRatio)
+    : annotationManager(*this),
+      fileSource(std::move(fileSource_)),
       spriteLoader(std::make_unique<SpriteLoader>(pixelRatio)),
-      light(std::make_unique<Light>()),
-      observer(&nullObserver) {
+      light(std::make_unique<Light>()) {
     spriteLoader->setObserver(this);
     light->setObserver(this);
 }
 
-Style::Impl::~Impl() = default;
+StyleImpl::~StyleImpl() = default;
 
-void Style::Impl::loadJSON(const std::string& json_) {
+void StyleImpl::loadJSON(const std::string& json_) {
     lastError = nullptr;
-    observer->onStyleLoading();
+    for (auto &observer: observers)
+        observer->onStyleLoading();
 
     url.clear();
     parse(json_);
 }
 
-void Style::Impl::loadURL(const std::string& url_) {
+void StyleImpl::loadURL(const std::string& url_) {
     if (!fileSource) {
-        observer->onStyleError(
-            std::make_exception_ptr(util::StyleLoadException("Unable to find resource provider for style url.")));
+        for (auto &observer: observers) {
+            observer->onStyleError(
+                std::make_exception_ptr(util::StyleLoadException("Unable to find resource provider for style url.")));
+        }
         return;
     }
 
     lastError = nullptr;
-    observer->onStyleLoading();
+    for (auto &observer: observers)
+        observer->onStyleLoading();
 
     loaded = false;
     url = url_;
@@ -71,8 +75,10 @@ void Style::Impl::loadURL(const std::string& url_) {
         if (res.error) {
             const std::string message = "loading style failed: " + res.error->message;
             Log::Error(Event::Setup, message.c_str());
-            observer->onStyleError(std::make_exception_ptr(util::StyleLoadException(message)));
-            observer->onResourceError(std::make_exception_ptr(std::runtime_error(res.error->message)));
+            for (auto &observer: observers) {
+                observer->onStyleError(std::make_exception_ptr(util::StyleLoadException(message)));
+                observer->onResourceError(std::make_exception_ptr(std::runtime_error(res.error->message)));
+            }
         } else if (res.notModified || res.noContent) {
             return;
         } else {
@@ -81,14 +87,16 @@ void Style::Impl::loadURL(const std::string& url_) {
     });
 }
 
-void Style::Impl::parse(const std::string& json_) {
+void StyleImpl::parse(const std::string& json_) {
     Parser parser;
 
     if (auto error = parser.parse(json_)) {
         std::string message = "Failed to parse style: " + util::toString(error);
         Log::Error(Event::ParseStyle, message.c_str());
-        observer->onStyleError(std::make_exception_ptr(util::StyleParseException(message)));
-        observer->onResourceError(error);
+        for (auto &observer: observers) {
+            observer->onStyleError(std::make_exception_ptr(util::StyleParseException(message)));
+            observer->onResourceError(error);
+        }
         return;
     }
 
@@ -127,26 +135,29 @@ void Style::Impl::parse(const std::string& json_) {
     glyphURL = parser.glyphURL;
 
     loaded = true;
-    observer->onStyleLoaded();
+
+    annotationManager.onStyleLoaded();
+    for (auto &observer: observers)
+        observer->onStyleLoaded();
 }
 
-std::string Style::Impl::getJSON() const {
+std::string StyleImpl::getJSON() const {
     return json;
 }
 
-std::string Style::Impl::getURL() const {
+std::string StyleImpl::getURL() const {
     return url;
 }
 
-void Style::Impl::setTransitionOptions(const TransitionOptions& options) {
+void StyleImpl::setTransitionOptions(const TransitionOptions& options) {
     transitionOptions = options;
 }
 
-TransitionOptions Style::Impl::getTransitionOptions() const {
+TransitionOptions StyleImpl::getTransitionOptions() const {
     return transitionOptions;
 }
 
-void Style::Impl::addSource(std::unique_ptr<Source> source) {
+void StyleImpl::addSource(std::unique_ptr<Source> source) {
     if (sources.get(source->getID())) {
         std::string msg = "Source " + source->getID() + " already exists";
         throw std::runtime_error(msg.c_str());
@@ -159,7 +170,7 @@ void Style::Impl::addSource(std::unique_ptr<Source> source) {
     }
 }
 
-std::unique_ptr<Source> Style::Impl::removeSource(const std::string& id) {
+std::unique_ptr<Source> StyleImpl::removeSource(const std::string& id) {
     // Check if source is in use
     for (const auto& layer: layers) {
         if (layer->getSourceID() == id) {
@@ -177,20 +188,20 @@ std::unique_ptr<Source> Style::Impl::removeSource(const std::string& id) {
     return source;
 }
 
-std::vector<Layer*> Style::Impl::getLayers() {
+std::vector<Layer*> StyleImpl::getLayers() {
     return layers.getWrappers();
 }
 
-std::vector<const Layer*> Style::Impl::getLayers() const {
+std::vector<const Layer*> StyleImpl::getLayers() const {
     auto wrappers = layers.getWrappers();
     return std::vector<const Layer*>(wrappers.begin(), wrappers.end());
 }
 
-Layer* Style::Impl::getLayer(const std::string& id) const {
+Layer* StyleImpl::getLayer(const std::string& id) const {
     return layers.get(id);
 }
 
-Layer* Style::Impl::addLayer(std::unique_ptr<Layer> layer, optional<std::string> before) {
+Layer* StyleImpl::addLayer(std::unique_ptr<Layer> layer, optional<std::string> before) {
     // TODO: verify source
     if (Source* source = sources.get(layer->getSourceID())) {
         if (!source->supportsLayerType(layer->baseImpl->getTypeInfo())) {
@@ -208,54 +219,56 @@ Layer* Style::Impl::addLayer(std::unique_ptr<Layer> layer, optional<std::string>
 
     layer->setObserver(this);
     Layer* result = layers.add(std::move(layer), before);
-    observer->onUpdate();
+    for (auto &observer: observers)
+        observer->onUpdate();
 
     return result;
 }
 
-std::unique_ptr<Layer> Style::Impl::removeLayer(const std::string& id) {
+std::unique_ptr<Layer> StyleImpl::removeLayer(const std::string& id) {
     std::unique_ptr<Layer> layer = layers.remove(id);
 
     if (layer) {
         layer->setObserver(nullptr);
-        observer->onUpdate();
+        for (auto &observer: observers)
+            observer->onUpdate();
     }
 
     return layer;
 }
 
-void Style::Impl::setLight(std::unique_ptr<Light> light_) {
+void StyleImpl::setLight(std::unique_ptr<Light> light_) {
     light = std::move(light_);
     light->setObserver(this);
     onLightChanged(*light);
 }
 
-Light* Style::Impl::getLight() const {
+Light* StyleImpl::getLight() const {
     return light.get();
 }
 
-std::string Style::Impl::getName() const {
+std::string StyleImpl::getName() const {
     return name;
 }
 
-CameraOptions Style::Impl::getDefaultCamera() const {
+CameraOptions StyleImpl::getDefaultCamera() const {
     return defaultCamera;
 }
 
-std::vector<Source*> Style::Impl::getSources() {
+std::vector<Source*> StyleImpl::getSources() {
     return sources.getWrappers();
 }
 
-std::vector<const Source*> Style::Impl::getSources() const {
+std::vector<const Source*> StyleImpl::getSources() const {
     auto wrappers = sources.getWrappers();
     return std::vector<const Source*>(wrappers.begin(), wrappers.end());
 }
 
-Source* Style::Impl::getSource(const std::string& id) const {
+Source* StyleImpl::getSource(const std::string& id) const {
     return sources.get(id);
 }
 
-bool Style::Impl::isLoaded() const {
+bool StyleImpl::isLoaded() const {
     if (!loaded) {
         return false;
     }
@@ -273,98 +286,116 @@ bool Style::Impl::isLoaded() const {
     return true;
 }
 
-void Style::Impl::addImage(std::unique_ptr<style::Image> image) {
+void StyleImpl::addImage(std::unique_ptr<style::Image> image) {
     images.remove(image->getID()); // We permit using addImage to update.
     images.add(std::move(image));
-    observer->onUpdate();
+    for (auto &observer: observers)
+        observer->onUpdate();
 }
 
-void Style::Impl::removeImage(const std::string& id) {
+void StyleImpl::removeImage(const std::string& id) {
     images.remove(id);
 }
 
-const style::Image* Style::Impl::getImage(const std::string& id) const {
+const style::Image* StyleImpl::getImage(const std::string& id) const {
     return images.get(id);
 }
 
-void Style::Impl::setObserver(style::Observer* observer_) {
-    observer = observer_;
+void StyleImpl::addObserver(style::Observer* observer) {
+    observers.insert(observer);
 }
 
-void Style::Impl::onSourceLoaded(Source& source) {
+void StyleImpl::removeObserver(Observer *observer)
+{
+    observers.erase(observer);
+}
+
+void StyleImpl::onSourceLoaded(Source& source) {
     sources.update(source);
-    observer->onSourceLoaded(source);
-    observer->onUpdate();
+    for (auto &observer: observers)
+        observer->onSourceLoaded(source);
+    for (auto &observer: observers)
+        observer->onUpdate();
 }
 
-void Style::Impl::onSourceChanged(Source& source) {
+void StyleImpl::onSourceChanged(Source& source) {
     sources.update(source);
-    observer->onSourceChanged(source);
-    observer->onUpdate();
+    for (auto &observer: observers)
+        observer->onSourceChanged(source);
+    for (auto &observer: observers)
+        observer->onUpdate();
 }
 
-void Style::Impl::onSourceError(Source& source, std::exception_ptr error) {
+void StyleImpl::onSourceError(Source& source, std::exception_ptr error) {
     lastError = error;
     Log::Error(Event::Style, "Failed to load source %s: %s",
                source.getID().c_str(), util::toString(error).c_str());
-    observer->onSourceError(source, error);
-    observer->onResourceError(error);
+    for (auto &observer: observers)
+        observer->onSourceError(source, error);
+    for (auto &observer: observers)
+        observer->onResourceError(error);
 }
 
-void Style::Impl::onSourceDescriptionChanged(Source& source) {
+void StyleImpl::onSourceDescriptionChanged(Source& source) {
     sources.update(source);
-    observer->onSourceDescriptionChanged(source);
+    for (auto &observer: observers)
+        observer->onSourceDescriptionChanged(source);
     if (!source.loaded && fileSource) {
         source.loadDescription(*fileSource);
     }
 }
 
-void Style::Impl::onSpriteLoaded(std::vector<std::unique_ptr<Image>>&& images_) {
+void StyleImpl::onSpriteLoaded(std::vector<std::unique_ptr<Image>>&& images_) {
     for (auto& image : images_) {
         addImage(std::move(image));
     }
     spriteLoaded = true;
-    observer->onUpdate(); // For *-pattern properties.
+    for (auto &observer: observers)
+        observer->onUpdate(); // For *-pattern properties.
 }
 
-void Style::Impl::onSpriteError(std::exception_ptr error) {
+void StyleImpl::onSpriteError(std::exception_ptr error) {
     lastError = error;
     Log::Error(Event::Style, "Failed to load sprite: %s", util::toString(error).c_str());
-    observer->onResourceError(error);
+    for (auto &observer: observers)
+        observer->onResourceError(error);
     // Unblock rendering tiles (even though sprite request has failed).
     spriteLoaded = true;
-    observer->onUpdate();
+    for (auto &observer: observers)
+        observer->onUpdate();
 }
 
-void Style::Impl::onLayerChanged(Layer& layer) {
+void StyleImpl::onLayerChanged(Layer& layer) {
     layers.update(layer);
-    observer->onUpdate();
+    for (auto &observer: observers)
+        observer->onUpdate();
 }
 
-void Style::Impl::onLightChanged(const Light&) {
-    observer->onUpdate();
+void StyleImpl::onLightChanged(const Light&) {
+    for (auto &observer: observers)
+        observer->onUpdate();
 }
 
-void Style::Impl::dumpDebugLogs() const {
+void StyleImpl::dumpDebugLogs() const {
     Log::Info(Event::General, "styleURL: %s", url.c_str());
     for (const auto& source : sources) {
         source->dumpDebugLogs();
     }
 }
 
-const std::string& Style::Impl::getGlyphURL() const {
+const std::string& StyleImpl::getGlyphURL() const {
     return glyphURL;
 }
 
-Immutable<std::vector<Immutable<Image::Impl>>> Style::Impl::getImageImpls() const {
+Immutable<std::vector<Immutable<Image::Impl>>> StyleImpl::getImageImpls() const {
     return images.getImpls();
 }
 
-Immutable<std::vector<Immutable<Source::Impl>>> Style::Impl::getSourceImpls() const {
+Immutable<std::vector<Immutable<Source::Impl>>> StyleImpl::getSourceImpls() const {
     return sources.getImpls();
 }
 
-Immutable<std::vector<Immutable<Layer::Impl>>> Style::Impl::getLayerImpls() const {
+Immutable<std::vector<Immutable<Layer::Impl>>> StyleImpl::getLayerImpls() const {
     return layers.getImpls();
 }
 

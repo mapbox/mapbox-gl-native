@@ -21,11 +21,12 @@ class ShapeAnnotationImpl;
 
 namespace style {
 class Style;
+class StyleImpl;
 } // namespace style
 
 class AnnotationManager : private util::noncopyable {
 public:
-    AnnotationManager(style::Style&);
+    AnnotationManager(style::StyleImpl&);
     ~AnnotationManager();
 
     AnnotationID addAnnotation(const Annotation&);
@@ -36,7 +37,6 @@ public:
     void removeImage(const std::string&);
     double getTopOffsetPixelsForImage(const std::string&);
 
-    void setStyle(style::Style&);
     void onStyleLoaded();
 
     void updateData();
@@ -63,7 +63,7 @@ private:
 
     std::unique_ptr<AnnotationTileData> getTileData(const CanonicalTileID&);
 
-    std::reference_wrapper<style::Style> style;
+    style::StyleImpl& style;
 
     std::mutex mutex;
 

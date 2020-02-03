@@ -19,7 +19,7 @@ TEST(Style, Properties) {
     util::RunLoop loop;
 
     auto fileSource = std::make_shared<StubFileSource>();
-    Style::Impl style { fileSource, 1.0 };
+    StyleImpl style { fileSource, 1.0 };
 
     style.loadJSON(R"STYLE({"name": "Test"})STYLE");
     ASSERT_EQ("Test", style.getName());
@@ -61,7 +61,7 @@ TEST(Style, DuplicateSource) {
     util::RunLoop loop;
 
     auto fileSource = std::make_shared<StubFileSource>();
-    Style::Impl style { fileSource, 1.0 };
+    StyleImpl style { fileSource, 1.0 };
 
     style.loadJSON(util::read_file("test/fixtures/resources/style-unused-sources.json"));
 
@@ -82,7 +82,7 @@ TEST(Style, RemoveSourceInUse) {
     Log::setObserver(std::unique_ptr<Log::Observer>(log));
 
     auto fileSource = std::make_shared<StubFileSource>();
-    Style::Impl style { fileSource, 1.0 };
+    StyleImpl style { fileSource, 1.0 };
 
     style.loadJSON(util::read_file("test/fixtures/resources/style-unused-sources.json"));
 
@@ -107,7 +107,7 @@ TEST(Style, RemoveSourceInUse) {
 TEST(Style, SourceImplsOrder) {
     util::RunLoop loop;
     auto fileSource = std::make_shared<StubFileSource>();
-    Style::Impl style{fileSource, 1.0};
+    StyleImpl style{fileSource, 1.0};
 
     style.addSource(std::make_unique<VectorSource>("c", "mapbox://mapbox.mapbox-terrain-v2"));
     style.addSource(std::make_unique<VectorSource>("b", "mapbox://mapbox.mapbox-terrain-v2"));

@@ -4,12 +4,18 @@
 #include <mbgl/style/image.hpp>
 #include <mbgl/style/source.hpp>
 #include <mbgl/style/layer.hpp>
+#include <mbgl/storage/file_source_manager.hpp>
+#include <mbgl/storage/resource_options.hpp>
 
 namespace mbgl {
 namespace style {
 
 Style::Style(std::shared_ptr<FileSource> fileSource, float pixelRatio)
-    : impl(std::make_unique<Impl>(std::move(fileSource), pixelRatio)) {}
+    : impl(std::make_unique<StyleImpl>(std::move(fileSource), pixelRatio)) {}
+
+Style::Style(const ResourceOptions &resourceOptions, float pixelRatio)
+    : impl(std::make_unique<StyleImpl>(FileSourceManager::get() ? FileSourceManager::get()->getFileSource(ResourceLoader, resourceOptions) : nullptr,
+                                       pixelRatio)) {}
 
 Style::~Style() = default;
 
@@ -79,7 +85,7 @@ std::vector<Source*> Style::getSources() {
 }
 
 std::vector<const Source*> Style::getSources() const {
-    return const_cast<const Impl&>(*impl).getSources();
+    return const_cast<const StyleImpl&>(*impl).getSources();
 }
 
 Source* Style::getSource(const std::string& id) {
@@ -107,7 +113,7 @@ std::vector<Layer*> Style::getLayers() {
 }
 
 std::vector<const Layer*> Style::getLayers() const {
-    return const_cast<const Impl&>(*impl).getLayers();
+    return const_cast<const StyleImpl&>(*impl).getLayers();
 }
 
 Layer* Style::getLayer(const std::string& layerID) {

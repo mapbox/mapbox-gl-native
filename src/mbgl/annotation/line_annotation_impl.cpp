@@ -12,7 +12,7 @@ LineAnnotationImpl::LineAnnotationImpl(AnnotationID id_, LineAnnotation annotati
       annotation(ShapeAnnotationGeometry::visit(annotation_.geometry, CloseShapeAnnotation{}), annotation_.opacity, annotation_.width, annotation_.color) {
 }
 
-void LineAnnotationImpl::updateStyle(Style::Impl& style) const {
+void LineAnnotationImpl::updateStyle(StyleImpl& style) const {
     Layer* layer = style.getLayer(layerID);
 
     if (!layer) {

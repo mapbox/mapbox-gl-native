@@ -12,7 +12,7 @@ FillAnnotationImpl::FillAnnotationImpl(AnnotationID id_, FillAnnotation annotati
       annotation(ShapeAnnotationGeometry::visit(annotation_.geometry, CloseShapeAnnotation{}), annotation_.opacity, annotation_.color, annotation_.outlineColor) {
 }
 
-void FillAnnotationImpl::updateStyle(Style::Impl& style) const {
+void FillAnnotationImpl::updateStyle(StyleImpl& style) const {
     Layer* layer = style.getLayer(layerID);
 
     if (!layer) {

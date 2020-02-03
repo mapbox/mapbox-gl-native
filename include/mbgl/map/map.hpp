@@ -34,7 +34,7 @@ public:
     explicit Map(RendererFrontend&,
                  MapObserver&,
                  const MapOptions&,
-                 const ResourceOptions&);
+                 const ResourceOptions &resourceOptions = ResourceOptions());
     ~Map();
 
     // Register a callback that will get called (on the render thread) when all resources have
@@ -48,8 +48,9 @@ public:
 
           style::Style& getStyle();
     const style::Style& getStyle() const;
+    std::shared_ptr<style::Style> getStylePointer();
 
-    void setStyle(std::unique_ptr<style::Style>);
+    void setStyle(const std::shared_ptr<mbgl::style::Style>&);
 
     // Transition
     void cancelTransitions();

@@ -33,7 +33,8 @@ Map::Map(RendererFrontend& frontend,
     : impl(std::make_unique<Impl>(
           frontend,
           observer,
-          FileSourceManager::get() ? FileSourceManager::get()->getFileSource(ResourceLoader, resourceOptions) : nullptr,
+//          FileSourceManager::get() ? FileSourceManager::get()->getFileSource(ResourceLoader, resourceOptions) : nullptr,
+          resourceOptions,
           mapOptions)) {}
 
 Map::Map(std::unique_ptr<Impl> impl_) : impl(std::move(impl_)) {}
@@ -87,13 +88,14 @@ const style::Style& Map::getStyle() const {
     return *impl->style;
 }
 
-void Map::setStyle(std::unique_ptr<Style> style) {
+std::shared_ptr<Style> Map::getStylePointer()
+{
+    return impl->style;
+}
+
+void Map::setStyle(const std::shared_ptr<Style>& style) {
     assert(style);
-    impl->onStyleLoading();
-    impl->style = std::move(style);
-    if (LayerManager::annotationsEnabled) {
-        impl->annotationManager.setStyle(*impl->style);
-    }
+    impl->setStyle(style);
 }
 
 #pragma mark - Transitions
@@ -399,26 +401,26 @@ std::vector<LatLng> Map::latLngsForPixels(const std::vector<ScreenCoordinate>& s
 
 void Map::addAnnotationImage(std::unique_ptr<style::Image> image) {
     if (LayerManager::annotationsEnabled) {
-        impl->annotationManager.addImage(std::move(image));
+        impl->style->impl->annotationManager.addImage(std::move(image));
     }
 }
 
 void Map::removeAnnotationImage(const std::string& id) {
     if (LayerManager::annotationsEnabled) {
-        impl->annotationManager.removeImage(id);
+        impl->style->impl->annotationManager.removeImage(id);
     }
 }
 
 double Map::getTopOffsetPixelsForAnnotationImage(const std::string& id) {
     if (LayerManager::annotationsEnabled) {
-        return impl->annotationManager.getTopOffsetPixelsForImage(id);
+        return impl->style->impl->annotationManager.getTopOffsetPixelsForImage(id);
     }
     return 0.0;
 }
 
 AnnotationID Map::addAnnotation(const Annotation& annotation) {
     if (LayerManager::annotationsEnabled) {
-        auto result = impl->annotationManager.addAnnotation(annotation);
+        auto result = impl->style->impl->annotationManager.addAnnotation(annotation);
         impl->onUpdate();
         return result;
     }
@@ -427,7 +429,7 @@ AnnotationID Map::addAnnotation(const Annotation& annotation) {
 
 void Map::updateAnnotation(AnnotationID id, const Annotation& annotation) {
     if (LayerManager::annotationsEnabled) {
-        if (impl->annotationManager.updateAnnotation(id, annotation)) {
+        if (impl->style->impl->annotationManager.updateAnnotation(id, annotation)) {
             impl->onUpdate();
         }
     }
@@ -435,7 +437,7 @@ void Map::updateAnnotation(AnnotationID id, const Annotation& annotation) {
 
 void Map::removeAnnotation(AnnotationID annotation) {
     if (LayerManager::annotationsEnabled) {
-        impl->annotationManager.removeAnnotation(annotation);
+        impl->style->impl->annotationManager.removeAnnotation(annotation);
         impl->onUpdate();
     }
 }

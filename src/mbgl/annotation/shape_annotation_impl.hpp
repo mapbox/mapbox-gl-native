@@ -20,7 +20,7 @@ public:
     ShapeAnnotationImpl(const AnnotationID);
     virtual ~ShapeAnnotationImpl() = default;
 
-    virtual void updateStyle(style::Style::Impl&) const = 0;
+    virtual void updateStyle(style::StyleImpl&) const = 0;
     virtual const ShapeAnnotationGeometry& geometry() const = 0;
 
     void updateTileData(const CanonicalTileID&, AnnotationTileData&);
