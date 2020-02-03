@@ -113,6 +113,13 @@ add_library(
 find_program(MBGL_TEST_NODEJS NAMES nodejs node)
 find_program(MBGL_TEST_NPM NAMES npm)
 
+if(MBGL_WITH_OPENGL)
+    target_compile_definitions(
+        mbgl-test
+        PRIVATE MBGL_RENDER_BACKEND_OPENGL=1
+    )
+endif()
+
 if(WIN32 OR CMAKE_SYSTEM_NAME STREQUAL Android OR NOT MBGL_TEST_NODEJS OR NOT MBGL_TEST_NPM)
     message("Target platform does not support HTTP tests or dependencies not found.")
 

@@ -1,8 +1,8 @@
 #pragma once
 
+#include <mbgl/gl/custom_layer.hpp>
 #include <mbgl/style/layer_impl.hpp>
 #include <mbgl/style/layer_properties.hpp>
-#include <mbgl/style/layers/custom_layer.hpp>
 
 #include <memory>
 
