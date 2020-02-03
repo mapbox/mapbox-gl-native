@@ -108,7 +108,9 @@ public:
         const size_t featureCount = sourceLayer->featureCount();
         for (size_t i = 0; i < featureCount; ++i) {
             auto feature = sourceLayer->getFeature(i);
-            if (!leaderLayerProperties->layerImpl().filter(style::expression::EvaluationContext { this->zoom, feature.get() }))
+            if (!leaderLayerProperties->layerImpl().filter(
+                    style::expression::EvaluationContext(this->zoom, feature.get())
+                        .withCanonicalTileID(&parameters.tileID.canonical)))
                 continue;
 
             PatternLayerMap patternDependencyMap;
@@ -155,8 +157,8 @@ public:
     void createBucket(const ImagePositions& patternPositions,
                       std::unique_ptr<FeatureIndex>& featureIndex,
                       std::unordered_map<std::string, LayerRenderData>& renderData,
-                      const bool,
-                      const bool,
+                      const bool /*firstLoad*/,
+                      const bool /*showCollisionBoxes*/,
                       const CanonicalTileID& canonical) override {
         auto bucket = std::make_shared<BucketType>(layout, layerPropertiesMap, zoom, overscaling);
         for (auto & patternFeature : features) {

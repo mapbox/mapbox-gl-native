@@ -227,7 +227,7 @@ public:
                               const style::expression::Value& formattedSection) override {
         using style::expression::EvaluationContext;
         auto evaluated = expression.evaluate(
-            EvaluationContext(&feature).withFormattedSection(&formattedSection).withCanonicalTileID(canonical),
+            EvaluationContext(&feature).withFormattedSection(&formattedSection).withCanonicalTileID(&canonical),
             defaultValue);
         this->statistics.add(evaluated);
         auto value = attributeValue(evaluated);
@@ -330,11 +330,11 @@ public:
         Range<T> range = {
             expression.evaluate(EvaluationContext(zoomRange.min, &feature)
                                     .withFormattedSection(&formattedSection)
-                                    .withCanonicalTileID(canonical),
+                                    .withCanonicalTileID(&canonical),
                                 defaultValue),
             expression.evaluate(EvaluationContext(zoomRange.max, &feature)
                                     .withFormattedSection(&formattedSection)
-                                    .withCanonicalTileID(canonical),
+                                    .withCanonicalTileID(&canonical),
                                 defaultValue),
         };
         this->statistics.add(range.min);
