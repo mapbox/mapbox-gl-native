@@ -1,10 +1,13 @@
+#include <mbgl/style/expression/within.hpp>
+
 #include <mapbox/geojson.hpp>
 #include <mapbox/geometry.hpp>
 #include <mbgl/style/conversion_impl.hpp>
-#include <mbgl/style/expression/within.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
+#include <mbgl/util/logging.hpp>
 #include <mbgl/util/string.hpp>
 
+namespace mbgl {
 namespace {
 
 double isLeft(mbgl::Point<double> P0, mbgl::Point<double> P1, mbgl::Point<double> P2) {
@@ -13,14 +16,13 @@ double isLeft(mbgl::Point<double> P0, mbgl::Point<double> P1, mbgl::Point<double
 
 // winding number algorithm for checking if point inside a ploygon or not.
 // http://geomalgorithms.com/a03-_inclusion.html#wn_PnPoly()
-bool pointWithinPoly(mbgl::Point<double> point, const mapbox::geometry::polygon<double>& polys) {
+bool pointWithinPolygons(mbgl::Point<double> point, const mapbox::geometry::polygon<double>& polys) {
     //  wn = the winding number (=0 only when point is outside)
     int wn = 0;
     for (auto poly : polys) {
         auto size = poly.size();
-        auto i = size;
         // loop through every edge of the polygon
-        for (i = 0; i < size - 1; ++i) {
+        for (decltype(size) i = 0; i < size - 1; ++i) {
             if (poly[i].y <= point.y) {
                 if (poly[i + 1].y > point.y) { // upward horizontal crossing from point to edge E(poly[i], poly[i+1])
                     if (isLeft(poly[i], poly[i + 1], point) > 0) {
@@ -42,34 +44,33 @@ bool pointWithinPoly(mbgl::Point<double> point, const mapbox::geometry::polygon<
     return wn != 0;
 }
 
-bool pointsWithinPoly(const mbgl::GeometryTileFeature& feature,
-                      const mbgl::CanonicalTileID& canonical,
-                      const mbgl::GeoJSON& geoJson) {
-    bool result = false;
-    geoJson.match(
-        [&](const mapbox::geometry::geometry<double>& geometrySet) {
-            geometrySet.match(
-                [&](const mapbox::geometry::polygon<double>& polygons) {
-                    convertGeometry(feature, canonical)
+bool pointsWithinPolygons(const mbgl::GeometryTileFeature& feature,
+                          const mbgl::CanonicalTileID& canonical,
+                          const mbgl::GeoJSON& geoJson) {
+    return geoJson.match(
+        [&feature, &canonical](const mapbox::geometry::geometry<double>& geometrySet) -> bool {
+            return geometrySet.match(
+                [&feature, &canonical](const mapbox::geometry::polygon<double>& polygons) -> bool {
+                    return convertGeometry(feature, canonical)
                         .match(
-                            [&](const mapbox::geometry::point<double>& point) {
-                                result = pointWithinPoly(point, polygons);
+                            [&polygons](const mapbox::geometry::point<double>& point) -> bool {
+                                return pointWithinPolygons(point, polygons);
                             },
-                            [&](const mapbox::geometry::multi_point<double>& points) {
+                            [&polygons](const mapbox::geometry::multi_point<double>& points) -> bool {
+                                auto result = false;
                                 for (const auto& p : points) {
-                                    result = pointWithinPoly(p, polygons);
+                                    result = pointWithinPolygons(p, polygons);
                                     if (!result) {
-                                        return;
+                                        return result;
                                     }
                                 }
+                                return result;
                             },
-                            [&](const auto&) { return; });
+                            [](const auto&) -> bool { return false; });
                 },
-                [&](const auto&) { return; });
+                [](const auto&) -> bool { return false; });
         },
-        [&](const auto&) { return; });
-
-    return result;
+        [](const auto&) -> bool { return false; });
 }
 
 mbgl::optional<mbgl::GeoJSON> parseValue(const mbgl::style::conversion::Convertible& value_,
@@ -89,14 +90,17 @@ mbgl::optional<mbgl::GeoJSON> parseValue(const mbgl::style::conversion::Converti
         }
     }
     ctx.error("'Within' expression requires valid geojson source that contains polygon geometry type.");
-    return mbgl::optional<mbgl::GeoJSON>();
+    return nullopt;
 }
 
 } // namespace
 
-namespace mbgl {
 namespace style {
 namespace expression {
+
+Within::Within(GeoJSON geojson) : Expression(Kind::Within, type::Boolean), geoJSONSource(std::move(geojson)) {}
+
+Within::~Within() {}
 
 using namespace mbgl::style::conversion;
 
@@ -107,7 +111,9 @@ EvaluationResult Within::evaluate(const EvaluationContext& params) const {
     auto geometryType = params.feature->getType();
     // Currently only support Point/Points in polygon
     if (geometryType == FeatureType::Point) {
-        return pointsWithinPoly(*params.feature, *params.canonical, geoJSONSource);
+        return pointsWithinPolygons(*params.feature, *params.canonical, geoJSONSource);
+    } else {
+        mbgl::Log::Warning(mbgl::Event::General, "Within expression currently only support 'Point' geometry type");
     }
     return false;
 }

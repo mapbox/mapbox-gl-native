@@ -207,6 +207,9 @@ ParseResult convertLegacyFilter(const Convertible& values, Error& error) {
         return nullopt;
     } else if (arrayLength(values) <= 1) {
         return {std::make_unique<Literal>(*op != "any")};
+    } else if (*op == "within") {
+        expression::ParsingContext ctx;
+        return ctx.parseExpression(values);
     } else {
         return {
             *op == "==" ||

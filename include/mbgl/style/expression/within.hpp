@@ -11,9 +11,11 @@ namespace mbgl {
 namespace style {
 namespace expression {
 
-class Within : public Expression {
+class Within final : public Expression {
 public:
-    Within(GeoJSON& geojson) : Expression(Kind::Within, type::Boolean), geoJSONSource(geojson) {}
+    explicit Within(GeoJSON geojson);
+
+    ~Within() final;
 
     EvaluationResult evaluate(const EvaluationContext&) const override;
 
