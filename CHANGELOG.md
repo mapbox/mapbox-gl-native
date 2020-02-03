@@ -2,6 +2,12 @@
 
 ## master
 
+### 🐞 Bug fixes
+
+- [core] Use std::list instead of std::map for factory instance ([#16161](https://github.com/mapbox/mapbox-gl-native/pull/16161))
+
+  Factory 'get' method can be invoked recursively and stable iterators are required to guarantee safety.
+
 ## maps-v1.0.0 (2020.01-release-unicorn)
 
 ### ✨ New features
