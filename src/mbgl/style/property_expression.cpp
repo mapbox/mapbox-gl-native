@@ -54,5 +54,9 @@ const expression::Expression& PropertyExpressionBase::getExpression() const noex
     return *expression;
 }
 
+std::shared_ptr<const expression::Expression> PropertyExpressionBase::getSharedExpression() const noexcept {
+    return expression;
+}
+
 } // namespace style
 } // namespace mbgl
