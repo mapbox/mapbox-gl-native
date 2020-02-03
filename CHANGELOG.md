@@ -2,6 +2,8 @@
 
 ## master
 
+## maps-v1.0.1 (2020.01-release-unicorn)
+
 ### 🐞 Bug fixes
 
 - [core] Use std::list instead of std::map for factory instance ([#16161](https://github.com/mapbox/mapbox-gl-native/pull/16161))
