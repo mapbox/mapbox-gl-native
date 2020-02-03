@@ -6,7 +6,7 @@
 #import "MGLStyleLayer_Private.h"
 #import "MGLGeometry_Private.h"
 
-#include <mbgl/style/layers/custom_layer.hpp>
+#include <mbgl/gl/custom_layer.hpp>
 #include <mbgl/math/wrap.hpp>
 
 class MGLOpenGLLayerHost : public mbgl::style::CustomLayerHost {

@@ -2,7 +2,9 @@
 
 #include <mbgl/layermanager/background_layer_factory.hpp>
 #include <mbgl/layermanager/circle_layer_factory.hpp>
-#include <mbgl/layermanager/custom_layer_factory.hpp>
+#ifdef MBGL_RENDER_BACKEND_OPENGL
+#include <mbgl/gl/custom_layer_factory.hpp>
+#endif
 #include <mbgl/layermanager/fill_extrusion_layer_factory.hpp>
 #include <mbgl/layermanager/fill_layer_factory.hpp>
 #include <mbgl/layermanager/heatmap_layer_factory.hpp>
@@ -59,8 +61,10 @@ LayerManagerDefault::LayerManagerDefault() {
 #if !defined(MBGL_LAYER_HEATMAP_DISABLE_ALL)
     addLayerType(std::make_unique<HeatmapLayerFactory>());
 #endif
+#ifdef MBGL_RENDER_BACKEND_OPENGL
 #if !defined(MBGL_LAYER_CUSTOM_DISABLE_ALL)
     addLayerType(std::make_unique<CustomLayerFactory>());
+#endif
 #endif
 }
 
