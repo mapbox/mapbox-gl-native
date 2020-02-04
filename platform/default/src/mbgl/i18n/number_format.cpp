@@ -22,7 +22,11 @@ std::string formatNumber(double number,
                    .unit(icu::CurrencyUnit(ucurrency.getBuffer(), status))
                    .locale(locale)
                    .formatDouble(number, status)
+#if U_ICU_VERSION_MAJOR_NUM >= 62
+                   .toString(status);
+#else
                    .toString();
+#endif
     } else {
         ustr = icu::number::NumberFormatter::with()
 #if U_ICU_VERSION_MAJOR_NUM >= 62
@@ -32,7 +36,11 @@ std::string formatNumber(double number,
 #endif
                    .locale(locale)
                    .formatDouble(number, status)
+#if U_ICU_VERSION_MAJOR_NUM >= 62
+                   .toString(status);
+#else
                    .toString();
+#endif
     }
     return ustr.toUTF8String(formatted);
 }
