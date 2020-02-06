@@ -12,13 +12,15 @@ public:
     class Impl;
     const Impl& impl() const;
 
+protected:
+    Mutable<Source::Impl> createMutable() const noexcept final;
+
 private:
     void loadDescription(FileSource&) final;
     bool supportsLayerType(const mbgl::style::LayerTypeInfo*) const override;
     mapbox::base::WeakPtr<Source> makeWeakPtr() override {
         return weakFactory.makeWeakPtr();
     }
-    Mutable<Impl> mutableImpl() const;
     mapbox::base::WeakPtrFactory<Source> weakFactory {this};
 };
 

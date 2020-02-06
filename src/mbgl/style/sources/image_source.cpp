@@ -87,5 +87,9 @@ bool ImageSource::supportsLayerType(const mbgl::style::LayerTypeInfo* info) cons
     return mbgl::underlying_type(Tile::Kind::Raster) == mbgl::underlying_type(info->tileKind);
 }
 
+Mutable<Source::Impl> ImageSource::createMutable() const noexcept {
+    return staticMutableCast<Source::Impl>(makeMutable<Impl>(impl()));
+}
+
 } // namespace style
 } // namespace mbgl

@@ -50,6 +50,10 @@ public:
     mapbox::base::WeakPtr<Source> makeWeakPtr() override {
         return weakFactory.makeWeakPtr();
     }
+
+protected:
+    Mutable<Source::Impl> createMutable() const noexcept final;
+
 private:
     std::shared_ptr<ThreadPool> threadPool;
     std::unique_ptr<Actor<CustomTileLoader>> loader;
