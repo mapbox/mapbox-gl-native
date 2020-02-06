@@ -14,10 +14,6 @@
 #include <map>
 
 namespace mbgl {
-
-// For testing use only
-constexpr const char* READ_ONLY_MODE_KEY = "read-only-mode";
-
 class DatabaseFileSourceThread {
 public:
     DatabaseFileSourceThread(std::shared_ptr<FileSource> onlineFileSource_, std::string cachePath)
@@ -122,7 +118,7 @@ public:
 
     void setOfflineMapboxTileCountLimit(uint64_t limit) { db->setOfflineMapboxTileCountLimit(limit); }
 
-    void reopenDatabaseReadOnlyForTesting() { db->reopenDatabaseReadOnlyForTesting(); }
+    void reopenDatabaseReadOnly(bool readOnly) { db->reopenDatabaseReadOnly(readOnly); }
 
 private:
     expected<OfflineDownload*, std::exception_ptr> getDownload(int64_t regionID) {
@@ -278,9 +274,7 @@ void DatabaseFileSource::setOfflineMapboxTileCountLimit(uint64_t limit) const {
 
 void DatabaseFileSource::setProperty(const std::string& key, const mapbox::base::Value& value) {
     if (key == READ_ONLY_MODE_KEY && value.getBool()) {
-        if (*value.getBool()) {
-            impl->actor().invoke(&DatabaseFileSourceThread::reopenDatabaseReadOnlyForTesting);
-        }
+        impl->actor().invoke(&DatabaseFileSourceThread::reopenDatabaseReadOnly, *value.getBool());
     } else {
         std::string message = "Resource provider does not support property " + key;
         Log::Error(Event::General, message.c_str());

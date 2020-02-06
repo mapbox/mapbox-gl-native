@@ -7,6 +7,12 @@
 
 namespace mbgl {
 
+// Properties that may be supported by database file sources.
+
+// Property to set database mode. When set, database opens in read-only mode; database opens in read-write-create mode
+// otherwise. type: bool
+constexpr const char* READ_ONLY_MODE_KEY = "read-only-mode";
+
 class ResourceOptions;
 
 // TODO: Split DatabaseFileSource into Ambient cache and Database interfaces.

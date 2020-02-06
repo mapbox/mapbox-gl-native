@@ -94,8 +94,7 @@ public:
     std::exception_ptr pack();
     void runPackDatabaseAutomatically(bool autopack_) { autopack = autopack_; }
 
-    // For testing only
-    void reopenDatabaseReadOnlyForTesting();
+    void reopenDatabaseReadOnly(bool readOnly);
 
 private:
     void initialize();
@@ -113,6 +112,7 @@ private:
     void cleanup();
     bool disabled();
     void vacuum();
+    void checkFlags();
 
     mapbox::sqlite::Statement& getStatement(const char *);
 
