@@ -19,8 +19,10 @@
 #include <mbgl/style/layers/background_layer.hpp>
 #include <mbgl/style/layers/raster_layer.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
+#include <mbgl/style/sources/custom_geometry_source.hpp>
 #include <mbgl/style/sources/geojson_source.hpp>
 #include <mbgl/style/sources/image_source.hpp>
+#include <mbgl/style/sources/vector_source.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/util/async_task.hpp>
 #include <mbgl/util/color.hpp>
@@ -1118,4 +1120,134 @@ TEST(Map, NoHangOnMissingImage) {
     test.map.jumpTo(test.map.getStyle().getDefaultCamera());
     // The test passes if the following call does not hang.
     test.frontend.render(test.map);
+}
+
+TEST(Map, PrefetchDeltaOverride) {
+    MapTest<> test{1, MapMode::Continuous};
+
+    test.map.getStyle().loadJSON(
+        R"STYLE({
+                "layers": [{
+                    "id": "vector",
+                    "type": "fill",
+                    "source": "vector",
+                    "minzoom": 0,
+                    "maxzoom": 24
+                },
+                {
+                    "id": "custom",
+                    "type": "fill",
+                    "source": "custom",
+                    "minzoom": 0,
+                    "maxzoom": 24
+                }]
+                })STYLE");
+
+    // Vector source
+    auto vectorSource = std::make_unique<VectorSource>("vector", Tileset{{"a/{z}/{x}/{y}"}});
+    vectorSource->setPrefetchZoomDelta(0);
+    test.map.getStyle().addSource(std::move(vectorSource));
+
+    unsigned requestedTiles = 0u;
+    test.fileSource->tileResponse = [&](const Resource&) {
+        ++requestedTiles;
+        Response res;
+        res.noContent = true;
+        return res;
+    };
+
+    // Custom source
+    CustomGeometrySource::Options options;
+    options.cancelTileFunction = [](const CanonicalTileID&) {};
+    options.fetchTileFunction = [&requestedTiles, &test](const CanonicalTileID& tileID) {
+        ++requestedTiles;
+        auto* customSrc = static_cast<CustomGeometrySource*>(test.map.getStyle().getSource("custom"));
+        if (customSrc) {
+            customSrc->setTileData(tileID, {});
+        }
+    };
+    auto customSource = std::make_unique<CustomGeometrySource>("custom", std::move(options));
+    customSource->setPrefetchZoomDelta(0);
+    test.map.getStyle().addSource(std::move(customSource));
+
+    test.map.jumpTo(CameraOptions().withZoom(double(16)));
+    test.observer.didFinishLoadingMapCallback = [&] { test.runLoop.stop(); };
+    test.runLoop.run();
+    // 2 sources x 4 tiles
+    EXPECT_EQ(8, requestedTiles);
+
+    requestedTiles = 0u;
+
+    // Should request z12 tiles when delta is set back to default, that is 4.
+    test.observer.didFinishRenderingFrameCallback = [&](MapObserver::RenderFrameStatus status) {
+        if (status.mode == MapObserver::RenderMode::Full) {
+            test.runLoop.stop();
+        }
+    };
+
+    test.map.getStyle().getSource("vector")->setPrefetchZoomDelta(nullopt);
+    test.map.getStyle().getSource("custom")->setPrefetchZoomDelta(nullopt);
+    test.runLoop.run();
+
+    // Each source requests 4 additional parent tiles.
+    EXPECT_EQ(8, requestedTiles);
+}
+
+// Test that custom source's tile pyramid is reset
+// if there is a significant change.
+TEST(Map, PrefetchDeltaOverrideCustomSource) {
+    MapTest<> test{1, MapMode::Continuous};
+
+    test.map.getStyle().loadJSON(
+        R"STYLE({
+                "layers": [{
+                    "id": "custom",
+                    "type": "fill",
+                    "source": "custom",
+                    "source-layer": "a",
+                    "minzoom": 0,
+                    "maxzoom": 24
+                }]
+                })STYLE");
+
+    unsigned requestedTiles = 0u;
+
+    auto makeCustomSource = [&requestedTiles, &test] {
+        CustomGeometrySource::Options options;
+        options.cancelTileFunction = [](const CanonicalTileID&) {};
+        options.fetchTileFunction = [&requestedTiles, &test](const CanonicalTileID& tileID) {
+            ++requestedTiles;
+            auto* source = static_cast<CustomGeometrySource*>(test.map.getStyle().getSource("custom"));
+            if (source) {
+                source->setTileData(tileID, {});
+            }
+        };
+        return std::make_unique<CustomGeometrySource>("custom", std::move(options));
+    };
+
+    auto customSource = makeCustomSource();
+    customSource->setPrefetchZoomDelta(0);
+    test.map.getStyle().addSource(std::move(customSource));
+
+    test.map.jumpTo(CameraOptions().withZoom(double(16)));
+    test.observer.didFinishLoadingMapCallback = [&] { test.runLoop.stop(); };
+    test.runLoop.run();
+    EXPECT_EQ(4, requestedTiles);
+    requestedTiles = 0u;
+
+    test.observer.didFinishRenderingFrameCallback = [&](MapObserver::RenderFrameStatus status) {
+        if (status.mode == MapObserver::RenderMode::Full) {
+            test.runLoop.stop();
+        }
+    };
+
+    auto layer = test.map.getStyle().removeLayer("custom");
+    std::move(test.map.getStyle().removeSource("custom"));
+    test.map.getStyle().addLayer(std::move(layer));
+    test.map.getStyle().addSource(makeCustomSource());
+    test.runLoop.run();
+
+    // Source was significantly mutated, therefore, tile pyramid would be cleared
+    // and current zoom level + parent tiles would be re-requested.
+    EXPECT_EQ(8, requestedTiles);
 }
