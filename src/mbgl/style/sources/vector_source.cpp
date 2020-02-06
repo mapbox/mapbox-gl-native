@@ -91,5 +91,9 @@ bool VectorSource::supportsLayerType(const mbgl::style::LayerTypeInfo* info) con
     return mbgl::underlying_type(Tile::Kind::Geometry) == mbgl::underlying_type(info->tileKind);
 }
 
+Mutable<Source::Impl> VectorSource::createMutable() const noexcept {
+    return staticMutableCast<Source::Impl>(makeMutable<Impl>(impl()));
+}
+
 } // namespace style
 } // namespace mbgl

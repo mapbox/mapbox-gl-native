@@ -27,7 +27,7 @@ const CustomGeometrySource::Impl& CustomGeometrySource::impl() const {
 }
 
 void CustomGeometrySource::loadDescription(FileSource&) {
-    baseImpl = makeMutable<CustomGeometrySource::Impl>(impl(), loader->self());
+    baseImpl = makeMutable<Impl>(impl(), loader->self());
     loaded = true;
     observer->onSourceLoaded(*this);
 }
@@ -47,6 +47,10 @@ void CustomGeometrySource::invalidateTile(const CanonicalTileID& tileID) {
 
 void CustomGeometrySource::invalidateRegion(const LatLngBounds& bounds) {
     loader->self().invoke(&CustomTileLoader::invalidateRegion, bounds, impl().getZoomRange());
+}
+
+Mutable<Source::Impl> CustomGeometrySource::createMutable() const noexcept {
+    return staticMutableCast<Source::Impl>(makeMutable<Impl>(impl()));
 }
 
 } // namespace style

@@ -73,6 +73,8 @@ public:
     SourceObserver* observer = nullptr;
 
     virtual void loadDescription(FileSource&) = 0;
+    void setPrefetchZoomDelta(optional<uint8_t> delta) noexcept;
+    optional<uint8_t> getPrefetchZoomDelta() const noexcept;
     void dumpDebugLogs() const;
 
     virtual bool supportsLayerType(const mbgl::style::LayerTypeInfo*) const = 0;
@@ -85,6 +87,9 @@ public:
     mapbox::base::TypeWrapper peer;
 
     virtual mapbox::base::WeakPtr<Source> makeWeakPtr() = 0;
+
+protected:
+    virtual Mutable<Impl> createMutable() const noexcept = 0;
 };
 
 } // namespace style
