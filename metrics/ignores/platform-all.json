@@ -1,11 +1,5 @@
 {
     "expression-tests/collator/accent-equals-de": "Locale-specific behavior changes based on platform.",
-    "expression-tests/in/assert-array": "https://github.com/mapbox/mapbox-gl-native/issues/15893",
-    "expression-tests/in/assert-string": "https://github.com/mapbox/mapbox-gl-native/issues/15893",
-    "expression-tests/in/basic-array": "https://github.com/mapbox/mapbox-gl-native/issues/15893",
-    "expression-tests/in/basic-string": "https://github.com/mapbox/mapbox-gl-native/issues/15893",
-    "expression-tests/in/invalid-haystack": "https://github.com/mapbox/mapbox-gl-native/issues/15893",
-    "expression-tests/in/invalid-needle": "https://github.com/mapbox/mapbox-gl-native/issues/15893",
     "expression-tests/interpolate-hcl/linear": "https://github.com/mapbox/mapbox-gl-native/issues/8720",
     "expression-tests/interpolate-lab/linear": "https://github.com/mapbox/mapbox-gl-native/issues/8720",
     "expression-tests/is-supported-script/default": "This tests RTL text plugin behavior specific to GL JS",
