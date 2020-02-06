@@ -162,7 +162,7 @@ void OfflineDatabase::removeExisting() {
 
 void OfflineDatabase::removeOldCacheTable() {
     assert(db);
-    assert(!readOnly);
+    checkFlags();
 
     db->exec("DROP TABLE IF EXISTS http_cache");
     if (autopack) vacuum();
@@ -170,7 +170,7 @@ void OfflineDatabase::removeOldCacheTable() {
 
 void OfflineDatabase::createSchema() {
     assert(db);
-    assert(!readOnly);
+    checkFlags();
 
     vacuum();
     db->exec("PRAGMA journal_mode = DELETE");
@@ -183,7 +183,7 @@ void OfflineDatabase::createSchema() {
 
 void OfflineDatabase::migrateToVersion3() {
     assert(db);
-    assert(!readOnly);
+    checkFlags();
 
     vacuum();
     db->exec("PRAGMA user_version = 3");
@@ -197,7 +197,7 @@ void OfflineDatabase::migrateToVersion3() {
 
 void OfflineDatabase::migrateToVersion5() {
     assert(db);
-    assert(!readOnly);
+    checkFlags();
 
     db->exec("PRAGMA journal_mode = DELETE");
     db->exec("PRAGMA synchronous = FULL");
@@ -206,7 +206,7 @@ void OfflineDatabase::migrateToVersion5() {
 
 void OfflineDatabase::migrateToVersion6() {
     assert(db);
-    assert(!readOnly);
+    checkFlags();
 
     mapbox::sqlite::Transaction transaction(*db);
     db->exec("ALTER TABLE resources ADD COLUMN must_revalidate INTEGER NOT NULL DEFAULT 0");
@@ -217,13 +217,19 @@ void OfflineDatabase::migrateToVersion6() {
 
 void OfflineDatabase::vacuum() {
     assert(db);
-    assert(!readOnly);
+    checkFlags();
 
     if (getPragma<int64_t>("PRAGMA auto_vacuum") != 2 /*INCREMENTAL*/) {
         db->exec("PRAGMA auto_vacuum = INCREMENTAL");
         db->exec("VACUUM");
     } else {
         db->exec("PRAGMA incremental_vacuum");
+    }
+}
+
+void OfflineDatabase::checkFlags() {
+    if (readOnly) {
+        throw std::runtime_error("Cannot modify database in read-only mode");
     }
 }
 
@@ -269,7 +275,7 @@ optional<int64_t> OfflineDatabase::hasInternal(const Resource& resource) {
 }
 
 std::pair<bool, uint64_t> OfflineDatabase::put(const Resource& resource, const Response& response) try {
-    assert(!readOnly);
+    if (readOnly) return {false, 0};
 
     if (!db) {
         initialize();
@@ -289,7 +295,7 @@ std::pair<bool, uint64_t> OfflineDatabase::put(const Resource& resource, const R
 }
 
 std::pair<bool, uint64_t> OfflineDatabase::putInternal(const Resource& resource, const Response& response, bool evict_) {
-    assert(!readOnly);
+    checkFlags();
 
     if (response.error) {
         return { false, 0 };
@@ -394,7 +400,7 @@ bool OfflineDatabase::putResource(const Resource& resource,
                                   const Response& response,
                                   const std::string& data,
                                   bool compressed) {
-    assert(!readOnly);
+    checkFlags();
 
     if (response.notModified) {
         // clang-format off
@@ -582,7 +588,7 @@ bool OfflineDatabase::putTile(const Resource::TileData& tile,
                               const Response& response,
                               const std::string& data,
                               bool compressed) {
-    assert(!readOnly);
+    checkFlags();
 
     if (response.notModified) {
         // clang-format off
@@ -684,7 +690,7 @@ bool OfflineDatabase::putTile(const Resource::TileData& tile,
 }
 
 std::exception_ptr OfflineDatabase::invalidateAmbientCache() try {
-    assert(!readOnly);
+    checkFlags();
 
     // clang-format off
     mapbox::sqlite::Query tileQuery{ getStatement(
@@ -717,7 +723,7 @@ std::exception_ptr OfflineDatabase::invalidateAmbientCache() try {
 }
 
 std::exception_ptr OfflineDatabase::clearAmbientCache() try {
-    assert(!readOnly);
+    checkFlags();
 
     // clang-format off
     mapbox::sqlite::Query tileQuery{ getStatement(
@@ -750,7 +756,7 @@ std::exception_ptr OfflineDatabase::clearAmbientCache() try {
 }
 
 std::exception_ptr OfflineDatabase::invalidateRegion(int64_t regionID) try {
-    assert(!readOnly);
+    checkFlags();
 
     {
         // clang-format off
@@ -814,7 +820,7 @@ expected<OfflineRegions, std::exception_ptr> OfflineDatabase::listRegions() try 
 expected<OfflineRegion, std::exception_ptr>
 OfflineDatabase::createRegion(const OfflineRegionDefinition& definition,
                               const OfflineRegionMetadata& metadata) try {
-    assert(!readOnly);
+    checkFlags();
 
     // clang-format off
     mapbox::sqlite::Query query{ getStatement(
@@ -833,7 +839,7 @@ OfflineDatabase::createRegion(const OfflineRegionDefinition& definition,
 
 expected<OfflineRegions, std::exception_ptr>
 OfflineDatabase::mergeDatabase(const std::string& sideDatabasePath) {
-    assert(!readOnly);
+    checkFlags();
 
     try {
         // clang-format off
@@ -911,7 +917,7 @@ OfflineDatabase::mergeDatabase(const std::string& sideDatabasePath) {
 
 expected<OfflineRegionMetadata, std::exception_ptr>
 OfflineDatabase::updateMetadata(const int64_t regionID, const OfflineRegionMetadata& metadata) try {
-    assert(!readOnly);
+    checkFlags();
 
     // clang-format off
     mapbox::sqlite::Query query{ getStatement(
@@ -929,7 +935,7 @@ OfflineDatabase::updateMetadata(const int64_t regionID, const OfflineRegionMetad
 }
 
 std::exception_ptr OfflineDatabase::deleteRegion(OfflineRegion&& region) try {
-    assert(!readOnly);
+    checkFlags();
 
     {
         mapbox::sqlite::Query query{ getStatement("DELETE FROM regions WHERE id = ?") };
@@ -966,7 +972,7 @@ optional<int64_t> OfflineDatabase::hasRegionResource(const Resource& resource) t
 uint64_t OfflineDatabase::putRegionResource(int64_t regionID,
                                             const Resource& resource,
                                             const Response& response) try {
-    assert(!readOnly);
+    checkFlags();
 
     if (!db) {
         initialize();
@@ -983,7 +989,7 @@ uint64_t OfflineDatabase::putRegionResource(int64_t regionID,
 void OfflineDatabase::putRegionResources(int64_t regionID,
                                          const std::list<std::tuple<Resource, Response>>& resources,
                                          OfflineRegionStatus& status) try {
-    assert(!readOnly);
+    checkFlags();
 
     if (!db) {
         initialize();
@@ -1028,7 +1034,7 @@ void OfflineDatabase::putRegionResources(int64_t regionID,
 }
 
 uint64_t OfflineDatabase::putRegionResourceInternal(int64_t regionID, const Resource& resource, const Response& response) {
-    assert(!readOnly);
+    checkFlags();
 
     uint64_t size = putInternal(resource, response, false).second;
     bool previouslyUnused = markUsed(regionID, resource);
@@ -1048,7 +1054,7 @@ uint64_t OfflineDatabase::putRegionResourceInternal(int64_t regionID, const Reso
 }
 
 bool OfflineDatabase::markUsed(int64_t regionID, const Resource& resource) {
-    assert(!readOnly);
+    checkFlags();
 
     if (resource.kind == Resource::Kind::Tile) {
         // clang-format off
@@ -1202,7 +1208,7 @@ T OfflineDatabase::getPragma(const char* sql) {
 // delete an arbitrary number of old cache entries. The free pages approach saves
 // us from calling VACUUM or keeping a running total, which can be costly.
 bool OfflineDatabase::evict(uint64_t neededFreeSize) {
-    assert(!readOnly);
+    checkFlags();
 
     uint64_t pageSize = getPragma<int64_t>("PRAGMA page_size");
     uint64_t pageCount = getPragma<int64_t>("PRAGMA page_count");
@@ -1378,11 +1384,11 @@ std::exception_ptr OfflineDatabase::resetDatabase() try {
     return std::current_exception();
 }
 
-void OfflineDatabase::reopenDatabaseReadOnlyForTesting() {
-    readOnly = true;
-
+void OfflineDatabase::reopenDatabaseReadOnly(bool readOnly_) {
+    if (readOnly == readOnly_) return;
     try {
         cleanup();
+        readOnly = readOnly_;
         initialize();
     } catch (...) {
         handleError("reopen database read-only");
