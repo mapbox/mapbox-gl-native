@@ -9,10 +9,10 @@
 #include <mbgl/util/mapbox.hpp>
 #include <mbgl/util/expected.hpp>
 
-#include <unordered_map>
+#include <list>
+#include <map>
 #include <memory>
 #include <string>
-#include <list>
 
 namespace mapbox {
 namespace sqlite {
@@ -38,8 +38,6 @@ struct MapboxTileLimitExceededException :  util::Exception {
 
 class OfflineDatabase : private util::noncopyable {
 public:
-    // Limits affect ambient caching (put) only; resources required by offline
-    // regions are exempt.
     OfflineDatabase(std::string path);
     ~OfflineDatabase();
 
@@ -96,6 +94,8 @@ public:
     std::exception_ptr pack();
     void runPackDatabaseAutomatically(bool autopack_) { autopack = autopack_; }
 
+    void reopenDatabaseReadOnly(bool readOnly);
+
 private:
     void initialize();
     void handleError(const mapbox::sqlite::Exception&, const char* action);
@@ -112,6 +112,7 @@ private:
     void cleanup();
     bool disabled();
     void vacuum();
+    void checkFlags();
 
     mapbox::sqlite::Statement& getStatement(const char *);
 
@@ -139,7 +140,7 @@ private:
 
     std::string path;
     std::unique_ptr<mapbox::sqlite::Database> db;
-    std::unordered_map<const char *, const std::unique_ptr<mapbox::sqlite::Statement>> statements;
+    std::map<const char*, const std::unique_ptr<mapbox::sqlite::Statement>> statements;
 
     template <class T>
     T getPragma(const char *);
@@ -151,6 +152,7 @@ private:
 
     bool evict(uint64_t neededFreeSize);
     bool autopack = true;
+    bool readOnly = false;
 };
 
 } // namespace mbgl
