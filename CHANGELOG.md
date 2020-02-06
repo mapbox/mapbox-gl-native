@@ -2,6 +2,11 @@
 
 ## master
 
+### ✨ New features
+
+- [core] Global settings API ([#16174](https://github.com/mapbox/mapbox-gl-native/pull/16174))
+
+  Global settings API provides means of managing non-persistent in-process settings. Initial implementation contains support for experimental option for setting thread priorities.
 ## maps-v1.0.1 (2020.01-release-unicorn)
 
 ### 🐞 Bug fixes
