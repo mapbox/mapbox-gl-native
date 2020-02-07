@@ -78,13 +78,11 @@ before_build:
 
 build_script:
   - call "%VCVARSALL%" amd64
-  - cmake -E remove ../next/vendor
-  - cmake -E copy_directory ../vendor ../next/vendor
   - cmake -G "Ninja"
       -DCMAKE_BUILD_TYPE=%CONFIGURATION%
       -DCMAKE_MAKE_PROGRAM="%APPVEYOR_BUILD_FOLDER%\platform\qt\ninja.exe"
       -DCMAKE_PREFIX_PATH=%QT_PREFIX%
       -DMBGL_WITH_QT=ON
-      ../next
+      ..
   - cmake --build . --target qmapboxgl -- -j %NUMBER_OF_PROCESSORS%
   - clcache -s
