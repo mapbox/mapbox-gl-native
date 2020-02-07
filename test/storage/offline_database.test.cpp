@@ -1875,3 +1875,30 @@ TEST(OfflineDatabase, ResetDatabase) {
     EXPECT_EQ(1u, log.count({ EventSeverity::Warning, Event::Database, -1, "Removing existing incompatible offline database" }));
     EXPECT_EQ(0u, log.uncheckedCount());
 }
+
+TEST(OfflineDatabase, PutResourceReadOnlyMode) {
+    FixtureLog log;
+    OfflineDatabase db(":memory:");
+
+    Resource resource{Resource::Style, "http://example.com/"};
+    Response response;
+    response.data = std::make_shared<std::string>("success");
+
+    // In read-only mode put() is a no-op
+    db.reopenDatabaseReadOnly(true /*readOnly*/);
+    auto failedPutResult = db.put(resource, response);
+    EXPECT_FALSE(failedPutResult.first);
+    EXPECT_EQ(0u, failedPutResult.second);
+
+    // put() works, if read-only mode is disabled
+    db.reopenDatabaseReadOnly(false /*readOnly*/);
+    auto succeededPutResult = db.put(resource, response);
+    EXPECT_TRUE(succeededPutResult.first);
+    EXPECT_EQ(7u, succeededPutResult.second);
+
+    auto getResult = db.get(resource);
+    EXPECT_EQ(nullptr, getResult->error);
+    EXPECT_EQ("success", *getResult->data);
+
+    EXPECT_EQ(0u, log.uncheckedCount());
+}
