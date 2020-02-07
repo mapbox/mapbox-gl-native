@@ -18,6 +18,7 @@ public:
     Immutable<CustomGeometrySource::TileOptions> getTileOptions() const;
     Range<uint8_t> getZoomRange() const;
     optional<ActorRef<CustomTileLoader>> getTileLoader() const;
+    bool operator!=(const Impl&) const noexcept;
 
 private:
     Immutable<CustomGeometrySource::TileOptions> tileOptions;
