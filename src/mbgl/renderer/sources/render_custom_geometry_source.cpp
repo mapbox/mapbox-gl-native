@@ -23,7 +23,14 @@ void RenderCustomGeometrySource::update(Immutable<style::Source::Impl> baseImpl_
                                  const TileParameters& parameters) {
     if (baseImpl != baseImpl_) {
         std::swap(baseImpl, baseImpl_);
-        tilePyramid.clearAll();
+
+        // Clear tile pyramid only if updated source has different tile options,
+        // zoom range or initialization state for a custom tile loader.
+        auto newImpl = staticImmutableCast<style::CustomGeometrySource::Impl>(baseImpl);
+        auto currentImpl = staticImmutableCast<style::CustomGeometrySource::Impl>(baseImpl_);
+        if (*newImpl != *currentImpl) {
+            tilePyramid.clearAll();
+        }
     }
 
     enabled = needsRendering;
