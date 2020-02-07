@@ -7,41 +7,58 @@
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/string.hpp>
 
+#include <rapidjson/document.h>
+#include <mbgl/style/conversion/json.hpp>
+
 namespace mbgl {
 namespace {
 
-double isLeft(mbgl::Point<double> P0, mbgl::Point<double> P1, mbgl::Point<double> P2) {
-    return ((P1.x - P0.x) * (P2.y - P0.y) - (P2.x - P0.x) * (P1.y - P0.y));
+class PolygonFeature : public GeometryTileFeature {
+public:
+    const Feature& feature;
+    mutable optional<GeometryCollection> geometry;
+
+    PolygonFeature(const Feature& feature_, const CanonicalTileID& canonical) : feature(feature_) {
+        geometry = convertGeometry(feature.geometry, canonical);
+        assert(geometry);
+        geometry = fixupPolygons(*geometry);
+    }
+
+    FeatureType getType() const override { return FeatureType::Polygon; }
+    const PropertyMap& getProperties() const override { return feature.properties; }
+    FeatureIdentifier getID() const override { return feature.id; }
+    optional<mbgl::Value> getValue(const std::string& /*key*/) const override { return optional<mbgl::Value>(); }
+    const GeometryCollection& getGeometries() const override {
+        assert(geometry);
+        return *geometry;
+    }
+};
+
+bool rayIntersect(const mbgl::Point<double>& p, const mbgl::Point<double>& p1, const mbgl::Point<double>& p2) {
+    return ((p1.y > p.y) != (p2.y > p.y)) && (p.x < (p2.x - p1.x) * (p.y - p1.y) / (p2.y - p1.y) + p1.x);
 }
 
-// winding number algorithm for checking if point inside a ploygon or not.
-// http://geomalgorithms.com/a03-_inclusion.html#wn_PnPoly()
-bool pointWithinPolygons(mbgl::Point<double> point, const mapbox::geometry::polygon<double>& polys) {
-    //  wn = the winding number (=0 only when point is outside)
-    int wn = 0;
-    for (auto poly : polys) {
-        auto size = poly.size();
-        // loop through every edge of the polygon
+// ray casting algorithm for detecting if point is in polygon
+bool pointWithinPolygon(const mbgl::Point<double>& point, const mapbox::geometry::polygon<double>& polygon) {
+    bool within = false;
+    for (auto ring : polygon) {
+        auto size = ring.size();
+        // loop through every edge of the ring
         for (decltype(size) i = 0; i < size - 1; ++i) {
-            if (poly[i].y <= point.y) {
-                if (poly[i + 1].y > point.y) { // upward horizontal crossing from point to edge E(poly[i], poly[i+1])
-                    if (isLeft(poly[i], poly[i + 1], point) > 0) {
-                        ++wn;
-                    }
-                }
-            } else {
-                if (poly[i + 1].y <= point.y) { // downward crossing
-                    if (isLeft(poly[i], poly[i + 1], point) < 0) {
-                        --wn;
-                    }
-                }
+            if (rayIntersect(point, ring[i], ring[i + 1])) {
+                within = !within;
             }
         }
-        if (wn != 0) {
-            return true;
-        }
     }
-    return wn != 0;
+    return within;
+}
+
+bool pointWithinPolygons(const mbgl::Point<double>& point, const mapbox::geometry::multi_polygon<double>& polygons) {
+    for (auto polygon : polygons) {
+        auto within = pointWithinPolygon(point, polygon);
+        if (within) return true;
+    }
+    return false;
 }
 
 bool pointsWithinPolygons(const mbgl::GeometryTileFeature& feature,
@@ -49,8 +66,11 @@ bool pointsWithinPolygons(const mbgl::GeometryTileFeature& feature,
                           const mbgl::GeoJSON& geoJson) {
     return geoJson.match(
         [&feature, &canonical](const mapbox::geometry::geometry<double>& geometrySet) -> bool {
-            return geometrySet.match(
-                [&feature, &canonical](const mapbox::geometry::polygon<double>& polygons) -> bool {
+            mbgl::Feature f(geometrySet);
+            PolygonFeature polyFeature(f, canonical);
+            auto refinedGeoSet = convertGeometry(polyFeature, canonical);
+            return refinedGeoSet.match(
+                [&feature, &canonical](const mapbox::geometry::multi_polygon<double>& polygons) -> bool {
                     return convertGeometry(feature, canonical)
                         .match(
                             [&polygons](const mapbox::geometry::point<double>& point) -> bool {
@@ -60,6 +80,24 @@ bool pointsWithinPolygons(const mbgl::GeometryTileFeature& feature,
                                 auto result = false;
                                 for (const auto& p : points) {
                                     result = pointWithinPolygons(p, polygons);
+                                    if (!result) {
+                                        return result;
+                                    }
+                                }
+                                return result;
+                            },
+                            [](const auto&) -> bool { return false; });
+                },
+                [&feature, &canonical](const mapbox::geometry::polygon<double>& polygon) -> bool {
+                    return convertGeometry(feature, canonical)
+                        .match(
+                            [&polygon](const mapbox::geometry::point<double>& point) -> bool {
+                                return pointWithinPolygon(point, polygon);
+                            },
+                            [&polygon](const mapbox::geometry::multi_point<double>& points) -> bool {
+                                auto result = false;
+                                for (const auto& p : points) {
+                                    result = pointWithinPolygon(p, polygon);
                                     if (!result) {
                                         return result;
                                     }
@@ -109,11 +147,11 @@ EvaluationResult Within::evaluate(const EvaluationContext& params) const {
         return false;
     }
     auto geometryType = params.feature->getType();
-    // Currently only support Point/Points in polygon
+    // Currently only support Point/Points in Polygon/Polygons
     if (geometryType == FeatureType::Point) {
         return pointsWithinPolygons(*params.feature, *params.canonical, geoJSONSource);
     } else {
-        mbgl::Log::Warning(mbgl::Event::General, "Within expression currently only support 'Point' geometry type");
+        mbgl::Log::Warning(mbgl::Event::General, "within expression currently only support 'Point' geometry type");
     }
     return false;
 }
@@ -122,7 +160,7 @@ ParseResult Within::parse(const Convertible& value, ParsingContext& ctx) {
     if (isArray(value)) {
         // object value, quoted with ["Within", value]
         if (arrayLength(value) != 2) {
-            ctx.error("'Within' expression requires exactly one argument, but found " +
+            ctx.error("'within' expression requires exactly one argument, but found " +
                       util::toString(arrayLength(value) - 1) + " instead.");
             return ParseResult();
         }
@@ -136,8 +174,37 @@ ParseResult Within::parse(const Convertible& value, ParsingContext& ctx) {
     return ParseResult();
 }
 
+Value valueConverter(const mapbox::geojson::rapidjson_value& v) {
+    if (v.IsDouble()) {
+        return v.GetDouble();
+    }
+    if (v.IsString()) {
+        return std::string(v.GetString());
+    }
+    if (v.IsArray()) {
+        std::vector<Value> result;
+        for (const auto& m : v.GetArray()) {
+            result.push_back(valueConverter(m));
+        }
+        return result;
+    }
+    // Ignore other types as valid geojson only contains above types.
+    return Null;
+}
+
 mbgl::Value Within::serialize() const {
-    return std::vector<mbgl::Value>{{getOperator()}, {mapbox::geojson::stringify(geoJSONSource)}};
+    std::unordered_map<std::string, Value> serialized;
+    rapidjson::CrtAllocator allocator;
+    const mapbox::geojson::rapidjson_value value = mapbox::geojson::convert(geoJSONSource, allocator);
+    if (value.IsObject()) {
+        for (const auto& m : value.GetObject()) {
+            serialized.emplace(m.name.GetString(), valueConverter(m.value));
+        }
+    } else {
+        mbgl::Log::Error(mbgl::Event::General,
+                         "Failed to serialize 'within' expression, converted rapidJSON is not an object");
+    }
+    return std::vector<mbgl::Value>{{getOperator(), *fromExpressionValue<mbgl::Value>(serialized)}};
 }
 
 } // namespace expression

@@ -7,6 +7,8 @@
 #include <mbgl/style/expression/dsl.hpp>
 #include <mbgl/style/expression/format_section_override.hpp>
 
+#include <sstream>
+
 using namespace mbgl;
 using namespace mbgl::style;
 using namespace mbgl::style::expression;
@@ -216,5 +218,101 @@ TEST(PropertyExpression, ImageExpression) {
         evaluatedImage = propExpr.evaluate(18.0, emptyTileFeature, availableImages, expression::Image());
         EXPECT_TRUE(evaluatedImage.isAvailable());
         EXPECT_EQ(evaluatedImage.id(), "bicycle-15"s);
+    }
+}
+
+TEST(PropertyExpression, WithinExpression) {
+    CanonicalTileID canonicalTileID(3, 3, 3);
+
+    // geoJSON source must be Polygon.(Currently only supports Polygon)
+    static const std::string invalidGeoSource = R"({
+      "type": "LineString",
+      "coordinates": [[0, 0], [0, 5], [5, 5], [5, 0]]
+    })";
+    static const std::string validGeoSource = R"data(
+    {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [-11.689453125, -9.79567758282973],
+          [2.021484375, -10.012129557908128],
+          [-15.99609375, -17.392579271057766],
+          [-5.9765625, -5.659718554577273],
+          [-16.259765625, -3.7327083213358336],
+          [-17.75390625, -12.897489183755892],
+          [-17.138671875, -21.002471054356715],
+          [4.482421875, -16.8886597873816],
+          [3.076171875, -7.01366792756663],
+          [ -5.9326171875, 0.6591651462894632],
+          [-16.1279296875, 1.4939713066293239],
+          [-11.689453125, -9.79567758282973]
+        ]
+      ]
+        })data";
+
+    // evaluation test with invalid geojson source
+    {
+        std::stringstream ss;
+        ss << std::string(R"(["within", )") << invalidGeoSource << std::string(R"( ])");
+        auto expression = createExpression(ss.str().c_str());
+        ASSERT_FALSE(expression);
+    }
+
+    // evaluation test with valid geojson source
+    std::stringstream ss;
+    ss << std::string(R"(["within", )") << validGeoSource << std::string(R"( ])");
+    auto expression = createExpression(ss.str().c_str());
+    ASSERT_TRUE(expression);
+    PropertyExpression<bool> propExpr(std::move(expression));
+
+    // evaluation test with valid geojson source but FeatureType is not Point (currently only support
+    // FeatureType::Point)
+    {
+        // testLine is inside polygon, but will return false
+        LineString<double> testLine{{-9.228515625, -17.560246503294888}, {-2.4609375, -16.04581345375217}};
+        auto geoLine = convertGeometry(testLine, canonicalTileID);
+        StubGeometryTileFeature lineFeature(FeatureType::LineString, geoLine);
+
+        auto evaluatedResult = propExpr.evaluate(EvaluationContext(&lineFeature).withCanonicalTileID(&canonicalTileID));
+        EXPECT_FALSE(evaluatedResult);
+    }
+
+    // evaluation test with valid geojson source and valid point features
+    {
+        auto getPointFeature = [&canonicalTileID](const Point<double>& testPoint) -> StubGeometryTileFeature {
+            auto geoPoint = convertGeometry(testPoint, canonicalTileID);
+            StubGeometryTileFeature pointFeature(FeatureType::Point, geoPoint);
+            return pointFeature;
+        };
+
+        // check `within` algorithm
+        auto pointFeature = getPointFeature(Point<double>(-10.72265625, -7.27529233637217));
+        auto evaluatedResult =
+            propExpr.evaluate(EvaluationContext(&pointFeature).withCanonicalTileID(&canonicalTileID));
+        EXPECT_FALSE(evaluatedResult);
+
+        pointFeature = getPointFeature(Point<double>(-7.646484374999999, -12.382928338487396));
+        evaluatedResult = propExpr.evaluate(EvaluationContext(&pointFeature).withCanonicalTileID(&canonicalTileID));
+        EXPECT_FALSE(evaluatedResult);
+
+        pointFeature = getPointFeature(Point<double>(-15.2490234375, -2.986927393334863));
+        evaluatedResult = propExpr.evaluate(EvaluationContext(&pointFeature).withCanonicalTileID(&canonicalTileID));
+        EXPECT_FALSE(evaluatedResult);
+
+        pointFeature = getPointFeature(Point<double>(-10.590820312499998, 2.4601811810210052));
+        evaluatedResult = propExpr.evaluate(EvaluationContext(&pointFeature).withCanonicalTileID(&canonicalTileID));
+        EXPECT_FALSE(evaluatedResult);
+
+        pointFeature = getPointFeature(Point<double>(-3.9990234375, -4.915832801313164));
+        evaluatedResult = propExpr.evaluate(EvaluationContext(&pointFeature).withCanonicalTileID(&canonicalTileID));
+        EXPECT_TRUE(evaluatedResult);
+
+        pointFeature = getPointFeature(Point<double>(-1.1865234375, -16.63619187839765));
+        evaluatedResult = propExpr.evaluate(EvaluationContext(&pointFeature).withCanonicalTileID(&canonicalTileID));
+        EXPECT_TRUE(evaluatedResult);
+
+        pointFeature = getPointFeature(Point<double>(-15.5126953125, -11.73830237143684));
+        evaluatedResult = propExpr.evaluate(EvaluationContext(&pointFeature).withCanonicalTileID(&canonicalTileID));
+        EXPECT_TRUE(evaluatedResult);
     }
 }

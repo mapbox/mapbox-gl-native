@@ -191,6 +191,11 @@ public:
                               const Feature& feature,
                               optional<double> colorRampParameter,
                               const std::set<std::string>& availableImages) const;
+    EvaluationResult evaluate(optional<float> zoom,
+                              const Feature& feature,
+                              optional<double> colorRampParameter,
+                              const std::set<std::string>& availableImages,
+                              const CanonicalTileID& canonical) const;
     EvaluationResult evaluate(optional<mbgl::Value> accumulated, const Feature& feature) const;
 
     /**

@@ -14,6 +14,8 @@
 
 #include <args.hxx>
 
+#include <regex>
+
 using namespace mbgl;
 using namespace mbgl::style;
 using namespace mbgl::style::conversion;
@@ -254,6 +256,19 @@ bool parseInputs(const JSValue& inputsValue, TestData& data) {
             heatmapDensity = evaluationContext["heatmapDensity"].GetDouble();
         }
 
+        // Parse canonicalID
+        optional<CanonicalTileID> canonical;
+        if (evaluationContext.HasMember("canonicalID")) {
+            assert(evaluationContext["canonicalID"].IsObject());
+            assert(
+                evaluationContext["canonicalID"].HasMember("z") && evaluationContext["canonicalID"]["z"].IsNumber() &&
+                evaluationContext["canonicalID"].HasMember("x") && evaluationContext["canonicalID"]["x"].IsNumber() &&
+                evaluationContext["canonicalID"].HasMember("y") && evaluationContext["canonicalID"]["y"].IsNumber());
+            canonical = CanonicalTileID(evaluationContext["canonicalID"]["z"].GetUint(),
+                                        evaluationContext["canonicalID"]["x"].GetUint(),
+                                        evaluationContext["canonicalID"]["y"].GetUint());
+        }
+
         // Parse availableImages
         std::set<std::string> availableImages;
         if (evaluationContext.HasMember("availableImages")) {
@@ -282,8 +297,11 @@ bool parseInputs(const JSValue& inputsValue, TestData& data) {
             feature.id = mapbox::geojson::convert<mapbox::feature::identifier>(featureObject["id"]);
         }
 
-        data.inputs.emplace_back(
-            std::move(zoom), std::move(heatmapDensity), std::move(availableImages), std::move(feature));
+        data.inputs.emplace_back(std::move(zoom),
+                                 std::move(heatmapDensity),
+                                 std::move(canonical),
+                                 std::move(availableImages),
+                                 std::move(feature));
     }
     return true;
 }
@@ -294,11 +312,11 @@ std::tuple<filesystem::path, std::vector<filesystem::path>, bool, uint32_t> pars
     args::ArgumentParser argumentParser("Mapbox GL Expression Test Runner");
 
     args::HelpFlag helpFlag(argumentParser, "help", "Display this help menu", { 'h', "help" });
-    args::Flag shuffleFlag(argumentParser, "shuffle", "Toggle shuffling the tests order",
-                           { 's', "shuffle" });
+    args::Flag shuffleFlag(argumentParser, "shuffle", "Toggle shuffling the tests order", {'s', "shuffle"});
     args::ValueFlag<uint32_t> seedValue(argumentParser, "seed", "Shuffle seed (default: random)",
                                         { "seed" });
     args::PositionalList<std::string> testNameValues(argumentParser, "URL", "Test name(s)");
+    args::ValueFlag<std::string> testFilterValue(argumentParser, "filter", "Test filter regex", {'f', "filter"});
 
     try {
         argumentParser.ParseCLI(argc, argv);
@@ -336,6 +354,7 @@ std::tuple<filesystem::path, std::vector<filesystem::path>, bool, uint32_t> pars
         paths.emplace_back(rootPath);
     }
 
+    auto testFilter = testFilterValue ? args::get(testFilterValue) : std::string{};
     // Recursively traverse through the test paths and collect test directories containing "test.json".
     std::vector<filesystem::path> testPaths;
     testPaths.reserve(paths.size());
@@ -346,6 +365,9 @@ std::tuple<filesystem::path, std::vector<filesystem::path>, bool, uint32_t> pars
         }
 
         for (auto& testPath : filesystem::recursive_directory_iterator(path)) {
+            if (!testFilter.empty() && !std::regex_search(testPath.path().string(), std::regex(testFilter))) {
+                continue;
+            }
             if (testPath.path().filename() == "test.json") {
                 testPaths.emplace_back(testPath.path());
             }

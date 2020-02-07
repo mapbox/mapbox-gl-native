@@ -2,6 +2,7 @@
 #include <mbgl/tile/tile_id.hpp>
 
 #include <mapbox/geometry/wagyu/wagyu.hpp>
+#include <mbgl/math/clamp.hpp>
 
 namespace mbgl {
 
@@ -171,6 +172,82 @@ Feature::geometry_type convertGeometry(const GeometryTileFeature& geometryTileFe
 
     // Unreachable, but placate GCC.
     return Point<double>();
+}
+
+GeometryCollection convertGeometry(const Feature::geometry_type& geometryTileFeature, const CanonicalTileID& tileID) {
+    const double size = util::EXTENT * std::pow(2, tileID.z);
+    const double x0 = util::EXTENT * static_cast<double>(tileID.x);
+    const double y0 = util::EXTENT * static_cast<double>(tileID.y);
+
+    auto latLonToTileCoodinates = [&](const Point<double>& c) {
+        Point<int16_t> p;
+
+        auto x = (c.x + 180.0) * size / 360.0 - x0;
+        p.x =
+            int16_t(util::clamp<int64_t>(x, std::numeric_limits<int16_t>::min(), std::numeric_limits<int16_t>::max()));
+
+        auto y = (180 - (std::log(std::tan((c.y + 90) * M_PI / 360.0)) * 180 / M_PI)) * size / 360 - y0;
+        p.y =
+            int16_t(util::clamp<int64_t>(y, std::numeric_limits<int16_t>::min(), std::numeric_limits<int16_t>::max()));
+
+        return p;
+    };
+
+    return geometryTileFeature.match(
+        [&](const Point<double>& point) -> GeometryCollection { return {{latLonToTileCoodinates(point)}}; },
+        [&](const MultiPoint<double>& points) -> GeometryCollection {
+            GeometryCollection result;
+            std::vector<Point<int16_t>> temp;
+            for (const auto p : points) {
+                temp.emplace_back(latLonToTileCoodinates(p));
+            }
+            result = {temp};
+            return result;
+        },
+        [&](const LineString<double>& lineString) -> GeometryCollection {
+            GeometryCollection result;
+            std::vector<Point<int16_t>> temp;
+            for (const auto p : lineString) {
+                temp.emplace_back(latLonToTileCoodinates(p));
+            }
+            result = {temp};
+            return result;
+        },
+        [&](const MultiLineString<double>& lineStrings) -> GeometryCollection {
+            GeometryCollection result;
+            for (const auto line : lineStrings) {
+                std::vector<Point<int16_t>> temp;
+                for (const auto p : line) {
+                    temp.emplace_back(latLonToTileCoodinates(p));
+                }
+                result.emplace_back(temp);
+            }
+            return result;
+        },
+        [&](const Polygon<double> polygon) -> GeometryCollection {
+            GeometryCollection result;
+            for (const auto line : polygon) {
+                std::vector<Point<int16_t>> temp;
+                for (const auto p : line) {
+                    temp.emplace_back(latLonToTileCoodinates(p));
+                }
+                result.emplace_back(temp);
+            }
+            return result;
+        },
+        [&](const MultiPolygon<double> polygons) -> GeometryCollection {
+            GeometryCollection result;
+            for (const auto polygon : polygons)
+                for (const auto line : polygon) {
+                    LineString<int16_t> temp;
+                    for (const auto p : line) {
+                        temp.emplace_back(latLonToTileCoodinates(p));
+                    }
+                    result.emplace_back(temp);
+                }
+            return result;
+        },
+        [](const auto&) -> GeometryCollection { return GeometryCollection(); });
 }
 
 Feature convertFeature(const GeometryTileFeature& geometryTileFeature, const CanonicalTileID& tileID) {
