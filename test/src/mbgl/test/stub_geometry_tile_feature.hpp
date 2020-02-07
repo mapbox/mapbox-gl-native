@@ -16,6 +16,9 @@ public:
           geometry(std::move(geometry_)) {
     }
 
+    StubGeometryTileFeature(FeatureType type_, GeometryCollection geometry_)
+        : type(type_), geometry(std::move(geometry_)) {}
+
     PropertyMap properties;
     FeatureIdentifier id;
     FeatureType type = FeatureType::Point;

@@ -188,6 +188,7 @@ add_library(
     ${PROJECT_SOURCE_DIR}/include/mbgl/style/expression/step.hpp
     ${PROJECT_SOURCE_DIR}/include/mbgl/style/expression/type.hpp
     ${PROJECT_SOURCE_DIR}/include/mbgl/style/expression/value.hpp
+    ${PROJECT_SOURCE_DIR}/include/mbgl/style/expression/within.hpp
     ${PROJECT_SOURCE_DIR}/include/mbgl/style/filter.hpp
     ${PROJECT_SOURCE_DIR}/include/mbgl/style/image.hpp
     ${PROJECT_SOURCE_DIR}/include/mbgl/style/layer.hpp
@@ -578,6 +579,7 @@ add_library(
     ${PROJECT_SOURCE_DIR}/src/mbgl/style/expression/util.cpp
     ${PROJECT_SOURCE_DIR}/src/mbgl/style/expression/util.hpp
     ${PROJECT_SOURCE_DIR}/src/mbgl/style/expression/value.cpp
+    ${PROJECT_SOURCE_DIR}/src/mbgl/style/expression/within.cpp
     ${PROJECT_SOURCE_DIR}/src/mbgl/style/filter.cpp
     ${PROJECT_SOURCE_DIR}/src/mbgl/style/image.cpp
     ${PROJECT_SOURCE_DIR}/src/mbgl/style/image_impl.cpp

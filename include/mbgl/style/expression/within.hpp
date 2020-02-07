@@ -31,10 +31,10 @@ public:
         return false;
     }
 
-    std::vector<optional<Value>> possibleOutputs() const override { return {{false}}; }
+    std::vector<optional<Value>> possibleOutputs() const override { return {{true}, {false}}; }
 
     mbgl::Value serialize() const override;
-    std::string getOperator() const override { return "Within"; }
+    std::string getOperator() const override { return "within"; }
 
 private:
     GeoJSON geoJSONSource;
