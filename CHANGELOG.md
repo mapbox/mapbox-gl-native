@@ -7,6 +7,13 @@
 - [core] Global settings API ([#16174](https://github.com/mapbox/mapbox-gl-native/pull/16174))
 
   Global settings API provides means of managing non-persistent in-process settings. Initial implementation contains support for experimental option for setting thread priorities.
+
+- Expose READ_ONLY_MODE_KEY property for DatabaseFileSource ([#16183](https://github.com/mapbox/mapbox-gl-native/pull/16183))
+
+  The `READ_ONLY_MODE_KEY` property is exposed for `DatabaseFileSource`.
+
+  This property allows to re-open the offline database in read-only mode and thus improves the performance for the set-ups that do not require the offline database modifications.
+
 ## maps-v1.0.1 (2020.01-release-unicorn)
 
 ### 🐞 Bug fixes
