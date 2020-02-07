@@ -14,6 +14,10 @@
 
   This property allows to re-open the offline database in read-only mode and thus improves the performance for the set-ups that do not require the offline database modifications.
 
+- [core] Add runtime API for setting tile prefetch delta for a Source ([#16179](https://github.com/mapbox/mapbox-gl-native/pull/16179))
+
+  The new `Source::setPrefetchZoomDelta(optional<uint8_t>)` method allows overriding default tile prefetch setting that is defined by the Map instance.
+
 ## maps-v1.0.1 (2020.01-release-unicorn)
 
 ### 🐞 Bug fixes
