@@ -1902,3 +1902,19 @@ TEST(OfflineDatabase, PutResourceReadOnlyMode) {
 
     EXPECT_EQ(0u, log.uncheckedCount());
 }
+
+TEST(OfflineDatabase, TEST_REQUIRES_WRITE(UpdateDatabaseReadOnlyMode)) {
+    FixtureLog log;
+    deleteDatabaseFiles();
+
+    OfflineDatabase db(filename);
+    db.reopenDatabaseReadOnly(true /*readOnly*/);
+    db.clearAmbientCache();
+    EXPECT_EQ(1u,
+              log.count({EventSeverity::Error,
+                         Event::Database,
+                         -1,
+                         "Can't clear ambient cache: Cannot modify database in read-only mode"}));
+
+    EXPECT_EQ(0u, log.uncheckedCount());
+}
