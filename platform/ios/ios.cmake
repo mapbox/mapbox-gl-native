@@ -104,7 +104,8 @@ if(MBGL_IOS_RENDER_TEST)
     execute_process(COMMAND ${PREPARE_CMD} RESULT_VARIABLE CMD_ERROR WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
     message(STATUS "CMD_ERROR:" ${CMD_ERROR})
 
-    set(RESOURCES ${PROJECT_SOURCE_DIR}/render-test/ios/Main.storyboard ${PROJECT_SOURCE_DIR}/render-test/ios/LaunchScreen.storyboard ${PROJECT_SOURCE_DIR}/test-data)
+    set(RESOURCES ${PROJECT_SOURCE_DIR}/render-test/ios/Main.storyboard ${PROJECT_SOURCE_DIR}/render-test/ios/LaunchScreen.storyboard
+                  ${PROJECT_SOURCE_DIR}/test-data)
 
     add_executable(
         RenderTestApp

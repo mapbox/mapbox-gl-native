@@ -137,7 +137,8 @@ target_include_directories(
 
 target_include_directories(
     mbgl-core
-    PRIVATE ${PROJECT_SOURCE_DIR}/platform/darwin/include ${PROJECT_SOURCE_DIR}/platform/darwin/src ${PROJECT_SOURCE_DIR}/platform/macos/src
+    PRIVATE
+        ${PROJECT_SOURCE_DIR}/platform/darwin/include ${PROJECT_SOURCE_DIR}/platform/darwin/src ${PROJECT_SOURCE_DIR}/platform/macos/src
 )
 
 include(${PROJECT_SOURCE_DIR}/vendor/icu.cmake)
