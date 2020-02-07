@@ -226,7 +226,7 @@ commands:
       - run:
           name: Configure
           command: |
-            cmake next -B build << parameters.config_params >>
+            cmake . -B build << parameters.config_params >>
   build:
     parameters:
       build_params:
@@ -320,7 +320,7 @@ jobs:
       - run:
           name: Build
           command: |
-            cmake next -B Build -G Xcode -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_OSX_SYSROOT=iphonesimulator
+            cmake . -B Build -G Xcode -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_OSX_SYSROOT=iphonesimulator
             cd Build && xcodebuild -sdk iphonesimulator -project Mapbox\ GL\ Native.xcodeproj -configuration Release
       - save
   ios-render-test-runner:
@@ -341,7 +341,7 @@ jobs:
           name: Build IOS RenderTestApp
           command: |
             cd render-test/ios
-            cmake ../../next -B Build -G Xcode -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_SYSROOT=iphoneos -DMBGL_IOS_RENDER_TEST=ON
+            cmake ../.. -B Build -G Xcode -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_SYSROOT=iphoneos -DMBGL_IOS_RENDER_TEST=ON
             cd Build
             xcodebuild -sdk iphoneos -project Mapbox\ GL\ Native.xcodeproj -scheme RenderTestApp build-for-testing -arch arm64 CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -configuration Release
             xcodebuild -sdk iphoneos -project Mapbox\ GL\ Native.xcodeproj build -target RenderTestAppTests -arch arm64 CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -configuration Release
@@ -391,8 +391,8 @@ jobs:
               cd ../.. && mkdir -p /tmp/tests/ios-render-test
               if ls render-test-app/TestLogs/*.html 1> /dev/null 2>&1; then cp render-test-app/TestLogs/*.html /tmp/tests/ios-render-test; fi
               if [[ -n $(ls render-test-app/TestLogs/*.zip 2>/dev/null) ]]; then
-                cp render-test-app/TestLogs/*.zip metrics/next-ios-render-test-runner/
-                cd metrics/next-ios-render-test-runner/
+                cp render-test-app/TestLogs/*.zip metrics/ios-render-test-runner/
+                cd metrics/ios-render-test-runner/
                 unzip *.zip
                 rm -rf *.zip
               fi
@@ -528,7 +528,8 @@ jobs:
       - run:
           name: CMake Format
           command: |
-            cmake-format -i $(find next -type f -name CMakeLists.txt -o -name '*.cmake')
+            cmake-format -i $(find -name '*.cmake'      -and -not -path './vendor/*/*' -and -not -path './build/*')
+            cmake-format -i $(find -name CMakeLists.txt -and -not -path './vendor/*/*' -and -not -path './build/*')
             git diff --exit-code | tee nitpick.patch
       - run:
           name: Clang Format
