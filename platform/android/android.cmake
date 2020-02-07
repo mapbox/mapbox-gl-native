@@ -137,7 +137,6 @@ target_sources(
         ${PROJECT_SOURCE_DIR}/platform/android/src/offline/offline_region_error.hpp
         ${PROJECT_SOURCE_DIR}/platform/android/src/offline/offline_region_status.cpp
         ${PROJECT_SOURCE_DIR}/platform/android/src/offline/offline_region_status.hpp
-        ${PROJECT_SOURCE_DIR}/platform/android/src/run_loop.cpp
         ${PROJECT_SOURCE_DIR}/platform/android/src/run_loop_impl.hpp
         ${PROJECT_SOURCE_DIR}/platform/android/src/snapshotter/map_snapshot.cpp
         ${PROJECT_SOURCE_DIR}/platform/android/src/snapshotter/map_snapshot.hpp
@@ -266,6 +265,7 @@ add_library(
     ${PROJECT_SOURCE_DIR}/platform/android/src/logger.cpp
     ${PROJECT_SOURCE_DIR}/platform/android/src/logger.hpp
     ${PROJECT_SOURCE_DIR}/platform/android/src/logging_android.cpp
+    ${PROJECT_SOURCE_DIR}/platform/android/src/run_loop.cpp
     ${PROJECT_SOURCE_DIR}/platform/android/src/text/local_glyph_rasterizer.cpp
     ${PROJECT_SOURCE_DIR}/platform/android/src/text/local_glyph_rasterizer_jni.hpp
 )
@@ -329,6 +329,13 @@ add_library(
     ${PROJECT_SOURCE_DIR}/platform/default/src/mbgl/text/local_glyph_rasterizer.cpp
     ${PROJECT_SOURCE_DIR}/platform/android/src/test/collator_test_stub.cpp
     ${PROJECT_SOURCE_DIR}/platform/android/src/test/number_format_test_stub.cpp
+    ${PROJECT_SOURCE_DIR}/platform/android/src/test/test_run_loop.cpp
+    ${PROJECT_SOURCE_DIR}/platform/android/src/run_loop.cpp
+)
+
+target_compile_definitions(
+    mbgl-test-runner
+    PRIVATE MBGL_TEST
 )
 
 target_include_directories(
@@ -401,6 +408,7 @@ add_library(
     ${PROJECT_SOURCE_DIR}/platform/android/src/test/collator_test_stub.cpp
     ${PROJECT_SOURCE_DIR}/platform/android/src/test/number_format_test_stub.cpp
     ${PROJECT_SOURCE_DIR}/platform/android/src/test/http_file_source_test_stub.cpp
+    ${PROJECT_SOURCE_DIR}/platform/android/src/run_loop.cpp
 )
 
 target_include_directories(
@@ -450,6 +458,7 @@ add_library(
     ${PROJECT_SOURCE_DIR}/platform/android/src/test/collator_test_stub.cpp
     ${PROJECT_SOURCE_DIR}/platform/android/src/test/number_format_test_stub.cpp
     ${PROJECT_SOURCE_DIR}/platform/android/src/test/http_file_source_test_stub.cpp
+    ${PROJECT_SOURCE_DIR}/platform/android/src/run_loop.cpp
 )
 
 target_include_directories(
