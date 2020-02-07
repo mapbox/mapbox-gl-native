@@ -517,7 +517,6 @@ jobs:
           name: Code Generators
           command: |
             platform/default/include/mbgl/storage/offline_schema.js
-            scripts/generate-file-lists.js
             scripts/generate-shaders.js
             scripts/generate-style-code.js
             git add -A && git diff --staged --exit-code | tee nitpick.patch
