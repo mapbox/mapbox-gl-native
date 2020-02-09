@@ -26,6 +26,7 @@
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/logging.hpp>
+#include <mbgl/perf/runtime_metrics.hpp>
 
 namespace mbgl {
 
@@ -49,7 +50,11 @@ public:
 private:
     bool hasRenderPass(RenderPass pass) const override { return layer.get().hasRenderPass(pass); }
     void upload(gfx::UploadPass& pass) const override { layer.get().upload(pass); }
-    void render(PaintParameters& parameters) const override { layer.get().render(parameters); }
+    void render(PaintParameters& parameters) const override {
+        MBGL_TRACE_RENDERER_BEGIN(layerrenderitem);
+        layer.get().render(parameters);
+        MBGL_TRACE_RENDERER_END(layerrenderitem);
+    }
     const std::string& getName() const override { return layer.get().getID(); } 
 
     uint32_t index;

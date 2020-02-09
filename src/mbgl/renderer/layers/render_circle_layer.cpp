@@ -10,6 +10,7 @@
 #include <mbgl/gfx/cull_face_mode.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/intersection_tests.hpp>
+#include <mbgl/perf/runtime_metrics.hpp>
 
 namespace mbgl {
 
@@ -63,7 +64,7 @@ void RenderCircleLayer::render(PaintParameters& parameters) {
     if (parameters.pass == RenderPass::Opaque) {
         return;
     }
-
+    MBGL_TRACE_RENDERER_BEGIN(circle_layer);
     for (const RenderTile& tile : *renderTiles) {
         const LayerRenderData* renderData = getRenderDataForPass(tile, parameters.pass);
         if (!renderData) {
@@ -122,6 +123,7 @@ void RenderCircleLayer::render(PaintParameters& parameters) {
             getID()
         );
     }
+    MBGL_TRACE_RENDERER_END(circle_layer);
 }
 
 GeometryCoordinate projectPoint(const GeometryCoordinate& p, const mat4& posMatrix, const Size& size) {

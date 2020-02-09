@@ -19,6 +19,7 @@
 #include <mbgl/layout/symbol_layout.hpp>
 #include <mbgl/layout/symbol_layout.hpp>
 #include <mbgl/util/math.hpp>
+#include <mbgl/perf/runtime_metrics.hpp>
 
 #include <cmath>
 #include <set>
@@ -345,7 +346,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters) {
     if (parameters.pass == RenderPass::Opaque) {
         return;
     }
-
+    MBGL_TRACE_RENDERER_BEGIN(symbol_layer);
     const bool sortFeaturesByKey = !impl(baseImpl).layout.get<SymbolSortKey>().isUndefined();
     std::multiset<RenderableSegment> renderableSegments;
 
@@ -540,6 +541,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters) {
             }
         }
     }
+    MBGL_TRACE_RENDERER_END(symbol_layer);
 }
 
 // static

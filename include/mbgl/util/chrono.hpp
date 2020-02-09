@@ -9,6 +9,7 @@ using Clock = std::chrono::steady_clock;
 
 using Seconds = std::chrono::seconds;
 using Milliseconds = std::chrono::milliseconds;
+using Nanoseconds = std::chrono::nanoseconds;
 
 using TimePoint = Clock::time_point;
 using Duration  = Clock::duration;
@@ -20,6 +21,10 @@ namespace util {
 
 inline Timestamp now() {
     return std::chrono::time_point_cast<Seconds>(std::chrono::system_clock::now());
+}
+
+inline uint64_t now_ns() {
+    return Clock::now().time_since_epoch().count();
 }
 
 // Returns the RFC1123 formatted date. E.g. "Tue, 04 Nov 2014 02:13:24 GMT"

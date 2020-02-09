@@ -1,0 +1,34 @@
+STRUCT_BEGIN(FrameTrace)
+
+STRUCT_MEMBER_UINT64_RANGE(update, true, false)  // Before attaching render target
+STRUCT_MEMBER_UINT64_RANGE(attach, true, false)
+STRUCT_MEMBER_UINT64_RANGE(render, true, false)
+STRUCT_MEMBER_UINT64_RANGE(orchestrate, true, false)   // Before orchestration
+STRUCT_MEMBER_UINT64_RANGE(prepare, true, false)       // Before prepare -- This and below are not present IF (!isMapModeContinuous && !renderTreeParameters->loaded)
+STRUCT_MEMBER_UINT64_RANGE(renderimpl, true, false)    // Before Impl::render
+STRUCT_MEMBER_UINT64_RANGE(waitrenderable, true, false) // Before wait on renderable
+STRUCT_MEMBER_UINT64_RANGE(upload, true, false)     // Before UPLOAD PASS
+STRUCT_MEMBER_UINT64_RANGE(draw, true, false)
+STRUCT_MEMBER_UINT64_RANGE(extrusions, true, false)                 // Before 3D pass (extrusions)
+STRUCT_MEMBER_UINT64_RANGE(clear, true, false)                      // 1st draw stage
+STRUCT_MEMBER_UINT64_RANGE(opaque, true, false)                     // 2 opaque should only have layer render items
+STRUCT_MEMBER_UINT64_RANGE(translucent, true, false)                // 3 same here
+STRUCT_MEMBER_UINT64_RANGE(debug, true, false)                      // 4 debug only renders sourceRenderItems
+STRUCT_MEMBER_UINT64_RANGE(flushencoder, true, false)               // 5 ---
+
+STRUCT_MEMBER_UINT64_RANGE(imagesourcerenderdata, false, true)
+STRUCT_MEMBER_UINT64_RANGE(layerrenderitem, false, true)
+STRUCT_MEMBER_UINT64_RANGE(tilesourcerenderitem, false, true)
+
+STRUCT_MEMBER_UINT64_RANGE(fill_layer, false, true)
+STRUCT_MEMBER_UINT64_RANGE(extrusion_layer, false, true)
+STRUCT_MEMBER_UINT64_RANGE(line_layer, false, true)
+STRUCT_MEMBER_UINT64_RANGE(circle_layer, false, true)
+STRUCT_MEMBER_UINT64_RANGE(heatmap_layer, false, true)
+STRUCT_MEMBER_UINT64_RANGE(background_layer, false, true)
+STRUCT_MEMBER_UINT64_RANGE(raster_layer, false, true)
+STRUCT_MEMBER_UINT64_RANGE(symbol_layer, false, true)
+STRUCT_MEMBER_UINT64_RANGE(hillshade_layer, false, true)
+STRUCT_MEMBER_UINT64_RANGE(custom_layer, false, true)
+
+STRUCT_END()

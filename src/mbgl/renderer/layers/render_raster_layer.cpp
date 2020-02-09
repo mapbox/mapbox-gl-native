@@ -9,6 +9,7 @@
 #include <mbgl/tile/tile.hpp>
 #include <mbgl/gfx/cull_face_mode.hpp>
 #include <mbgl/style/layers/raster_layer_impl.hpp>
+#include <mbgl/perf/runtime_metrics.hpp>
 
 namespace mbgl {
 
@@ -90,6 +91,7 @@ void RenderRasterLayer::render(PaintParameters& parameters) {
     if (parameters.pass != RenderPass::Translucent || (!renderTiles && !imageData)) {
         return;
     }
+    MBGL_TRACE_RENDERER_BEGIN(raster_layer);
     const auto& evaluated = static_cast<const RasterLayerProperties&>(*evaluatedProperties).evaluated;
     RasterProgram::Binders paintAttributeData{ evaluated, 0 };
 
@@ -199,6 +201,7 @@ void RenderRasterLayer::render(PaintParameters& parameters) {
             }
         }
     }
+    MBGL_TRACE_RENDERER_END(raster_layer);
 }
 
 } // namespace mbgl

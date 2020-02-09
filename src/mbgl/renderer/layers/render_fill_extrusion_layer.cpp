@@ -16,6 +16,7 @@
 #include <mbgl/tile/tile.hpp>
 #include <mbgl/util/intersection_tests.hpp>
 #include <mbgl/util/math.hpp>
+#include <mbgl/perf/runtime_metrics.hpp>
 
 namespace mbgl {
 
@@ -71,7 +72,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters) {
     if (parameters.pass != RenderPass::Translucent) {
         return;
     }
-
+    MBGL_TRACE_RENDERER_BEGIN(extrusion_layer);
     const auto& evaluated = static_cast<const FillExtrusionLayerProperties&>(*evaluatedProperties).evaluated;
     const auto& crossfade = static_cast<const FillExtrusionLayerProperties&>(*evaluatedProperties).crossfade;
     if (evaluatedProperties->renderPasses == mbgl::underlying_type(RenderPass::None)) {
@@ -224,6 +225,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters) {
         // to prevent the second draw in cases where we have coincident polygons.
         drawTiles(parameters.stencilModeFor3D(), parameters.colorModeForRenderPass(), "color");
     }
+    MBGL_TRACE_RENDERER_END(extrusion_layer);
 }
 
 bool RenderFillExtrusionLayer::queryIntersectsFeature(const GeometryCoordinates& queryGeometry,

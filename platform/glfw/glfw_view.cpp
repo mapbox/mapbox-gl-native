@@ -23,10 +23,15 @@
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/platform.hpp>
 #include <mbgl/util/string.hpp>
+#include <mbgl/perf/runtime_metrics.hpp>
 
 #include <mapbox/cheap_ruler.hpp>
 #include <mapbox/geometry.hpp>
 #include <mapbox/geojson.hpp>
+
+#include <fstream>
+#include <string>
+#include <iostream>
 
 #if MBGL_USE_GLES2
 #define GLFW_INCLUDE_ES2
@@ -233,6 +238,18 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
             break;
         case GLFW_KEY_K:
             view->addRandomCustomPointAnnotations(1);
+            break;
+        case GLFW_KEY_H:
+            MBGL_IF_TRACING(if (mbgl::util::Tracer::get().isCollectingData()) { \
+                mbgl::util::Tracer::get().setCollectData(false); \
+                std::string json = mbgl::util::Tracer::get().dumpAll(true); \
+                printf("%s\n", json.c_str()); \
+                                std::ofstream out("/tmp/mbgl_glfw_trace.json"); \
+                                out << json; \
+                                out.close(); \
+            } else { \
+                mbgl::util::Tracer::get().setCollectData(true); \
+            })
             break;
         case GLFW_KEY_L:
             view->addRandomLineAnnotations(1);

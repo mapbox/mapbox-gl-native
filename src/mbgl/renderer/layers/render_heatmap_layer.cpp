@@ -14,6 +14,7 @@
 #include <mbgl/gfx/context.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/intersection_tests.hpp>
+#include <mbgl/perf/runtime_metrics.hpp>
 
 namespace mbgl {
 
@@ -72,7 +73,7 @@ void RenderHeatmapLayer::render(PaintParameters& parameters) {
     if (parameters.pass == RenderPass::Opaque) {
         return;
     }
-
+    MBGL_TRACE_RENDERER_BEGIN(heatmap_layer);
     if (parameters.pass == RenderPass::Pass3D) {
         const auto& viewportSize = parameters.staticData.backendSize;
         const auto size = Size{viewportSize.width / 4, viewportSize.height / 4};
@@ -196,6 +197,7 @@ void RenderHeatmapLayer::render(PaintParameters& parameters) {
             getID()
         );
     }
+    MBGL_TRACE_RENDERER_END(heatmap_layer);
 }
 
 void RenderHeatmapLayer::updateColorRamp() {

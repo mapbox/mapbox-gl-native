@@ -9,6 +9,7 @@
 #include <mbgl/tile/vector_tile.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/math.hpp>
+#include <mbgl/perf/runtime_metrics.hpp>
 
 namespace mbgl {
 
@@ -37,9 +38,11 @@ void TileSourceRenderItem::upload(gfx::UploadPass& parameters) const {
 }
 
 void TileSourceRenderItem::render(PaintParameters& parameters) const {
+    MBGL_TRACE_RENDERER_BEGIN(tilesourcerenderitem);
     for (auto& tile : *renderTiles) {
         tile.finishRender(parameters);
     }
+    MBGL_TRACE_RENDERER_END(tilesourcerenderitem);
 }
 
 RenderTileSource::RenderTileSource(Immutable<style::Source::Impl> impl_)

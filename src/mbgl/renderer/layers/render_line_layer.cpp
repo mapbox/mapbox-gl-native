@@ -16,6 +16,7 @@
 #include <mbgl/tile/tile.hpp>
 #include <mbgl/util/intersection_tests.hpp>
 #include <mbgl/util/math.hpp>
+#include <mbgl/perf/runtime_metrics.hpp>
 
 namespace mbgl {
 
@@ -95,7 +96,7 @@ void RenderLineLayer::render(PaintParameters& parameters) {
     if (parameters.pass == RenderPass::Opaque) {
         return;
     }
-
+    MBGL_TRACE_RENDERER_BEGIN(line_layer);
     parameters.renderTileClippingMasks(renderTiles);
 
     for (const RenderTile& tile : *renderTiles) {
@@ -217,6 +218,7 @@ void RenderLineLayer::render(PaintParameters& parameters) {
                  LineProgram::TextureBindings{});
         }
     }
+    MBGL_TRACE_RENDERER_END(line_layer);
 }
 
 namespace {

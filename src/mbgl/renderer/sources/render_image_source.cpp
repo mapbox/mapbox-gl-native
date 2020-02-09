@@ -12,6 +12,7 @@
 #include <mbgl/util/tile_cover.hpp>
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/constants.hpp>
+#include <mbgl/perf/runtime_metrics.hpp>
 
 namespace mbgl {
 
@@ -29,7 +30,7 @@ void ImageSourceRenderData::render(PaintParameters& parameters) const {
     if (!bucket || !(parameters.debugOptions & MapDebugOptions::TileBorders)) {
         return;
     }
-
+    MBGL_TRACE_RENDERER_BEGIN(imagesourcerenderdata);
     static const style::Properties<>::PossiblyEvaluated properties {};
     static const DebugProgram::Binders paintAttributeData(properties, 0);
 
@@ -64,6 +65,7 @@ void ImageSourceRenderData::render(PaintParameters& parameters) const {
             "image"
         );
     }
+    MBGL_TRACE_RENDERER_END(imagesourcerenderdata);
 }
 
 RenderImageSource::RenderImageSource(Immutable<style::ImageSource::Impl> impl_)

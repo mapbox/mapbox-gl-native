@@ -21,9 +21,11 @@ public:
     void render();
     
     mbgl::Renderer* getRenderer();
+    void setRecordFrame(bool enabled);
 
 private:
     GLFWView& glfwView;
     std::unique_ptr<mbgl::Renderer> renderer;
     std::shared_ptr<mbgl::UpdateParameters> updateParameters;
+    bool recordFrames = false;
 };

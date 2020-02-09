@@ -262,6 +262,8 @@ add_library(
     ${PROJECT_SOURCE_DIR}/include/mbgl/util/work_request.hpp
     ${PROJECT_SOURCE_DIR}/include/mbgl/util/work_task.hpp
     ${PROJECT_SOURCE_DIR}/include/mbgl/util/work_task_impl.hpp
+    ${PROJECT_SOURCE_DIR}/include/mbgl/perf/runtime_metrics.hpp
+    ${PROJECT_SOURCE_DIR}/include/mbgl/perf/trace_data.in
     ${PROJECT_SOURCE_DIR}/src/csscolorparser/csscolorparser.cpp
     ${PROJECT_SOURCE_DIR}/src/csscolorparser/csscolorparser.hpp
     ${PROJECT_SOURCE_DIR}/src/mbgl/actor/mailbox.cpp

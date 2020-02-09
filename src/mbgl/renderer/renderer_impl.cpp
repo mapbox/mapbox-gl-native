@@ -14,6 +14,7 @@
 #include <mbgl/renderer/render_tree.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/logging.hpp>
+#include <mbgl/perf/runtime_metrics.hpp>
 
 namespace mbgl {
 
@@ -43,6 +44,8 @@ void Renderer::Impl::setObserver(RendererObserver* observer_) {
 }
 
 void Renderer::Impl::render(const RenderTree& renderTree) {
+    MBGL_TRACE_RENDERER_BEGIN(waitrenderable);
+
     if (renderState == RenderState::Never) {
         observer->onWillStartRenderingMap();
     }
@@ -79,6 +82,9 @@ void Renderer::Impl::render(const RenderTree& renderTree) {
     const auto& sourceRenderItems = renderTree.getSourceRenderItems();
     const auto& layerRenderItems = renderTree.getLayerRenderItems();
 
+    MBGL_TRACE_RENDERER_END(waitrenderable);
+    MBGL_TRACE_RENDERER_BEGIN(upload);
+
     // - UPLOAD PASS -------------------------------------------------------------------------------
     // Uploads all required buffers and images before we do any actual rendering.
     {
@@ -95,6 +101,10 @@ void Renderer::Impl::render(const RenderTree& renderTree) {
         renderTree.getLineAtlas().upload(*uploadPass);
         renderTree.getPatternAtlas().upload(*uploadPass);
     }
+
+    MBGL_TRACE_RENDERER_END(upload)
+    MBGL_TRACE_RENDERER_BEGIN(draw);
+    MBGL_TRACE_RENDERER_BEGIN(extrusions);
 
     // - 3D PASS -------------------------------------------------------------------------------------
     // Renders any 3D layers bottom-to-top to unique FBOs with texture attachments, but share the same
@@ -123,6 +133,9 @@ void Renderer::Impl::render(const RenderTree& renderTree) {
         }
     }
 
+    MBGL_TRACE_RENDERER_END(extrusions)
+    MBGL_TRACE_RENDERER_BEGIN(clear);
+
     // - CLEAR -------------------------------------------------------------------------------------
     // Renders the backdrop of the OpenGL view. This also paints in areas where we don't have any
     // tiles whatsoever.
@@ -135,6 +148,9 @@ void Renderer::Impl::render(const RenderTree& renderTree) {
         }
         parameters.renderPass = parameters.encoder->createRenderPass("main buffer", { parameters.backend.getDefaultRenderable(), color, 1, 0 });
     }
+
+    MBGL_TRACE_RENDERER_END(clear)
+    MBGL_TRACE_RENDERER_BEGIN(opaque);
 
     // Actually render the layers
 
@@ -157,6 +173,9 @@ void Renderer::Impl::render(const RenderTree& renderTree) {
         }
     }
 
+    MBGL_TRACE_RENDERER_END(opaque)
+    MBGL_TRACE_RENDERER_BEGIN(translucent);
+
     // - TRANSLUCENT PASS --------------------------------------------------------------------------
     // Make a second pass, rendering translucent objects. This time, we render bottom-to-top.
     {
@@ -174,6 +193,9 @@ void Renderer::Impl::render(const RenderTree& renderTree) {
         }
     }
 
+    MBGL_TRACE_RENDERER_END(translucent)
+    MBGL_TRACE_RENDERER_BEGIN(debug);
+
     // - DEBUG PASS --------------------------------------------------------------------------------
     // Renders debug overlays.
     {
@@ -187,6 +209,9 @@ void Renderer::Impl::render(const RenderTree& renderTree) {
             renderItem.render(parameters);
         }
     }
+
+    MBGL_TRACE_RENDERER_END(debug)
+    MBGL_TRACE_RENDERER_BEGIN(flushencoder);
 
 #if not defined(NDEBUG)
     if (parameters.debugOptions & MapDebugOptions::StencilClip) {
@@ -220,6 +245,8 @@ void Renderer::Impl::render(const RenderTree& renderTree) {
         renderState = RenderState::Fully;
         observer->onDidFinishRenderingMap();
     }
+    MBGL_TRACE_RENDERER_END(flushencoder)
+    MBGL_TRACE_RENDERER_END(draw)
 }
 
 void Renderer::Impl::reduceMemoryUse() {
