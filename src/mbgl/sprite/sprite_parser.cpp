@@ -149,50 +149,54 @@ optional<style::ImageContent> getContent(const JSValue& value, const char* prope
 
 } // namespace
 
-std::vector<std::unique_ptr<style::Image>> parseSprite(const std::string& encodedImage, const std::string& json) {
+std::vector<Immutable<style::Image::Impl>> parseSprite(const std::string& encodedImage, const std::string& json) {
     const PremultipliedImage raster = decodeImage(encodedImage);
 
     JSDocument doc;
     doc.Parse<0>(json.c_str());
     if (doc.HasParseError()) {
         throw std::runtime_error("Failed to parse JSON: " + formatJSONParseError(doc));
-    } else if (!doc.IsObject()) {
+    }
+
+    if (!doc.IsObject()) {
         throw std::runtime_error("Sprite JSON root must be an object");
-    } else {
-        std::vector<std::unique_ptr<style::Image>> images;
-        for (const auto& property : doc.GetObject()) {
-            const std::string name = { property.name.GetString(), property.name.GetStringLength() };
-            const JSValue& value = property.value;
+    }
 
-            if (value.IsObject()) {
-                const uint16_t x = getUInt16(value, "x", name.c_str(), 0);
-                const uint16_t y = getUInt16(value, "y", name.c_str(), 0);
-                const uint16_t width = getUInt16(value, "width", name.c_str(), 0);
-                const uint16_t height = getUInt16(value, "height", name.c_str(), 0);
-                const double pixelRatio = getDouble(value, "pixelRatio", name.c_str(), 1);
-                const bool sdf = getBoolean(value, "sdf", name.c_str(), false);
-                style::ImageStretches stretchX = getStretches(value, "stretchX", name.c_str());
-                style::ImageStretches stretchY = getStretches(value, "stretchY", name.c_str());
-                optional<style::ImageContent> content = getContent(value, "content", name.c_str());
+    const auto& properties = doc.GetObject();
+    std::vector<Immutable<style::Image::Impl>> images;
+    images.reserve(properties.MemberCount());
+    for (const auto& property : properties) {
+        const std::string name = {property.name.GetString(), property.name.GetStringLength()};
+        const JSValue& value = property.value;
 
-                auto image = createStyleImage(name,
-                                              raster,
-                                              x,
-                                              y,
-                                              width,
-                                              height,
-                                              pixelRatio,
-                                              sdf,
-                                              std::move(stretchX),
-                                              std::move(stretchY),
-                                              std::move(content));
-                if (image) {
-                    images.push_back(std::move(image));
-                }
+        if (value.IsObject()) {
+            const uint16_t x = getUInt16(value, "x", name.c_str(), 0);
+            const uint16_t y = getUInt16(value, "y", name.c_str(), 0);
+            const uint16_t width = getUInt16(value, "width", name.c_str(), 0);
+            const uint16_t height = getUInt16(value, "height", name.c_str(), 0);
+            const double pixelRatio = getDouble(value, "pixelRatio", name.c_str(), 1);
+            const bool sdf = getBoolean(value, "sdf", name.c_str(), false);
+            style::ImageStretches stretchX = getStretches(value, "stretchX", name.c_str());
+            style::ImageStretches stretchY = getStretches(value, "stretchY", name.c_str());
+            optional<style::ImageContent> content = getContent(value, "content", name.c_str());
+
+            auto image = createStyleImage(name,
+                                          raster,
+                                          x,
+                                          y,
+                                          width,
+                                          height,
+                                          pixelRatio,
+                                          sdf,
+                                          std::move(stretchX),
+                                          std::move(stretchY),
+                                          std::move(content));
+            if (image) {
+                images.push_back(std::move(image->baseImpl));
             }
         }
-        return images;
     }
+    return images;
 }
 
 } // namespace mbgl

@@ -170,7 +170,6 @@ void Map::Impl::jumpTo(const CameraOptions& camera) {
 }
 
 void Map::Impl::onStyleImageMissing(const std::string& id, std::function<void()> done) {
-
     if (style->getImage(id) == nullptr) {
         observer.onStyleImageMissing(id);
     }

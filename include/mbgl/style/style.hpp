@@ -1,8 +1,10 @@
 #pragma once
 
-#include <mbgl/style/transition_options.hpp>
 #include <mbgl/map/camera.hpp>
+#include <mbgl/style/transition_options.hpp>
 #include <mbgl/util/geo.hpp>
+#include <mbgl/util/image.hpp>
+#include <mbgl/util/immutable.hpp>
 
 #include <string>
 #include <vector>
@@ -45,7 +47,7 @@ public:
     void setLight(std::unique_ptr<Light>);
 
     // Images
-    const Image* getImage(const std::string&) const;
+    const PremultipliedImage* getImage(const std::string&) const;
     void addImage(std::unique_ptr<Image>);
     void removeImage(const std::string&);
 

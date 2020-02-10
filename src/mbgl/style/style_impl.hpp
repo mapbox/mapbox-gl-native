@@ -78,13 +78,14 @@ public:
     void setLight(std::unique_ptr<Light>);
     Light* getLight() const;
 
-    const style::Image* getImage(const std::string&) const;
+    const style::Image::Impl* getImage(const std::string&) const;
     void addImage(std::unique_ptr<style::Image>);
     void removeImage(const std::string&);
 
     const std::string& getGlyphURL() const;
 
-    Immutable<std::vector<Immutable<Image::Impl>>> getImageImpls() const;
+    using ImageImpls = std::vector<Immutable<Image::Impl>>;
+    Immutable<ImageImpls> getImageImpls() const;
     Immutable<std::vector<Immutable<Source::Impl>>> getSourceImpls() const;
     Immutable<std::vector<Immutable<Layer::Impl>>> getLayerImpls() const;
 
@@ -106,7 +107,7 @@ private:
     std::unique_ptr<SpriteLoader> spriteLoader;
 
     std::string glyphURL;
-    CollectionWithPersistentOrder<style::Image> images;
+    Immutable<ImageImpls> images = makeMutable<ImageImpls>();
     CollectionWithPersistentOrder<Source> sources;
     Collection<Layer> layers;
     TransitionOptions transitionOptions;
@@ -117,7 +118,7 @@ private:
     CameraOptions defaultCamera;
 
     // SpriteLoaderObserver implementation.
-    void onSpriteLoaded(std::vector<std::unique_ptr<Image>>&&) override;
+    void onSpriteLoaded(std::vector<Immutable<style::Image::Impl>>) override;
     void onSpriteError(std::exception_ptr) override;
 
     // SourceObserver implementation.
