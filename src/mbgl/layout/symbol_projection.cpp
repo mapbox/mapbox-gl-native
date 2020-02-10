@@ -410,8 +410,16 @@ namespace mbgl {
             const float pitchScaledFontSize = pitchWithMap ?
                 fontSize * perspectiveRatio :
                 fontSize / perspectiveRatio;
-            
-            const Point<float> anchorPoint = project(placedSymbol.anchorPoint, labelPlaneMatrix).first;
+
+            const auto transformedTileAnchor = project(placedSymbol.anchorPoint, labelPlaneMatrix);
+
+            // Skip labels behind the camera
+            if (transformedTileAnchor.second <= 0.0) {
+                hideGlyphs(placedSymbol.glyphOffsets.size(), dynamicVertexArray);
+                continue;
+            }
+
+            const Point<float> anchorPoint = transformedTileAnchor.first;
 
             PlacementResult placeUnflipped = placeGlyphsAlongLine(placedSymbol, pitchScaledFontSize, false /*unflipped*/, keepUpright, posMatrix, labelPlaneMatrix, glCoordMatrix, dynamicVertexArray, anchorPoint, state.getSize().aspectRatio());
             

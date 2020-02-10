@@ -217,7 +217,7 @@ commands:
           command: |
               platform/darwin/scripts/generate-style-code.js
               platform/darwin/scripts/update-examples.js
-              git add -A && git diff --staged --exit-code
+              git add -A && git diff --staged --exit-code | tee nitpick.patch
   config:
     parameters:
       config_params:
