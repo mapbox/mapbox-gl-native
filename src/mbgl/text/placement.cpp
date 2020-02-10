@@ -113,7 +113,12 @@ void Placement::placeLayer(const RenderLayer& layer) {
     std::set<uint32_t> seenCrossTileIDs;
     for (const auto& item : layer.getPlacementData()) {
         Bucket& bucket = item.bucket;
-        BucketPlacementParameters params{item.tile, layer.baseImpl->source, item.featureIndex, item.sortKey, item.symbolInstanceStart, item.symbolInstanceEnd};
+        BucketPlacementParameters params{item.tile,
+                                         layer.baseImpl->source,
+                                         item.featureIndex,
+                                         item.sortKey,
+                                         item.symbolInstanceStart,
+                                         item.symbolInstanceEnd};
         bucket.place(*this, params, seenCrossTileIDs);
     }
 }
