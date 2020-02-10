@@ -1,9 +1,10 @@
+#include <mbgl/style/image.hpp>
+#include <mbgl/style/image_impl.hpp>
+#include <mbgl/style/layer.hpp>
+#include <mbgl/style/light.hpp>
+#include <mbgl/style/source.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/style_impl.hpp>
-#include <mbgl/style/light.hpp>
-#include <mbgl/style/image.hpp>
-#include <mbgl/style/source.hpp>
-#include <mbgl/style/layer.hpp>
 
 namespace mbgl {
 namespace style {
@@ -59,8 +60,11 @@ const Light* Style::getLight() const {
     return impl->getLight();
 }
 
-const Image* Style::getImage(const std::string& name) const {
-    return impl->getImage(name);
+const PremultipliedImage* Style::getImage(const std::string& name) const {
+    if (auto* image = impl->getImage(name)) {
+        return &(image->image);
+    }
+    return nullptr;
 }
 
 void Style::addImage(std::unique_ptr<Image> image) {

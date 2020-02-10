@@ -3,6 +3,7 @@
 
 #include <mbgl/sprite/sprite_parser.hpp>
 #include <mbgl/style/image.hpp>
+#include <mbgl/style/image_impl.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/string.hpp>
@@ -242,8 +243,8 @@ TEST(Sprite, SpriteParsing) {
     const auto images = parseSprite(image_1x, json_1x);
 
     std::set<std::string> names;
-    std::transform(images.begin(), images.end(), std::inserter(names, names.begin()),
-                   [](const auto& image) { return image->getID(); });
+    std::transform(
+        images.begin(), images.end(), std::inserter(names, names.begin()), [](const auto& image) { return image->id; });
 
     EXPECT_EQ(std::set<std::string>({ "airfield_icon",
                                       "airport_icon",
@@ -321,11 +322,12 @@ TEST(Sprite, SpriteParsing) {
               names);
 
     {
-        auto& sprite = *std::find_if(images.begin(), images.end(), [] (const auto& image) { return image->getID() == "generic-metro"; });
-        EXPECT_EQ(18u, sprite->getImage().size.width);
-        EXPECT_EQ(18u, sprite->getImage().size.height);
-        EXPECT_EQ(1, sprite->getPixelRatio());
-        EXPECT_EQ(readImage("test/fixtures/annotations/result-spriteparsing.png"), sprite->getImage());
+        auto& sprite =
+            *std::find_if(images.begin(), images.end(), [](const auto& image) { return image->id == "generic-metro"; });
+        EXPECT_EQ(18u, sprite->image.size.width);
+        EXPECT_EQ(18u, sprite->image.size.height);
+        EXPECT_EQ(1, sprite->pixelRatio);
+        EXPECT_EQ(readImage("test/fixtures/annotations/result-spriteparsing.png"), sprite->image);
     }
 }
 
@@ -460,10 +462,10 @@ TEST(Sprite, SpriteParsingStretchAndContent) {
         }
     })JSON");
     EXPECT_EQ(1u, images.size());
-    EXPECT_EQ("image", images[0]->getID());
-    EXPECT_EQ((style::ImageStretches{{2, 14}}), images[0]->getStretchX());
-    EXPECT_EQ((style::ImageStretches{{0, 4}, {12, 16}}), images[0]->getStretchY());
-    EXPECT_EQ((style::ImageContent{2, 2, 14, 14}), images[0]->getContent());
+    EXPECT_EQ("image", images[0]->id);
+    EXPECT_EQ((style::ImageStretches{{2, 14}}), images[0]->stretchX);
+    EXPECT_EQ((style::ImageStretches{{0, 4}, {12, 16}}), images[0]->stretchY);
+    EXPECT_EQ((style::ImageContent{2, 2, 14, 14}), images[0]->content);
 }
 
 TEST(Sprite, SpriteParsingEmptyImage) {

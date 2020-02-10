@@ -17,7 +17,7 @@ using namespace mbgl::style;
 
 class StubSpriteLoaderObserver : public SpriteLoaderObserver {
 public:
-    void onSpriteLoaded(std::vector<std::unique_ptr<style::Image>>&& images) override {
+    void onSpriteLoaded(std::vector<Immutable<style::Image::Impl>> images) override {
         if (spriteLoaded) spriteLoaded(std::move(images));
     }
 
@@ -25,7 +25,7 @@ public:
         if (spriteError) spriteError(error);
     }
 
-    std::function<void (std::vector<std::unique_ptr<style::Image>>&&)> spriteLoaded;
+    std::function<void(std::vector<Immutable<style::Image::Impl>>)> spriteLoaded;
     std::function<void (std::exception_ptr)> spriteError;
 };
 
@@ -92,7 +92,7 @@ TEST(SpriteLoader, LoadingSuccess) {
         test.end();
     };
 
-    test.observer.spriteLoaded = [&] (std::vector<std::unique_ptr<style::Image>>&& images) {
+    test.observer.spriteLoaded = [&](std::vector<Immutable<style::Image::Impl>> images) {
         EXPECT_EQ(images.size(), 367u);
         test.end();
     };
@@ -169,7 +169,7 @@ TEST(SpriteLoader, LoadingCancel) {
         return optional<Response>();
     };
 
-    test.observer.spriteLoaded = [&] (const std::vector<std::unique_ptr<style::Image>>&) {
+    test.observer.spriteLoaded = [&](std::vector<Immutable<style::Image::Impl>>) {
         FAIL() << "Should never be called";
     };
 
