@@ -666,6 +666,12 @@ void Placement::placeBucket(const SymbolBucket& bucket,
             placeSymbol(*it);
         }
     }
+
+    // As long as this placement lives, we have to hold onto this bucket's
+    // matching FeatureIndex/data for querying purposes
+    retainedQueryData.emplace(std::piecewise_construct,
+            std::forward_as_tuple(bucket.bucketInstanceId),
+            std::forward_as_tuple(bucket.bucketInstanceId, params.featureIndex, overscaledID));
 }
 
 void Placement::commit() {
