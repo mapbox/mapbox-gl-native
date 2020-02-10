@@ -103,17 +103,19 @@ void RenderGeoJSONSource::update(Immutable<style::Source::Impl> baseImpl_,
 
     if (!data_) return;
 
-    tilePyramid.update(layers,
-                       needsRendering,
-                       needsRelayout,
-                       parameters,
-                       SourceType::GeoJSON,
-                       util::tileSize,
-                       impl().getZoomRange(),
-                       optional<LatLngBounds>{},
-                       [&, data_](const OverscaledTileID& tileID) {
-                           return std::make_unique<GeoJSONTile>(tileID, impl().id, parameters, data_);
-                       });
+    tilePyramid.update(
+        layers,
+        needsRendering,
+        needsRelayout,
+        parameters,
+        SourceType::GeoJSON,
+        util::tileSize,
+        impl().getZoomRange(),
+        optional<LatLngBounds>{},
+        [&, data_](const OverscaledTileID& tileID) {
+            return std::make_unique<GeoJSONTile>(tileID, impl().id, parameters, data_);
+        },
+        baseImpl->getPrefetchZoomDelta());
 }
 
 mapbox::util::variant<Value, FeatureCollection>
