@@ -17,7 +17,7 @@ Mapbox GL Native targeting your host architecture given that you have all the
 dependencies installed and run the example app.
 
 ```
-$ git update submodules --init --recursive
+$ git submodules update --init --recursive
 $ cmake . -B build
 $ cmake --build build
 $ MAPBOX_ACCESS_TOKEN=my_access_token_here ./build/platform/glfw/mbgl-glfw
