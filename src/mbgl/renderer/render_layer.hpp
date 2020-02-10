@@ -8,6 +8,7 @@
 
 #include <memory>
 #include <string>
+#include <list>
 
 namespace mbgl {
 
@@ -30,9 +31,15 @@ public:
 
 class LayerPlacementData {
 public:
+    friend bool operator<(const LayerPlacementData& lhs, const LayerPlacementData& rhs) {
+        return lhs.sortKey < rhs.sortKey;
+    }
     std::reference_wrapper<SymbolBucket> bucket;
     std::reference_wrapper<const RenderTile> tile;
     std::shared_ptr<FeatureIndex> featureIndex;
+    float sortKey;
+    size_t symbolInstanceStart;
+    size_t symbolInstanceEnd;
 };
 
 class LayerPrepareParameters {
@@ -96,7 +103,7 @@ public:
 
     virtual void prepare(const LayerPrepareParameters&);
 
-    const std::vector<LayerPlacementData>& getPlacementData() const { 
+    const std::list<LayerPlacementData>& getPlacementData() const { 
         return placementData; 
     }
 
@@ -127,7 +134,7 @@ protected:
     // evaluated StyleProperties object and is updated accordingly.
     RenderPass passes = RenderPass::None;
 
-    std::vector<LayerPlacementData> placementData;
+    std::list<LayerPlacementData> placementData;
 
 private:
     // Some layers may not render correctly on some hardware when the vertex attribute limit of

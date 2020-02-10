@@ -389,6 +389,7 @@ TEST(CrossTileSymbolLayerIndex, offscreenSymbols) {
     std::vector<SymbolInstance> mainInstances;
     mainInstances.push_back(makeSymbolInstance(1000, 1000, u"Washington"));
     mainInstances.push_back(makeSymbolInstance(2000, 2000, u"Richmond"));
+    std::vector<SortKeyRange> mainRanges;
     SymbolBucket symbolBucket{layout,
                               {},
                               16.0f,
@@ -398,6 +399,7 @@ TEST(CrossTileSymbolLayerIndex, offscreenSymbols) {
                               sortFeaturesByY,
                               bucketLeaderID,
                               std::move(mainInstances),
+                              std::move(mainRanges),
                               1.0f,
                               false,
                               {},

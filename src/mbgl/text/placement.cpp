@@ -111,58 +111,14 @@ Placement::Placement() : collisionIndex({}, MapMode::Static), collisionGroups(tr
 
 void Placement::placeLayer(const RenderLayer& layer) {
     std::set<uint32_t> seenCrossTileIDs;
-    std::list<BucketPlacementParameters> parameters;
-
     for (const auto& item : layer.getPlacementData()) {
-        SymbolBucket& bucket = item.bucket;
-        if (bucket.sortKeyRanges.size() == 0) {
-            BucketPlacementParameters params{item.bucket,
-                                             item.tile,
-                                             projMatrix,
-                                             layer.baseImpl->source,
-                                             item.featureIndex,
-                                             showCollisionBoxes,
-                                             0.0f,
-                                             0,
-                                             bucket.symbolInstances.size()};
-            parameters.push_back(params);
-
-        } else {
-            for (const SortKeyRange& sortKeyRange : bucket.sortKeyRanges) {
-                BucketPlacementParameters params{item.bucket,
-                                                 item.tile,
-                                                 projMatrix,
-                                                 layer.baseImpl->source,
-                                                 item.featureIndex,
-                                                 showCollisionBoxes,
-                                                 sortKeyRange.sortKey,
-                                                 sortKeyRange.symbolInstanceStart,
-                                                 sortKeyRange.symbolInstanceEnd};
-
-                auto sortPosition = std::upper_bound(parameters.cbegin(), parameters.cend(), params);
-                parameters.insert(sortPosition, std::move(params));
-            }
-        }
-    }
-
-    for (auto& params : parameters) {
-        SymbolBucket& bucket = params.bucket;
+        Bucket& bucket = item.bucket;
+        BucketPlacementParameters params{item.tile, layer.baseImpl->source, item.featureIndex, item.sortKey, item.symbolInstanceStart, item.symbolInstanceEnd};
         bucket.place(*this, params, seenCrossTileIDs);
-
-        bucket.justReloaded = false;
-
-        const OverscaledTileID& overscaledID = params.tile.getOverscaledTileID();
-
-        // As long as this placement lives, we have to hold onto this bucket's
-        // matching FeatureIndex/data for querying purposes
-        retainedQueryData.emplace(std::piecewise_construct,
-                                  std::forward_as_tuple(bucket.bucketInstanceId),
-                                  std::forward_as_tuple(bucket.bucketInstanceId, params.featureIndex, overscaledID));
     }
 }
 
 namespace {
-<<<<<<< HEAD
 Point<float> calculateVariableLayoutOffset(style::SymbolAnchorType anchor,
                                            float width,
                                            float height,
@@ -171,10 +127,6 @@ Point<float> calculateVariableLayoutOffset(style::SymbolAnchorType anchor,
                                            bool rotateWithMap,
                                            bool pitchWithMap,
                                            float bearing) {
-=======
-Point<float> calculateVariableLayoutOffset(
-    style::SymbolAnchorType anchor, float width, float height, std::array<float, 2> offset, float textBoxScale) {
->>>>>>> fixup
     AnchorAlignment alignment = AnchorAlignment::getAnchorAlignment(anchor);
     float shiftX = -(alignment.horizontalAlign - 0.5f) * width;
     float shiftY = -(alignment.verticalAlign - 0.5f) * height;

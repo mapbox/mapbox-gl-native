@@ -580,7 +580,16 @@ void RenderSymbolLayer::prepare(const LayerPrepareParameters& params) {
             const Tile* tile = params.source->getRenderedTile(renderTile.id);
             assert(tile);
             assert(tile->kind == Tile::Kind::Geometry);
-            placementData.push_back({*bucket, renderTile, static_cast<const GeometryTile*>(tile)->getFeatureIndex()});
+
+            if (bucket->sortKeyRanges.size() == 0) {
+                placementData.push_back({*bucket, renderTile, static_cast<const GeometryTile*>(tile)->getFeatureIndex(), 0.0f, 0, bucket->symbolInstances.size()});
+            } else {
+                for (const SortKeyRange& sortKeyRange : bucket->sortKeyRanges) {
+                    LayerPlacementData layerData{*bucket, renderTile, static_cast<const GeometryTile*>(tile)->getFeatureIndex(), sortKeyRange.sortKey, sortKeyRange.symbolInstanceStart, sortKeyRange.symbolInstanceEnd};
+                    auto sortPosition = std::upper_bound(placementData.cbegin(), placementData.cend(), layerData);
+                    placementData.insert(sortPosition, std::move(layerData));
+                }
+            }
         }
     }
 }
