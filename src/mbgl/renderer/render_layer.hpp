@@ -36,6 +36,7 @@ public:
     std::reference_wrapper<SymbolBucket> bucket;
     std::reference_wrapper<const RenderTile> tile;
     std::shared_ptr<FeatureIndex> featureIndex;
+    bool firstInBucket;
     float sortKey;
     size_t symbolInstanceStart;
     size_t symbolInstanceEnd;

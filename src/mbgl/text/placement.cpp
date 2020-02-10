@@ -741,7 +741,9 @@ void Placement::commit() {
 void Placement::updateLayerBuckets(const RenderLayer& layer, const TransformState& state, bool updateOpacities) const {
     std::set<uint32_t> seenCrossTileIDs;
     for (const auto& item : layer.getPlacementData()) {
-        item.bucket.get().updateVertices(*this, updateOpacities, state, item.tile, seenCrossTileIDs);
+        if (item.firstInBucket) {
+            item.bucket.get().updateVertices(*this, updateOpacities, state, item.tile, seenCrossTileIDs);
+        }
     }
 }
 

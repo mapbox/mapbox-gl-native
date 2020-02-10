@@ -583,10 +583,13 @@ void RenderSymbolLayer::prepare(const LayerPrepareParameters& params) {
             assert(tile);
             assert(tile->kind == Tile::Kind::Geometry);
 
+            bool firstInBucket = true;
+
             if (bucket->sortKeyRanges.size() == 0) {
                 placementData.push_back({*bucket,
                                          renderTile,
                                          static_cast<const GeometryTile*>(tile)->getFeatureIndex(),
+                                         firstInBucket,
                                          0.0f,
                                          0,
                                          bucket->symbolInstances.size()});
@@ -595,11 +598,14 @@ void RenderSymbolLayer::prepare(const LayerPrepareParameters& params) {
                     LayerPlacementData layerData{*bucket,
                                                  renderTile,
                                                  static_cast<const GeometryTile*>(tile)->getFeatureIndex(),
+                                                 firstInBucket,
                                                  sortKeyRange.sortKey,
                                                  sortKeyRange.symbolInstanceStart,
                                                  sortKeyRange.symbolInstanceEnd};
                     auto sortPosition = std::upper_bound(placementData.cbegin(), placementData.cend(), layerData);
                     placementData.insert(sortPosition, std::move(layerData));
+
+                    firstInBucket = false;
                 }
             }
         }
