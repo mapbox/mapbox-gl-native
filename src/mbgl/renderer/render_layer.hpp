@@ -33,7 +33,7 @@ public:
     friend bool operator<(const LayerPlacementData& lhs, const LayerPlacementData& rhs) {
         return lhs.sortKey < rhs.sortKey;
     }
-    std::reference_wrapper<SymbolBucket> bucket;
+    std::reference_wrapper<Bucket> bucket;
     std::reference_wrapper<const RenderTile> tile;
     std::shared_ptr<FeatureIndex> featureIndex;
     bool firstInBucket;
