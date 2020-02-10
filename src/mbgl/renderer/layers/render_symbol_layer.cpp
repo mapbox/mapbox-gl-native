@@ -582,10 +582,20 @@ void RenderSymbolLayer::prepare(const LayerPrepareParameters& params) {
             assert(tile->kind == Tile::Kind::Geometry);
 
             if (bucket->sortKeyRanges.size() == 0) {
-                placementData.push_back({*bucket, renderTile, static_cast<const GeometryTile*>(tile)->getFeatureIndex(), 0.0f, 0, bucket->symbolInstances.size()});
+                placementData.push_back({*bucket,
+                                         renderTile,
+                                         static_cast<const GeometryTile*>(tile)->getFeatureIndex(),
+                                         0.0f,
+                                         0,
+                                         bucket->symbolInstances.size()});
             } else {
                 for (const SortKeyRange& sortKeyRange : bucket->sortKeyRanges) {
-                    LayerPlacementData layerData{*bucket, renderTile, static_cast<const GeometryTile*>(tile)->getFeatureIndex(), sortKeyRange.sortKey, sortKeyRange.symbolInstanceStart, sortKeyRange.symbolInstanceEnd};
+                    LayerPlacementData layerData{*bucket,
+                                                 renderTile,
+                                                 static_cast<const GeometryTile*>(tile)->getFeatureIndex(),
+                                                 sortKeyRange.sortKey,
+                                                 sortKeyRange.symbolInstanceStart,
+                                                 sortKeyRange.symbolInstanceEnd};
                     auto sortPosition = std::upper_bound(placementData.cbegin(), placementData.cend(), layerData);
                     placementData.insert(sortPosition, std::move(layerData));
                 }

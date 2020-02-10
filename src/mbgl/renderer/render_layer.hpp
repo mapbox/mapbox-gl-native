@@ -1,14 +1,13 @@
 #pragma once
+#include <list>
 #include <mbgl/layout/layout.hpp>
 #include <mbgl/renderer/render_pass.hpp>
 #include <mbgl/renderer/render_source.hpp>
 #include <mbgl/style/layer_properties.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/util/mat4.hpp>
-
 #include <memory>
 #include <string>
-#include <list>
 
 namespace mbgl {
 
@@ -103,9 +102,7 @@ public:
 
     virtual void prepare(const LayerPrepareParameters&);
 
-    const std::list<LayerPlacementData>& getPlacementData() const { 
-        return placementData; 
-    }
+    const std::list<LayerPlacementData>& getPlacementData() const { return placementData; }
 
     // Latest evaluated properties.
     Immutable<style::LayerProperties> evaluatedProperties;
