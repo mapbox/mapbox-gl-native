@@ -18,6 +18,12 @@
 
   The new `Source::setPrefetchZoomDelta(optional<uint8_t>)` method allows overriding default tile prefetch setting that is defined by the Map instance.
 
+- [core] Add support for `within expression`. Implement the use of `within expression` with paint propery and filter expression. ([#16157](https://github.com/mapbox/mapbox-gl-native/pull/16157))
+   
+  The `within expression` enables checking whether a feature is inside a pre-defined geometry set/boundary or not. This `within expression` returns a boolean value, `true` indicates that the feature being evaluated is inside the geometry set. The returned value can be then consumed as input by another expression or used directly by a paint/layer property.
+ 
+  Support for using `within expression` with layout propery will be implemented separately.
+
 ### 🏁 Performance improvements
 
  - [core] Loading images to style optimization ([#16187](https://github.com/mapbox/mapbox-gl-native/pull/16187))
