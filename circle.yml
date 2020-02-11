@@ -1219,7 +1219,7 @@ jobs:
       - install-ios-packaging-dependencies
       - run:
           name: Build dynamic framework for device and simulator
-          command: make iframework BUILD_DOCS=false
+          command: make iframework
           no_output_timeout: 5m
       - deploy:
           name: Upload snapshot build to s3
