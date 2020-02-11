@@ -31,7 +31,7 @@ public:
     GeometryCollection geometry;
     optional<TaggedString> formattedText;
     optional<style::expression::Image> icon;
-    float sortKey = 0.0f;
+    double sortKey = 0.0f;
     std::size_t index;
     bool allowsVerticalWritingMode = false;
 };

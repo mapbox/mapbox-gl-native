@@ -66,7 +66,7 @@ struct RenderableSegment {
                       const RenderTile& tile_,
                       const LayerRenderData& renderData_,
                       const SymbolBucket::PaintProperties& bucketPaintProperties_,
-                      float sortKey_,
+                      double sortKey_,
                       const SymbolType type_)
         : segment(segment_),
           tile(tile_),
@@ -79,7 +79,7 @@ struct RenderableSegment {
     const RenderTile& tile;
     const LayerRenderData& renderData;
     const SymbolBucket::PaintProperties& bucketPaintProperties;
-    float sortKey;
+    double sortKey;
     SymbolType type;
 
     friend bool operator < (const RenderableSegment& lhs, const RenderableSegment& rhs) {

@@ -900,7 +900,7 @@ size_t SymbolLayout::addSymbol(SymbolBucket::Buffer& buffer,
                                const SymbolQuad& symbol,
                                const Anchor& labelAnchor,
                                PlacedSymbol& placedSymbol,
-                               float sortKey) {
+                               double sortKey) {
     constexpr const uint16_t vertexLength = 4;
 
     const auto &tl = symbol.tl;
@@ -914,7 +914,7 @@ size_t SymbolLayout::addSymbol(SymbolBucket::Buffer& buffer,
 
     if (buffer.segments.empty() ||
         buffer.segments.back().vertexLength + vertexLength > std::numeric_limits<uint16_t>::max() ||
-        fabs(buffer.segments.back().sortKey - sortKey) > std::numeric_limits<float>::epsilon()) {
+        fabs(buffer.segments.back().sortKey - sortKey) > std::numeric_limits<double>::epsilon()) {
         buffer.segments.emplace_back(buffer.vertices.elements(), buffer.triangles.elements(), 0ul, 0ul, sortKey);
     }
 
@@ -993,7 +993,7 @@ size_t SymbolLayout::addSymbols(SymbolBucket::Buffer& buffer,
                                 const SymbolQuads& symbols,
                                 const Anchor& labelAnchor,
                                 PlacedSymbol& placedSymbol,
-                                float sortKey) {
+                                double sortKey) {
     bool firstSymbol = true;
     size_t firstIndex = 0;
     for (auto& symbol : symbols) {

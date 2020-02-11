@@ -93,9 +93,9 @@ public:
     const PropertyValue<SymbolPlacementType>& getSymbolPlacement() const;
     void setSymbolPlacement(const PropertyValue<SymbolPlacementType>&);
 
-    static PropertyValue<float> getDefaultSymbolSortKey();
-    const PropertyValue<float>& getSymbolSortKey() const;
-    void setSymbolSortKey(const PropertyValue<float>&);
+    static PropertyValue<double> getDefaultSymbolSortKey();
+    const PropertyValue<double>& getSymbolSortKey() const;
+    void setSymbolSortKey(const PropertyValue<double>&);
 
     static PropertyValue<float> getDefaultSymbolSpacing();
     const PropertyValue<float>& getSymbolSpacing() const;

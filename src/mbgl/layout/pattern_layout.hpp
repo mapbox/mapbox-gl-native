@@ -23,7 +23,7 @@ public:
     PatternFeature(std::size_t i_,
                    std::unique_ptr<GeometryTileFeature> feature_,
                    PatternLayerMap patterns_,
-                   float sortKey_ = 0.0f)
+                   double sortKey_ = 0.0f)
         : i(i_), feature(std::move(feature_)), patterns(std::move(patterns_)), sortKey(sortKey_) {}
 
     friend bool operator<(const PatternFeature& lhs, const PatternFeature& rhs) { return lhs.sortKey < rhs.sortKey; }
@@ -31,7 +31,7 @@ public:
     std::size_t i;
     std::unique_ptr<GeometryTileFeature> feature;
     PatternLayerMap patterns;
-    float sortKey;
+    double sortKey;
 };
 
 template <typename SortKeyPropertyType>
@@ -60,7 +60,7 @@ struct PatternFeatureInserter {
                        float zoom,
                        const PropertiesType& properties) {
         const auto& sortKeyProperty = properties.template get<SortKeyPropertyType>();
-        float sortKey = sortKeyProperty.evaluate(*feature, zoom, SortKeyPropertyType::defaultValue());
+        double sortKey = sortKeyProperty.evaluate(*feature, zoom, SortKeyPropertyType::defaultValue());
         PatternFeature patternFeature{index, std::move(feature), std::move(patternDependencyMap), sortKey};
         const auto lowerBound = std::lower_bound(features.cbegin(), features.cend(), patternFeature);
         features.insert(lowerBound, std::move(patternFeature));

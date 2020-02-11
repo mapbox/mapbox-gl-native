@@ -96,7 +96,7 @@ struct SymbolPlacement : LayoutProperty<SymbolPlacementType> {
     static SymbolPlacementType defaultValue() { return SymbolPlacementType::Point; }
 };
 
-struct SymbolSortKey : DataDrivenLayoutProperty<float> {
+struct SymbolSortKey : DataDrivenLayoutProperty<double> {
     static constexpr const char *name() { return "symbol-sort-key"; }
     static float defaultValue() { return 0; }
 };

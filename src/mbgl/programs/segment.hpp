@@ -15,7 +15,7 @@ public:
             std::size_t indexOffset_,
             std::size_t vertexLength_ = 0,
             std::size_t indexLength_ = 0,
-            float sortKey_ = 0.0f)
+            double sortKey_ = 0.0f)
         : vertexOffset(vertexOffset_),
           indexOffset(indexOffset_),
           vertexLength(vertexLength_),
@@ -39,7 +39,7 @@ public:
     //     uses fill-color and the other uses fill-pattern
     mutable std::map<std::string, gfx::DrawScope> drawScopes;
 
-    float sortKey;
+    double sortKey;
 };
 
 template <class AttributeList>

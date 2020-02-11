@@ -81,13 +81,13 @@ private:
                      const SymbolQuad&,
                      const Anchor& labelAnchor,
                      PlacedSymbol& placedSymbol,
-                     float sortKey);
+                     double sortKey);
     size_t addSymbols(SymbolBucket::Buffer&,
                       const Range<float> sizeData,
                       const SymbolQuads&,
                       const Anchor& labelAnchor,
                       PlacedSymbol& placedSymbol,
-                      float sortKey);
+                      double sortKey);
 
     // Adds symbol quads to bucket and returns formatted section index of last
     // added quad.

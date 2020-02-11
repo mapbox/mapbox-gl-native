@@ -301,15 +301,15 @@ void SymbolLayer::setSymbolPlacement(const PropertyValue<SymbolPlacementType>& v
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
-PropertyValue<float> SymbolLayer::getDefaultSymbolSortKey() {
+PropertyValue<double> SymbolLayer::getDefaultSymbolSortKey() {
     return SymbolSortKey::defaultValue();
 }
 
-const PropertyValue<float>& SymbolLayer::getSymbolSortKey() const {
+const PropertyValue<double>& SymbolLayer::getSymbolSortKey() const {
     return impl().layout.get<SymbolSortKey>();
 }
 
-void SymbolLayer::setSymbolSortKey(const PropertyValue<float>& value) {
+void SymbolLayer::setSymbolSortKey(const PropertyValue<double>& value) {
     if (value == getSymbolSortKey()) return;
     auto impl_ = mutableImpl();
     impl_->layout.get<SymbolSortKey>() = value;

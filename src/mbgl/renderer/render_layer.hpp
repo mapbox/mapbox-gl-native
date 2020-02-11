@@ -37,7 +37,7 @@ public:
     std::reference_wrapper<const RenderTile> tile;
     std::shared_ptr<FeatureIndex> featureIndex;
     bool firstInBucket;
-    float sortKey;
+    double sortKey;
     size_t symbolInstanceStart;
     size_t symbolInstanceEnd;
 };
