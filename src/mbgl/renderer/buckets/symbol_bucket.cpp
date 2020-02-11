@@ -22,6 +22,7 @@ SymbolBucket::SymbolBucket(Immutable<style::SymbolLayoutProperties::PossiblyEval
                            bool sortFeaturesByY_,
                            const std::string bucketName_,
                            const std::vector<SymbolInstance>&& symbolInstances_,
+                           const std::vector<SortKeyRange>&& sortKeyRanges_,
                            float tilePixelRatio_,
                            bool allowVerticalPlacement_,
                            std::vector<style::TextWritingModeType> placementModes_)
@@ -35,7 +36,8 @@ SymbolBucket::SymbolBucket(Immutable<style::SymbolLayoutProperties::PossiblyEval
       sortUploaded(false),
       justReloaded(false),
       hasVariablePlacement(false),
-      symbolInstances(std::move(symbolInstances_)),
+      symbolInstances(symbolInstances_),
+      sortKeyRanges(sortKeyRanges_),
       textSizeBinder(SymbolSizeBinder::create(zoom, textSize, TextSize::defaultValue())),
       iconSizeBinder(SymbolSizeBinder::create(zoom, iconSize, IconSize::defaultValue())),
       tilePixelRatio(tilePixelRatio_),

@@ -59,6 +59,7 @@ public:
                  bool sortFeaturesByY,
                  const std::string bucketLeaderID,
                  const std::vector<SymbolInstance>&&,
+                 const std::vector<SortKeyRange>&&,
                  const float tilePixelRatio,
                  bool allowVerticalPlacement,
                  std::vector<style::TextWritingModeType> placementModes);
@@ -100,6 +101,7 @@ public:
     bool hasVariablePlacement : 1;
 
     std::vector<SymbolInstance> symbolInstances;
+    std::vector<SortKeyRange> sortKeyRanges;
 
     struct PaintProperties {
         SymbolIconProgram::Binders iconBinders;

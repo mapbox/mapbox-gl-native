@@ -362,6 +362,8 @@ void RenderSymbolLayer::render(PaintParameters& parameters) {
         assert(bucket.paintProperties.find(getID()) != bucket.paintProperties.end());
         const auto& bucketPaintProperties = bucket.paintProperties.at(getID());
 
+        bucket.justReloaded = false;
+
         auto addRenderables = [&renderableSegments, &tile, renderData, &bucketPaintProperties, it = renderableSegments.begin()] (auto& segments, const SymbolType type) mutable {
             for (auto& segment : segments) {
                 it = renderableSegments.emplace_hint(it, SegmentWrapper{std::ref(segment)}, tile, *renderData, bucketPaintProperties, segment.sortKey, type);
@@ -518,7 +520,28 @@ void RenderSymbolLayer::prepare(const LayerPrepareParameters& params) {
             const Tile* tile = params.source->getRenderedTile(renderTile.id);
             assert(tile);
             assert(tile->kind == Tile::Kind::Geometry);
-            placementData.push_back({*bucket, renderTile, static_cast<const GeometryTile*>(tile)->getFeatureIndex()});
+
+            bool firstInBucket = true;
+            auto featureIndex = static_cast<const GeometryTile*>(tile)->getFeatureIndex();
+
+            if (bucket->sortKeyRanges.empty()) {
+                placementData.push_back(
+                    {*bucket, renderTile, featureIndex, firstInBucket, 0.0f, 0, bucket->symbolInstances.size()});
+            } else {
+                for (const SortKeyRange& sortKeyRange : bucket->sortKeyRanges) {
+                    LayerPlacementData layerData{*bucket,
+                                                 renderTile,
+                                                 featureIndex,
+                                                 firstInBucket,
+                                                 sortKeyRange.sortKey,
+                                                 sortKeyRange.symbolInstanceStart,
+                                                 sortKeyRange.symbolInstanceEnd};
+                    auto sortPosition = std::upper_bound(placementData.cbegin(), placementData.cend(), layerData);
+                    placementData.insert(sortPosition, std::move(layerData));
+
+                    firstInBucket = false;
+                }
+            }
         }
     }
 }
