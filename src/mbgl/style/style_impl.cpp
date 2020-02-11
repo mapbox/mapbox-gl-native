@@ -301,10 +301,10 @@ void Style::Impl::removeImage(const std::string& id) {
     images = std::move(newImages);
 }
 
-const style::Image::Impl* Style::Impl::getImage(const std::string& id) const {
+optional<Immutable<style::Image::Impl>> Style::Impl::getImage(const std::string& id) const {
     auto found = std::find_if(images->begin(), images->end(), [&id](const auto& image) { return image->id == id; });
-    if (found == images->end()) return nullptr;
-    return found->get();
+    if (found == images->end()) return nullopt;
+    return *found;
 }
 
 void Style::Impl::setObserver(style::Observer* observer_) {

@@ -78,7 +78,7 @@ public:
     void setLight(std::unique_ptr<Light>);
     Light* getLight() const;
 
-    const style::Image::Impl* getImage(const std::string&) const;
+    optional<Immutable<style::Image::Impl>> getImage(const std::string&) const;
     void addImage(std::unique_ptr<style::Image>);
     void removeImage(const std::string&);
 
