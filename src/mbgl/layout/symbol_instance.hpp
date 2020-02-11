@@ -121,4 +121,11 @@ public:
     uint32_t crossTileID = 0;
 };
 
+class SortKeyRange {
+public:
+    float sortKey;
+    size_t symbolInstanceStart;
+    size_t symbolInstanceEnd;
+};
+
 } // namespace mbgl
