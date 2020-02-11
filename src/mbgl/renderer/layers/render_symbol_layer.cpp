@@ -587,13 +587,8 @@ void RenderSymbolLayer::prepare(const LayerPrepareParameters& params) {
             auto featureIndex = static_cast<const GeometryTile*>(tile)->getFeatureIndex();
 
             if (bucket->sortKeyRanges.empty()) {
-                placementData.push_back({*bucket,
-                                         renderTile,
-                                         featureIndex,
-                                         firstInBucket,
-                                         0.0f,
-                                         0,
-                                         bucket->symbolInstances.size()});
+                placementData.push_back(
+                    {*bucket, renderTile, featureIndex, firstInBucket, 0.0f, 0, bucket->symbolInstances.size()});
             } else {
                 for (const SortKeyRange& sortKeyRange : bucket->sortKeyRanges) {
                     LayerPlacementData layerData{*bucket,
