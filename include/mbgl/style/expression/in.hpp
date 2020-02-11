@@ -10,8 +10,7 @@ namespace expression {
 
 class In final : public Expression {
 public:
-    In(std::unique_ptr<Expression> needle_, std::unique_ptr<Expression> haystack_)
-        : Expression(Kind::In, type::Boolean), needle(std::move(needle_)), haystack(std::move(haystack_)) {}
+    In(std::unique_ptr<Expression> needle_, std::unique_ptr<Expression> haystack_);
 
     static ParseResult parse(const mbgl::style::conversion::Convertible& value, ParsingContext& ctx);
 
