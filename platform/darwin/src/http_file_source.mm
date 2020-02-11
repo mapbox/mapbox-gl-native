@@ -207,9 +207,10 @@ NSURL *resourceURLWithAccountType(const Resource& resource, NSInteger accountTyp
 
         if (resource.usage == Resource::Usage::Offline) {
             [queryItems addObject:[NSURLQueryItem queryItemWithName:@"offline" value:@"true"]];
+        } else {
+            // Only add SKU token to requests not tagged as "offline" usage.
+            [queryItems addObject:[NSURLQueryItem queryItemWithName:@"sku" value:MGLNativeNetworkManager.sharedManager.skuToken]];
         }
-
-        [queryItems addObject:[NSURLQueryItem queryItemWithName:@"sku" value:MGLNativeNetworkManager.sharedManager.skuToken]];
         
         if (components.queryItems) {
             [queryItems addObjectsFromArray:components.queryItems];
