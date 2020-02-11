@@ -44,7 +44,7 @@ bool pointWithinPolygon(const mbgl::Point<double>& point, const mapbox::geometry
     for (auto ring : polygon) {
         auto size = ring.size();
         // loop through every edge of the ring
-        for (decltype(size) i = 0; i < size - 1; ++i) {
+        for (std::size_t i = 0; i < size - 1; ++i) {
             if (rayIntersect(point, ring[i], ring[i + 1])) {
                 within = !within;
             }
@@ -55,8 +55,7 @@ bool pointWithinPolygon(const mbgl::Point<double>& point, const mapbox::geometry
 
 bool pointWithinPolygons(const mbgl::Point<double>& point, const mapbox::geometry::multi_polygon<double>& polygons) {
     for (auto polygon : polygons) {
-        auto within = pointWithinPolygon(point, polygon);
-        if (within) return true;
+        if (pointWithinPolygon(point, polygon)) return true;
     }
     return false;
 }
@@ -77,14 +76,9 @@ bool pointsWithinPolygons(const mbgl::GeometryTileFeature& feature,
                                 return pointWithinPolygons(point, polygons);
                             },
                             [&polygons](const mapbox::geometry::multi_point<double>& points) -> bool {
-                                auto result = false;
-                                for (const auto& p : points) {
-                                    result = pointWithinPolygons(p, polygons);
-                                    if (!result) {
-                                        return result;
-                                    }
-                                }
-                                return result;
+                                return std::all_of(points.begin(), points.end(), [&polygons](const auto& p) {
+                                    return pointWithinPolygons(p, polygons);
+                                });
                             },
                             [](const auto&) -> bool { return false; });
                 },
@@ -95,14 +89,9 @@ bool pointsWithinPolygons(const mbgl::GeometryTileFeature& feature,
                                 return pointWithinPolygon(point, polygon);
                             },
                             [&polygon](const mapbox::geometry::multi_point<double>& points) -> bool {
-                                auto result = false;
-                                for (const auto& p : points) {
-                                    result = pointWithinPolygon(p, polygon);
-                                    if (!result) {
-                                        return result;
-                                    }
-                                }
-                                return result;
+                                return std::all_of(points.begin(), points.end(), [&polygon](const auto& p) {
+                                    return pointWithinPolygon(p, polygon);
+                                });
                             },
                             [](const auto&) -> bool { return false; });
                 },
@@ -138,7 +127,7 @@ namespace expression {
 
 Within::Within(GeoJSON geojson) : Expression(Kind::Within, type::Boolean), geoJSONSource(std::move(geojson)) {}
 
-Within::~Within() {}
+Within::~Within() = default;
 
 using namespace mbgl::style::conversion;
 
@@ -150,15 +139,15 @@ EvaluationResult Within::evaluate(const EvaluationContext& params) const {
     // Currently only support Point/Points in Polygon/Polygons
     if (geometryType == FeatureType::Point) {
         return pointsWithinPolygons(*params.feature, *params.canonical, geoJSONSource);
-    } else {
-        mbgl::Log::Warning(mbgl::Event::General, "within expression currently only support 'Point' geometry type");
     }
+    mbgl::Log::Warning(mbgl::Event::General, "within expression currently only support 'Point' geometry type");
+
     return false;
 }
 
 ParseResult Within::parse(const Convertible& value, ParsingContext& ctx) {
     if (isArray(value)) {
-        // object value, quoted with ["Within", value]
+        // object value, quoted with ["within", value]
         if (arrayLength(value) != 2) {
             ctx.error("'within' expression requires exactly one argument, but found " +
                       util::toString(arrayLength(value) - 1) + " instead.");
@@ -183,6 +172,7 @@ Value valueConverter(const mapbox::geojson::rapidjson_value& v) {
     }
     if (v.IsArray()) {
         std::vector<Value> result;
+        result.reserve(v.Size());
         for (const auto& m : v.GetArray()) {
             result.push_back(valueConverter(m));
         }

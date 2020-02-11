@@ -196,27 +196,27 @@ GeometryCollection convertGeometry(const Feature::geometry_type& geometryTileFea
     return geometryTileFeature.match(
         [&](const Point<double>& point) -> GeometryCollection { return {{latLonToTileCoodinates(point)}}; },
         [&](const MultiPoint<double>& points) -> GeometryCollection {
-            GeometryCollection result;
-            std::vector<Point<int16_t>> temp;
+            MultiPoint<int16_t> result;
+            result.reserve(points.size());
             for (const auto p : points) {
-                temp.emplace_back(latLonToTileCoodinates(p));
+                result.emplace_back(latLonToTileCoodinates(p));
             }
-            result = {temp};
-            return result;
+            return {std::move(result)};
         },
         [&](const LineString<double>& lineString) -> GeometryCollection {
-            GeometryCollection result;
-            std::vector<Point<int16_t>> temp;
+            LineString<int16_t> result;
+            result.reserve(lineString.size());
             for (const auto p : lineString) {
-                temp.emplace_back(latLonToTileCoodinates(p));
+                result.emplace_back(latLonToTileCoodinates(p));
             }
-            result = {temp};
-            return result;
+            return {std::move(result)};
         },
         [&](const MultiLineString<double>& lineStrings) -> GeometryCollection {
             GeometryCollection result;
+            result.reserve(lineStrings.size());
             for (const auto line : lineStrings) {
-                std::vector<Point<int16_t>> temp;
+                LineString<int16_t> temp;
+                temp.reserve(line.size());
                 for (const auto p : line) {
                     temp.emplace_back(latLonToTileCoodinates(p));
                 }
@@ -226,9 +226,11 @@ GeometryCollection convertGeometry(const Feature::geometry_type& geometryTileFea
         },
         [&](const Polygon<double> polygon) -> GeometryCollection {
             GeometryCollection result;
-            for (const auto line : polygon) {
-                std::vector<Point<int16_t>> temp;
-                for (const auto p : line) {
+            result.reserve(polygon.size());
+            for (const auto ring : polygon) {
+                LinearRing<int16_t> temp;
+                temp.reserve(ring.size());
+                for (const auto p : ring) {
                     temp.emplace_back(latLonToTileCoodinates(p));
                 }
                 result.emplace_back(temp);
@@ -237,14 +239,17 @@ GeometryCollection convertGeometry(const Feature::geometry_type& geometryTileFea
         },
         [&](const MultiPolygon<double> polygons) -> GeometryCollection {
             GeometryCollection result;
-            for (const auto polygon : polygons)
-                for (const auto line : polygon) {
-                    LineString<int16_t> temp;
-                    for (const auto p : line) {
-                        temp.emplace_back(latLonToTileCoodinates(p));
+            result.reserve(polygons.size());
+            for (const auto pg : polygons) {
+                for (const auto r : pg) {
+                    LinearRing<int16_t> ring;
+                    ring.reserve(r.size());
+                    for (const auto p : r) {
+                        ring.emplace_back(latLonToTileCoodinates(p));
                     }
-                    result.emplace_back(temp);
+                    result.emplace_back(ring);
                 }
+            }
             return result;
         },
         [](const auto&) -> GeometryCollection { return GeometryCollection(); });
