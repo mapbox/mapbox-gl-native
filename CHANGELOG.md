@@ -18,6 +18,20 @@
 
   The new `Source::setPrefetchZoomDelta(optional<uint8_t>)` method allows overriding default tile prefetch setting that is defined by the Map instance.
 
+### 🏁 Performance improvements
+
+ - [core] Loading images to style optimization ([#16187](https://github.com/mapbox/mapbox-gl-native/pull/16187))
+
+   This change enables attaching images to the style with batches and avoids massive re-allocations. Thus, it improves UI performance especially at start-up time.
+
+### 🧩  Architectural changes
+
+##### ⚠️  Breaking changes
+
+ - [core] Loading images to style optimization ([#16187](https://github.com/mapbox/mapbox-gl-native/pull/16187))
+
+   The `style::Style::getImage()` semantics changed - it now returns `optional<style::Image>`.
+
 ## maps-v1.0.1 (2020.01-release-unicorn)
 
 ### 🐞 Bug fixes
