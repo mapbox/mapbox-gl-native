@@ -1,11 +1,11 @@
 #include <list>
 #include <mbgl/layout/symbol_layout.hpp>
+#include <mbgl/renderer/bucket.hpp>
+#include <mbgl/renderer/buckets/symbol_bucket.hpp>
 #include <mbgl/renderer/render_layer.hpp>
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/text/placement.hpp>
 #include <mbgl/tile/geometry_tile.hpp>
-#include <mbgl/renderer/buckets/symbol_bucket.hpp>
-#include <mbgl/renderer/bucket.hpp>
 #include <mbgl/util/math.hpp>
 #include <utility>
 
