@@ -22,8 +22,6 @@
     "expression-tests/legacy/interval/composite-default": "https://github.com/mapbox/mapbox-gl-native/issues/12747",
     "expression-tests/legacy/interval/tokens-zoom": "https://github.com/mapbox/mapbox-gl-native/issues/12747",
     "expression-tests/resolved-locale/basic": "Even the 'en' locale may not be present on some test systems.",
-    "expression-tests/within/basic": "TODO: Fix by implementing `within` expression",
-    "expression-tests/within/invalid-geojson": "TODO: Fix by implementing `within` expression",
     "probes/file-size/fail-file-doesnt-match": "Should fail, doesn't match the expectation.",
     "probes/file-size/fail-file-not-found": "Should fail, file not found.",
     "probes/file-size/fail-size-is-over": "Should fail, size is bigger than expected.",
@@ -135,10 +133,5 @@
     "render-tests/line-pattern/with-dasharray":"https://github.com/mapbox/mapbox-gl-js/pull/9189",
     "render-tests/symbol-sort-key/placement-tile-boundary-right-then-left": "https://github.com/mapbox/mapbox-gl-js/pull/9054",
     "render-tests/line-dasharray/zero-length-gap":"https://github.com/mapbox/mapbox-gl-js/pull/9246",
-    "render-tests/within/layout-text": "TODO: Fix by enabling `within` expreesion with layout property",
-    "render-tests/within/filter-with-inlined-geojson": "TODO: Fix by enabling `within` expreesion with filter expression",
-    "render-tests/within/paint-circle": "TODO: Fix by enabling `within` expreesion with paint property",
-    "render-tests/within/paint-icon": "TODO: Fix by enabling `within` expreesion with paint property",
-    "render-tests/within/paint-text": "TODO: Fix by enabling `within` expreesion with paint property"
-
+    "render-tests/within/layout-text": "TODO: Fix by enabling `within` expreesion with layout property"
 }
