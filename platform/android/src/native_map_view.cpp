@@ -1099,8 +1099,8 @@ void NativeMapView::removeImage(JNIEnv& env, const jni::String& name) {
 }
 
 jni::Local<jni::Object<Bitmap>> NativeMapView::getImage(JNIEnv& env, const jni::String& name) {
-    if (auto* image = map->getStyle().getImage(jni::Make<std::string>(env, name))) {
-        return Bitmap::CreateBitmap(env, *image);
+    if (auto image = map->getStyle().getImage(jni::Make<std::string>(env, name))) {
+        return Bitmap::CreateBitmap(env, image->getImage());
     }
     return jni::Local<jni::Object<Bitmap>>();
 }

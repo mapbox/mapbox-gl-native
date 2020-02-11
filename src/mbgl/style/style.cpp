@@ -60,11 +60,10 @@ const Light* Style::getLight() const {
     return impl->getLight();
 }
 
-const PremultipliedImage* Style::getImage(const std::string& name) const {
-    if (auto* image = impl->getImage(name)) {
-        return &(image->image);
-    }
-    return nullptr;
+optional<Image> Style::getImage(const std::string& name) const {
+    auto image = impl->getImage(name);
+    if (!image) return nullopt;
+    return style::Image(std::move(*image));
 }
 
 void Style::addImage(std::unique_ptr<Image> image) {
