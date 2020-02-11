@@ -661,8 +661,11 @@ void Placement::placeBucket(const SymbolBucket& bucket,
         }
 
     } else {
+        auto beginIt = bucket.symbolInstances.begin() + params.symbolInstanceStart;
         auto endIt = bucket.symbolInstances.begin() + params.symbolInstanceEnd;
-        for (auto it = bucket.symbolInstances.begin() + params.symbolInstanceStart; it != endIt; it++) {
+        assert(params.symbolInstanceStart < params.symbolInstanceEnd);
+        assert(params.symbolInstanceEnd <= bucket.symbolInstances.size());
+        for (auto it = beginIt; it != endIt; ++it) {
             placeSymbol(*it);
         }
     }

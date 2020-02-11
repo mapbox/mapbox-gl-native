@@ -578,14 +578,6 @@ void SymbolLayout::addFeature(const std::size_t layoutFeatureIndex,
                                       anchor.point.y < util::EXTENT;
 
         if (mode == MapMode::Tile || anchorInsideTile) {
-            if (sortFeaturesByKey) {
-                if (sortKeyRanges.size() && sortKeyRanges.back().sortKey == feature.sortKey) {
-                    sortKeyRanges.back().symbolInstanceEnd = symbolInstances.size() + 1;
-                } else {
-                    sortKeyRanges.push_back({feature.sortKey, symbolInstances.size(), symbolInstances.size() + 1});
-                }
-            }
-
             // For static/continuous rendering, only add symbols anchored within this tile:
             //  neighboring symbols will be added as part of the neighboring tiles.
             // In tiled rendering mode, add all symbols in the buffers so that we can:
@@ -613,6 +605,14 @@ void SymbolLayout::addFeature(const std::size_t layoutFeatureIndex,
                                          variableTextOffset,
                                          allowVerticalPlacement,
                                          iconType);
+
+            if (sortFeaturesByKey) {
+                if (sortKeyRanges.size() && sortKeyRanges.back().sortKey == feature.sortKey) {
+                    sortKeyRanges.back().symbolInstanceEnd = symbolInstances.size();
+                } else {
+                    sortKeyRanges.push_back({feature.sortKey, symbolInstances.size() - 1, symbolInstances.size()});
+                }
+            }
         }
     };
 
