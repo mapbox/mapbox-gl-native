@@ -125,3 +125,19 @@ TEST(Style, SourceImplsOrder) {
     EXPECT_EQ("b", sourceImpls[1]->id);
     EXPECT_EQ("c", sourceImpls[2]->id);
 }
+
+TEST(Style, AddRemoveImage) {
+    util::RunLoop loop;
+    auto fileSource = std::make_shared<StubFileSource>();
+    Style::Impl style{fileSource, 1.0};
+    style.addImage(std::make_unique<style::Image>("one", PremultipliedImage({16, 16}), 2));
+    style.addImage(std::make_unique<style::Image>("two", PremultipliedImage({16, 16}), 2));
+    style.addImage(std::make_unique<style::Image>("three", PremultipliedImage({16, 16}), 2));
+
+    style.removeImage("one");
+    style.removeImage("two");
+
+    EXPECT_TRUE(!!style.getImage("three"));
+    EXPECT_FALSE(!!style.getImage("two"));
+    EXPECT_FALSE(!!style.getImage("four"));
+}
