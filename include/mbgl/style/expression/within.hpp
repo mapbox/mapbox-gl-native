@@ -15,7 +15,7 @@ class Within final : public Expression {
 public:
     explicit Within(GeoJSON geojson);
 
-    ~Within() final;
+    ~Within() override;
 
     EvaluationResult evaluate(const EvaluationContext&) const override;
 

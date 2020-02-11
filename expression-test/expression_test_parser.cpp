@@ -259,14 +259,13 @@ bool parseInputs(const JSValue& inputsValue, TestData& data) {
         // Parse canonicalID
         optional<CanonicalTileID> canonical;
         if (evaluationContext.HasMember("canonicalID")) {
-            assert(evaluationContext["canonicalID"].IsObject());
-            assert(
-                evaluationContext["canonicalID"].HasMember("z") && evaluationContext["canonicalID"]["z"].IsNumber() &&
-                evaluationContext["canonicalID"].HasMember("x") && evaluationContext["canonicalID"]["x"].IsNumber() &&
-                evaluationContext["canonicalID"].HasMember("y") && evaluationContext["canonicalID"]["y"].IsNumber());
-            canonical = CanonicalTileID(evaluationContext["canonicalID"]["z"].GetUint(),
-                                        evaluationContext["canonicalID"]["x"].GetUint(),
-                                        evaluationContext["canonicalID"]["y"].GetUint());
+            const auto& canonicalIDObject = evaluationContext["canonicalID"];
+            assert(canonicalIDObject.IsObject());
+            assert(canonicalIDObject.HasMember("z") && canonicalIDObject["z"].IsNumber());
+            assert(canonicalIDObject.HasMember("x") && canonicalIDObject["x"].IsNumber());
+            assert(canonicalIDObject.HasMember("y") && canonicalIDObject["y"].IsNumber());
+            canonical = CanonicalTileID(
+                canonicalIDObject["z"].GetUint(), canonicalIDObject["x"].GetUint(), canonicalIDObject["y"].GetUint());
         }
 
         // Parse availableImages
