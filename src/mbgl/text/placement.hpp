@@ -92,6 +92,9 @@ public:
     std::string sourceId;
     std::shared_ptr<FeatureIndex> featureIndex;
     bool showCollisionBoxes;
+    float sortKey;
+    size_t symbolInstanceStart;
+    size_t symbolInstanceEnd;
 };
 
 class Placement;
