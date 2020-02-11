@@ -91,6 +91,9 @@ public:
     const mat4& projMatrix;
     std::string sourceId;
     std::shared_ptr<FeatureIndex> featureIndex;
+    float sortKey;
+    size_t symbolInstanceStart;
+    size_t symbolInstanceEnd;
     bool showCollisionBoxes;
 };
 
