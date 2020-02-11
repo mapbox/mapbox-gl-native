@@ -1,3 +1,4 @@
+#include <list>
 #include <mbgl/text/placement.hpp>
 
 #include <mbgl/layout/symbol_layout.hpp>
@@ -110,12 +111,14 @@ void Placement::placeLayer(const RenderLayer& layer, const mat4& projMatrix, boo
     std::set<uint32_t> seenCrossTileIDs;
     for (const auto& item : layer.getPlacementData()) {
         Bucket& bucket = item.bucket;
-        BucketPlacementParameters params{
-                item.tile,
-                projMatrix,
-                layer.baseImpl->source,
-                item.featureIndex,
-                showCollisionBoxes};
+        BucketPlacementParameters params{item.tile,
+                                         projMatrix,
+                                         layer.baseImpl->source,
+                                         item.featureIndex,
+                                         item.sortKey,
+                                         item.symbolInstanceStart,
+                                         item.symbolInstanceEnd,
+                                         showCollisionBoxes};
         bucket.place(*this, params, seenCrossTileIDs);
     }
 }
@@ -518,12 +521,14 @@ void Placement::placeBucket(
             placeSymbol(*it);
         }
     } else {
-        for (const SymbolInstance& symbol : bucket.symbolInstances) {
-            placeSymbol(symbol);
+        auto beginIt = bucket.symbolInstances.begin() + params.symbolInstanceStart;
+        auto endIt = bucket.symbolInstances.begin() + params.symbolInstanceEnd;
+        assert(params.symbolInstanceStart < params.symbolInstanceEnd);
+        assert(params.symbolInstanceEnd <= bucket.symbolInstances.size());
+        for (auto it = beginIt; it != endIt; ++it) {
+            placeSymbol(*it);
         }
     }
-
-    bucket.justReloaded = false;
 
     // As long as this placement lives, we have to hold onto this bucket's
     // matching FeatureIndex/data for querying purposes
@@ -590,7 +595,9 @@ void Placement::commit(TimePoint now, const double zoom) {
 void Placement::updateLayerBuckets(const RenderLayer& layer, const TransformState& state, bool updateOpacities) const {
     std::set<uint32_t> seenCrossTileIDs;
     for (const auto& item : layer.getPlacementData()) {
-        item.bucket.get().updateVertices(*this, updateOpacities, state, item.tile, seenCrossTileIDs);
+        if (item.firstInBucket) {
+            item.bucket.get().updateVertices(*this, updateOpacities, state, item.tile, seenCrossTileIDs);
+        }
     }
 }
 

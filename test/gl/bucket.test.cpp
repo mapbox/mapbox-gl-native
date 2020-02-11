@@ -123,9 +123,22 @@ TEST(Buckets, SymbolBucket) {
     bool sortFeaturesByY = false;
     std::string bucketLeaderID = "test";
     std::vector<SymbolInstance> symbolInstances;
+    std::vector<SortKeyRange> symbolRanges;
 
     gl::Context context{ backend };
-    SymbolBucket bucket { std::move(layout), {}, 16.0f, 1.0f, 0, iconsNeedLinear, sortFeaturesByY, bucketLeaderID, std::move(symbolInstances), 1.0f, false, {}};
+    SymbolBucket bucket{std::move(layout),
+                        {},
+                        16.0f,
+                        1.0f,
+                        0,
+                        iconsNeedLinear,
+                        sortFeaturesByY,
+                        bucketLeaderID,
+                        std::move(symbolInstances),
+                        std::move(symbolRanges),
+                        1.0f,
+                        false,
+                        {}};
     ASSERT_FALSE(bucket.hasIconData());
     ASSERT_FALSE(bucket.hasSdfIconData());
     ASSERT_FALSE(bucket.hasTextData());

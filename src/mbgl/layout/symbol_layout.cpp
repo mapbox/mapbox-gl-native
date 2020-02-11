@@ -107,7 +107,7 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
 
     const bool hasSymbolSortKey = !leader.layout.get<SymbolSortKey>().isUndefined();
     const auto symbolZOrder = layout->get<SymbolZOrder>();
-    const bool sortFeaturesByKey = symbolZOrder != SymbolZOrderType::ViewportY && hasSymbolSortKey;
+    sortFeaturesByKey = symbolZOrder != SymbolZOrderType::ViewportY && hasSymbolSortKey;
     const bool zOrderByViewportY = symbolZOrder == SymbolZOrderType::ViewportY || (symbolZOrder == SymbolZOrderType::Auto && !sortFeaturesByKey);
     sortFeaturesByY = zOrderByViewportY && (layout->get<TextAllowOverlap>() || layout->get<IconAllowOverlap>() ||
         layout->get<TextIgnorePlacement>() || layout->get<IconIgnorePlacement>());
@@ -560,6 +560,14 @@ void SymbolLayout::addFeature(const std::size_t layoutFeatureIndex,
                     layoutFeatureIndex, feature.index,
                     feature.formattedText ? feature.formattedText->rawText() : std::u16string(),
                     overscaling, iconRotation, textRotation, variableTextOffset, allowVerticalPlacement, iconType);
+
+            if (sortFeaturesByKey) {
+                if (sortKeyRanges.size() && sortKeyRanges.back().sortKey == feature.sortKey) {
+                    sortKeyRanges.back().symbolInstanceEnd = symbolInstances.size();
+                } else {
+                    sortKeyRanges.push_back({feature.sortKey, symbolInstances.size() - 1, symbolInstances.size()});
+                }
+            }
         }
     };
 
@@ -679,8 +687,17 @@ std::vector<float> CalculateTileDistances(const GeometryCoordinates& line, const
 }
 
 void SymbolLayout::createBucket(const ImagePositions&, std::unique_ptr<FeatureIndex>&, std::unordered_map<std::string, LayerRenderData>& renderData, const bool firstLoad, const bool showCollisionBoxes) {
-    auto bucket = std::make_shared<SymbolBucket>(layout, layerPaintProperties, textSize, iconSize, zoom, iconsNeedLinear,
-                                                 sortFeaturesByY, bucketLeaderID, std::move(symbolInstances), tilePixelRatio,
+    auto bucket = std::make_shared<SymbolBucket>(layout,
+                                                 layerPaintProperties,
+                                                 textSize,
+                                                 iconSize,
+                                                 zoom,
+                                                 iconsNeedLinear,
+                                                 sortFeaturesByY,
+                                                 bucketLeaderID,
+                                                 std::move(symbolInstances),
+                                                 std::move(sortKeyRanges),
+                                                 tilePixelRatio,
                                                  allowVerticalPlacement,
                                                  std::move(placementModes));
 
