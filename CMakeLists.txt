@@ -586,6 +586,7 @@ add_library(
     ${PROJECT_SOURCE_DIR}/src/mbgl/style/expression/get_covering_stops.cpp
     ${PROJECT_SOURCE_DIR}/src/mbgl/style/expression/image.cpp
     ${PROJECT_SOURCE_DIR}/src/mbgl/style/expression/image_expression.cpp
+    ${PROJECT_SOURCE_DIR}/src/mbgl/style/expression/in.cpp
     ${PROJECT_SOURCE_DIR}/src/mbgl/style/expression/interpolate.cpp
     ${PROJECT_SOURCE_DIR}/src/mbgl/style/expression/is_constant.cpp
     ${PROJECT_SOURCE_DIR}/src/mbgl/style/expression/is_expression.cpp

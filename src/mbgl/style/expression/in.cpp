@@ -8,15 +8,30 @@ namespace mbgl {
 namespace style {
 namespace expression {
 
+namespace {
+bool isComparableType(type::Type type) {
+    return type == type::Boolean || type == type::String || type == type::Number || type == type::Null ||
+        type == type::Value;
+}
+
+bool isComparableRuntimeValue(type::Type type) {
+    return type == type::Boolean || type == type::String || type == type::Number || type == type::Null;
+}
+
+bool isSearchableRuntimeValue(type::Type type) {
+    return type == type::String || type.is<type::Array>() || type == type::Null;
+}
+}
+
 EvaluationResult In::evaluate(const EvaluationContext& params) const {
     const EvaluationResult evaluatedNeedle = needle->evaluate(params);
-    const EvaluationResult evaluatedHeystack = haystack->evaluate(params);
-
     if (!evaluatedNeedle) {
         return evaluatedNeedle.error();
     }
-    if (!evaluatedHeystack) {
-        return evaluatedHeystack.error();
+
+    const EvaluationResult evaluatedHaystack = haystack->evaluate(params);
+    if (!evaluatedHaystack) {
+        return evaluatedHaystack.error();
     }
 
     type::Type evaluatedNeedleType = typeOf(*evaluatedNeedle);
@@ -25,18 +40,18 @@ EvaluationResult In::evaluate(const EvaluationContext& params) const {
                                toString(evaluatedNeedleType) + " instead."};
     }
 
-    type::Type evaluatedHeystackType = typeOf(*evaluatedHeystack);
-    if (!isSearchableRuntimeValue(evaluatedHeystackType)) {
+    type::Type evaluatedHaystackType = typeOf(*evaluatedHaystack);
+    if (!isSearchableRuntimeValue(evaluatedHaystackType)) {
         return EvaluationError{"Expected second argument to be of type array or string, but found " +
-                               toString(evaluatedHeystackType) + " instead."};
+                               toString(evaluatedHaystackType) + " instead."};
     }
 
-    if (evaluatedNeedleType == type::Null || evaluatedHeystackType == type::Null) {
+    if (evaluatedNeedleType == type::Null || evaluatedHaystackType == type::Null) {
         return EvaluationResult(false);
     }
 
-    if (evaluatedHeystackType == type::String) {
-        const auto heystackString = evaluatedHeystack->get<std::string>();
+    if (evaluatedHaystackType == type::String) {
+        const auto haystackString = evaluatedHaystack->get<std::string>();
         std::string needleValue = "";
         if (evaluatedNeedleType == type::Boolean) {
             needleValue = evaluatedNeedle->get<bool>() ? "true" : " false";
@@ -47,20 +62,20 @@ EvaluationResult In::evaluate(const EvaluationContext& params) const {
             needleValue.erase(needleValue.find_last_not_of('0') + 1, std::string::npos);
             needleValue.erase(needleValue.find_last_not_of('.') + 1, std::string::npos);
         }
-        return EvaluationResult(heystackString.find(needleValue) != std::string::npos);
+        return EvaluationResult(haystackString.find(needleValue) != std::string::npos);
     } else {
-        const auto heystackArray = evaluatedHeystack->get<std::vector<Value>>();
+        const auto haystackArray = evaluatedHaystack->get<std::vector<Value>>();
 
         bool result = false;
         if (evaluatedNeedleType == type::Boolean) {
             auto needleValue = evaluatedNeedle->get<bool>();
-            result = find(heystackArray.begin(), heystackArray.end(), needleValue) != heystackArray.end();
+            result = find(haystackArray.begin(), haystackArray.end(), needleValue) != haystackArray.end();
         } else if (evaluatedNeedleType == type::String) {
             auto needleValue = evaluatedNeedle->get<std::string>();
-            result = find(heystackArray.begin(), heystackArray.end(), needleValue) != heystackArray.end();
+            result = find(haystackArray.begin(), haystackArray.end(), needleValue) != haystackArray.end();
         } else if (evaluatedNeedleType == type::Number) {
             auto needleValue = evaluatedNeedle->get<double>();
-            result = find(heystackArray.begin(), heystackArray.end(), needleValue) != heystackArray.end();
+            result = find(haystackArray.begin(), haystackArray.end(), needleValue) != haystackArray.end();
         }
         return EvaluationResult(result);
     }
@@ -96,19 +111,6 @@ ParseResult In::parse(const Convertible& value, ParsingContext& ctx) {
     }
 
     return ParseResult(std::make_unique<In>(std::move(*needle), std::move(*haystack)));
-}
-
-bool In::isComparableType(type::Type type) {
-    return type == type::Boolean || type == type::String || type == type::Number || type == type::Null ||
-           type == type::Value;
-}
-
-bool In::isComparableRuntimeValue(type::Type type) {
-    return type == type::Boolean || type == type::String || type == type::Number || type == type::Null;
-}
-
-bool In::isSearchableRuntimeValue(type::Type type) {
-    return type == type::String || type.is<type::Array>() || type == type::Null;
 }
 
 } // namespace expression
