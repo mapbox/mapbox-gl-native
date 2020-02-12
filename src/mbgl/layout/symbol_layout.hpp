@@ -115,6 +115,7 @@ private:
     const std::unique_ptr<GeometryTileLayer> sourceLayer;
     const float overscaling;
     const float zoom;
+    const CanonicalTileID canonicalID;
     const MapMode mode;
     const float pixelRatio;
 

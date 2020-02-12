@@ -86,6 +86,7 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
       sourceLayer(std::move(sourceLayer_)),
       overscaling(parameters.tileID.overscaleFactor()),
       zoom(parameters.tileID.overscaledZ),
+      canonicalID(parameters.tileID.canonical),
       mode(parameters.mode),
       pixelRatio(parameters.pixelRatio),
       tileSize(util::tileSize * overscaling),
@@ -141,9 +142,9 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
         ft.index = i;
 
         if (hasText) {
-            auto formatted = layout->evaluate<TextField>(zoom, ft, layoutParameters.availableImages);
-            auto textTransform = layout->evaluate<TextTransform>(zoom, ft);
-            FontStack baseFontStack = layout->evaluate<TextFont>(zoom, ft);
+            auto formatted = layout->evaluate<TextField>(zoom, ft, layoutParameters.availableImages, canonicalID);
+            auto textTransform = layout->evaluate<TextTransform>(zoom, ft, canonicalID);
+            FontStack baseFontStack = layout->evaluate<TextFont>(zoom, ft, canonicalID);
 
             ft.formattedText = TaggedString();
             for (const auto & section : formatted.sections) {
@@ -188,13 +189,13 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
         }
 
         if (hasIcon) {
-            ft.icon = layout->evaluate<IconImage>(zoom, ft, layoutParameters.availableImages);
+            ft.icon = layout->evaluate<IconImage>(zoom, ft, layoutParameters.availableImages, canonicalID);
             layoutParameters.imageDependencies.emplace(ft.icon->id(), ImageType::Icon);
         }
 
         if (ft.formattedText || ft.icon) {
             if (sortFeaturesByKey) {
-                ft.sortKey = layout->evaluate<SymbolSortKey>(zoom, ft);
+                ft.sortKey = layout->evaluate<SymbolSortKey>(zoom, ft, canonicalID);
                 const auto lowerBound = std::lower_bound(features.begin(), features.end(), ft);
                 features.insert(lowerBound, std::move(ft));
             } else {
@@ -355,14 +356,16 @@ void SymbolLayout::prepareSymbols(const GlyphMap& glyphMap,
         ShapedTextOrientations shapedTextOrientations;
         optional<PositionedIcon> shapedIcon;
         std::array<float, 2> textOffset{{0.0f, 0.0f}};
-        const float layoutTextSize = layout->evaluate<TextSize>(zoom + 1, feature);
-        const float layoutTextSizeAtBucketZoomLevel = layout->evaluate<TextSize>(zoom, feature);
-        const float layoutIconSize = layout->evaluate<IconSize>(zoom + 1, feature);
+        const float layoutTextSize = layout->evaluate<TextSize>(zoom + 1, feature, canonicalID);
+        const float layoutTextSizeAtBucketZoomLevel = layout->evaluate<TextSize>(zoom, feature, canonicalID);
+        const float layoutIconSize = layout->evaluate<IconSize>(zoom + 1, feature, canonicalID);
 
         // if feature has text, shape the text
         if (feature.formattedText && layoutTextSize > 0.0f) {
             const float lineHeight = layout->get<TextLineHeight>() * util::ONE_EM;
-            const float spacing = util::i18n::allowsLetterSpacing(feature.formattedText->rawText()) ? layout->evaluate<TextLetterSpacing>(zoom, feature) * util::ONE_EM : 0.0f;
+            const float spacing = util::i18n::allowsLetterSpacing(feature.formattedText->rawText())
+                                      ? layout->evaluate<TextLetterSpacing>(zoom, feature, canonicalID) * util::ONE_EM
+                                      : 0.0f;
 
             auto applyShaping = [&](const TaggedString& formattedText,
                                     WritingModeType writingMode,
@@ -371,7 +374,7 @@ void SymbolLayout::prepareSymbols(const GlyphMap& glyphMap,
                 const Shaping result = getShaping(
                     /* string */ formattedText,
                     /* maxWidth: ems */
-                    isPointPlacement ? layout->evaluate<TextMaxWidth>(zoom, feature) * util::ONE_EM : 0.0f,
+                    isPointPlacement ? layout->evaluate<TextMaxWidth>(zoom, feature, canonicalID) * util::ONE_EM : 0.0f,
                     /* ems */ lineHeight,
                     textAnchor,
                     textJustify,
@@ -389,22 +392,24 @@ void SymbolLayout::prepareSymbols(const GlyphMap& glyphMap,
                 return result;
             };
 
-            const std::vector<style::TextVariableAnchorType> variableTextAnchor = layout->evaluate<TextVariableAnchor>(zoom, feature);
-            const SymbolAnchorType textAnchor = layout->evaluate<TextAnchor>(zoom, feature); 
+            const std::vector<style::TextVariableAnchorType> variableTextAnchor =
+                layout->evaluate<TextVariableAnchor>(zoom, feature, canonicalID);
+            const SymbolAnchorType textAnchor = layout->evaluate<TextAnchor>(zoom, feature, canonicalID);
             if (variableTextAnchor.empty()) {
                 // Layers with variable anchors use the `text-radial-offset` property and the [x, y] offset vector
                 // is calculated at placement time instead of layout time
-                const float radialOffset = layout->evaluate<TextRadialOffset>(zoom, feature);
+                const float radialOffset = layout->evaluate<TextRadialOffset>(zoom, feature, canonicalID);
                 if (radialOffset > 0.0f) {
                     // The style spec says don't use `text-offset` and `text-radial-offset` together
                     // but doesn't actually specify what happens if you use both. We go with the radial offset.
                     textOffset = evaluateRadialOffset(textAnchor, radialOffset * util::ONE_EM);
                 } else {
-                    textOffset = {{layout->evaluate<TextOffset>(zoom, feature)[0] * util::ONE_EM,
-                                   layout->evaluate<TextOffset>(zoom, feature)[1] * util::ONE_EM}};
+                    textOffset = {{layout->evaluate<TextOffset>(zoom, feature, canonicalID)[0] * util::ONE_EM,
+                                   layout->evaluate<TextOffset>(zoom, feature, canonicalID)[1] * util::ONE_EM}};
                 }
             }
-            TextJustifyType textJustify = textAlongLine ? TextJustifyType::Center : layout->evaluate<TextJustify>(zoom, feature);
+            TextJustifyType textJustify =
+                textAlongLine ? TextJustifyType::Center : layout->evaluate<TextJustify>(zoom, feature, canonicalID);
 
             const auto addVerticalShapingForPointLabelIfNeeded = [&] {
                 if (allowVerticalPlacement && feature.formattedText->allowsVerticalWritingMode()) {
@@ -474,8 +479,8 @@ void SymbolLayout::prepareSymbols(const GlyphMap& glyphMap,
             if (image != imageMap.end()) {
                 iconType = SymbolContent::IconRGBA;
                 shapedIcon = PositionedIcon::shapeIcon(imagePositions.at(feature.icon->id()),
-                                                       layout->evaluate<IconOffset>(zoom, feature),
-                                                       layout->evaluate<IconAnchor>(zoom, feature));
+                                                       layout->evaluate<IconOffset>(zoom, feature, canonicalID),
+                                                       layout->evaluate<IconAnchor>(zoom, feature, canonicalID));
                 if (image->second->sdf) {
                     iconType = SymbolContent::IconSDF;
                 }
@@ -520,13 +525,13 @@ void SymbolLayout::addFeature(const std::size_t layoutFeatureIndex,
     const float minScale = 0.5f;
     const float glyphSize = 24.0f;
 
-    const std::array<float, 2> iconOffset = layout->evaluate<IconOffset>(zoom, feature);
+    const std::array<float, 2> iconOffset = layout->evaluate<IconOffset>(zoom, feature, canonicalID);
 
     // To reduce the number of labels that jump around when zooming we need
     // to use a text-size value that is the same for all zoom levels.
     // This calculates text-size at a high zoom level so that all tiles can
     // use the same value when calculating anchor positions.
-    const float textMaxSize = layout->evaluate<TextSize>(18, feature);
+    const float textMaxSize = layout->evaluate<TextSize>(18, feature, canonicalID);
 
     const float fontScale = layoutTextSize / glyphSize;
     const float textBoxScale = tilePixelRatio * fontScale;
@@ -536,15 +541,15 @@ void SymbolLayout::addFeature(const std::size_t layoutFeatureIndex,
     const float textPadding = layout->get<TextPadding>() * tilePixelRatio;
     const float iconPadding = layout->get<IconPadding>() * tilePixelRatio;
     const float textMaxAngle = layout->get<TextMaxAngle>() * util::DEG2RAD;
-    const float iconRotation = layout->evaluate<IconRotate>(zoom, feature);
-    const float textRotation = layout->evaluate<TextRotate>(zoom, feature);
+    const float iconRotation = layout->evaluate<IconRotate>(zoom, feature, canonicalID);
+    const float textRotation = layout->evaluate<TextRotate>(zoom, feature, canonicalID);
     std::array<float, 2> variableTextOffset;
     if (!textRadialOffset.isUndefined()) {
-        variableTextOffset = {{layout->evaluate<TextRadialOffset>(zoom, feature) * util::ONE_EM,
-                               INVALID_OFFSET_VALUE}};
+        variableTextOffset = {
+            {layout->evaluate<TextRadialOffset>(zoom, feature, canonicalID) * util::ONE_EM, INVALID_OFFSET_VALUE}};
     } else {
-        variableTextOffset = {{layout->evaluate<TextOffset>(zoom, feature)[0] * util::ONE_EM,
-                               layout->evaluate<TextOffset>(zoom, feature)[1] * util::ONE_EM}};
+        variableTextOffset = {{layout->evaluate<TextOffset>(zoom, feature, canonicalID)[0] * util::ONE_EM,
+                               layout->evaluate<TextOffset>(zoom, feature, canonicalID)[1] * util::ONE_EM}};
     }
 
     const SymbolPlacementType textPlacement = layout->get<TextRotationAlignment>() != AlignmentType::Map
