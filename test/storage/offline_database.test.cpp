@@ -779,7 +779,7 @@ TEST(OfflineDatabase, MapboxTileLimitExceeded) {
         db.put(ambientTile, response);
     };
 
-    auto insertRegionTile = [&](int64_t regionID, unsigned i) {
+    auto insertRegionTile = [&](int64_t regionID, uint64_t i) {
         const Resource tile = Resource::tile("mapbox://region_tile_" + std::to_string(i), 1, 0, 0, 0, Tileset::Scheme::XYZ);
         db.putRegionResource(regionID, tile, response);
     };
@@ -801,14 +801,14 @@ TEST(OfflineDatabase, MapboxTileLimitExceeded) {
     ASSERT_EQ(db.getOfflineMapboxTileCount(), 0);
 
     // Fine because this region is under the tile limit.
-    for (unsigned i = 0; i < limit - 10; ++i) {
+    for (uint64_t i = 0; i < limit - 10; ++i) {
         insertRegionTile(region1->getID(), i);
     }
 
     ASSERT_EQ(db.getOfflineMapboxTileCount(), limit - 10);
 
     // Fine because this region + the previous is at the limit.
-    for (unsigned i = limit; i < limit + 10; ++i) {
+    for (uint64_t i = limit; i < limit + 10; ++i) {
         insertRegionTile(region2->getID(), i);
     }
 
@@ -848,7 +848,7 @@ TEST(OfflineDatabase, MapboxTileLimitExceeded) {
     // 10, which would blow up the limit if it wasn't
     // for the fact that tile 60 is already on the
     // database and will not count.
-    for (unsigned i = limit; i < limit + 10; ++i) {
+    for (uint64_t i = limit; i < limit + 10; ++i) {
         insertRegionTile(region1->getID(), i);
     }
 

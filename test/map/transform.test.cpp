@@ -621,7 +621,8 @@ TEST(Transform, LatLngBounds) {
     }
 
     transform.jumpTo(CameraOptions().withCenter(sanFrancisco));
-    ASSERT_EQ(transform.getLatLng(), sanFrancisco);
+    ASSERT_NEAR(transform.getLatLng().latitude(), sanFrancisco.latitude(), 1e-8);
+    ASSERT_NEAR(transform.getLatLng().longitude(), sanFrancisco.longitude(), 1e-8);
 
     // Single location.
     transform.setLatLngBounds(LatLngBounds::singleton(sanFrancisco));
@@ -655,7 +656,7 @@ TEST(Transform, LatLngBounds) {
     // └───┴───┸───┴───┸───┴───┘
     transform.setLatLngBounds(LatLngBounds::hull({ -90.0, 0.0 }, { 90.0, 180.0 }));
     transform.jumpTo(CameraOptions().withCenter(sanFrancisco));
-    ASSERT_EQ(transform.getLatLng().latitude(), sanFrancisco.latitude());
+    ASSERT_NEAR(transform.getLatLng().latitude(), sanFrancisco.latitude(), 1e-8);
     ASSERT_EQ(transform.getLatLng().longitude(), 0.0);
 
     //    -1   |   0   |  +1
