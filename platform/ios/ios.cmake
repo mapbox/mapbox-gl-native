@@ -4,7 +4,7 @@ target_compile_definitions(
 )
 
 if(NOT DEFINED IOS_DEPLOYMENT_TARGET)
-    set(IOS_DEPLOYMENT_TARGET "9.0")
+    set(IOS_DEPLOYMENT_TARGET "12.0")
 endif()
 
 macro(initialize_ios_target target)
