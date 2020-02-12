@@ -152,7 +152,12 @@ workflows:
             - macos-xcode11-release
           config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_BUILD_TYPE=Debug'
           style_tests: true
-      - ios-xcode11-release
+      - build-template:
+          name: ios-xcode11-release
+          executor_name: macos-11_0_0
+          target_is_macos: true
+          config_params: '-G Xcode -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_ARCHITECTURES=arm64e -DCMAKE_OSX_SYSROOT=iphoneos'
+          build_params: '--config Release'
 
 #
 # Executors: we currently support two executors, one based on Ubuntu 19.04 aka Disco
@@ -312,18 +317,6 @@ commands:
           gcloud auth activate-service-account --key-file secret.json --project android-gl-native
           rm secret.json
 jobs:
-  ios-xcode11-release:
-    executor: macos-11_0_0
-    steps:
-      - checkout
-      - prepare
-      - prepare-macos
-      - run:
-          name: Build
-          command: |
-            cmake . -B Build -G Xcode -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_OSX_SYSROOT=iphonesimulator
-            cd Build && xcodebuild -sdk iphonesimulator -project Mapbox\ GL\ Native.xcodeproj -configuration Release
-      - save
   ios-render-test-runner:
     executor: macos-11_0_0
     steps:
