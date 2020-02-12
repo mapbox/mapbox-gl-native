@@ -32,6 +32,10 @@
 
    This change enables attaching images to the style with batches and avoids massive re-allocations. Thus, it improves UI performance especially at start-up time.
 
+ - [core] Fix excessive onSpriteLoaded() notifications ([#16196](https://github.com/mapbox/mapbox-gl-native/pull/16196))
+
+   The excessive `onSpriteLoaded()` notifications affected the render orchestration logic and could have significant negative performance impact.
+
 ### 🧩  Architectural changes
 
 ##### ⚠️  Breaking changes
