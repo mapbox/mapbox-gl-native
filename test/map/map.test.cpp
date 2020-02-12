@@ -30,6 +30,8 @@
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/run_loop.hpp>
 
+#include <atomic>
+
 using namespace mbgl;
 using namespace mbgl::style;
 using namespace std::literals::string_literals;
@@ -1148,7 +1150,7 @@ TEST(Map, PrefetchDeltaOverride) {
     vectorSource->setPrefetchZoomDelta(0);
     test.map.getStyle().addSource(std::move(vectorSource));
 
-    unsigned requestedTiles = 0u;
+    std::atomic_int requestedTiles(0);
     test.fileSource->tileResponse = [&](const Resource&) {
         ++requestedTiles;
         Response res;
@@ -1176,7 +1178,7 @@ TEST(Map, PrefetchDeltaOverride) {
     // 2 sources x 4 tiles
     EXPECT_EQ(8, requestedTiles);
 
-    requestedTiles = 0u;
+    requestedTiles = 0;
 
     // Should request z12 tiles when delta is set back to default, that is 4.
     test.observer.didFinishRenderingFrameCallback = [&](MapObserver::RenderFrameStatus status) {
@@ -1210,7 +1212,7 @@ TEST(Map, PrefetchDeltaOverrideCustomSource) {
                 }]
                 })STYLE");
 
-    unsigned requestedTiles = 0u;
+    std::atomic_int requestedTiles(0);
 
     auto makeCustomSource = [&requestedTiles, &test] {
         CustomGeometrySource::Options options;
@@ -1233,7 +1235,7 @@ TEST(Map, PrefetchDeltaOverrideCustomSource) {
     test.observer.didFinishLoadingMapCallback = [&] { test.runLoop.stop(); };
     test.runLoop.run();
     EXPECT_EQ(4, requestedTiles);
-    requestedTiles = 0u;
+    requestedTiles = 0;
 
     test.observer.didFinishRenderingFrameCallback = [&](MapObserver::RenderFrameStatus status) {
         if (status.mode == MapObserver::RenderMode::Full) {
