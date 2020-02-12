@@ -335,16 +335,15 @@ jobs:
           name: Build IOS RenderTestApp
           command: |
             cd render-test/ios
-            cmake ../.. -B Build -G Xcode -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_SYSROOT=iphoneos -DMBGL_IOS_RENDER_TEST=ON
-            cd Build
-            xcodebuild -sdk iphoneos -project Mapbox\ GL\ Native.xcodeproj -scheme RenderTestApp build-for-testing -arch arm64 CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -configuration Release
-            xcodebuild -sdk iphoneos -project Mapbox\ GL\ Native.xcodeproj build -target RenderTestAppTests -arch arm64 CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -configuration Release
+            ccache --zero-stats --max-size=2G
+            cmake ../.. -B Build -G Xcode -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_SYSROOT=iphoneos -DMBGL_IOS_RENDER_TEST=ON -DCMAKE_OSX_ARCHITECTURES=arm64e
+            cmake --build Build --config Release
+            ccache --show-stats
       - run:
           name: Codesign RenderTestApp for running on a physical device
           command: |
             cd render-test/ios
             ./codesigning/generate-entitlements.swift
-            ls codesigning
             cd Build
             ../codesigning/codesign_all.sh
             codesign -dv --verbose=4 Release-iphoneos/RenderTestApp.app # for debugging that app is signed or not
