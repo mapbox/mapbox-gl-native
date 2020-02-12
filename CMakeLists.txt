@@ -195,6 +195,7 @@ add_library(
     ${PROJECT_SOURCE_DIR}/include/mbgl/style/expression/get_covering_stops.hpp
     ${PROJECT_SOURCE_DIR}/include/mbgl/style/expression/image.hpp
     ${PROJECT_SOURCE_DIR}/include/mbgl/style/expression/image_expression.hpp
+    ${PROJECT_SOURCE_DIR}/include/mbgl/style/expression/in.hpp
     ${PROJECT_SOURCE_DIR}/include/mbgl/style/expression/interpolate.hpp
     ${PROJECT_SOURCE_DIR}/include/mbgl/style/expression/interpolator.hpp
     ${PROJECT_SOURCE_DIR}/include/mbgl/style/expression/is_constant.hpp
