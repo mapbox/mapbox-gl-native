@@ -365,7 +365,7 @@ TEST(TileCount, BoundsCrossingAntimeridian) {
 TEST(TileCover, DISABLED_FuzzPoly) {
     while(true)
     {
-        std::srand (time(nullptr));
+        std::srand(static_cast<uint32_t>(time(nullptr)));
         std::size_t len = std::rand() % 10000 + 3;
         Polygon<double> polygon;
 
@@ -393,7 +393,7 @@ TEST(TileCover, DISABLED_FuzzPoly) {
 TEST(TileCover, DISABLED_FuzzLine) {
     while(true)
     {
-        std::srand (time(nullptr));
+        std::srand(static_cast<uint32_t>(time(nullptr)));
         std::size_t len = std::rand() % 10000 + 3;
         MultiLineString<double> mls;
 
