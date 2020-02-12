@@ -132,14 +132,14 @@ workflows:
           config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=gcc-5 -DCMAKE_CXX_COMPILER=g++-5 -DMBGL_WITH_QT=ON'
       - build-template:
           name: qt5-macos-gcc5-release
-          executor_name: macos-11_0_0
+          executor_name: macos-11_1_0
           target_is_macos: true
           requires:
             - qt5-linux-gcc5-release
           config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DMBGL_WITH_QT=ON -DCMAKE_PREFIX_PATH=$(echo /usr/local/Cellar/qt/5.*/lib/cmake)'
       - build-template:
           name: macos-xcode11-release
-          executor_name: macos-11_0_0
+          executor_name: macos-11_1_0
           target_is_macos: true
           config_params: '-G Ninja -DCMAKE_INSTALL_PREFIX=/tmp/workspace/install/$CIRCLE_JOB -DCMAKE_CXX_COMPILER_LAUNCHER=ccache'
           install: true
@@ -147,7 +147,7 @@ workflows:
           style_tests: true
       - build-template:
           name: macos-xcode11-debug
-          executor_name: macos-11_0_0
+          executor_name: macos-11_1_0
           target_is_macos: true
           requires:
             - macos-xcode11-release
@@ -155,7 +155,7 @@ workflows:
           style_tests: true
       - build-template:
           name: ios-xcode11-release
-          executor_name: macos-11_0_0
+          executor_name: macos-11_3_1
           target_is_macos: true
           config_params: '-G Xcode -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_ARCHITECTURES=arm64e -DCMAKE_OSX_SYSROOT=iphoneos'
           build_params: '--config Release'
@@ -182,9 +182,15 @@ executors:
       QT_INSTALL_DOCS: /usr/share/qt5/doc
       QT_VERSION: 5
       TSAN_OPTIONS: suppressions=/src/platform/linux/tsan_suppress.txt
-  macos-11_0_0:
+  macos-11_1_0:
     macos:
       xcode: '11.1.0'
+    environment:
+      HOMEBREW_NO_AUTO_UPDATE: 1
+      HOMEBREW_NO_INSTALL_CLEANUP: 1
+  macos-11_3_1:
+    macos:
+      xcode: '11.3.1'
     environment:
       HOMEBREW_NO_AUTO_UPDATE: 1
       HOMEBREW_NO_INSTALL_CLEANUP: 1
@@ -319,7 +325,7 @@ commands:
           rm secret.json
 jobs:
   ios-render-test-runner:
-    executor: macos-11_0_0
+    executor: macos-11_3_1
     steps:
       - checkout
       - prepare
@@ -369,7 +375,7 @@ jobs:
               gcloud firebase test ios models list
               gcloud firebase test ios run \
                 --test testapp.zip \
-                --device model=iphonexs,version=12.0,locale=en,orientation=portrait --xcode-version=11.1 --timeout 20m \
+                --device model=iphone11,version=13.3,locale=en,orientation=portrait --xcode-version=11.3.1 --timeout 20m \
                 --verbosity=debug --no-record-video --results-dir ios-render-test-app-${CIRCLE_BUILD_NUM}
             fi
       - run:
@@ -377,7 +383,7 @@ jobs:
           when: always
           command: |
             if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON_IOS}" ]]; then
-              testResult=$(gsutil ls -d gs://test-lab-hn7kwqcz3108z-hjm4qtbqqkymk/ios-render-test-app-${CIRCLE_BUILD_NUM}/iphonexs-12.0-en-portrait/TestLogs/)
+              testResult=$(gsutil ls -d gs://test-lab-hn7kwqcz3108z-hjm4qtbqqkymk/ios-render-test-app-${CIRCLE_BUILD_NUM}/iphone11-13.3-en-portrait/TestLogs/)
               mkdir -p render-test-app
               gsutil -m cp -r $testResult render-test-app
               cd render-test-app/TestLogs
@@ -393,7 +399,7 @@ jobs:
             fi
       - save
   ios-unit-test-runner:
-    executor: macos-11_0_0
+    executor: macos-11_3_1
     steps:
       - checkout
       - prepare
@@ -443,7 +449,7 @@ jobs:
               gcloud firebase test ios models list
               gcloud firebase test ios run \
                 --test testapp.zip \
-                --device model=iphonexs,version=12.0,locale=en,orientation=portrait --xcode-version=11.1 --timeout 20m \
+                --device model=iphone11,version=13.3,locale=en,orientation=portrait --xcode-version=11.3.1 --timeout 20m \
                 --verbosity=debug --no-record-video --results-dir ios-unit-test-app-${CIRCLE_BUILD_NUM}
             fi
       - run:
@@ -451,7 +457,7 @@ jobs:
           when: always
           command: |
             if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON_IOS}" ]]; then
-              testResult=$(gsutil ls -d gs://test-lab-hn7kwqcz3108z-hjm4qtbqqkymk/ios-unit-test-app-${CIRCLE_BUILD_NUM}/iphonexs-12.0-en-portrait/TestLogs/)
+              testResult=$(gsutil ls -d gs://test-lab-hn7kwqcz3108z-hjm4qtbqqkymk/ios-unit-test-app-${CIRCLE_BUILD_NUM}/iphone11-13.3-en-portrait/TestLogs/)
               mkdir -p unit-test-app
               gsutil -m cp -r $testResult unit-test-app
               cd unit-test-app/TestLogs
@@ -461,7 +467,7 @@ jobs:
             fi
       - save
   ios-benchmark-runner:
-    executor: macos-11_0_0
+    executor: macos-11_3_1
     steps:
       - checkout
       - prepare
@@ -511,7 +517,7 @@ jobs:
               gcloud firebase test ios models list
               gcloud firebase test ios run \
                 --test testapp.zip \
-                --device model=iphonexs,version=12.0,locale=en,orientation=portrait --xcode-version=11.1 --timeout 20m \
+                --device model=iphone11,version=13.3,locale=en,orientation=portrait --xcode-version=11.3.1 --timeout 20m \
                 --verbosity=debug --no-record-video --results-dir ios-benchmark-app-${CIRCLE_BUILD_NUM}
             fi
       - run:
@@ -519,7 +525,7 @@ jobs:
           when: always
           command: |
             if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON_IOS}" ]]; then
-              testResult=$(gsutil ls -d gs://test-lab-hn7kwqcz3108z-hjm4qtbqqkymk/ios-benchmark-app-${CIRCLE_BUILD_NUM}/iphonexs-12.0-en-portrait/TestLogs/)
+              testResult=$(gsutil ls -d gs://test-lab-hn7kwqcz3108z-hjm4qtbqqkymk/ios-benchmark-app-${CIRCLE_BUILD_NUM}/iphone11-13.3-en-portrait/TestLogs/)
               mkdir -p benchmark-app
               gsutil -m cp -r $testResult benchmark-app
               cd benchmark-app/TestLogs
