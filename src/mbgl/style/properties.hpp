@@ -169,6 +169,11 @@ public:
         }
 
         template <class T>
+        static T evaluate(float, const GeometryTileFeature&, const CanonicalTileID&, const T& t, const T&) {
+            return t;
+        }
+
+        template <class T>
         static T evaluate(float z,
                           const GeometryTileFeature& feature,
                           const PossiblyEvaluatedPropertyValue<T>& v,
@@ -191,6 +196,30 @@ public:
             return v.match(
                 [&](const T& t) { return t; },
                 [&](const PropertyExpression<T>& t) { return t.evaluate(z, feature, availableImages, defaultValue); });
+        }
+
+        template <class T>
+        static T evaluate(float z,
+                          const GeometryTileFeature& feature,
+                          const PossiblyEvaluatedPropertyValue<T>& v,
+                          const T& defaultValue,
+                          const std::set<std::string>& availableImages,
+                          const CanonicalTileID& canonical) {
+            return v.match([&](const T& t) { return t; },
+                           [&](const PropertyExpression<T>& t) {
+                               return t.evaluate(z, feature, availableImages, canonical, defaultValue);
+                           });
+        }
+
+        template <class T>
+        static T evaluate(float z,
+                          const GeometryTileFeature& feature,
+                          const CanonicalTileID& canonical,
+                          const PossiblyEvaluatedPropertyValue<T>& v,
+                          const T& defaultValue) {
+            return v.match(
+                [&](const T& t) { return t; },
+                [&](const PropertyExpression<T>& t) { return t.evaluate(z, feature, canonical, defaultValue); });
         }
 
         template <class T>
@@ -218,6 +247,14 @@ public:
         template <class P>
         auto evaluate(float z, const GeometryTileFeature& feature, const std::set<std::string>& availableImages) const {
             return evaluate(z, feature, this->template get<P>(), P::defaultValue(), availableImages);
+        }
+
+        template <class P>
+        auto evaluate(float z,
+                      const GeometryTileFeature& feature,
+                      const std::set<std::string>& availableImages,
+                      const CanonicalTileID& canonical) const {
+            return evaluate(z, feature, this->template get<P>(), P::defaultValue(), availableImages, canonical);
         }
 
         Evaluated evaluate(float z, const GeometryTileFeature& feature) const {

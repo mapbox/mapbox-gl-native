@@ -45,7 +45,8 @@ struct PatternFeatureInserter<void> {
                        std::unique_ptr<GeometryTileFeature> feature,
                        PatternLayerMap patternDependencyMap,
                        float /*zoom*/,
-                       const PropertiesType&) {
+                       const PropertiesType&,
+                       const CanonicalTileID&) {
         features.emplace_back(index, std::move(feature), std::move(patternDependencyMap));
     }
 };
@@ -58,9 +59,10 @@ struct PatternFeatureInserter {
                        std::unique_ptr<GeometryTileFeature> feature,
                        PatternLayerMap patternDependencyMap,
                        float zoom,
-                       const PropertiesType& properties) {
+                       const PropertiesType& properties,
+                       const CanonicalTileID& canonical) {
         const auto& sortKeyProperty = properties.template get<SortKeyPropertyType>();
-        float sortKey = sortKeyProperty.evaluate(*feature, zoom, SortKeyPropertyType::defaultValue());
+        float sortKey = sortKeyProperty.evaluate(*feature, zoom, canonical, SortKeyPropertyType::defaultValue());
         PatternFeature patternFeature{index, std::move(feature), std::move(patternDependencyMap), sortKey};
         const auto lowerBound = std::lower_bound(features.cbegin(), features.cend(), patternFeature);
         features.insert(lowerBound, std::move(patternFeature));
@@ -127,12 +129,17 @@ public:
                             const auto min = patternProperty.evaluate(*feature,
                                                                       zoom - 1,
                                                                       layoutParameters.availableImages,
+                                                                      parameters.tileID.canonical,
                                                                       PatternPropertyType::defaultValue());
-                            const auto mid = patternProperty.evaluate(
-                                *feature, zoom, layoutParameters.availableImages, PatternPropertyType::defaultValue());
+                            const auto mid = patternProperty.evaluate(*feature,
+                                                                      zoom,
+                                                                      layoutParameters.availableImages,
+                                                                      parameters.tileID.canonical,
+                                                                      PatternPropertyType::defaultValue());
                             const auto max = patternProperty.evaluate(*feature,
                                                                       zoom + 1,
                                                                       layoutParameters.availableImages,
+                                                                      parameters.tileID.canonical,
                                                                       PatternPropertyType::defaultValue());
 
                             layoutParameters.imageDependencies.emplace(min.to.id(), ImageType::Pattern);
@@ -145,14 +152,17 @@ public:
                 }
             }
 
-            PatternFeatureInserter<SortKeyPropertyType>::insert(
-                features, i, std::move(feature), std::move(patternDependencyMap), zoom, layout);
+            PatternFeatureInserter<SortKeyPropertyType>::insert(features,
+                                                                i,
+                                                                std::move(feature),
+                                                                std::move(patternDependencyMap),
+                                                                zoom,
+                                                                layout,
+                                                                parameters.tileID.canonical);
         }
     };
 
-    bool hasDependencies() const override {
-        return hasPattern;
-    }
+    bool hasDependencies() const override { return hasPattern; }
 
     void createBucket(const ImagePositions& patternPositions,
                       std::unique_ptr<FeatureIndex>& featureIndex,

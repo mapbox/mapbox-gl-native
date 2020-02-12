@@ -52,7 +52,7 @@ public:
     std::map<std::string, LineProgram::Binders> paintPropertyBinders;
 
 private:
-    void addGeometry(const GeometryCoordinates&, const GeometryTileFeature&);
+    void addGeometry(const GeometryCoordinates&, const GeometryTileFeature&, const CanonicalTileID&);
 
     struct TriangleElement {
         TriangleElement(uint16_t a_, uint16_t b_, uint16_t c_) : a(a_), b(b_), c(c_) {}
