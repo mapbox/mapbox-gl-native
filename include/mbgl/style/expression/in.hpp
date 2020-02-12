@@ -17,17 +17,11 @@ public:
     EvaluationResult evaluate(const EvaluationContext& params) const override;
     void eachChild(const std::function<void(const Expression&)>&) const override;
 
-    bool operator==(const Expression& e) const override {
-        if (e.getKind() == Kind::In) {
-            auto rhs = static_cast<const In*>(&e);
-            return *needle == *(rhs->needle) && *haystack == *(rhs->haystack);
-        }
-        return false;
-    }
+    bool operator==(const Expression& e) const override;
 
-    std::vector<optional<Value>> possibleOutputs() const override { return {{true}, {false}}; }
+    std::vector<optional<Value>> possibleOutputs() const override;
 
-    std::string getOperator() const override { return "in"; }
+    std::string getOperator() const override;
 
 private:
     std::unique_ptr<Expression> needle;
