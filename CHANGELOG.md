@@ -24,6 +24,8 @@
  
   Support for using `within expression` with layout propery will be implemented separately.
 
+- [core] Add support for using `within expression` with layout propery. ([#16194](https://github.com/mapbox/mapbox-gl-native/pull/16194))
+
 ### 🏁 Performance improvements
 
  - [core] Loading images to style optimization ([#16187](https://github.com/mapbox/mapbox-gl-native/pull/16187))
