@@ -6,7 +6,7 @@
 
 @interface IosTestRunner ()
 
-@property (nullable) TestRunner* runner;
+@property (nullable) TestRunner *runner;
 
 @property (copy, nullable) NSString *resultPath;
 
@@ -31,7 +31,7 @@
         
         for (uint32_t i = 0; i < bundleContents.count; i++) {
             NSString *dirName = [bundleContents objectAtIndex: i];
-            if ([dirName isEqualToString:@"test-data"]) {
+            if ([dirName isEqualToString: dataDir]) {
                 NSString *destinationPath = [documentsDir stringByAppendingPathComponent: dirName];
                 BOOL success = [fileManager fileExistsAtPath: destinationPath];
                 if (success) {
@@ -56,9 +56,10 @@
                 break;
             }
         }
-        std::string basePath = std::string([documentsDir UTF8String]) + std::string("/test-data");
+        NSString *baseDir = [documentsDir stringByAppendingPathComponent: dataDir];
+        std::string basePath = std::string([baseDir UTF8String]);
         self.testStatus = self.runner->startTest(basePath) ? YES : NO;
-        self.resultPath = [documentsDir stringByAppendingPathComponent:@"/test-data/test/results.xml"];
+        self.resultPath = [baseDir stringByAppendingPathComponent: resultFilePath];
 
         BOOL fileFound = [fileManager fileExistsAtPath: self.resultPath];
         if (fileFound == NO) {
