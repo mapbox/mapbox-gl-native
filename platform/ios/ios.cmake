@@ -108,8 +108,6 @@ if(MBGL_IOS_RENDER_TEST)
         ${PROJECT_SOURCE_DIR}/platform/ios/test/common/ios_test_runner.hpp
         ${PROJECT_SOURCE_DIR}/platform/ios/test/common/AppDelegate.h
         ${PROJECT_SOURCE_DIR}/platform/ios/test/common/AppDelegate.m
-        ${PROJECT_SOURCE_DIR}/platform/ios/test/common/ViewController.h
-        ${PROJECT_SOURCE_DIR}/platform/ios/test/common/ViewController.m
         ${PROJECT_SOURCE_DIR}/platform/ios/test/common/main.m
         ${PROJECT_SOURCE_DIR}/render-test/ios/ios_test_runner.cpp
         ${PROJECT_SOURCE_DIR}/render-test/ios/iosTestRunner.h
@@ -202,12 +200,10 @@ if(MBGL_IOS_UNIT_TEST)
         ${PROJECT_SOURCE_DIR}/platform/ios/test/common/ios_test_runner.hpp
         ${PROJECT_SOURCE_DIR}/platform/ios/test/common/AppDelegate.h
         ${PROJECT_SOURCE_DIR}/platform/ios/test/common/AppDelegate.m
-        ${PROJECT_SOURCE_DIR}/platform/ios/test/common/ViewController.h
-        ${PROJECT_SOURCE_DIR}/platform/ios/test/common/ViewController.m
+        ${PROJECT_SOURCE_DIR}/platform/ios/test/common/iosTestRunner.mm
         ${PROJECT_SOURCE_DIR}/platform/ios/test/common/main.m
         ${PROJECT_SOURCE_DIR}/test/ios/ios_test_runner.cpp
         ${PROJECT_SOURCE_DIR}/test/ios/iosTestRunner.h
-        ${PROJECT_SOURCE_DIR}/test/ios/iosTestRunner.mm
         ${RESOURCES}
     )
     initialize_ios_target(UnitTestsApp)
