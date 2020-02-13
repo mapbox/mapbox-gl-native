@@ -156,10 +156,6 @@ else()
         COMPILE_OPTIONS
         $<$<STREQUAL:${CMAKE_SYSTEM_NAME},iOS>:-Wno-shorten-64-to-32>
     )
-    target_include_directories(
-        mbgl-test
-        PRIVATE ${PROJECT_SOURCE_DIR}/vendor/cpp-httplib
-    )
 endif()
 
 if(NOT DEFINED ENV{CI})
@@ -187,6 +183,7 @@ target_include_directories(
     PUBLIC ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/test/include
 )
 
+include(${PROJECT_SOURCE_DIR}/vendor/cpp-httplib.cmake)
 include(${PROJECT_SOURCE_DIR}/vendor/googletest.cmake)
 
 if(CMAKE_SYSTEM_NAME STREQUAL iOS)
@@ -211,6 +208,7 @@ target_link_libraries(
         Mapbox::Base::Extras::args
         Mapbox::Base::pixelmatch-cpp
         mbgl-compiler-options
+        mbgl-vendor-cpp-httplib
     PUBLIC mbgl-core
 )
 
