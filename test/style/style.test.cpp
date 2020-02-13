@@ -129,7 +129,7 @@ TEST(Style, SourceImplsOrder) {
 TEST(Style, AddRemoveImage) {
     util::RunLoop loop;
     auto fileSource = std::make_shared<StubFileSource>();
-    Style::Impl style{fileSource, 1.0};
+    StyleImpl style{fileSource, 1.0};
     style.addImage(std::make_unique<style::Image>("one", PremultipliedImage({16, 16}), 2));
     style.addImage(std::make_unique<style::Image>("two", PremultipliedImage({16, 16}), 2));
     style.addImage(std::make_unique<style::Image>("three", PremultipliedImage({16, 16}), 2));
