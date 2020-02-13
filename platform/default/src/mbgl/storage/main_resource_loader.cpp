@@ -81,13 +81,17 @@ public:
                             callback(response);
                             // Set the priority of existing resource to low if it's expired but usable.
                             res.setPriority(Resource::Priority::Low);
+                        } else {
+                            // Set prior data only if it was not returned to the requester.
+                            // Once we get 304 response from the network, we will forward response
+                            // to the requester.
+                            res.priorData = response.data;
                         }
 
                         // Copy response fields for cache control request
                         res.priorModified = response.modified;
                         res.priorExpires = response.expires;
                         res.priorEtag = response.etag;
-                        res.priorData = response.data;
                     }
 
                     tasks[req] = requestFromNetwork(res, std::move(tasks[req]));

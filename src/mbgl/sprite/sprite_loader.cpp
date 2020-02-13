@@ -60,7 +60,8 @@ void SpriteLoader::load(const std::string& url, FileSource& fileSource) {
             emitSpriteLoadedIfComplete();
         } else {
             // Only trigger a sprite loaded event we got new data.
-            loader->json = res.data;
+            assert(loader->json != res.data);
+            loader->json = std::move(res.data);
             emitSpriteLoadedIfComplete();
         }
     });
@@ -74,7 +75,8 @@ void SpriteLoader::load(const std::string& url, FileSource& fileSource) {
             loader->image = std::make_shared<std::string>();
             emitSpriteLoadedIfComplete();
         } else {
-            loader->image = res.data;
+            assert(loader->image != res.data);
+            loader->image = std::move(res.data);
             emitSpriteLoadedIfComplete();
         }
     });
