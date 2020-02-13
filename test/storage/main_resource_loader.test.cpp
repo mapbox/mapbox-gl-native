@@ -8,6 +8,7 @@
 #include <mbgl/storage/resource_transform.hpp>
 #include <mbgl/test/util.hpp>
 #include <mbgl/util/run_loop.hpp>
+#include <mbgl/util/timer.hpp>
 
 using namespace mbgl;
 
@@ -746,6 +747,41 @@ TEST(MainResourceLoader, TEST_REQUIRES_SERVER(CachedResourceLowPriority)) {
 
     fs.resume();
     NetworkStatus::Set(NetworkStatus::Status::Online);
+
+    loop.run();
+}
+
+TEST(MainResourceLoader, TEST_REQUIRES_SERVER(NoDoubleDispatch)) {
+    util::RunLoop loop;
+    MainResourceLoader fs(ResourceOptions{});
+
+    const Resource resource{Resource::Unknown, "http://127.0.0.1:3000/revalidate-same"};
+    Response response;
+    response.data = std::make_shared<std::string>("data");
+    response.etag.emplace("snowfall");
+
+    std::unique_ptr<AsyncRequest> req;
+    unsigned responseCount = 0u;
+    auto dbfs = FileSourceManager::get()->getFileSource(FileSourceType::Database, ResourceOptions{});
+    dbfs->forward(resource, response, [&] {
+        req = fs.request(resource, [&](Response res) {
+            EXPECT_EQ(nullptr, res.error);
+            EXPECT_FALSE(bool(res.modified));
+            EXPECT_TRUE(bool(res.etag));
+            EXPECT_EQ("snowfall", *res.etag);
+            if (!res.notModified) {
+                ASSERT_TRUE(res.data.get());
+                EXPECT_EQ("data", *res.data);
+                ++responseCount;
+            }
+        });
+    });
+
+    util::Timer timer;
+    timer.start(Milliseconds(100), Duration::zero(), [&loop, &responseCount] {
+        EXPECT_EQ(1u, responseCount);
+        loop.stop();
+    });
 
     loop.run();
 }
