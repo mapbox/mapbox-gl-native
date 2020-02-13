@@ -26,6 +26,12 @@
 
 - [core] Add support for using `within expression` with layout propery. ([#16194](https://github.com/mapbox/mapbox-gl-native/pull/16194))
 
+### 🐞 Bug fixes
+
+- [core] Don't provide multiple responses with the same data for 304 replies ([#16200](https://github.com/mapbox/mapbox-gl-native/pull/16200))
+
+  In cases when cached resource is useable, yet don't have an expiration timestamp, we provided data to the requester from the cache and the same data was returned once 304 response was received from the network.
+
 ### 🏁 Performance improvements
 
  - [core] Loading images to style optimization ([#16187](https://github.com/mapbox/mapbox-gl-native/pull/16187))
