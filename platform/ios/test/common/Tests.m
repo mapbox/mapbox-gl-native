@@ -14,7 +14,7 @@
     [super tearDown];
 }
 
-- (void)testStartUnitTestRunner {
+- (void)testStartTestRunner {
     IosTestRunner* runner = [[IosTestRunner alloc] init];
     XCTAssert(runner, @"IOSTestRunner is not initialized correctly");
 

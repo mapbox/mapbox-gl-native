@@ -94,30 +94,26 @@ target_link_libraries(
 )
 
 if(MBGL_IOS_RENDER_TEST)
-    set(CMAKE_OSX_ARCHITECTURES "armv7;i386;x86_64;arm64")
-
     include(${PROJECT_SOURCE_DIR}/vendor/zip-archive.cmake)
     initialize_ios_target(mbgl-vendor-zip-archive)
 
     set(PREPARE_CMD "${PROJECT_SOURCE_DIR}/render-test/ios/setup_test_data.sh")
-    message("COMMAND: ${PREPARE_CMD}")
     execute_process(COMMAND ${PREPARE_CMD} RESULT_VARIABLE CMD_ERROR WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
-    message(STATUS "CMD_ERROR:" ${CMD_ERROR})
 
-    set(RESOURCES ${PROJECT_SOURCE_DIR}/render-test/ios/Main.storyboard ${PROJECT_SOURCE_DIR}/render-test/ios/LaunchScreen.storyboard
-                  ${PROJECT_SOURCE_DIR}/test-data)
+    set(RESOURCES ${PROJECT_SOURCE_DIR}/platform/ios/test/common/Main.storyboard
+                  ${PROJECT_SOURCE_DIR}/platform/ios/test/common/LaunchScreen.storyboard ${PROJECT_SOURCE_DIR}/test-data)
 
     add_executable(
         RenderTestApp
-        ${PROJECT_SOURCE_DIR}/render-test/ios/ios_test_runner.hpp
+        ${PROJECT_SOURCE_DIR}/platform/ios/test/common/ios_test_runner.hpp
+        ${PROJECT_SOURCE_DIR}/platform/ios/test/common/AppDelegate.h
+        ${PROJECT_SOURCE_DIR}/platform/ios/test/common/AppDelegate.m
+        ${PROJECT_SOURCE_DIR}/platform/ios/test/common/ViewController.h
+        ${PROJECT_SOURCE_DIR}/platform/ios/test/common/ViewController.m
+        ${PROJECT_SOURCE_DIR}/platform/ios/test/common/main.m
         ${PROJECT_SOURCE_DIR}/render-test/ios/ios_test_runner.cpp
-        ${PROJECT_SOURCE_DIR}/render-test/ios/AppDelegate.h
-        ${PROJECT_SOURCE_DIR}/render-test/ios/AppDelegate.m
-        ${PROJECT_SOURCE_DIR}/render-test/ios/ViewController.h
-        ${PROJECT_SOURCE_DIR}/render-test/ios/ViewController.m
         ${PROJECT_SOURCE_DIR}/render-test/ios/iosTestRunner.h
         ${PROJECT_SOURCE_DIR}/render-test/ios/iosTestRunner.mm
-        ${PROJECT_SOURCE_DIR}/render-test/ios/main.m
         ${RESOURCES}
     )
     initialize_ios_target(RenderTestApp)
@@ -147,6 +143,7 @@ if(MBGL_IOS_RENDER_TEST)
             ${PROJECT_SOURCE_DIR}/platform/darwin/include
             ${PROJECT_SOURCE_DIR}/platform/darwin/include/mbgl/interface/
             ${PROJECT_SOURCE_DIR}/platform/default/include
+            ${PROJECT_SOURCE_DIR}/platform/ios/test/common
             ${PROJECT_SOURCE_DIR}/src
     )
 
@@ -168,18 +165,12 @@ if(MBGL_IOS_RENDER_TEST)
             mbgl-vendor-zip-archive
     )
 
+    set_target_properties(RenderTestApp PROPERTIES XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "")
+    set_target_properties(RenderTestApp PROPERTIES XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED "NO")
+
     find_package(XCTest REQUIRED)
 
     xctest_add_bundle(RenderTestAppTests RenderTestApp ${PROJECT_SOURCE_DIR}/render-test/ios/tests/Tests.m)
-
-    set_target_properties(
-        RenderTestAppTests
-        PROPERTIES
-            XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET
-            "${IOS_DEPLOYMENT_TARGET}"
-            XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH
-            $<$<CONFIG:Debug>:YES>
-    )
 
     target_include_directories(
         RenderTestAppTests
@@ -188,7 +179,11 @@ if(MBGL_IOS_RENDER_TEST)
 
     xctest_add_test(XCTest.RenderTestApp RenderTestAppTests)
 
+    set_target_properties(RenderTestAppTests PROPERTIES XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET "${IOS_DEPLOYMENT_TARGET}")
+    set_target_properties(RenderTestAppTests PROPERTIES XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH $<$<CONFIG:Debug>:YES>)
     set_target_properties(RenderTestAppTests PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${PROJECT_SOURCE_DIR}/render-test/ios/tests/Info.plist)
+    set_target_properties(RenderTestAppTests PROPERTIES XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "")
+    set_target_properties(RenderTestAppTests PROPERTIES XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED "NO")
 endif()
 
 if(MBGL_IOS_UNIT_TEST)
@@ -199,24 +194,20 @@ if(MBGL_IOS_UNIT_TEST)
             ${CMAKE_CURRENT_BINARY_DIR}/test-data/mapbox-gl-js/src/style-spec/reference
     )
 
-    set(
-        RESOURCES
-        ${PROJECT_SOURCE_DIR}/test/ios/Main.storyboard
-        ${PROJECT_SOURCE_DIR}/test/ios/LaunchScreen.storyboard
-        ${CMAKE_CURRENT_BINARY_DIR}/test-data
-    )
+    set(RESOURCES ${PROJECT_SOURCE_DIR}/platform/ios/test/common/Main.storyboard
+                  ${PROJECT_SOURCE_DIR}/platform/ios/test/common/LaunchScreen.storyboard ${CMAKE_CURRENT_BINARY_DIR}/test-data)
 
     add_executable(
         UnitTestsApp
-        ${PROJECT_SOURCE_DIR}/test/ios/ios_test_runner.hpp
+        ${PROJECT_SOURCE_DIR}/platform/ios/test/common/ios_test_runner.hpp
+        ${PROJECT_SOURCE_DIR}/platform/ios/test/common/AppDelegate.h
+        ${PROJECT_SOURCE_DIR}/platform/ios/test/common/AppDelegate.m
+        ${PROJECT_SOURCE_DIR}/platform/ios/test/common/ViewController.h
+        ${PROJECT_SOURCE_DIR}/platform/ios/test/common/ViewController.m
+        ${PROJECT_SOURCE_DIR}/platform/ios/test/common/main.m
         ${PROJECT_SOURCE_DIR}/test/ios/ios_test_runner.cpp
-        ${PROJECT_SOURCE_DIR}/test/ios/AppDelegate.h
-        ${PROJECT_SOURCE_DIR}/test/ios/AppDelegate.m
-        ${PROJECT_SOURCE_DIR}/test/ios/ViewController.h
-        ${PROJECT_SOURCE_DIR}/test/ios/ViewController.m
         ${PROJECT_SOURCE_DIR}/test/ios/iosTestRunner.h
         ${PROJECT_SOURCE_DIR}/test/ios/iosTestRunner.mm
-        ${PROJECT_SOURCE_DIR}/test/ios/main.m
         ${RESOURCES}
     )
     initialize_ios_target(UnitTestsApp)
@@ -236,12 +227,11 @@ if(MBGL_IOS_UNIT_TEST)
 
     target_include_directories(
         UnitTestsApp
-        PUBLIC {MBGL_ROOT}/test/include ${PROJECT_SOURCE_DIR}/include
-    )
-
-    target_include_directories(
-        UnitTestsApp
-        PUBLIC ${PROJECT_SOURCE_DIR}/test/ios
+        PUBLIC
+            ${PROJECT_SOURCE_DIR}/include
+            ${PROJECT_SOURCE_DIR}/platform/ios/test/common
+            ${PROJECT_SOURCE_DIR}/test/include
+            ${PROJECT_SOURCE_DIR}/test/ios
     )
 
     target_link_libraries(
@@ -263,16 +253,7 @@ if(MBGL_IOS_UNIT_TEST)
 
     find_package(XCTest REQUIRED)
 
-    xctest_add_bundle(UnitTestsAppTests UnitTestsApp ${PROJECT_SOURCE_DIR}/test/ios/tests/Tests.m)
-
-    set_target_properties(
-        UnitTestsAppTests
-        PROPERTIES
-            XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET
-            "${IOS_DEPLOYMENT_TARGET}"
-            XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH
-            $<$<CONFIG:Debug>:YES>
-    )
+    xctest_add_bundle(UnitTestsAppTests UnitTestsApp ${PROJECT_SOURCE_DIR}/platform/ios/test/common/Tests.m)
 
     target_include_directories(
         UnitTestsAppTests
@@ -281,8 +262,11 @@ if(MBGL_IOS_UNIT_TEST)
 
     xctest_add_test(XCTest.UnitTestsApp UnitTestsAppTests)
 
+    set_target_properties(UnitTestsAppTests PROPERTIES XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET "${IOS_DEPLOYMENT_TARGET}")
+    set_target_properties(UnitTestsAppTests PROPERTIES XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH $<$<CONFIG:Debug>:YES>)
     set_target_properties(UnitTestsAppTests PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${PROJECT_SOURCE_DIR}/test/ios/tests/Info.plist)
     set_target_properties(UnitTestsAppTests PROPERTIES XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "")
     set_target_properties(UnitTestsAppTests PROPERTIES XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED "NO")
 endif()
+
 unset(IOS_DEPLOYMENT_TARGET CACHE)
