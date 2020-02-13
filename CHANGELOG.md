@@ -34,6 +34,10 @@
 
 - [core] Fix potential visual artifact for line-dasharray ([#16202](https://github.com/mapbox/mapbox-gl-native/pull/16202))
 
+- Store gfx::DrawScope objects with associated render objects. ([#15395](https://github.com/mapbox/mapbox-gl-native/pull/15395))
+
+  We used some shared SegmentVectors, e.g. for drawing raster or background tiles. In longer running maps, this lead to resource accumulation. By storing the SegmentVectors and the contained gfx::DrawScope objects, we ensure that resources get released when the associated render objects vanish.
+
 ### 🏁 Performance improvements
 
  - [core] Loading images to style optimization ([#16187](https://github.com/mapbox/mapbox-gl-native/pull/16187))
