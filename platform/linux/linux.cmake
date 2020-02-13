@@ -1,6 +1,6 @@
 find_package(CURL REQUIRED)
-find_package(ICU REQUIRED i18n)
-find_package(ICU REQUIRED uc)
+find_package(ICU OPTIONAL_COMPONENTS i18n)
+find_package(ICU OPTIONAL_COMPONENTS uc)
 find_package(JPEG REQUIRED)
 find_package(OpenGL REQUIRED GLX)
 find_package(PNG REQUIRED)
@@ -65,6 +65,20 @@ target_include_directories(
 include(${PROJECT_SOURCE_DIR}/vendor/nunicode.cmake)
 include(${PROJECT_SOURCE_DIR}/vendor/sqlite.cmake)
 
+if(NOT ${ICU_FOUND} OR "${ICU_VERSION}" VERSION_LESS 62.0)
+    message("-- ICU not found or too old, using builtin.")
+
+    set(MBGL_USE_BUILTIN_ICU TRUE)
+    include(${PROJECT_SOURCE_DIR}/vendor/icu.cmake)
+
+    set_source_files_properties(
+        ${PROJECT_SOURCE_DIR}/platform/default/src/mbgl/i18n/number_format.cpp
+        PROPERTIES
+        COMPILE_DEFINITIONS
+        MBGL_USE_BUILTIN_ICU
+    )
+endif()
+
 target_link_libraries(
     mbgl-core
     PRIVATE
@@ -72,8 +86,9 @@ target_link_libraries(
         ${JPEG_LIBRARIES}
         ${LIBUV_LIBRARIES}
         ${X11_LIBRARIES}
-        ICU::i18n
-        ICU::uc
+        $<$<NOT:$<BOOL:${MBGL_USE_BUILTIN_ICU}>>:ICU::i18n>
+        $<$<NOT:$<BOOL:${MBGL_USE_BUILTIN_ICU}>>:ICU::uc>
+        $<$<BOOL:${MBGL_USE_BUILTIN_ICU}>:mbgl-vendor-icu>
         OpenGL::GLX
         PNG::PNG
         mbgl-vendor-nunicode
