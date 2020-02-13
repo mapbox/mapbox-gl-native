@@ -96,23 +96,6 @@ public:
 
 private:
     void parse(const std::string&);
-
-    // SpriteLoaderObserver implementation.
-    //void onSpriteLoaded(std::vector<std::unique_ptr<Image>>&&) override;
-    //void onSpriteError(std::exception_ptr) override;
-
-    // SourceObserver implementation.
-    //void onSourceLoaded(Source&) override;
-    //void onSourceChanged(Source&) override;
-    //void onSourceError(Source&, std::exception_ptr) override;
-    //void onSourceDescriptionChanged(Source&) override;
-
-    // LayerObserver implementation.
-    //void onLayerChanged(Layer&) override;
-
-    // LightObserver implementation.
-    //void onLightChanged(const Light&) override;
-
 public:
     bool mutated = false;
     bool loaded = false;
@@ -138,9 +121,7 @@ private:
     // Defaults
     std::string name;
     CameraOptions defaultCamera;
-//<<<<<<< HEAD
     std::set<Observer*> observers;
-//=======
 
     // SpriteLoaderObserver implementation.
     void onSpriteLoaded(std::vector<Immutable<style::Image::Impl>>) override;
