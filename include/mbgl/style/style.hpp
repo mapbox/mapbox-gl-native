@@ -1,8 +1,10 @@
 #pragma once
 
-#include <mbgl/style/transition_options.hpp>
 #include <mbgl/map/camera.hpp>
+#include <mbgl/style/image.hpp>
+#include <mbgl/style/transition_options.hpp>
 #include <mbgl/util/geo.hpp>
+#include <mbgl/util/immutable.hpp>
 
 #include <string>
 #include <vector>
@@ -16,7 +18,6 @@ class ResourceOptions;
 namespace style {
 
 class Light;
-class Image;
 class Source;
 class Layer;
 class StyleImpl;
@@ -48,7 +49,7 @@ public:
     void setLight(std::unique_ptr<Light>);
 
     // Images
-    const Image* getImage(const std::string&) const;
+    optional<Image> getImage(const std::string&) const;
     void addImage(std::unique_ptr<Image>);
     void removeImage(const std::string&);
 

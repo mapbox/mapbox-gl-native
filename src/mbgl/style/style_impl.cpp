@@ -1,3 +1,4 @@
+#include <mbgl/gl/custom_layer.hpp>
 #include <mbgl/sprite/sprite_loader.hpp>
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/storage/resource.hpp>
@@ -6,7 +7,6 @@
 #include <mbgl/style/layer_impl.hpp>
 #include <mbgl/style/layers/background_layer.hpp>
 #include <mbgl/style/layers/circle_layer.hpp>
-#include <mbgl/style/layers/custom_layer.hpp>
 #include <mbgl/style/layers/fill_extrusion_layer.hpp>
 #include <mbgl/style/layers/fill_layer.hpp>
 #include <mbgl/style/layers/heatmap_layer.hpp>
@@ -106,7 +106,7 @@ void StyleImpl::parse(const std::string& json_) {
 
     sources.clear();
     layers.clear();
-    images.clear();
+    images = makeMutable<ImageImpls>();
 
     transitionOptions = parser.transition;
 
@@ -287,18 +287,38 @@ bool StyleImpl::isLoaded() const {
 }
 
 void StyleImpl::addImage(std::unique_ptr<style::Image> image) {
-    images.remove(image->getID()); // We permit using addImage to update.
-    images.add(std::move(image));
+    auto newImages = makeMutable<ImageImpls>(*images);
+    auto it =
+        std::lower_bound(newImages->begin(), newImages->end(), image->getID(), [](const auto& a, const std::string& b) {
+            return a->id < b;
+        });
+    if (it != newImages->end() && (*it)->id == image->getID()) {
+        // We permit using addImage to update.
+        *it = std::move(image->baseImpl);
+    } else {
+        newImages->insert(it, std::move(image->baseImpl));
+    }
+    images = std::move(newImages);
     for (auto &observer: observers)
         observer->onUpdate();
 }
 
 void StyleImpl::removeImage(const std::string& id) {
-    images.remove(id);
+    auto newImages = makeMutable<ImageImpls>(*images);
+    auto found =
+        std::find_if(newImages->begin(), newImages->end(), [&id](const auto& image) { return image->id == id; });
+    if (found == images->end()) {
+        Log::Warning(Event::General, "Image '%s' is not present in style, cannot remove", id.c_str());
+        return;
+    }
+    newImages->erase(found);
+    images = std::move(newImages);
 }
 
-const style::Image* StyleImpl::getImage(const std::string& id) const {
-    return images.get(id);
+optional<Immutable<style::Image::Impl>> StyleImpl::getImage(const std::string& id) const {
+    auto found = std::find_if(images->begin(), images->end(), [&id](const auto& image) { return image->id == id; });
+    if (found == images->end()) return nullopt;
+    return *found;
 }
 
 void StyleImpl::addObserver(style::Observer* observer) {
@@ -345,10 +365,12 @@ void StyleImpl::onSourceDescriptionChanged(Source& source) {
     }
 }
 
-void StyleImpl::onSpriteLoaded(std::vector<std::unique_ptr<Image>>&& images_) {
-    for (auto& image : images_) {
-        addImage(std::move(image));
-    }
+void StyleImpl::onSpriteLoaded(std::vector<Immutable<style::Image::Impl>> images_) {
+    auto newImages = makeMutable<ImageImpls>(*images);
+    newImages->insert(
+        newImages->end(), std::make_move_iterator(images_.begin()), std::make_move_iterator(images_.end()));
+    std::sort(newImages->begin(), newImages->end(), [](const auto& a, const auto& b) { return a->id < b->id; });
+    images = std::move(newImages);
     spriteLoaded = true;
     for (auto &observer: observers)
         observer->onUpdate(); // For *-pattern properties.
@@ -388,7 +410,7 @@ const std::string& StyleImpl::getGlyphURL() const {
 }
 
 Immutable<std::vector<Immutable<Image::Impl>>> StyleImpl::getImageImpls() const {
-    return images.getImpls();
+    return images;
 }
 
 Immutable<std::vector<Immutable<Source::Impl>>> StyleImpl::getSourceImpls() const {

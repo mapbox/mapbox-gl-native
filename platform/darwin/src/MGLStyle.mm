@@ -528,7 +528,7 @@ static_assert(6 == mbgl::util::default_styles::numOrderedStyles,
     }
 
     auto styleImage = self.rawStyle->getImage([name UTF8String]);
-    return styleImage ? [[MGLImage alloc] initWithMGLStyleImage:styleImage] : nil;
+    return styleImage ? [[MGLImage alloc] initWithMGLStyleImage:&(*styleImage)] : nil;
 }
 
 #pragma mark Style transitions

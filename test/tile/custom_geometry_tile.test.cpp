@@ -61,8 +61,11 @@ TEST(CustomGeometryTile, InvokeFetchTile) {
     auto mb =std::make_shared<Mailbox>(*Scheduler::GetCurrent());
     ActorRef<CustomTileLoader> loaderActor(loader, mb);
 
-    CustomGeometryTile tile(OverscaledTileID(0, 0, 0), "source", test.tileParameters, CustomGeometrySource::TileOptions(),
-    loaderActor);
+    CustomGeometryTile tile(OverscaledTileID(0, 0, 0),
+                            "source",
+                            test.tileParameters,
+                            makeMutable<CustomGeometrySource::TileOptions>(),
+                            loaderActor);
 
     tile.setNecessity(TileNecessity::Required);
 
@@ -86,8 +89,11 @@ TEST(CustomGeometryTile, InvokeCancelTile) {
     auto mb =std::make_shared<Mailbox>(*Scheduler::GetCurrent());
     ActorRef<CustomTileLoader> loaderActor(loader, mb);
 
-    CustomGeometryTile tile(OverscaledTileID(0, 0, 0), "source", test.tileParameters, CustomGeometrySource::TileOptions(),
-    loaderActor);
+    CustomGeometryTile tile(OverscaledTileID(0, 0, 0),
+                            "source",
+                            test.tileParameters,
+                            makeMutable<CustomGeometrySource::TileOptions>(),
+                            loaderActor);
 
     tile.setNecessity(TileNecessity::Required);
     tile.setNecessity(TileNecessity::Optional);
@@ -108,8 +114,11 @@ TEST(CustomGeometryTile, InvokeTileChanged) {
     auto mb =std::make_shared<Mailbox>(*Scheduler::GetCurrent());
     ActorRef<CustomTileLoader> loaderActor(loader, mb);
 
-    CustomGeometryTile tile(OverscaledTileID(0, 0, 0), "source", test.tileParameters, CustomGeometrySource::TileOptions(),
-    loaderActor);
+    CustomGeometryTile tile(OverscaledTileID(0, 0, 0),
+                            "source",
+                            test.tileParameters,
+                            makeMutable<CustomGeometrySource::TileOptions>(),
+                            loaderActor);
 
     Immutable<LayerProperties> layerProperties = makeMutable<CircleLayerProperties>(staticImmutableCast<CircleLayer::Impl>(layer.baseImpl));
     StubTileObserver observer;

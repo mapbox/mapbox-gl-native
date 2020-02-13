@@ -2,6 +2,8 @@
 
 #include "ios_test_runner.hpp"
 
+#import "SSZipArchive.h"
+
 #include <string>
 
 @interface IosTestRunner ()
@@ -76,8 +78,8 @@
 
             std::string basePath = std::string([path UTF8String]);
             self.testStatus = self.runner->startTest(basePath) ? YES : NO;
-            self.styleResultPath =  [path stringByAppendingPathComponent:@"/next-ios-render-test-runner-style.html"];
-            self.metricResultPath =  [path stringByAppendingPathComponent:@"/next-ios-render-test-runner-metrics.html"];
+            self.styleResultPath =  [path stringByAppendingPathComponent:@"/ios-render-test-runner-style.html"];
+            self.metricResultPath =  [path stringByAppendingPathComponent:@"/ios-render-test-runner-metrics.html"];
 
             BOOL fileFound = [fileManager fileExistsAtPath: self.styleResultPath];
             if (fileFound == NO) {
@@ -90,6 +92,45 @@
                 NSLog(@"Metric test result file '%@' doese not exit ", self.metricResultPath);
                 self.testStatus = NO;
             }
+
+            NSString *rebaselinePath = [path stringByAppendingPathComponent:@"/baselines"];
+            BOOL needArchiving = NO;
+            BOOL isDir = NO;
+            NSArray *subpaths = [[NSArray alloc] init];
+            if ([fileManager fileExistsAtPath:rebaselinePath isDirectory: &isDir] && isDir){
+                subpaths = [fileManager subpathsAtPath:rebaselinePath];
+                for(NSString *path in subpaths)
+                {
+                    NSString *longPath = [rebaselinePath stringByAppendingPathComponent:path];
+                    if([fileManager fileExistsAtPath:longPath isDirectory:&isDir] && !isDir)
+                    {
+                        needArchiving = YES;
+                        break;
+                    }
+                }
+            }
+            else {
+               NSLog(@"Metric path '%@' doese not exit ", rebaselinePath);
+            }
+
+            if (needArchiving) {
+                NSString *archivePath = [path stringByAppendingString:@"/metrics.zip"];
+                BOOL success = [SSZipArchive createZipFileAtPath:archivePath
+                withContentsOfDirectory:rebaselinePath
+                    keepParentDirectory:NO
+                       compressionLevel:-1
+                               password:nil
+                                    AES:YES
+                        progressHandler:nil];
+
+                if (success) {
+                    NSLog(@"Successfully archive all of the metrics into metrics.zip");
+                    self.metricPath =  archivePath;
+                }
+                else {
+                    NSLog(@"Failed to archive rebaselined metrics into metrics.zip");
+                }
+            }
         }
 
         delete self.runner;
@@ -99,14 +140,18 @@
 }
 
 - (NSString*) getStyleResultPath {
-   return self.styleResultPath;
+    return self.styleResultPath;
 }
 
 - (NSString*) getMetricResultPath {
-   return self.metricResultPath;
+    return self.metricResultPath;
+}
+
+- (NSString*) getMetricPath {
+    return self.metricPath;
 }
 
 - (BOOL) getTestStatus {
-   return self.testStatus;
+    return self.testStatus;
 }
 @end

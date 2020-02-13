@@ -15,12 +15,13 @@ public:
 
     optional<std::string> getAttribution() const final;
 
-    CustomGeometrySource::TileOptions getTileOptions() const;
+    Immutable<CustomGeometrySource::TileOptions> getTileOptions() const;
     Range<uint8_t> getZoomRange() const;
     optional<ActorRef<CustomTileLoader>> getTileLoader() const;
+    bool operator!=(const Impl&) const noexcept;
 
 private:
-    CustomGeometrySource::TileOptions tileOptions;
+    Immutable<CustomGeometrySource::TileOptions> tileOptions;
     Range<uint8_t> zoomRange;
     optional<ActorRef<CustomTileLoader>> loaderRef;
 };

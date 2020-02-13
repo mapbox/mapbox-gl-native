@@ -334,4 +334,4 @@ void glCheckError(const char *cmd, const char *file, int line);
 #endif
 
 }  // namespace platform
-}  // namespace mbgl
+} // namespace mbgl

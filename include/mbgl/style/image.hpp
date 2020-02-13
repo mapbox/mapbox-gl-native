@@ -69,6 +69,7 @@ public:
 
     class Impl;
     Immutable<Impl> baseImpl;
+    explicit Image(Immutable<Impl> baseImpl_) : baseImpl(std::move(baseImpl_)) {}
 };
 
 } // namespace style

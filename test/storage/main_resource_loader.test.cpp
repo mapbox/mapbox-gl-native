@@ -687,16 +687,23 @@ TEST(MainResourceLoader, TEST_REQUIRES_SERVER(CachedResourceLowPriority)) {
     response.data = std::make_shared<std::string>("Cached Request 4");
     dbfs->forward(resource2, response);
 
-    onlineFs->setProperty("max-concurrent-requests", 1u);
+    onlineFs->setProperty(MAX_CONCURRENT_REQUESTS_KEY, 1u);
     fs.pause();
     NetworkStatus::Set(NetworkStatus::Status::Offline);
 
     // Ensure that the online requests for new resources are processed first.
+    Resource nonCached0{Resource::Unknown, "http://127.0.0.1:3000/load/0", {}, Resource::LoadingMethod::All};
+    std::unique_ptr<AsyncRequest> req0 = fs.request(nonCached0, [&](Response res) {
+        req0.reset();
+        EXPECT_EQ(online_response_counter, 0); // make sure this is responded first
+        EXPECT_EQ("Request 0", *res.data);
+    });
+
     Resource nonCached1{Resource::Unknown, "http://127.0.0.1:3000/load/1", {}, Resource::LoadingMethod::All};
     std::unique_ptr<AsyncRequest> req1 = fs.request(nonCached1, [&](Response res) {
         online_response_counter++;
         req1.reset();
-        EXPECT_EQ(online_response_counter, 1); // make sure this is responded first
+        EXPECT_EQ(online_response_counter, 1); // make sure this is responded second
         EXPECT_EQ("Request 1", *res.data);
     });
 
@@ -733,7 +740,7 @@ TEST(MainResourceLoader, TEST_REQUIRES_SERVER(CachedResourceLowPriority)) {
     std::unique_ptr<AsyncRequest> req2 = fs.request(nonCached2, [&](Response res) {
         online_response_counter++;
         req2.reset();
-        EXPECT_EQ(online_response_counter, 2); // make sure this is responded second
+        EXPECT_EQ(online_response_counter, 2); // make sure this is responded third
         EXPECT_EQ("Request 2", *res.data);
     });
 

@@ -120,5 +120,9 @@ bool GeoJSONSource::supportsLayerType(const mbgl::style::LayerTypeInfo* info) co
     return mbgl::underlying_type(Tile::Kind::Geometry) == mbgl::underlying_type(info->tileKind);
 }
 
+Mutable<Source::Impl> GeoJSONSource::createMutable() const noexcept {
+    return staticMutableCast<Source::Impl>(makeMutable<Impl>(impl()));
+}
+
 } // namespace style
 } // namespace mbgl

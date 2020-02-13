@@ -27,17 +27,17 @@ void RenderRasterDEMSource::updateInternal(const Tileset& tileset,
                                            const bool needsRendering,
                                            const bool needsRelayout,
                                            const TileParameters& parameters) {
-    tilePyramid.update(layers,
-                       needsRendering,
-                       needsRelayout,
-                       parameters,
-                       SourceType::RasterDEM,
-                       impl().getTileSize(),
-                       tileset.zoomRange,
-                       tileset.bounds,
-                       [&] (const OverscaledTileID& tileID) {
-                           return std::make_unique<RasterDEMTile>(tileID, parameters, tileset);
-                       });
+    tilePyramid.update(
+        layers,
+        needsRendering,
+        needsRelayout,
+        parameters,
+        SourceType::RasterDEM,
+        impl().getTileSize(),
+        tileset.zoomRange,
+        tileset.bounds,
+        [&](const OverscaledTileID& tileID) { return std::make_unique<RasterDEMTile>(tileID, parameters, tileset); },
+        baseImpl->getPrefetchZoomDelta());
     algorithm::updateTileMasks(tilePyramid.getRenderedTiles());
 }
 

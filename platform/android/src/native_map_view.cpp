@@ -1099,12 +1099,10 @@ void NativeMapView::removeImage(JNIEnv& env, const jni::String& name) {
 }
 
 jni::Local<jni::Object<Bitmap>> NativeMapView::getImage(JNIEnv& env, const jni::String& name) {
-    const mbgl::style::Image *image = map->getStyle().getImage(jni::Make<std::string>(env, name));
-    if (image) {
+    if (auto image = map->getStyle().getImage(jni::Make<std::string>(env, name))) {
         return Bitmap::CreateBitmap(env, image->getImage());
-    } else {
-        return jni::Local<jni::Object<Bitmap>>();
     }
+    return jni::Local<jni::Object<Bitmap>>();
 }
 
 void NativeMapView::setPrefetchTiles(JNIEnv&, jni::jboolean enable) {

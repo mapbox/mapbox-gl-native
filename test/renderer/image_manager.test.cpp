@@ -27,10 +27,10 @@ TEST(ImageManager, Basic) {
     auto images = parseSprite(util::read_file("test/fixtures/annotations/emerald.png"),
                               util::read_file("test/fixtures/annotations/emerald.json"));
     for (auto& image : images) {
-        imageManager.addImage(image->baseImpl);
-        auto* stored = imageManager.getImage(image->getID());
+        imageManager.addImage(image);
+        auto* stored = imageManager.getImage(image->id);
         ASSERT_TRUE(stored);
-        EXPECT_EQ(image->getImage().size, stored->image.size);
+        EXPECT_EQ(image->image.size, stored->image.size);
     }
 }
 

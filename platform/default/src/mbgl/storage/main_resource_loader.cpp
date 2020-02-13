@@ -1,5 +1,6 @@
 #include <mbgl/actor/actor.hpp>
 #include <mbgl/actor/scheduler.hpp>
+#include <mbgl/platform/settings.hpp>
 #include <mbgl/storage/file_source_manager.hpp>
 #include <mbgl/storage/file_source_request.hpp>
 #include <mbgl/storage/main_resource_loader.hpp>
@@ -9,6 +10,7 @@
 #include <mbgl/util/thread.hpp>
 
 #include <cassert>
+#include <map>
 
 namespace mbgl {
 
@@ -116,7 +118,7 @@ private:
     const std::shared_ptr<FileSource> databaseFileSource;
     const std::shared_ptr<FileSource> localFileSource;
     const std::shared_ptr<FileSource> onlineFileSource;
-    std::unordered_map<AsyncRequest*, std::unique_ptr<AsyncRequest>> tasks;
+    std::map<AsyncRequest*, std::unique_ptr<AsyncRequest>> tasks;
 };
 
 class MainResourceLoader::Impl {
@@ -131,7 +133,12 @@ public:
           onlineFileSource(std::move(onlineFileSource_)),
           supportsCacheOnlyRequests_(bool(databaseFileSource)),
           thread(std::make_unique<util::Thread<MainResourceLoaderThread>>(
-              "ResourceLoaderThread", assetFileSource, databaseFileSource, localFileSource, onlineFileSource)) {}
+              util::makeThreadPrioritySetter(platform::EXPERIMENTAL_THREAD_PRIORITY_WORKER),
+              "ResourceLoaderThread",
+              assetFileSource,
+              databaseFileSource,
+              localFileSource,
+              onlineFileSource)) {}
 
     std::unique_ptr<AsyncRequest> request(const Resource& resource, Callback callback) {
         auto req = std::make_unique<FileSourceRequest>(std::move(callback));

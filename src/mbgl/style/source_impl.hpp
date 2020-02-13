@@ -20,9 +20,12 @@ public:
     Impl& operator=(const Impl&) = delete;
 
     virtual optional<std::string> getAttribution() const = 0;
+    void setPrefetchZoomDelta(optional<uint8_t> delta) noexcept;
+    optional<uint8_t> getPrefetchZoomDelta() const noexcept;
 
     const SourceType type;
     const std::string id;
+    optional<uint8_t> prefetchZoomDelta;
 
 protected:
     Impl(SourceType, std::string);

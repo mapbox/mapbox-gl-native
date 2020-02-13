@@ -57,7 +57,8 @@ void TilePyramid::update(const std::vector<Immutable<style::LayerProperties>>& l
                          const uint16_t tileSize,
                          const Range<uint8_t> zoomRange,
                          optional<LatLngBounds> bounds,
-                         std::function<std::unique_ptr<Tile> (const OverscaledTileID&)> createTile) {
+                         std::function<std::unique_ptr<Tile>(const OverscaledTileID&)> createTile,
+                         optional<uint8_t> sourcePrefetchZoomDelta) {
     // If we need a relayout, abandon any cached tiles; they're now stale.
     if (needsRelayout) {
         cache.clear();
@@ -105,8 +106,10 @@ void TilePyramid::update(const std::vector<Immutable<style::LayerProperties>>& l
         if (parameters.mode == MapMode::Continuous && type != style::SourceType::GeoJSON && type != style::SourceType::Annotations) {
             // Request lower zoom level tiles (if configured to do so) in an attempt
             // to show something on the screen faster at the cost of a little of bandwidth.
-            if (parameters.prefetchZoomDelta) {
-                panZoom = std::max<int32_t>(tileZoom - parameters.prefetchZoomDelta, zoomRange.min);
+            const uint8_t prefetchZoomDelta =
+                sourcePrefetchZoomDelta ? *sourcePrefetchZoomDelta : parameters.prefetchZoomDelta;
+            if (prefetchZoomDelta) {
+                panZoom = std::max<int32_t>(tileZoom - prefetchZoomDelta, zoomRange.min);
             }
 
             if (panZoom < idealZoom) {

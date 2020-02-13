@@ -20,6 +20,6 @@ std::unique_ptr<style::Image> createStyleImage(const std::string& id,
                                                optional<style::ImageContent> content = nullopt);
 
 // Parses an image and an associated JSON file and returns the sprite objects.
-std::vector<std::unique_ptr<style::Image>> parseSprite(const std::string& image, const std::string& json);
+std::vector<Immutable<style::Image::Impl>> parseSprite(const std::string& image, const std::string& json);
 
 } // namespace mbgl

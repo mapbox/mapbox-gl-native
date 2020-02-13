@@ -6,8 +6,6 @@
 
 #if ANDROID
     #define TEST_READ_ONLY 0
-    #undef TEST_HAS_SERVER
-    #define TEST_HAS_SERVER 0
 #elif TARGET_OS_IOS
     #define TEST_READ_ONLY 1
     #undef TEST_HAS_SERVER
@@ -54,19 +52,25 @@
 
 #include <cstdint>
 #include <memory>
+#include <thread>
 
 #include <gtest/gtest.h>
+
+namespace httplib {
+class Server;
+}
 
 namespace mbgl {
 namespace test {
 
-class Server {
+class HttpServer {
 public:
-    Server(const char* script);
-    ~Server();
+    HttpServer();
+    ~HttpServer();
 
 private:
-    int fd = -1;
+    std::unique_ptr<httplib::Server> server;
+    std::thread serverThread;
 };
 
 void checkImage(const std::string& base,

@@ -1,197 +1,166 @@
 version: 2.1
 
+#
+# This CI configuration heavily relies on templates and CMake. Most of the
+# jobs will have the following steps (usually configurable via parameters):
+# prepare, build and test.
+#
+# 'sanity-checks' and 'baselines' are special. The former will run a series
+# of checks to see if the patch has the minimum requirements for landing in
+# our repository and the latter will generate new baselines for the tests
+# in case the PR changes the baselines.
+#
 workflows:
   version: 2
-  mbgl-next:
+  development:
     jobs:
-      - next-sanity-checks
-      - next-android-benchmark-runner
-      - next-android-api-breakage
-      - next-android-render-test-runner
-      - next-android-unit-test-runner
-      - next-ios-render-test-runner
-      - next-baselines:
+      - sanity-checks
+      - android-benchmark-runner
+      - android-api-breakage
+      - android-render-test-runner
+      - android-unit-test-runner
+      - ios-render-test-runner
+      - baselines:
           requires:
-            - next-android-arm64-v8a-release
-            - next-android-armeabi-v7a-release
-            - next-android-render-test-runner
-            - next-android-x86-release
-            - next-android-x86_64-release
-            - next-linux-clang8-release
-            - next-linux-gcc8-release
-            - next-macos-xcode11-release
-      - next-build-template:
-          name: next-android-armeabi-v7a-release
+            - android-arm64-v8a-release
+            - android-armeabi-v7a-release
+            - android-render-test-runner
+            - android-x86-release
+            - android-x86_64-release
+            - linux-clang8-release
+            - linux-gcc8-release
+            - macos-xcode11-release
+            - ios-render-test-runner
+      - build-template:
+          name: android-armeabi-v7a-release
           executor_name: ubuntu-disco
           target_is_android: true
           config_params: '-G Ninja -DCMAKE_INSTALL_PREFIX=/tmp/workspace/install/$CIRCLE_JOB -DCMAKE_TOOLCHAIN_FILE=/opt/android/ndk-bundle/build/cmake/android.toolchain.cmake -DANDROID_CCACHE=/usr/bin/ccache -DANDROID_ABI=armeabi-v7a'
           install: true
-      - next-build-template:
-          name: next-android-arm64-v8a-release
+      - build-template:
+          name: android-arm64-v8a-release
           executor_name: ubuntu-disco
           target_is_android: true
           config_params: '-G Ninja -DCMAKE_INSTALL_PREFIX=/tmp/workspace/install/$CIRCLE_JOB -DCMAKE_TOOLCHAIN_FILE=/opt/android/ndk-bundle/build/cmake/android.toolchain.cmake -DANDROID_CCACHE=/usr/bin/ccache -DANDROID_ABI=arm64-v8a'
           build_params: '--target libmapbox-gl.so'
           install: true
-      - next-build-template:
-          name: next-android-x86-release
+      - build-template:
+          name: android-x86-release
           executor_name: ubuntu-disco
           target_is_android: true
           config_params: '-G Ninja -DCMAKE_INSTALL_PREFIX=/tmp/workspace/install/$CIRCLE_JOB -DCMAKE_TOOLCHAIN_FILE=/opt/android/ndk-bundle/build/cmake/android.toolchain.cmake -DANDROID_CCACHE=/usr/bin/ccache -DANDROID_ABI=x86'
           build_params: '--target libmapbox-gl.so'
           install: true
-      - next-build-template:
-          name: next-android-x86_64-release
+      - build-template:
+          name: android-x86_64-release
           executor_name: ubuntu-disco
           target_is_android: true
           config_params: '-G Ninja -DCMAKE_INSTALL_PREFIX=/tmp/workspace/install/$CIRCLE_JOB -DCMAKE_TOOLCHAIN_FILE=/opt/android/ndk-bundle/build/cmake/android.toolchain.cmake -DANDROID_CCACHE=/usr/bin/ccache -DANDROID_ABI=x86_64'
           build_params: '--target libmapbox-gl.so'
           install: true
-      - next-build-template:
-          name: next-linux-gcc8-release
+      - build-template:
+          name: linux-gcc8-release
           executor_name: ubuntu-disco
           target_is_linux: true
           config_params: '-G Ninja -DCMAKE_INSTALL_PREFIX=/tmp/workspace/install/$CIRCLE_JOB -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=gcc-8 -DCMAKE_CXX_COMPILER=g++-8'
           install: true
           metrics: true
           style_tests: true
-      - next-build-template:
-          name: next-linux-gcc4.9-release
+      - build-template:
+          name: linux-gcc4.9-release
           executor_name: ubuntu-disco
           target_is_linux: true
           requires:
-            - next-linux-gcc8-release
+            - linux-gcc8-release
           config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=gcc-4.9 -DCMAKE_CXX_COMPILER=g++-4.9'
           build_params: '--target mbgl-glfw'
           test_params: '-N -Q'
-      - next-build-template:
-          name: next-linux-gcc8-debug-coverage
+      - build-template:
+          name: linux-gcc8-debug-coverage
           executor_name: ubuntu-disco
           target_is_linux: true
           requires:
-            - next-linux-gcc8-release
+            - linux-gcc8-release
           config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=gcc-8 -DCMAKE_CXX_COMPILER=g++-8 -DCMAKE_BUILD_TYPE=Debug -DMBGL_WITH_COVERAGE=ON'
           style_tests: true
-      - next-build-template:
-          name: next-linux-clang8-release
+      - build-template:
+          name: linux-clang8-release
           executor_name: ubuntu-disco
           target_is_linux: true
           config_params: '-G Ninja -DCMAKE_INSTALL_PREFIX=/tmp/workspace/install/$CIRCLE_JOB -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8'
           install: true
           metrics: true
           style_tests: true
-      - next-build-template:
-          name: next-FIXME-linux-asan
+      - build-template:
+          name: FIXME-linux-asan
           executor_name: ubuntu-disco
           target_is_linux: true
           requires:
-            - next-sanity-checks
+            - sanity-checks
           config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8 -DMBGL_WITH_SANITIZER=address'
           test_params: '|| true'
           style_tests: true
-      - next-build-template:
-          name: next-linux-tsan
+      - build-template:
+          name: linux-tsan
           executor_name: ubuntu-disco
           target_is_linux: true
           requires:
-            - next-sanity-checks
+            - sanity-checks
           config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8 -DMBGL_WITH_SANITIZER=thread'
           style_tests: true
-      - next-build-template:
-          name: next-FIXME-linux-valgrind
+      - build-template:
+          name: FIXME-linux-valgrind
           executor_name: ubuntu-disco
           target_is_linux: true
           config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8 -DCMAKE_CXX_FLAGS=-DSANITIZE'
           test_params: '-j 4 -E "mbgl-node|gl-benchmark" -D ExperimentalMemCheck || true'
-      - next-build-template:
-          name: next-FIXME-linux-ubsan
+      - build-template:
+          name: FIXME-linux-ubsan
           executor_name: ubuntu-disco
           target_is_linux: true
           requires:
-            - next-sanity-checks
+            - sanity-checks
           config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8 -DMBGL_WITH_SANITIZER=undefined'
           test_params: '|| true'
           style_tests: true
-      - next-build-template:
-          name: next-qt5-linux-gcc5-release
+      - build-template:
+          name: qt5-linux-gcc5-release
           executor_name: ubuntu-disco
           target_is_linux: true
           config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=gcc-5 -DCMAKE_CXX_COMPILER=g++-5 -DMBGL_WITH_QT=ON'
-      - next-build-template:
-          name: next-qt5-macos-gcc5-release
+      - build-template:
+          name: qt5-macos-gcc5-release
           executor_name: macos-11_0_0
           target_is_macos: true
           requires:
-            - next-qt5-linux-gcc5-release
+            - qt5-linux-gcc5-release
           config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DMBGL_WITH_QT=ON -DCMAKE_PREFIX_PATH=$(echo /usr/local/Cellar/qt/5.*/lib/cmake)'
-          test_params: '-N -Q'
-      - next-build-template:
-          name: next-macos-xcode11-release
+      - build-template:
+          name: macos-xcode11-release
           executor_name: macos-11_0_0
           target_is_macos: true
           config_params: '-G Ninja -DCMAKE_INSTALL_PREFIX=/tmp/workspace/install/$CIRCLE_JOB -DCMAKE_CXX_COMPILER_LAUNCHER=ccache'
           install: true
           metrics: true
           style_tests: true
-      - next-build-template:
-          name: next-macos-xcode11-debug
+      - build-template:
+          name: macos-xcode11-debug
           executor_name: macos-11_0_0
           target_is_macos: true
           requires:
-            - next-macos-xcode11-release
+            - macos-xcode11-release
           config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_BUILD_TYPE=Debug'
           style_tests: true
-      - next-ios-xcode11-release
-  mbgl-legacy:
-    jobs:
-      #
-      # Naming convention: {platform}-{additional description}-{build type}
-      #   - {platform} is the client platform/framework, which may differ from
-      #     the build platform. Specify both if applicable, e.g., "qt5-macos".
-      #   - {additional description} optionally describes the compiler or other
-      #     unique aspect of the build environment.
-      #   - {build type} is typically "debug" or "release".
-      #
-      - node-linux-release:
-          filters:
-            tags:
-              only: /node-.*/
-      - node-macos-release:
-          filters:
-            tags:
-              only: /node-.*/
-      - linux-clang-7-sanitize-address-undefined
-      - linux-clang-7-sanitize-thread
-      - linux-gcc5-debug-coverage
-      - linux-doxygen
-      - ios-debug
-      - ios-debug-xcode10
-      - ios-release-template:
-          name: ios-release
-      - ios-release-tag:
-          filters:
-            tags:
-              only: /ios-.*/
-            branches:
-              ignore: /.*/
-      - macos-debug
-  nightly:
-    triggers:
-      - schedule:
-          cron: "0 5 * * *"
-          filters:
-            branches:
-              only:
-                - master
-    jobs:
-      - metrics-nightly
-      - ios-release-template:
-          name: ios-release-nightly
-      - ios-sanitize-nightly
-      - ios-sanitize-address-nightly
-      - ios-static-analyzer-nightly
-      - ios-static-analyzer-nightly-xcode10
+      - ios-xcode11-release
 
+#
+# Executors: we currently support two executors, one based on Ubuntu 19.04 aka Disco
+# and another based on macOS + Xcode 11.1.0. The Ubuntu executor is a lot more stable
+# and will produce reproduceable builds completely offline because it uses a docker
+# image with all the build dependencies preinstalled, whereas the macOS is managed
+# by CircleCI and will install dependencies on build time. Build results from the macOS
+# bots might differ if in meantime the macOS image gets updated. :-(
+#
 executors:
   ubuntu-disco:
     docker:
@@ -205,6 +174,7 @@ executors:
       ASAN_OPTIONS: strict_string_checks=1:detect_stack_use_after_return=1:check_initialization_order=1:strict_init_order=1:halt_on_error=0
       QT_INSTALL_DOCS: /usr/share/qt5/doc
       QT_VERSION: 5
+      TSAN_OPTIONS: suppressions=/src/platform/linux/tsan_suppress.txt
   macos-11_0_0:
     macos:
       xcode: '11.1.0'
@@ -213,22 +183,13 @@ executors:
       HOMEBREW_NO_INSTALL_CLEANUP: 1
 
 commands:
-  next-prepare:
-    parameters:
-      use_sanity_check_ccache:
-        type: boolean
-        default: true
+  prepare:
     steps:
       - restore_cache:
           keys:
             - 'ccache-v1-{{ .Environment.CIRCLE_JOB }}-{{ .Branch }}-{{ .Revision }}'
             - 'ccache-v1-{{ .Environment.CIRCLE_JOB }}-{{ .Branch }}-'
             - 'ccache-v1-{{ .Environment.CIRCLE_JOB }}-master'
-      - when:
-          condition: << parameters.use_sanity_check_ccache >>
-          steps:
-            - restore_cache:
-                key: 'ccache-v1-next-sanity-checks-master'
       - run:
           name: Prepare
           command: |
@@ -237,38 +198,27 @@ commands:
             git gc
             npm install --ignore-scripts
             ulimit -c unlimited
-  next-prepare-linux:
+  prepare-linux:
     steps:
       - run:
           name: Prepare Linux
           background: true
           command: |
             Xvfb :99 -noreset -screen 0 1280x1024x24
-  next-prepare-macos:
-    parameters:
-      build-ios-test-runner:
-        type: boolean
-        default: false
+  prepare-macos:
     steps:
       - run:
           name: Prepare macOS
           command: |
-            brew install cmake ccache glfw ninja pkgconfig qt
-      - when:
-          condition: << parameters.build-ios-test-runner >>
-          steps:
-            - run:
-                name: Prepare macOS with extra environment
-                command: |
-                  brew cask install google-cloud-sdk	
-                  brew install chargepoint/xcparse/xcparse
+            brew install cmake ccache glfw ninja pkgconfig qt chargepoint/xcparse/xcparse
+            brew cask install google-cloud-sdk
       - run:
           name: Code Generators macOS
           command: |
               platform/darwin/scripts/generate-style-code.js
               platform/darwin/scripts/update-examples.js
-              git add -A && git diff --staged --exit-code
-  next-config:
+              git add -A && git diff --staged --exit-code | tee nitpick.patch
+  config:
     parameters:
       config_params:
         type: string
@@ -276,8 +226,8 @@ commands:
       - run:
           name: Configure
           command: |
-            cmake next -B build << parameters.config_params >>
-  next-build:
+            cmake . -B build << parameters.config_params >>
+  build:
     parameters:
       build_params:
         type: string
@@ -286,15 +236,15 @@ commands:
           name: Build
           command: |
             ccache --zero-stats --max-size=2G
-            cmake --build build -j 8 << parameters.build_params >>
+            cmake --build build -j $(nproc) << parameters.build_params >>
             ccache --show-stats
-  next-install:
+  install:
     steps:
       - run:
           name: Install
           command: |
             cmake --build build --target install/strip
-  next-test:
+  test:
     parameters:
       test_params:
         type: string
@@ -304,7 +254,7 @@ commands:
           command: |
             cd build
             ctest -V << parameters.test_params >>
-  next-metrics:
+  metrics:
     parameters:
       step_name:
         type: string
@@ -315,7 +265,7 @@ commands:
           name: << parameters.step_name >>
           command: |
             build/mbgl-render-test-runner << parameters.metrics_params >>
-  next-save:
+  save:
     steps:
       - save_cache:
           key: 'ccache-v1-{{ .Environment.CIRCLE_JOB }}-{{ .Branch }}-{{ .Revision }}'
@@ -352,362 +302,33 @@ commands:
       - store_artifacts:
           path: /tmp/tests
           destination: tests
-  npm-install:
-    steps:
-    - run:
-        name: npm install
-        command: npm install --ignore-scripts
-  prepare-environment:
-    steps:
-    - run:
-        name: Prepare environment
-        command: touch "$BASH_ENV" && ./scripts/environment.js | tee -a "$BASH_ENV"
-  prepare-ccache:
-    steps:
-    - run:
-        name: Prepare ccache
-        command: |
-          # CircleCI doesn't have any way to embed arbitrary environment variables or command output
-          # into cache keys, so we're using the workaround of writing the desired content to a file,
-          # and then using `{{ checksum "filename" }}` in the cache key.
-          echo "$CIRCLE_BRANCH"
-          echo "$CIRCLE_BRANCH" > .circle-branch
-          echo "$CIRCLE_SHA1"
-          echo "$CIRCLE_SHA1" > .circle-sha1
-          echo "$CIRCLE_TARGET_BRANCH"
-          echo "${CIRCLE_TARGET_BRANCH:master}" > .circle-target-branch
-          echo "$CIRCLE_MERGE_BASE"
-          echo "${CIRCLE_MERGE_BASE:master}" > .circle-merge-base
-          ccache --clear
-  reset-ccache-stats:
-    steps:
-    - run:
-        name: Clear ccache statistics
-        command: |
-          ccache --zero-stats
-          ccache --max-size=2G
-          ccache --show-stats
-  show-ccache-stats:
-    steps:
-    - run:
-        name: Show ccache statistics
-        command: ccache --show-stats
-
-
-  save-node_modules-cache:
-    steps:
-    - save_cache:
-        name: Save node_modules cache
-        key: 'node_modules/v1/{{ arch }}/{{ checksum "package.json" }}'
-        paths: [ "node_modules" ]
-  restore-node_modules-cache:
-    steps:
-    - restore_cache:
-        name: Restore node_modules cache
-        keys:
-          - 'node_modules/v1/{{ arch }}/{{ checksum "package.json" }}'
-          - 'node_modules/v1/{{ arch }}'
-  save-mason_packages-cache:
-    steps:
-    - save_cache:
-        name: Save mason_packages cache
-        key: 'mason_packages/v3/{{ arch }}/{{ checksum "cmake/mason-dependencies.cmake" }}'
-        paths: [ "mason_packages/.binaries" ]
-  restore-mason_packages-cache:
-    steps:
-    - restore_cache:
-        name: Restore mason_packages cache
-        keys:
-          - 'mason_packages/v3/{{ arch }}/{{ checksum "cmake/mason-dependencies.cmake" }}'
-          - 'mason_packages/v3/{{ arch }}'
-  save-ccache:
-    steps:
-    - save_cache:
-        name: Save ccache
-        key: 'ccache/v1/{{ arch }}/{{ .Environment.CIRCLE_JOB }}/{{ checksum ".circle-branch" }}/{{ checksum ".circle-sha1" }}'
-        paths: [ "~/.ccache" ]
-  restore-ccache:
-    steps:
-    - restore_cache:
-        name: Restore ccache
-        keys:
-          - 'ccache/v1/{{ arch }}/{{ .Environment.CIRCLE_JOB }}/{{ checksum ".circle-branch" }}/{{ checksum ".circle-sha1" }}'
-          - 'ccache/v1/{{ arch }}/{{ .Environment.CIRCLE_JOB }}/{{ checksum ".circle-branch" }}'
-          - 'ccache/v1/{{ arch }}/{{ .Environment.CIRCLE_JOB }}/{{ checksum ".circle-target-branch" }}/{{ checksum ".circle-merge-base" }}'
-          - 'ccache/v1/{{ arch }}/{{ .Environment.CIRCLE_JOB }}/{{ checksum ".circle-target-branch" }}'
-          - 'ccache/v1/{{ arch }}/{{ .Environment.CIRCLE_JOB }}'
-  install-dependencies:
-    parameters:
-      node_modules:
-        type: boolean
-        default: true
-      ccache:
-        type: boolean
-        default: true
-      mason:
-        type: boolean
-        default: true
-    steps:
-      - checkout
-      - when:
-          condition: << parameters.node_modules >>
-          steps: [ restore-node_modules-cache, npm-install ]
-      - prepare-environment
-      - when:
-          condition: << parameters.ccache >>
-          steps: [ prepare-ccache, restore-ccache, reset-ccache-stats ]
-      - when:
-          condition: << parameters.mason >>
-          steps: [ restore-mason_packages-cache ]
-  save-dependencies:
-    parameters:
-      node_modules:
-        type: boolean
-        default: true
-      ccache:
-        type: boolean
-        default: true
-      mason:
-        type: boolean
-        default: true
-    steps:
-      - when:
-          condition: << parameters.node_modules >>
-          steps: [ save-node_modules-cache ]
-      - when:
-          condition: << parameters.ccache >>
-          steps: [ save-ccache, show-ccache-stats ]
-      - when:
-          condition: << parameters.mason >>
-          steps: [ save-mason_packages-cache ]
-
-  setup-llvm-symbolizer:
-    steps:
-    - run:
-        name: Environment Setup
-        command: |
-          # LLVM has a hard check for "llvm-symbolizer" and doesn't support suffixed executables
-          ln -s /usr/bin/llvm-symbolizer-* /usr/bin/llvm-symbolizer
-          # We'll use tee to redirect stderr to a file so we can check for sanitiziation
-          # https://bugs.launchpad.net/ubuntu/+source/xorg-server/+bug/1059947
-          sed -i 's/"$@" 2>&1/"$@"/' /usr/bin/xvfb-run
-
-
-  configure-cmake:
-    steps:
-    - run:
-        name: CMake configuration step
-        command: |
-          mkdir -p build
-          cd build
-          cmake -DWITH_COVERAGE=${WITH_COVERAGE:0} -DWITH_OSMESA=${WITH_OSMESA:0} -DWITH_EGL=${WITH_EGL:0} ..
-          cd ..
-  build-node:
-    steps:
-    - run:
-        name: Build node
-        command: make node-all
-  build-linux:
-    steps:
-    - run:
-        name: Build linux
-        command: make linux
-  build-benchmark:
-    steps:
-    - run:
-        name: Build benchmark
-        command: make benchmark
-  build-test:
-    steps:
-    - run:
-        name: Build test
-        command: make test
-  build-ios-test:
-    steps:
-    - run:
-        name: Build ios-test
-        command: make ios-test
-        no_output_timeout: 2m
-  build-ios-integration-test:
-    steps:
-    - run:
-        name: Build ios-integration-test
-        command: make ios-integration-test
-  build-macos-test:
-    steps:
-    - run:
-        name: Build and run macOS tests
-        command: make run-test
-        no_output_timeout: 2m
-
-
-  check-public-symbols:
-    steps:
-    - run:
-        name: Check public symbols
-        command: make darwin-check-public-symbols
-
-
-  conditionally-skip-firebase:
-    steps:
-    - run:
-        name: Check if Firebase should be skipped
-        command: |
-          FIREBASE_TAG=$( git diff origin/$CIRCLE_TARGET_BRANCH... --stat | grep -ivE -e"ios|macos|darwin" || true )
-          if [ -z "${FIREBASE_TAG}" ]; then
-            echo "Skipping Firebase tests because commits changed only Darwin-specific paths."
-            echo 'export SKIP_FIREBASE=1' >> $BASH_ENV
-          fi
   login-google-cloud-platform:
     steps:
     - run:
-        name: Log in to Google Cloud Platform
+        name: Login Google Cloud Platform
         command: |
-          if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON}" && -z "${SKIP_FIREBASE:-}" ]]; then
-            echo "${GCLOUD_SERVICE_ACCOUNT_JSON}" > secret.json
-            gcloud auth activate-service-account --key-file secret.json --project android-gl-native
-            rm secret.json
-          fi
-
-
-  install-ios-packaging-dependencies:
-    steps:
-    - run:
-        name: Install iOS packaging dependencies
-        command: |
-          echo "ruby-2.6" > ~/.ruby-version
-          ./platform/ios/scripts/install-packaging-dependencies.sh
-        background: true
-
-  install-macos-dependencies:
-    steps:
-    - run:
-        name: Install macOS dependencies
-        command: brew install cmake ccache
-
-  install-node-macos-dependencies:
-    steps:
-    - run:
-        name: Install Node macOS dependencies
-        command: |
-          brew install node@8
-          brew link node@8 --force --overwrite
-
-  run-node-macos-tests:
-    steps:
-    - run:
-        name: Run node tests
-        command: make test-node
-
-  run-node-linux-tests:
-    parameters:
-      node_version:
-        type: string
-        default: v8
-    steps:
-    - run:
-        name: Run node tests
-        command: |
-          . "$NVM_DIR/nvm.sh" && nvm use << parameters.node_version >>
-          xvfb-run --server-args="-screen 0 1024x768x24" \
-            logbt -- apitrace trace --api=egl -v make test-node
-
-  run-unit-tests:
-    steps:
-    - run:
-        name: Run tests
-        command: |
-          xvfb-run --server-args="-screen 0 1024x768x24" \
-            make run-test
-
-  run-unit-tests-sanitized:
-    steps:
-    - run:
-        name: Run tests
-        command: |
-          # Source.RenderTileSetSourceUpdate and Source.InvisibleSourcesTileNecessity are filtered out due to #15294
-          xvfb-run --server-args="-screen 0 1024x768x24" make run-test--Source.RenderTileSetSourceUpdate:Source.InvisibleSourcesTileNecessity 2> >(tee sanitizer 1>&2)
-          # Unfortunately, Google Test eats the status code, so we'll have to check the output.
-          [ -z "$(sed -n '/^SUMMARY: .*Sanitizer:/p' sanitizer)" ]
-
-  publish-node-package:
-    steps:
-    - run:
-        name: Publish node package
-        when: on_success
-        command: platform/node/scripts/publish.sh
-
-  collect-xcode-build-logs:
-    steps:
-    - run:
-        name: Collect Xcode build logs
-        when: always
-        command: |
-          export XCODE_LOG_DIR=build/logs
-          mkdir -p $XCODE_LOG_DIR
-          cp build/*.log $XCODE_LOG_DIR
-  upload-xcode-build-logs:
-    steps:
-    - store_artifacts:
-        path: build/logs
-
-
-  notify-slack-nightly-failure:
-    steps:
-    - run:
-        name: Send a Slack notification on nightly failure
-        when: on_fail
-        command: |
-          if [[ $CIRCLE_BRANCH == master ]]; then
-            export SLACK_MESSAGE="Nightly build of \`$CIRCLE_JOB\` <$CIRCLE_BUILD_URL|failed>."
-            export SLACK_COLOR="danger"
-            scripts/notify-slack.sh
-          fi
-
-  #
-  # Add this step to all regular jobs to enable skipping of certain non-code-related changes.
-  #
-  # Do not include this step in nightly or release deployment jobs.
-  #
-  # To make a job potentially skippable on changes unrelated to its platform, it must:
-  #   - Target one of the skippable platforms: Android, iOS, or macOS.
-  #   - Have a job name that begins with a supported platform name.
-  #   - Not be related to core functionality or rendering tests. Job names that
-  #     contain "render-tests" cannot be skipped by platform changes.
-  #
-  # See the script in the following step for how to implement support for other platforms.
-  #
-  check-if-this-job-can-be-skipped:
-    steps:
-    - run:
-        name: Check if this job can be skipped
-        command: |
-          if [[ $CIRCLE_BRANCH != master ]] && [[ $CIRCLE_BRANCH != release-* ]] && [[ -z $CIRCLE_TAG ]]; then
-            scripts/check-ci-job-skippability.js
-          fi
-
+          echo "${GCLOUD_SERVICE_ACCOUNT_JSON}" > secret.json
+          gcloud auth activate-service-account --key-file secret.json --project android-gl-native
+          rm secret.json
 jobs:
-  next-ios-xcode11-release:
+  ios-xcode11-release:
     executor: macos-11_0_0
     steps:
       - checkout
-      - next-prepare:
-          use_sanity_check_ccache: false
-      - next-prepare-macos
+      - prepare
+      - prepare-macos
       - run:
           name: Build
           command: |
-            cmake next -B Build -G Xcode -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_OSX_SYSROOT=iphonesimulator
+            cmake . -B Build -G Xcode -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_OSX_SYSROOT=iphonesimulator
             cd Build && xcodebuild -sdk iphonesimulator -project Mapbox\ GL\ Native.xcodeproj -configuration Release
-      - next-save
-  next-ios-render-test-runner:
+      - save
+  ios-render-test-runner:
     executor: macos-11_0_0
     steps:
       - checkout
-      - next-prepare:
-          use_sanity_check_ccache: false
-      - next-prepare-macos:
-          build-ios-test-runner: true
+      - prepare
+      - prepare-macos
       - run:
           name: Prepare codesign keychain 
           command: |
@@ -720,7 +341,7 @@ jobs:
           name: Build IOS RenderTestApp
           command: |
             cd render-test/ios
-            cmake ../../next -B Build -G Xcode -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_SYSROOT=iphoneos -DMBGL_IOS_RENDER_TEST=ON
+            cmake ../.. -B Build -G Xcode -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_SYSROOT=iphoneos -DMBGL_IOS_RENDER_TEST=ON
             cd Build
             xcodebuild -sdk iphoneos -project Mapbox\ GL\ Native.xcodeproj -scheme RenderTestApp build-for-testing -arch arm64 CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -configuration Release
             xcodebuild -sdk iphoneos -project Mapbox\ GL\ Native.xcodeproj build -target RenderTestAppTests -arch arm64 CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -configuration Release
@@ -769,13 +390,19 @@ jobs:
               xcparse attachments *.xcresult && ls
               cd ../.. && mkdir -p /tmp/tests/ios-render-test
               if ls render-test-app/TestLogs/*.html 1> /dev/null 2>&1; then cp render-test-app/TestLogs/*.html /tmp/tests/ios-render-test; fi
+              if [[ -n $(ls render-test-app/TestLogs/*.zip 2>/dev/null) ]]; then
+                cp render-test-app/TestLogs/*.zip metrics/ios-render-test-runner/
+                cd metrics/ios-render-test-runner/
+                unzip *.zip
+                rm -rf *.zip
+              fi
             fi
-      - next-save
-  next-android-benchmark-runner:
+      - save
+  android-benchmark-runner:
     executor: ubuntu-disco
     steps:
       - checkout
-      - next-prepare
+      - prepare
       - run:
           name: Build BenchmarkRunner APK
           command: |
@@ -786,43 +413,39 @@ jobs:
           name: Run BenchmarkRunner on Firebase
           no_output_timeout: 20m
           command: |
-            if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON}" && -z "${SKIP_FIREBASE:-}" ]]; then
-              gcloud firebase test android models list
-              gcloud firebase test android run --type instrumentation \
-                --app benchmark/android/app/build/outputs/apk/release/app-release.apk \
-                --test benchmark/android/app/build/outputs/apk/androidTest/release/app-release-androidTest.apk \
-                --device-ids flame --os-version-ids 29 --locales en --orientations portrait --timeout 20m \
-                --directories-to-pull /sdcard/benchmark/results --results-dir benchmark-${CIRCLE_BUILD_NUM} \
-                --no-record-video --no-performance-metrics
-            fi
+            gcloud firebase test android models list
+            gcloud firebase test android run --type instrumentation \
+              --app benchmark/android/app/build/outputs/apk/release/app-release.apk \
+              --test benchmark/android/app/build/outputs/apk/androidTest/release/app-release-androidTest.apk \
+              --device-ids flame --os-version-ids 29 --locales en --orientations portrait --timeout 20m \
+              --directories-to-pull /sdcard/benchmark/results --results-dir benchmark-${CIRCLE_BUILD_NUM} \
+              --no-record-video --no-performance-metrics
       - run:
           name: Retrieve TestResult from gcloud
           when: always
           command: |
-            if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON}" && -z "${SKIP_FIREBASE:-}" ]]; then
-              testResult=$(gsutil ls gs://test-lab-186672a0qp5bq-ycr70axads3nc/benchmark-${CIRCLE_BUILD_NUM}/**/results/results.json)
-              mkdir -p /tmp/tests/benchmark
-              gsutil cp $testResult /tmp/tests/benchmark
-            fi
-  next-android-api-breakage:
+            testResult=$(gsutil ls gs://test-lab-186672a0qp5bq-ycr70axads3nc/benchmark-${CIRCLE_BUILD_NUM}/**/results/results.json)
+            mkdir -p /tmp/tests/benchmark
+            gsutil cp $testResult /tmp/tests/benchmark
+  android-api-breakage:
     executor: ubuntu-disco
     steps:
       - run:
           name: Clone mapbox-gl-native-android in working directory
           command: git clone https://github.com/mapbox/mapbox-gl-native-android.git .
-      - next-prepare
+      - prepare
       - run:
           name: Update mapbox-gl-native to match PR
           command: cd vendor/mapbox-gl-native && git fetch origin $CIRCLE_SHA1 && git checkout $CIRCLE_SHA1 && git submodule update --init --recursive
       - run:
           name: Build SDK
           command: BUILDTYPE=Release make android-arm-v8
-      - next-save
-  next-android-unit-test-runner:
+      - save
+  android-unit-test-runner:
     executor: ubuntu-disco
     steps:
       - checkout
-      - next-prepare
+      - prepare
       - run:
           name: Build UnitTestRunner APK
           command: |
@@ -833,30 +456,26 @@ jobs:
           name: Run UnitTestRunner on Firebase
           no_output_timeout: 20m
           command: |
-            if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON}" && -z "${SKIP_FIREBASE:-}" ]]; then
-              gcloud firebase test android models list
-              gcloud firebase test android run --type instrumentation \
-                --app test/android/app/build/outputs/apk/release/app-release.apk \
-                --test test/android/app/build/outputs/apk/androidTest/release/app-release-androidTest.apk \
-                --device-ids flame --os-version-ids 29 --locales en --orientations portrait --timeout 20m \
-                --directories-to-pull /sdcard/test/results --results-dir unit-test-${CIRCLE_BUILD_NUM} \
-                --no-record-video --no-performance-metrics
-            fi
+            gcloud firebase test android models list
+            gcloud firebase test android run --type instrumentation \
+              --app test/android/app/build/outputs/apk/release/app-release.apk \
+              --test test/android/app/build/outputs/apk/androidTest/release/app-release-androidTest.apk \
+              --device-ids flame --os-version-ids 29 --locales en --orientations portrait --timeout 20m \
+              --directories-to-pull /sdcard/test/results --results-dir unit-test-${CIRCLE_BUILD_NUM} \
+              --no-record-video --no-performance-metrics
       - run:
           name: Retrieve Test Result from gcloud
           when: always
           command: |
-            if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON}" && -z "${SKIP_FIREBASE:-}" ]]; then
-              testResult=$(gsutil ls gs://test-lab-186672a0qp5bq-ycr70axads3nc/unit-test-${CIRCLE_BUILD_NUM}/**/results/results.xml)
-              mkdir -p /tmp/tests/unit-test
-              gsutil cp $testResult /tmp/tests/unit-test
-            fi
-      - next-save
-  next-android-render-test-runner:
+            testResult=$(gsutil ls gs://test-lab-186672a0qp5bq-ycr70axads3nc/unit-test-${CIRCLE_BUILD_NUM}/**/results/results.xml)
+            mkdir -p /tmp/tests/unit-test
+            gsutil cp $testResult /tmp/tests/unit-test
+      - save
+  android-render-test-runner:
     executor: ubuntu-disco
     steps:
       - checkout
-      - next-prepare
+      - prepare
       - run:
           name: Build RenderTestRunner APK
           command: |
@@ -867,44 +486,37 @@ jobs:
           name: Run RenderTestRunner Instrumentation Test on Firebase
           no_output_timeout: 20m
           command: |
-            if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON}" && -z "${SKIP_FIREBASE:-}" ]]; then
-              gcloud firebase test android models list
-              gcloud firebase test android run --type instrumentation \
-                --app render-test/android/app/build/outputs/apk/release/app-release.apk \
-                --test render-test/android/app/build/outputs/apk/androidTest/release/app-release-androidTest.apk \
-                --device-ids flame --os-version-ids 29 --locales en --orientations portrait --timeout 20m \
-                --directories-to-pull /sdcard --results-dir render-test-app-${CIRCLE_BUILD_NUM} \
-                --no-record-video --no-performance-metrics
-            fi
+            gcloud firebase test android models list
+            gcloud firebase test android run --type instrumentation \
+              --app render-test/android/app/build/outputs/apk/release/app-release.apk \
+              --test render-test/android/app/build/outputs/apk/androidTest/release/app-release-androidTest.apk \
+              --device-ids flame --os-version-ids 29 --locales en --orientations portrait --timeout 20m \
+              --directories-to-pull /sdcard --results-dir render-test-app-${CIRCLE_BUILD_NUM} \
+              --no-record-video --no-performance-metrics
       - run:
           name: Retrieve TestResult from gcloud
           when: always
           command: |
-            if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON}" && -z "${SKIP_FIREBASE:-}" ]]; then
-              testResult=$(gsutil ls gs://test-lab-186672a0qp5bq-ycr70axads3nc/render-test-app-${CIRCLE_BUILD_NUM}/**/*.html)
-              mkdir -p /tmp/tests/render-test-app
-              gsutil cp $testResult /tmp/tests/render-test-app
-            fi
+            testResult=$(gsutil ls gs://test-lab-186672a0qp5bq-ycr70axads3nc/render-test-app-${CIRCLE_BUILD_NUM}/**/*.html)
+            mkdir -p /tmp/tests/render-test-app
+            gsutil cp $testResult /tmp/tests/render-test-app
       - run:
           name: Retrieve Rebaselined Metrics from gcloud
           command: |
-            if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON}" && -z "${SKIP_FIREBASE:-}" ]]; then
-              metricsResult=$(gsutil ls -d gs://test-lab-186672a0qp5bq-ycr70axads3nc/render-test-app-${CIRCLE_BUILD_NUM}/*/*/sdcard/baselines/*) || true
-              gsutil -m cp -r $metricsResult metrics/next-android-render-test-runner/ || true
-            fi
-      - next-save
-  next-sanity-checks:
+            metricsResult=$(gsutil ls -d gs://test-lab-186672a0qp5bq-ycr70axads3nc/render-test-app-${CIRCLE_BUILD_NUM}/*/*/sdcard/baselines/*) || true
+            gsutil -m cp -r $metricsResult metrics/android-render-test-runner/ || true
+      - save
+  sanity-checks:
     executor: ubuntu-disco
     steps:
       - checkout
-      - next-prepare
-      - next-config:
+      - prepare
+      - config:
           config_params: '-G Ninja -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8'
       - run:
           name: Code Generators
           command: |
             platform/default/include/mbgl/storage/offline_schema.js
-            scripts/generate-file-lists.js
             scripts/generate-shaders.js
             scripts/generate-style-code.js
             git add -A && git diff --staged --exit-code | tee nitpick.patch
@@ -915,7 +527,8 @@ jobs:
       - run:
           name: CMake Format
           command: |
-            cmake-format -i $(find next -type f -name CMakeLists.txt -o -name '*.cmake')
+            cmake-format -i $(find -name '*.cmake'      -and -not -path './vendor/*/*' -and -not -path './build/*')
+            cmake-format -i $(find -name CMakeLists.txt -and -not -path './vendor/*/*' -and -not -path './build/*')
             git diff --exit-code | tee nitpick.patch
       - run:
           name: Clang Format
@@ -925,28 +538,28 @@ jobs:
       - run:
           name: Clang Tidy
           command: |
-            run-clang-tidy-8 -quiet -j24 -p build $PWD/src/.*cpp $PWD/platform/.*cpp |tee clang-tidy.log
+            run-clang-tidy-8 -quiet -j $(nproc) -p build $PWD/src/.*cpp $PWD/platform/.*cpp |tee clang-tidy.log
             grep -o \\[[a-z].*-.*[a-z]\] clang-tidy.log |sort |uniq -c |sort -n
-      - next-save
-  next-baselines:
+      - save
+  baselines:
     executor: ubuntu-disco
     steps:
       - checkout
-      - next-prepare
-      - next-prepare-linux
+      - prepare
+      - prepare-linux
       - attach_workspace:
           at: /tmp/attach
       - run:
           name: 'Binary Size'
           command: |
-            /tmp/attach/install/next-linux-gcc8-release/bin/mbgl-render-test-runner -u rebaseline -p metrics/next-binary-size.json
+            /tmp/attach/install/linux-gcc8-release/bin/mbgl-render-test-runner -u rebaseline -p metrics/binary-size.json
       - run:
           name: 'Matrics Baselines'
           command: |
             cp -r /tmp/attach/metrics .
             git add -A && git diff --staged --exit-code | tee baselines.patch
-      - next-save
-  next-build-template:
+      - save
+  build-template:
     parameters:
       config_params:
         type: string
@@ -983,472 +596,47 @@ jobs:
       - when:
           condition: << parameters.target_is_android >>
           steps:
-            - next-prepare
-            - next-config:
+            - prepare
+            - config:
                 config_params: << parameters.config_params >>
-            - next-build:
+            - build:
                 build_params: << parameters.build_params >>
       - when:
           condition: << parameters.target_is_linux >>
           steps:
-            - next-prepare
-            - next-prepare-linux
-            - next-config:
+            - prepare
+            - prepare-linux
+            - config:
                 config_params: << parameters.config_params >>
-            - next-build:
+            - build:
                 build_params: << parameters.build_params >>
-            - next-test:
+            - test:
                 test_params: << parameters.test_params >>
       - when:
           condition: << parameters.target_is_macos >>
           steps:
-            - next-prepare:
-                use_sanity_check_ccache: false
-            - next-prepare-macos
-            - next-config:
+            - prepare
+            - prepare-macos
+            - config:
                 config_params: << parameters.config_params >>
-            - next-build:
+            - build:
                 build_params: << parameters.build_params >>
-            - next-test:
+            - test:
                 test_params: << parameters.test_params >>
       - when:
           condition: << parameters.install >>
           steps:
-            - next-install
+            - install
       - when:
           condition: << parameters.style_tests >>
           steps:
-            - next-metrics:
+            - metrics:
                 step_name: 'Style Tests'
                 metrics_params: '-u rebaseline -p metrics/$CIRCLE_JOB-style.json'
       - when:
           condition: << parameters.metrics >>
           steps:
-            - next-metrics:
+            - metrics:
                 step_name: 'Metrics'
                 metrics_params: '-u rebaseline -p metrics/$CIRCLE_JOB-metrics.json'
-      - next-save
-# ------------------------------------------------------------------------------
-  node-linux-release:
-    docker:
-      - image: mbgl/linux-clang-3.9:2077f965ed
-    resource_class: large
-    working_directory: /src
-    environment:
-      LIBSYSCONFCPUS: 4
-      JOBS: 4
-      BUILDTYPE: RelWithDebInfo
-      WITH_EGL: 1
-    steps:
-      - install-dependencies
-      - build-node
-      - save-dependencies
-      - run-node-linux-tests
-      - publish-node-package
-
-# ------------------------------------------------------------------------------
-  node-macos-release:
-    macos:
-      xcode: "11.1.0"
-    environment:
-      BUILDTYPE: RelWithDebInfo
-      HOMEBREW_NO_AUTO_UPDATE: 1
-      HOMEBREW_NO_INSTALL_CLEANUP: 1
-    steps:
-      - install-macos-dependencies
-      - install-node-macos-dependencies
-      - install-dependencies
-      - check-if-this-job-can-be-skipped
-      - build-node
-      - save-dependencies
-      - run-node-macos-tests
-      - publish-node-package
-      - collect-xcode-build-logs
-      - upload-xcode-build-logs
-
-# ------------------------------------------------------------------------------
-  linux-clang-7-sanitize-address-undefined:
-    docker:
-      - image: mbgl/linux-clang-7:a5a3c52107
-    resource_class: large
-    working_directory: /src
-    environment:
-      LIBSYSCONFCPUS: 4
-      JOBS: 4
-      BUILDTYPE: Sanitize
-      WITH_EGL: 1
-      GDB: '' # Do not run with GDB
-      CXXFLAGS: -fsanitize=address -fsanitize=undefined
-      LDFLAGS: -fsanitize=address -fsanitize=undefined
-      ASAN_OPTIONS: detect_leaks=0:color=always:print_summary=1
-      UBSAN_OPTIONS: print_stacktrace=1:color=always:print_summary=1
-    steps:
-      - install-dependencies
-      - check-if-this-job-can-be-skipped
-      - setup-llvm-symbolizer
-      - build-test
-      - save-dependencies
-      - run-unit-tests-sanitized
-
-# ------------------------------------------------------------------------------
-  linux-clang-7-sanitize-thread:
-    docker:
-      - image: mbgl/linux-clang-7:a5a3c52107
-    resource_class: large
-    working_directory: /src
-    environment:
-      LIBSYSCONFCPUS: 4
-      JOBS: 4
-      BUILDTYPE: Sanitize
-      WITH_EGL: 1
-      GDB: '' # Do not run with GDB
-      CXXFLAGS: -fsanitize=thread
-      LDFLAGS: -fsanitize=thread
-      TSAN_OPTIONS: color=always:print_summary=1
-    steps:
-      - install-dependencies
-      - check-if-this-job-can-be-skipped
-      - setup-llvm-symbolizer
-      - build-test
-      - save-dependencies
-      - run-unit-tests-sanitized
-
-# ------------------------------------------------------------------------------
-  linux-gcc5-debug-coverage:
-    docker:
-      - image: mbgl/linux-gcc-5:54f59e3ac5
-    resource_class: large
-    working_directory: /src
-    environment:
-      LIBSYSCONFCPUS: 4
-      JOBS: 4
-      BUILDTYPE: Debug
-      WITH_EGL: 1
-      WITH_COVERAGE: 1
-    steps:
-      - install-dependencies
-      - check-if-this-job-can-be-skipped
-      - build-linux
-      - build-benchmark
-      - build-test
-      - save-dependencies
-      - run-unit-tests
-      - run:
-          name: Upload coverage results to codecov.io
-          command: |
-            bash <(curl -sSfL https://codecov.io/bash) || echo 'Codecov failed to upload'
-      - run:
-          name: Upload coverage metrics to s3
-          command: |
-            if [[ $CIRCLE_BRANCH == master ]]; then
-                scripts/publish_core_codecoverage.js -p Linux -s Core
-            fi
-
-# ------------------------------------------------------------------------------
-  linux-doxygen:
-    docker:
-      - image: mbgl/linux-gcc-5:54f59e3ac5
-    resource_class: large
-    working_directory: /src
-    environment:
-      LIBSYSCONFCPUS: 2
-      JOBS: 2
-      BUILDTYPE: Debug
-      WITH_EGL: 1
-      WITH_COVERAGE: 1
-    steps:
-      - install-dependencies
-      - check-if-this-job-can-be-skipped
-      - run:
-          name: Install doxygen
-          command: apt update && apt install -y doxygen
-      - build-linux
-      - save-dependencies
-      - run:
-          name: Check documentation coverage
-          command: |
-              platform/linux/ninja -C "build/linux-$(uname -m)/Debug" doxygen_coverage
-              scripts/publish_doxygen_coverage.js "build/linux-$(uname -m)/Debug/doxygen-coverage.json"
-
-# ------------------------------------------------------------------------------
-  ios-debug:
-    macos:
-      xcode: "11.1.0"
-    environment:
-      BUILDTYPE: Debug
-      HOMEBREW_NO_AUTO_UPDATE: 1
-      HOMEBREW_NO_INSTALL_CLEANUP: 1
-    steps:
-      - install-macos-dependencies
-      - install-dependencies
-      - check-public-symbols
-      - run:
-          name: Lint podspecs and plist files
-          command: make ios-lint
-      - check-if-this-job-can-be-skipped
-      - build-ios-test
-      - run:
-          name: Check symbol namespacing for mapbox-events-ios
-          command: make ios-check-events-symbols
-      - save-dependencies
-      - collect-xcode-build-logs
-      - upload-xcode-build-logs
-
-# ------------------------------------------------------------------------------
-  ios-debug-xcode10:
-    macos:
-      xcode: "10.3.0"
-    environment:
-      BUILDTYPE: Debug
-      HOMEBREW_NO_AUTO_UPDATE: 1
-      HOMEBREW_NO_INSTALL_CLEANUP: 1
-    steps:
-      - install-macos-dependencies
-      - install-dependencies
-      - check-public-symbols
-      - run:
-          name: Lint podspecs and plist files
-          command: make ios-lint
-      - check-if-this-job-can-be-skipped
-      - build-ios-test
-      - run:
-          name: Check symbol namespacing for mapbox-events-ios
-          command: make ios-check-events-symbols
-      - save-dependencies
-      - collect-xcode-build-logs
-      - upload-xcode-build-logs
-
-# ------------------------------------------------------------------------------
-  ios-sanitize-nightly:
-    macos:
-      xcode: "11.1.0"
-    environment:
-      BUILDTYPE: Debug
-      HOMEBREW_NO_AUTO_UPDATE: 1
-      HOMEBREW_NO_INSTALL_CLEANUP: 1
-      SLACK_CHANNEL: C0ACM9Q2C
-    steps:
-      - install-macos-dependencies
-      - install-dependencies
-      - run:
-          name: Build and run SDK unit tests with thread and undefined behavior sanitizers
-          command: make ios-sanitize
-      - run:
-          name: Get iOS code coverage
-          command: |
-            echo "Skipping iOS code coverage"
-          # Currently failing, need to update for Xcode 11
-          # platform/ios/scripts/ios-code-coverage.sh CI
-          #
-      - save-dependencies
-      - collect-xcode-build-logs
-      - upload-xcode-build-logs
-      - notify-slack-nightly-failure
-
-# ------------------------------------------------------------------------------
-  ios-sanitize-address-nightly:
-    macos:
-      xcode: "11.1.0"
-    environment:
-      BUILDTYPE: Debug
-      HOMEBREW_NO_AUTO_UPDATE: 1
-      HOMEBREW_NO_INSTALL_CLEANUP: 1
-      SLACK_CHANNEL: C0ACM9Q2C
-    steps:
-      - install-macos-dependencies
-      - install-dependencies
-      - run:
-          name: Build and run SDK unit tests with address sanitizer
-          command: make ios-sanitize-address
-      - save-dependencies
-      - collect-xcode-build-logs
-      - upload-xcode-build-logs
-      - notify-slack-nightly-failure
-
-# ------------------------------------------------------------------------------
-  ios-static-analyzer-nightly:
-    macos:
-      xcode: "11.1.0"
-    environment:
-      BUILDTYPE: Debug
-      HOMEBREW_NO_AUTO_UPDATE: 1
-      HOMEBREW_NO_INSTALL_CLEANUP: 1
-      SLACK_CHANNEL: C0ACM9Q2C
-    steps:
-      - install-macos-dependencies
-      - install-dependencies
-      - run:
-          name: Build and run SDK unit tests with the static analyzer
-          command: make ios-static-analyzer
-      - save-dependencies
-      - collect-xcode-build-logs
-      - upload-xcode-build-logs
-      - notify-slack-nightly-failure
-
-# ------------------------------------------------------------------------------
-  ios-static-analyzer-nightly-xcode10:
-    macos:
-      xcode: "10.3.0"
-    environment:
-      BUILDTYPE: Debug
-      HOMEBREW_NO_AUTO_UPDATE: 1
-      HOMEBREW_NO_INSTALL_CLEANUP: 1
-      SLACK_CHANNEL: C0ACM9Q2C
-    steps:
-      - install-macos-dependencies
-      - install-dependencies
-      - run:
-          name: Build and run SDK unit tests with the static analyzer
-          command: make ios-static-analyzer
-      - save-dependencies
-      - collect-xcode-build-logs
-      - upload-xcode-build-logs
-      - notify-slack-nightly-failure
-
-# ------------------------------------------------------------------------------
-  ios-release-template:
-    macos:
-      xcode: "11.1.0"
-    shell: /bin/bash --login -eo pipefail
-    environment:
-      BUILDTYPE: Release
-      HOMEBREW_NO_AUTO_UPDATE: 1
-      HOMEBREW_NO_INSTALL_CLEANUP: 1
-      SLACK_CHANNEL: C0ACM9Q2C
-    steps:
-      - install-macos-dependencies
-      - install-dependencies
-      - check-if-this-job-can-be-skipped
-      - install-ios-packaging-dependencies
-      - run:
-          name: Build dynamic framework for device and simulator
-          command: make iframework BUILD_DOCS=false
-          no_output_timeout: 5m
-      - deploy:
-          name: Upload snapshot build to s3
-          command: |
-            if [[ $CIRCLE_BRANCH == master ]]; then
-              platform/ios/scripts/deploy-snapshot.sh
-            fi
-      - deploy:
-          name: Deploy to Mapbox CocoaPods spec repo
-          command: |
-            if [[ $CIRCLE_BRANCH == master ]]; then
-              platform/ios/scripts/deploy-to-cocoapods.sh
-            fi
-      - run:
-         name: Record size
-         command: |
-              echo "Skipping Record size step"
-              # Skipping due to https://github.com/mapbox/mapbox-gl-native/issues/15751
-              #platform/ios/scripts/metrics.sh
-      - run:
-          name: Trigger metrics
-          command: |
-            if [[ $CIRCLE_BRANCH == master ]]; then
-              if [ -n "${MOBILE_METRICS_TOKEN}" ]; then
-                curl -u ${MOBILE_METRICS_TOKEN}: -d build_parameters[CIRCLE_JOB]=ios-maps-benchmark https://circleci.com/api/v1.1/project/github/mapbox/mobile-metrics/tree/master
-              else
-                echo "MOBILE_METRICS_TOKEN not provided"
-              fi
-            fi
-      - save-dependencies
-      - collect-xcode-build-logs
-      - upload-xcode-build-logs
-      - notify-slack-nightly-failure
-
-# ------------------------------------------------------------------------------
-  ios-release-tag:
-    macos:
-      xcode: "11.0.0"
-    shell: /bin/bash --login -eo pipefail
-    environment:
-      BUILDTYPE: Release
-      HOMEBREW_NO_AUTO_UPDATE: 1
-      HOMEBREW_NO_INSTALL_CLEANUP: 1
-      SLACK_CHANNEL: C0ACM9Q2C
-    steps:
-      - checkout
-      - run:
-          name: Send a Slack notification on start
-          command: |
-            export SLACK_MESSAGE="<$CIRCLE_BUILD_URL|Release build for \`$CIRCLE_TAG\` started.>"
-            scripts/notify-slack.sh
-      - install-macos-dependencies
-      - install-dependencies
-      - install-ios-packaging-dependencies
-      - run:
-          name: Trigger external deploy steps
-          command: |
-            export VERSION_TAG=${CIRCLE_TAG}
-            export GITHUB_TOKEN=${DANGER_GITHUB_API_TOKEN}
-            export DOCS_REPO="ios-sdk"
-            scripts/trigger-maps-documentation-deploy-steps.sh
-      - run:
-          name: Build, package, and upload iOS release
-          command: |
-            export VERSION_TAG=${CIRCLE_TAG}
-            export GITHUB_TOKEN=${DANGER_GITHUB_API_TOKEN}
-            platform/ios/scripts/deploy-packages.sh
-      - deploy:
-          name: Deploy to CocoaPods
-          command: platform/ios/scripts/deploy-to-cocoapods.sh
-      - save-dependencies
-      - collect-xcode-build-logs
-      - upload-xcode-build-logs
-      - run:
-          name: Send a Slack notification on failure
-          when: on_fail
-          command: |
-            export SLACK_MESSAGE="<$CIRCLE_BUILD_URL|Release build for \`$CIRCLE_TAG\` failed.>"
-            export SLACK_COLOR="danger"
-            scripts/notify-slack.sh
-      - run:
-          name: Send a Slack notification on success
-          when: on_success
-          command: |
-            export SLACK_MESSAGE="<$CIRCLE_BUILD_URL|Release build for \`$CIRCLE_TAG\` succeeded.>"
-            export SLACK_COLOR="good"
-            scripts/notify-slack.sh
-
-# ------------------------------------------------------------------------------
-  macos-debug:
-    macos:
-      xcode: "10.1.0"
-    environment:
-      BUILDTYPE: Debug
-      HOMEBREW_NO_AUTO_UPDATE: 1
-      HOMEBREW_NO_INSTALL_CLEANUP: 1
-    steps:
-      - install-macos-dependencies
-      - install-dependencies
-      - check-if-this-job-can-be-skipped
-      - build-macos-test
-      - check-public-symbols
-      - run:
-          name: Lint plist files
-          command: make macos-lint
-      - run:
-          name: Nitpick Darwin code generation
-          command: scripts/nitpick/generated-code.js darwin
-      - save-dependencies
-      - store_artifacts:
-          path: test/fixtures
-          destination: test/fixtures
-      - collect-xcode-build-logs
-      - upload-xcode-build-logs
-
-# ------------------------------------------------------------------------------
-  metrics-nightly:
-    docker:
-      - image: mbgl/linux-gcc-5:54f59e3ac5
-    working_directory: /src
-    environment:
-      LIBSYSCONFCPUS: 2
-      JOBS: 2
-    steps:
-      - install-dependencies
-      - run:
-          name: Collect GitHub statistics
-          command: |
-              scripts/publish_github_stats.js
+      - save

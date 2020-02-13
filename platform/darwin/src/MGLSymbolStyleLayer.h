@@ -994,7 +994,9 @@ MGL_EXPORT
  If true, the symbols will not cross tile edges to avoid mutual collisions.
  Recommended in layers that don't have enough padding in the vector tile to
  prevent collisions, or if it is a point symbol layer placed after a line symbol
- layer.
+ layer. When using a client that supports global collision detection, like
+ Mapbox GL JS version 0.42.0 or greater, enabling this property is not needed to
+ prevent clipped labels at tile boundaries.
  
  The default value of this property is an expression that evaluates to `NO`. Set
  this property to `nil` to reset it to the default value.
@@ -1629,7 +1631,7 @@ MGL_EXPORT
 
 /**
  To increase the chance of placing high-priority labels on the map, you can
- provide an array of `textAnchor` locations: the render will attempt to place
+ provide an array of `textAnchor` locations: the renderer will attempt to place
  the label at each location, in order, before moving onto the next label. Use
  `textJustify: auto` to choose justification based on anchor position. To apply
  an offset, use the `textRadialOffset` or the two-dimensional `textOffset`.

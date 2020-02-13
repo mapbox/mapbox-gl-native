@@ -51,6 +51,14 @@ public:
     }
 
     template <class Feature>
+    T evaluate(const Feature& feature, float zoom, const CanonicalTileID& canonical, T defaultValue) const {
+        return this->match([&](const T& constant_) { return constant_; },
+                           [&](const style::PropertyExpression<T>& expression) {
+                               return expression.evaluate(zoom, feature, canonical, defaultValue);
+                           });
+    }
+
+    template <class Feature>
     T evaluate(const Feature& feature, float zoom, const FeatureState& featureState, T defaultValue) const {
         return this->match([&](const T& constant_) { return constant_; },
                            [&](const style::PropertyExpression<T>& expression) {
@@ -96,13 +104,15 @@ public:
     Faded<T> evaluate(const Feature& feature,
                       float zoom,
                       const std::set<std::string>& availableImages,
+                      const CanonicalTileID& canonical,
                       T defaultValue) const {
         return this->match(
             [&] (const Faded<T>& constant_) { return constant_; },
             [&] (const style::PropertyExpression<T>& expression) {
                 if (!expression.isZoomConstant()) {
-                    const T min = expression.evaluate(floor(zoom), feature, availableImages, defaultValue);
-                    const T max = expression.evaluate(floor(zoom) + 1, feature, availableImages, defaultValue);
+                    const T min = expression.evaluate(floor(zoom), feature, availableImages, canonical, defaultValue);
+                    const T max =
+                        expression.evaluate(floor(zoom) + 1, feature, availableImages, canonical, defaultValue);
                     return Faded<T> {min, max};
                 } else {
                     const T evaluated = expression.evaluate(feature, availableImages, defaultValue);

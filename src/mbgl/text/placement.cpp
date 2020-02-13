@@ -1,11 +1,11 @@
-#include <mbgl/text/placement.hpp>
-
+#include <list>
 #include <mbgl/layout/symbol_layout.hpp>
 #include <mbgl/renderer/bucket.hpp>
 #include <mbgl/renderer/buckets/symbol_bucket.hpp>
 #include <mbgl/renderer/render_layer.hpp>
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/renderer/update_parameters.hpp>
+#include <mbgl/text/placement.hpp>
 #include <mbgl/tile/geometry_tile.hpp>
 #include <mbgl/util/math.hpp>
 #include <utility>
@@ -113,7 +113,12 @@ void Placement::placeLayer(const RenderLayer& layer) {
     std::set<uint32_t> seenCrossTileIDs;
     for (const auto& item : layer.getPlacementData()) {
         Bucket& bucket = item.bucket;
-        BucketPlacementParameters params{item.tile, layer.baseImpl->source, item.featureIndex};
+        BucketPlacementParameters params{item.tile,
+                                         layer.baseImpl->source,
+                                         item.featureIndex,
+                                         item.sortKey,
+                                         item.symbolInstanceStart,
+                                         item.symbolInstanceEnd};
         bucket.place(*this, params, seenCrossTileIDs);
     }
 }
@@ -331,9 +336,6 @@ void Placement::placeBucket(const SymbolBucket& bucket,
 
                 const bool doVariableIconPlacement =
                     hasIconTextFit && !iconAllowOverlap && symbolInstance.placedIconIndex;
-
-                bool stickToFirstAnchor = false;
-
                 const auto placeFeatureForVariableAnchors = [&](const CollisionFeature& textCollisionFeature,
                                                                 style::TextWritingModeType orientation,
                                                                 const CollisionFeature& iconCollisionFeature) {
@@ -347,8 +349,6 @@ void Placement::placeBucket(const SymbolBucket& bucket,
                     for (size_t i = 0u; i < placementAttempts; ++i) {
                         auto anchor = variableTextAnchors[i % anchorsSize];
                         const bool isFirstAnchor = (anchor == variableTextAnchors.front());
-                        if (stickToFirstAnchor && !isFirstAnchor) continue;
-
                         const bool allowOverlap = (i >= anchorsSize);
                         shift = calculateVariableLayoutOffset(anchor,
                                                               width,
@@ -360,10 +360,13 @@ void Placement::placeBucket(const SymbolBucket& bucket,
                                                               state.getBearing());
                         textBoxes.clear();
 
-                        if (mapMode == MapMode::Tile && isFirstAnchor) {
-                            assert(tileBorders);
-                            stickToFirstAnchor = collisionIndex.featureIntersectsTileBorders(
-                                textCollisionFeature, shift, posMatrix, pixelRatio, *tileBorders);
+                        if (mapMode == MapMode::Tile && !isFirstAnchor &&
+                            collisionIndex.intercectsTileEdges(symbolInstance.textCollisionFeature.boxes.front(),
+                                                               shift,
+                                                               posMatrix,
+                                                               pixelRatio,
+                                                               *tileBorders)) {
+                            continue;
                         }
 
                         placedFeature = collisionIndex.placeFeature(textCollisionFeature,
@@ -566,19 +569,42 @@ void Placement::placeBucket(const SymbolBucket& bucket,
     } else if (mapMode == MapMode::Tile && !avoidEdges) {
         // In this case we first try to place symbols, which intersects the tile borders, so that
         // those symbols will remain even if each tile is handled independently.
-        const auto& symbolInstances = bucket.symbolInstances;
-        std::vector<std::reference_wrapper<const SymbolInstance>> sorted(symbolInstances.begin(),
-                                                                         symbolInstances.end());
+        std::vector<std::reference_wrapper<const SymbolInstance>> symbolInstances(bucket.symbolInstances.begin(),
+                                                                                  bucket.symbolInstances.end());
         optional<style::TextVariableAnchorType> variableAnchor;
         if (!variableTextAnchors.empty()) variableAnchor = variableTextAnchors.front();
-        std::unordered_map<uint32_t, bool> sortedCache;
-        sortedCache.reserve(sorted.size());
 
-        auto intersectsTileBorder = [&](const SymbolInstance& symbol) -> bool {
-            if (symbol.textCollisionFeature.alongLine || symbol.textCollisionFeature.boxes.empty()) return false;
+        std::unordered_map<uint32_t, bool> locationCache;
+        locationCache.reserve(symbolInstances.size());
 
-            auto it = sortedCache.find(symbol.crossTileID);
-            if (it != sortedCache.end()) return it->second;
+        // Keeps the data necessary to find a feature location according to a tile.
+        struct NeighborTileData {
+            NeighborTileData(const CollisionIndex& collisionIndex, UnwrappedTileID id_, Point<float> shift_)
+                : id(id_), shift(shift_), matrix() {
+                collisionIndex.getTransformState().matrixFor(matrix, id);
+                matrix::multiply(matrix, collisionIndex.getTransformState().getProjectionMatrix(), matrix);
+                borders = collisionIndex.projectTileBoundaries(matrix);
+            }
+
+            UnwrappedTileID id;
+            Point<float> shift;
+            mat4 matrix;
+            CollisionBoundaries borders;
+        };
+
+        uint8_t z = renderTile.id.canonical.z;
+        uint32_t x = renderTile.id.canonical.x;
+        uint32_t y = renderTile.id.canonical.y;
+        const std::array<NeighborTileData, 4> neightbors{{
+            {collisionIndex, UnwrappedTileID(z, x, y - 1), {0.0f, util::EXTENT}},  // top
+            {collisionIndex, UnwrappedTileID(z, x, y + 1), {0.0f, -util::EXTENT}}, // bottom
+            {collisionIndex, UnwrappedTileID(z, x - 1, y), {util::EXTENT, 0.0f}},  // left
+            {collisionIndex, UnwrappedTileID(z, x + 1, y), {-util::EXTENT, 0.0f}}  // right
+        }};
+
+        auto intercectsTileEdges = [&](const CollisionBox& collisionBox, const SymbolInstance& symbol) -> bool {
+            auto it = locationCache.find(symbol.crossTileID);
+            if (it != locationCache.end()) return it->second;
 
             Point<float> offset{};
             if (variableAnchor) {
@@ -594,34 +620,61 @@ void Placement::placeBucket(const SymbolBucket& bucket,
                                                        pitchTextWithMap,
                                                        state.getBearing());
             }
-            bool result = collisionIndex.featureIntersectsTileBorders(
-                symbol.textCollisionFeature, offset, posMatrix, pixelRatio, *tileBorders);
-            sortedCache.insert(std::make_pair(symbol.crossTileID, result));
-            return result;
+
+            bool intercects =
+                collisionIndex.intercectsTileEdges(collisionBox, offset, renderTile.matrix, pixelRatio, *tileBorders);
+            if (!intercects) {
+                // Check if this symbol intersects the neighbor tile borders.
+                // If so, it also shall be placed with priority (location = FeatureLocation::IntersectsTileBorder).
+                for (const auto& neighbor : neightbors) {
+                    intercects = collisionIndex.intercectsTileEdges(
+                        collisionBox, offset + neighbor.shift, neighbor.matrix, pixelRatio, neighbor.borders);
+                    if (intercects) break;
+                }
+            }
+
+            locationCache.insert(std::make_pair(symbol.crossTileID, intercects));
+            return intercects;
         };
 
-        std::stable_sort(
-            sorted.begin(), sorted.end(), [&intersectsTileBorder](const SymbolInstance& a, const SymbolInstance& b) {
-                return intersectsTileBorder(a) && !intersectsTileBorder(b);
-            });
+        std::stable_sort(symbolInstances.begin(),
+                         symbolInstances.end(),
+                         [&intercectsTileEdges](const SymbolInstance& a, const SymbolInstance& b) {
+                             assert(!a.textCollisionFeature.alongLine);
+                             assert(!b.textCollisionFeature.alongLine);
+                             if (a.textCollisionFeature.boxes.empty() || b.textCollisionFeature.boxes.empty())
+                                 return false;
 
-        for (const SymbolInstance& symbol : sorted) {
+                             auto intercectsA = intercectsTileEdges(a.textCollisionFeature.boxes.front(), a);
+                             auto intercectsB = intercectsTileEdges(b.textCollisionFeature.boxes.front(), b);
+                             if (intercectsA) {
+                                 if (!intercectsB) return true;
+                                 // Both symbols are inrecepting the tile borders, we need a universal cross-tile rule
+                                 // to define which of them shall be placed first - use anchor `y` point.
+                                 return a.anchor.point.y < b.anchor.point.y;
+                             }
+                             return false;
+                         });
+
+        for (const SymbolInstance& symbol : symbolInstances) {
             placeSymbol(symbol);
         }
 
     } else {
-        for (const SymbolInstance& symbol : bucket.symbolInstances) {
-            placeSymbol(symbol);
+        auto beginIt = bucket.symbolInstances.begin() + params.symbolInstanceStart;
+        auto endIt = bucket.symbolInstances.begin() + params.symbolInstanceEnd;
+        assert(params.symbolInstanceStart < params.symbolInstanceEnd);
+        assert(params.symbolInstanceEnd <= bucket.symbolInstances.size());
+        for (auto it = beginIt; it != endIt; ++it) {
+            placeSymbol(*it);
         }
     }
-
-    bucket.justReloaded = false;
 
     // As long as this placement lives, we have to hold onto this bucket's
     // matching FeatureIndex/data for querying purposes
     retainedQueryData.emplace(std::piecewise_construct,
-                                std::forward_as_tuple(bucket.bucketInstanceId),
-                                std::forward_as_tuple(bucket.bucketInstanceId, params.featureIndex, overscaledID));
+                              std::forward_as_tuple(bucket.bucketInstanceId),
+                              std::forward_as_tuple(bucket.bucketInstanceId, params.featureIndex, overscaledID));
 }
 
 void Placement::commit() {
@@ -691,7 +744,9 @@ void Placement::commit() {
 void Placement::updateLayerBuckets(const RenderLayer& layer, const TransformState& state, bool updateOpacities) const {
     std::set<uint32_t> seenCrossTileIDs;
     for (const auto& item : layer.getPlacementData()) {
-        item.bucket.get().updateVertices(*this, updateOpacities, state, item.tile, seenCrossTileIDs);
+        if (item.firstInBucket) {
+            item.bucket.get().updateVertices(*this, updateOpacities, state, item.tile, seenCrossTileIDs);
+        }
     }
 }
 

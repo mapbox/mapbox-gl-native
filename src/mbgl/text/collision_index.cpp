@@ -96,14 +96,11 @@ inline bool CollisionIndex::overlapsTile(const CollisionBoundaries& boundaries,
            boundaries[1] < tileBoundaries[3] && boundaries[3] > tileBoundaries[1];
 }
 
-bool CollisionIndex::featureIntersectsTileBorders(const CollisionFeature& feature,
-                                                  Point<float> shift,
-                                                  const mat4& posMatrix,
-                                                  const float textPixelRatio,
-                                                  const CollisionBoundaries& tileEdges) const {
-    assert(!feature.alongLine);
-    assert(!feature.boxes.empty());
-    const CollisionBox& box = feature.boxes.front();
+bool CollisionIndex::intercectsTileEdges(const CollisionBox& box,
+                                         Point<float> shift,
+                                         const mat4& posMatrix,
+                                         const float textPixelRatio,
+                                         const CollisionBoundaries& tileEdges) const {
     auto collisionBoundaries = getProjectedCollisionBoundaries(posMatrix, shift, textPixelRatio, box);
     return overlapsTile(collisionBoundaries, tileEdges) && !isInsideTile(collisionBoundaries, tileEdges);
 }

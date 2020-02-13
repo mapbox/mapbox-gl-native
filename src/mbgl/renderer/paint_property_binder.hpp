@@ -105,8 +105,12 @@ public:
 
     virtual ~PaintPropertyBinder() = default;
 
-    virtual void populateVertexVector(const GeometryTileFeature& feature, std::size_t length, std::size_t index,
-                                      const ImagePositions&, const optional<PatternDependency>&,
+    virtual void populateVertexVector(const GeometryTileFeature& feature,
+                                      std::size_t length,
+                                      std::size_t index,
+                                      const ImagePositions&,
+                                      const optional<PatternDependency>&,
+                                      const CanonicalTileID& canonical,
                                       const style::expression::Value&) = 0;
 
     virtual void updateVertexVectors(const FeatureStates&, const GeometryTileLayer&, const ImagePositions&) {}
@@ -131,8 +135,13 @@ public:
         : constant(std::move(constant_)) {
     }
 
-    void populateVertexVector(const GeometryTileFeature&, std::size_t, std::size_t, const ImagePositions&,
-                              const optional<PatternDependency>&, const style::expression::Value&) override {}
+    void populateVertexVector(const GeometryTileFeature&,
+                              std::size_t,
+                              std::size_t,
+                              const ImagePositions&,
+                              const optional<PatternDependency>&,
+                              const CanonicalTileID&,
+                              const style::expression::Value&) override {}
     void updateVertexVector(std::size_t, std::size_t, const GeometryTileFeature&, const FeatureState&) override {}
     void upload(gfx::UploadPass&) override {}
     void setPatternParameters(const optional<ImagePosition>&, const optional<ImagePosition>&, const CrossfadeParameters&) override {};
@@ -160,8 +169,13 @@ public:
         : constant(std::move(constant_)), constantPatternPositions({}) {
     }
 
-    void populateVertexVector(const GeometryTileFeature&, std::size_t, std::size_t, const ImagePositions&,
-                              const optional<PatternDependency>&, const style::expression::Value&) override {}
+    void populateVertexVector(const GeometryTileFeature&,
+                              std::size_t,
+                              std::size_t,
+                              const ImagePositions&,
+                              const optional<PatternDependency>&,
+                              const CanonicalTileID&,
+                              const style::expression::Value&) override {}
     void updateVertexVector(std::size_t, std::size_t, const GeometryTileFeature&, const FeatureState&) override {}
     void upload(gfx::UploadPass&) override {}
 
@@ -204,11 +218,17 @@ public:
           defaultValue(std::move(defaultValue_)) {
     }
     void setPatternParameters(const optional<ImagePosition>&, const optional<ImagePosition>&, const CrossfadeParameters&) override {};
-    void populateVertexVector(const GeometryTileFeature& feature, std::size_t length, std::size_t index,
-                              const ImagePositions&, const optional<PatternDependency>&,
+    void populateVertexVector(const GeometryTileFeature& feature,
+                              std::size_t length,
+                              std::size_t index,
+                              const ImagePositions&,
+                              const optional<PatternDependency>&,
+                              const CanonicalTileID& canonical,
                               const style::expression::Value& formattedSection) override {
         using style::expression::EvaluationContext;
-        auto evaluated = expression.evaluate(EvaluationContext(&feature).withFormattedSection(&formattedSection), defaultValue);
+        auto evaluated = expression.evaluate(
+            EvaluationContext(&feature).withFormattedSection(&formattedSection).withCanonicalTileID(&canonical),
+            defaultValue);
         this->statistics.add(evaluated);
         auto value = attributeValue(evaluated);
         auto elements = vertexVector.elements();
@@ -299,13 +319,23 @@ public:
           zoomRange({zoom, zoom + 1}) {
     }
     void setPatternParameters(const optional<ImagePosition>&, const optional<ImagePosition>&, const CrossfadeParameters&) override {};
-    void populateVertexVector(const GeometryTileFeature& feature, std::size_t length, std::size_t index,
-                              const ImagePositions&, const optional<PatternDependency>&,
+    void populateVertexVector(const GeometryTileFeature& feature,
+                              std::size_t length,
+                              std::size_t index,
+                              const ImagePositions&,
+                              const optional<PatternDependency>&,
+                              const CanonicalTileID& canonical,
                               const style::expression::Value& formattedSection) override {
         using style::expression::EvaluationContext;
         Range<T> range = {
-                expression.evaluate(EvaluationContext(zoomRange.min, &feature).withFormattedSection(&formattedSection), defaultValue),
-                expression.evaluate(EvaluationContext(zoomRange.max, &feature).withFormattedSection(&formattedSection), defaultValue),
+            expression.evaluate(EvaluationContext(zoomRange.min, &feature)
+                                    .withFormattedSection(&formattedSection)
+                                    .withCanonicalTileID(&canonical),
+                                defaultValue),
+            expression.evaluate(EvaluationContext(zoomRange.max, &feature)
+                                    .withFormattedSection(&formattedSection)
+                                    .withCanonicalTileID(&canonical),
+                                defaultValue),
         };
         this->statistics.add(range.min);
         this->statistics.add(range.max);
@@ -416,9 +446,12 @@ public:
         crossfade = crossfade_;
     };
 
-    void populateVertexVector(const GeometryTileFeature&, std::size_t length, std::size_t /* index */,
+    void populateVertexVector(const GeometryTileFeature&,
+                              std::size_t length,
+                              std::size_t /* index */,
                               const ImagePositions& patternPositions,
                               const optional<PatternDependency>& patternDependencies,
+                              const CanonicalTileID&,
                               const style::expression::Value&) override {
         if (!patternDependencies || patternDependencies->mid.empty())  {
             // Unlike other propperties with expressions that evaluate to null, the default value for `*-pattern` properties is an empty
@@ -589,12 +622,15 @@ public:
     PaintPropertyBinders(PaintPropertyBinders&&) = default;
     PaintPropertyBinders(const PaintPropertyBinders&) = delete;
 
-    void populateVertexVectors(const GeometryTileFeature& feature, std::size_t length, std::size_t index,
+    void populateVertexVectors(const GeometryTileFeature& feature,
+                               std::size_t length,
+                               std::size_t index,
                                const ImagePositions& patternPositions,
                                const optional<PatternDependency>& patternDependencies,
+                               const CanonicalTileID& canonical,
                                const style::expression::Value& formattedSection = {}) {
-        util::ignore({(binders.template get<Ps>()->populateVertexVector(feature, length, index, patternPositions,
-                                                                        patternDependencies, formattedSection),
+        util::ignore({(binders.template get<Ps>()->populateVertexVector(
+                           feature, length, index, patternPositions, patternDependencies, canonical, formattedSection),
                        0)...});
     }
 

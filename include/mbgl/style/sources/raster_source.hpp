@@ -31,6 +31,9 @@ public:
         return weakFactory.makeWeakPtr();
     }
 
+protected:
+    Mutable<Source::Impl> createMutable() const noexcept final;
+
 private:
     const variant<std::string, Tileset> urlOrTileset;
     std::unique_ptr<AsyncRequest> req;

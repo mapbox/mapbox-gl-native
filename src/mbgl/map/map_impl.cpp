@@ -196,10 +196,7 @@ void Map::Impl::setStyle(const std::shared_ptr<style::Style>& style_)
 }
 
 void Map::Impl::onStyleImageMissing(const std::string& id, std::function<void()> done) {
-
-    if (style->getImage(id) == nullptr) {
-        observer.onStyleImageMissing(id);
-    }
+    if (!style->getImage(id)) observer.onStyleImageMissing(id);
 
     done();
     onUpdate();

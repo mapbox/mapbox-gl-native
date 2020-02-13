@@ -25,8 +25,12 @@ public:
                const uint32_t overscaling);
     ~LineBucket() override;
 
-    void addFeature(const GeometryTileFeature&, const GeometryCollection&, const mbgl::ImagePositions& patternPositions,
-                    const PatternLayerMap&, std::size_t) override;
+    void addFeature(const GeometryTileFeature&,
+                    const GeometryCollection&,
+                    const mbgl::ImagePositions& patternPositions,
+                    const PatternLayerMap&,
+                    std::size_t,
+                    const CanonicalTileID&) override;
 
     bool hasData() const override;
 
@@ -48,7 +52,7 @@ public:
     std::map<std::string, LineProgram::Binders> paintPropertyBinders;
 
 private:
-    void addGeometry(const GeometryCoordinates&, const GeometryTileFeature&);
+    void addGeometry(const GeometryCoordinates&, const GeometryTileFeature&, const CanonicalTileID&);
 
     struct TriangleElement {
         TriangleElement(uint16_t a_, uint16_t b_, uint16_t c_) : a(a_), b(b_), c(c_) {}

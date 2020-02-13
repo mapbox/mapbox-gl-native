@@ -70,3 +70,12 @@
 [submodule "vendor/googletest"]
 	path = vendor/googletest
 	url = https://github.com/google/googletest.git
+[submodule "vendor/zip-archive"]
+	path = vendor/zip-archive
+	url = https://github.com/ZipArchive/ZipArchive.git
+[submodule "vendor/cpp-httplib"]
+	path = vendor/cpp-httplib
+	url = https://github.com/yhirose/cpp-httplib.git
+[submodule "vendor/curl-android-ios"]
+	path = vendor/curl-android-ios
+	url = https://github.com/gcesarmza/curl-android-ios.git

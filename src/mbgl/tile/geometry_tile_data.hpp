@@ -80,6 +80,10 @@ std::vector<GeometryCollection> classifyRings(const GeometryCollection&);
 // Truncate polygon to the largest `maxHoles` inner rings by area.
 void limitHoles(GeometryCollection&, uint32_t maxHoles);
 
+Feature::geometry_type convertGeometry(const GeometryTileFeature& geometryTileFeature, const CanonicalTileID& tileID);
+
+GeometryCollection convertGeometry(const Feature::geometry_type& geometryTileFeature, const CanonicalTileID& tileID);
+
 // convert from GeometryTileFeature to Feature (eventually we should eliminate GeometryTileFeature)
 Feature convertFeature(const GeometryTileFeature&, const CanonicalTileID&);
 

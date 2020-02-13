@@ -81,13 +81,14 @@ public:
     void setLight(std::unique_ptr<Light>);
     Light* getLight() const;
 
-    const style::Image* getImage(const std::string&) const;
+    optional<Immutable<style::Image::Impl>> getImage(const std::string&) const;
     void addImage(std::unique_ptr<style::Image>);
     void removeImage(const std::string&);
 
     const std::string& getGlyphURL() const;
 
-    Immutable<std::vector<Immutable<Image::Impl>>> getImageImpls() const;
+    using ImageImpls = std::vector<Immutable<Image::Impl>>;
+    Immutable<ImageImpls> getImageImpls() const;
     Immutable<std::vector<Immutable<Source::Impl>>> getSourceImpls() const;
     Immutable<std::vector<Immutable<Layer::Impl>>> getLayerImpls() const;
 
@@ -97,20 +98,20 @@ private:
     void parse(const std::string&);
 
     // SpriteLoaderObserver implementation.
-    void onSpriteLoaded(std::vector<std::unique_ptr<Image>>&&) override;
-    void onSpriteError(std::exception_ptr) override;
+    //void onSpriteLoaded(std::vector<std::unique_ptr<Image>>&&) override;
+    //void onSpriteError(std::exception_ptr) override;
 
     // SourceObserver implementation.
-    void onSourceLoaded(Source&) override;
-    void onSourceChanged(Source&) override;
-    void onSourceError(Source&, std::exception_ptr) override;
-    void onSourceDescriptionChanged(Source&) override;
+    //void onSourceLoaded(Source&) override;
+    //void onSourceChanged(Source&) override;
+    //void onSourceError(Source&, std::exception_ptr) override;
+    //void onSourceDescriptionChanged(Source&) override;
 
     // LayerObserver implementation.
-    void onLayerChanged(Layer&) override;
+    //void onLayerChanged(Layer&) override;
 
     // LightObserver implementation.
-    void onLightChanged(const Light&) override;
+    //void onLightChanged(const Light&) override;
 
 public:
     bool mutated = false;
@@ -128,7 +129,7 @@ private:
     std::unique_ptr<SpriteLoader> spriteLoader;
 
     std::string glyphURL;
-    CollectionWithPersistentOrder<style::Image> images;
+    Immutable<ImageImpls> images = makeMutable<ImageImpls>();
     CollectionWithPersistentOrder<Source> sources;
     Collection<Layer> layers;
     TransitionOptions transitionOptions;
@@ -137,7 +138,26 @@ private:
     // Defaults
     std::string name;
     CameraOptions defaultCamera;
+//<<<<<<< HEAD
     std::set<Observer*> observers;
+//=======
+
+    // SpriteLoaderObserver implementation.
+    void onSpriteLoaded(std::vector<Immutable<style::Image::Impl>>) override;
+    void onSpriteError(std::exception_ptr) override;
+
+    // SourceObserver implementation.
+    void onSourceLoaded(Source&) override;
+    void onSourceChanged(Source&) override;
+    void onSourceError(Source&, std::exception_ptr) override;
+    void onSourceDescriptionChanged(Source&) override;
+
+    // LayerObserver implementation.
+    void onLayerChanged(Layer&) override;
+
+    // LightObserver implementation.
+    void onLightChanged(const Light&) override;
+
     std::exception_ptr lastError;
 };
 

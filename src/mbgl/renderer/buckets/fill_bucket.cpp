@@ -44,9 +44,12 @@ FillBucket::FillBucket(const FillBucket::PossiblyEvaluatedLayoutProperties,
 
 FillBucket::~FillBucket() = default;
 
-void FillBucket::addFeature(const GeometryTileFeature& feature, const GeometryCollection& geometry,
-                            const ImagePositions& patternPositions, const PatternLayerMap& patternDependencies,
-                            std::size_t index) {
+void FillBucket::addFeature(const GeometryTileFeature& feature,
+                            const GeometryCollection& geometry,
+                            const ImagePositions& patternPositions,
+                            const PatternLayerMap& patternDependencies,
+                            std::size_t index,
+                            const CanonicalTileID& canonical) {
     for (auto& polygon : classifyRings(geometry)) {
         // Optimize polygons with many interior rings for earcut tesselation.
         limitHoles(polygon, 500);
@@ -112,10 +115,11 @@ void FillBucket::addFeature(const GeometryTileFeature& feature, const GeometryCo
 
     for (auto& pair : paintPropertyBinders) {
         const auto it = patternDependencies.find(pair.first);
-        if (it != patternDependencies.end()){
-            pair.second.populateVertexVectors(feature, vertices.elements(), index, patternPositions, it->second);
+        if (it != patternDependencies.end()) {
+            pair.second.populateVertexVectors(
+                feature, vertices.elements(), index, patternPositions, it->second, canonical);
         } else {
-            pair.second.populateVertexVectors(feature, vertices.elements(), index, patternPositions, {});
+            pair.second.populateVertexVectors(feature, vertices.elements(), index, patternPositions, {}, canonical);
         }
     }
 }

@@ -765,15 +765,17 @@ public:
                         const bool needsRendering,
                         const bool needsRelayout,
                         const TileParameters& parameters) override {
-        tilePyramid.update(layers,
-                           needsRendering,
-                           needsRelayout,
-                           parameters,
-                           SourceType::Vector,
-                           util::tileSize,
-                           tileset.zoomRange,
-                           tileset.bounds,
-                           [&](const OverscaledTileID& tileID) { return std::make_unique<FakeTile>(*this, tileID); });
+        tilePyramid.update(
+            layers,
+            needsRendering,
+            needsRelayout,
+            parameters,
+            SourceType::Vector,
+            util::tileSize,
+            tileset.zoomRange,
+            tileset.bounds,
+            [&](const OverscaledTileID& tileID) { return std::make_unique<FakeTile>(*this, tileID); },
+            baseImpl->getPrefetchZoomDelta());
     }
 
     const optional<Tileset>& getTileset() const override {

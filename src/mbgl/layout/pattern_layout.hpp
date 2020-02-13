@@ -45,7 +45,8 @@ struct PatternFeatureInserter<void> {
                        std::unique_ptr<GeometryTileFeature> feature,
                        PatternLayerMap patternDependencyMap,
                        float /*zoom*/,
-                       const PropertiesType&) {
+                       const PropertiesType&,
+                       const CanonicalTileID&) {
         features.emplace_back(index, std::move(feature), std::move(patternDependencyMap));
     }
 };
@@ -58,9 +59,10 @@ struct PatternFeatureInserter {
                        std::unique_ptr<GeometryTileFeature> feature,
                        PatternLayerMap patternDependencyMap,
                        float zoom,
-                       const PropertiesType& properties) {
+                       const PropertiesType& properties,
+                       const CanonicalTileID& canonical) {
         const auto& sortKeyProperty = properties.template get<SortKeyPropertyType>();
-        float sortKey = sortKeyProperty.evaluate(*feature, zoom, SortKeyPropertyType::defaultValue());
+        float sortKey = sortKeyProperty.evaluate(*feature, zoom, canonical, SortKeyPropertyType::defaultValue());
         PatternFeature patternFeature{index, std::move(feature), std::move(patternDependencyMap), sortKey};
         const auto lowerBound = std::lower_bound(features.cbegin(), features.cend(), patternFeature);
         features.insert(lowerBound, std::move(patternFeature));
@@ -108,7 +110,9 @@ public:
         const size_t featureCount = sourceLayer->featureCount();
         for (size_t i = 0; i < featureCount; ++i) {
             auto feature = sourceLayer->getFeature(i);
-            if (!leaderLayerProperties->layerImpl().filter(style::expression::EvaluationContext { this->zoom, feature.get() }))
+            if (!leaderLayerProperties->layerImpl().filter(
+                    style::expression::EvaluationContext(this->zoom, feature.get())
+                        .withCanonicalTileID(&parameters.tileID.canonical)))
                 continue;
 
             PatternLayerMap patternDependencyMap;
@@ -125,12 +129,17 @@ public:
                             const auto min = patternProperty.evaluate(*feature,
                                                                       zoom - 1,
                                                                       layoutParameters.availableImages,
+                                                                      parameters.tileID.canonical,
                                                                       PatternPropertyType::defaultValue());
-                            const auto mid = patternProperty.evaluate(
-                                *feature, zoom, layoutParameters.availableImages, PatternPropertyType::defaultValue());
+                            const auto mid = patternProperty.evaluate(*feature,
+                                                                      zoom,
+                                                                      layoutParameters.availableImages,
+                                                                      parameters.tileID.canonical,
+                                                                      PatternPropertyType::defaultValue());
                             const auto max = patternProperty.evaluate(*feature,
                                                                       zoom + 1,
                                                                       layoutParameters.availableImages,
+                                                                      parameters.tileID.canonical,
                                                                       PatternPropertyType::defaultValue());
 
                             layoutParameters.imageDependencies.emplace(min.to.id(), ImageType::Pattern);
@@ -143,16 +152,24 @@ public:
                 }
             }
 
-            PatternFeatureInserter<SortKeyPropertyType>::insert(
-                features, i, std::move(feature), std::move(patternDependencyMap), zoom, layout);
+            PatternFeatureInserter<SortKeyPropertyType>::insert(features,
+                                                                i,
+                                                                std::move(feature),
+                                                                std::move(patternDependencyMap),
+                                                                zoom,
+                                                                layout,
+                                                                parameters.tileID.canonical);
         }
     };
 
-    bool hasDependencies() const override {
-        return hasPattern;
-    }
+    bool hasDependencies() const override { return hasPattern; }
 
-    void createBucket(const ImagePositions& patternPositions, std::unique_ptr<FeatureIndex>& featureIndex, std::unordered_map<std::string, LayerRenderData>& renderData, const bool, const bool) override {
+    void createBucket(const ImagePositions& patternPositions,
+                      std::unique_ptr<FeatureIndex>& featureIndex,
+                      std::unordered_map<std::string, LayerRenderData>& renderData,
+                      const bool /*firstLoad*/,
+                      const bool /*showCollisionBoxes*/,
+                      const CanonicalTileID& canonical) override {
         auto bucket = std::make_shared<BucketType>(layout, layerPropertiesMap, zoom, overscaling);
         for (auto & patternFeature : features) {
             const auto i = patternFeature.i;
@@ -160,7 +177,7 @@ public:
             const PatternLayerMap& patterns = patternFeature.patterns;
             const GeometryCollection& geometries = feature->getGeometries();
 
-            bucket->addFeature(*feature, geometries, patternPositions, patterns, i);
+            bucket->addFeature(*feature, geometries, patternPositions, patterns, i, canonical);
             featureIndex->insert(geometries, i, sourceLayerID, bucketLeaderID);
         }
         if (bucket->hasData()) {

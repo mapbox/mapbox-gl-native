@@ -1,11 +1,11 @@
 #pragma once
+#include <list>
 #include <mbgl/layout/layout.hpp>
 #include <mbgl/renderer/render_pass.hpp>
 #include <mbgl/renderer/render_source.hpp>
 #include <mbgl/style/layer_properties.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/util/mat4.hpp>
-
 #include <memory>
 #include <string>
 
@@ -20,6 +20,7 @@ class RenderTile;
 class TransformState;
 class PatternAtlas;
 class LineAtlas;
+class SymbolBucket;
 
 class LayerRenderData {
 public:
@@ -29,9 +30,16 @@ public:
 
 class LayerPlacementData {
 public:
+    friend bool operator<(const LayerPlacementData& lhs, const LayerPlacementData& rhs) {
+        return lhs.sortKey < rhs.sortKey;
+    }
     std::reference_wrapper<Bucket> bucket;
     std::reference_wrapper<const RenderTile> tile;
     std::shared_ptr<FeatureIndex> featureIndex;
+    bool firstInBucket;
+    float sortKey;
+    size_t symbolInstanceStart;
+    size_t symbolInstanceEnd;
 };
 
 class LayerPrepareParameters {
@@ -95,9 +103,7 @@ public:
 
     virtual void prepare(const LayerPrepareParameters&);
 
-    const std::vector<LayerPlacementData>& getPlacementData() const { 
-        return placementData; 
-    }
+    const std::list<LayerPlacementData>& getPlacementData() const { return placementData; }
 
     // Latest evaluated properties.
     Immutable<style::LayerProperties> evaluatedProperties;
@@ -126,7 +132,7 @@ protected:
     // evaluated StyleProperties object and is updated accordingly.
     RenderPass passes = RenderPass::None;
 
-    std::vector<LayerPlacementData> placementData;
+    std::list<LayerPlacementData> placementData;
 
 private:
     // Some layers may not render correctly on some hardware when the vertex attribute limit of

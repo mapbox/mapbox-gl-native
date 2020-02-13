@@ -1,0 +1,19 @@
+{
+    "file-size": [
+        [
+            "mbgl-glfw",
+            "/tmp/attach/install/linux-clang8-release/bin/mbgl-glfw",
+            6507720
+        ],
+        [
+            "mbgl-offline",
+            "/tmp/attach/install/linux-clang8-release/bin/mbgl-offline",
+            5774024
+        ],
+        [
+            "mbgl-render",
+            "/tmp/attach/install/linux-clang8-release/bin/mbgl-render",
+            6409144
+        ]
+    ]
+}

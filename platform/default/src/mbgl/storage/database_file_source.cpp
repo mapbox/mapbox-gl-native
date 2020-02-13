@@ -1,3 +1,4 @@
+#include <mbgl/platform/settings.hpp>
 #include <mbgl/storage/database_file_source.hpp>
 #include <mbgl/storage/file_source_manager.hpp>
 #include <mbgl/storage/file_source_request.hpp>
@@ -7,13 +8,12 @@
 #include <mbgl/storage/response.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/logging.hpp>
+#include <mbgl/util/platform.hpp>
 #include <mbgl/util/thread.hpp>
 
+#include <map>
+
 namespace mbgl {
-
-// For testing use only
-constexpr const char* READ_ONLY_MODE_KEY = "read-only-mode";
-
 class DatabaseFileSourceThread {
 public:
     DatabaseFileSourceThread(std::shared_ptr<FileSource> onlineFileSource_, std::string cachePath)
@@ -118,7 +118,7 @@ public:
 
     void setOfflineMapboxTileCountLimit(uint64_t limit) { db->setOfflineMapboxTileCountLimit(limit); }
 
-    void reopenDatabaseReadOnlyForTesting() { db->reopenDatabaseReadOnlyForTesting(); }
+    void reopenDatabaseReadOnly(bool readOnly) { db->reopenDatabaseReadOnly(readOnly); }
 
 private:
     expected<OfflineDownload*, std::exception_ptr> getDownload(int64_t regionID) {
@@ -141,7 +141,7 @@ private:
     }
 
     std::unique_ptr<OfflineDatabase> db;
-    std::unordered_map<int64_t, std::unique_ptr<OfflineDownload>> downloads;
+    std::map<int64_t, std::unique_ptr<OfflineDownload>> downloads;
     std::shared_ptr<FileSource> onlineFileSource;
 };
 
@@ -149,7 +149,10 @@ class DatabaseFileSource::Impl {
 public:
     Impl(std::shared_ptr<FileSource> onlineFileSource, const std::string& cachePath)
         : thread(std::make_unique<util::Thread<DatabaseFileSourceThread>>(
-              "DatabaseFileSource", std::move(onlineFileSource), cachePath)) {}
+              util::makeThreadPrioritySetter(platform::EXPERIMENTAL_THREAD_PRIORITY_DATABASE),
+              "DatabaseFileSource",
+              std::move(onlineFileSource),
+              cachePath)) {}
 
     ActorRef<DatabaseFileSourceThread> actor() const { return thread->actor(); }
 
@@ -271,9 +274,7 @@ void DatabaseFileSource::setOfflineMapboxTileCountLimit(uint64_t limit) const {
 
 void DatabaseFileSource::setProperty(const std::string& key, const mapbox::base::Value& value) {
     if (key == READ_ONLY_MODE_KEY && value.getBool()) {
-        if (*value.getBool()) {
-            impl->actor().invoke(&DatabaseFileSourceThread::reopenDatabaseReadOnlyForTesting);
-        }
+        impl->actor().invoke(&DatabaseFileSourceThread::reopenDatabaseReadOnly, *value.getBool());
     } else {
         std::string message = "Resource provider does not support property " + key;
         Log::Error(Event::General, message.c_str());

@@ -1,6 +1,66 @@
 # Changelog
 
-## Master
+## master
+
+### ✨ New features
+
+- [core] Global settings API ([#16174](https://github.com/mapbox/mapbox-gl-native/pull/16174))
+
+  Global settings API provides means of managing non-persistent in-process settings. Initial implementation contains support for experimental option for setting thread priorities.
+
+- Expose READ_ONLY_MODE_KEY property for DatabaseFileSource ([#16183](https://github.com/mapbox/mapbox-gl-native/pull/16183))
+
+  The `READ_ONLY_MODE_KEY` property is exposed for `DatabaseFileSource`.
+
+  This property allows to re-open the offline database in read-only mode and thus improves the performance for the set-ups that do not require the offline database modifications.
+
+- [core] Add runtime API for setting tile prefetch delta for a Source ([#16179](https://github.com/mapbox/mapbox-gl-native/pull/16179))
+
+  The new `Source::setPrefetchZoomDelta(optional<uint8_t>)` method allows overriding default tile prefetch setting that is defined by the Map instance.
+
+- [core] Add support for `within expression`. Implement the use of `within expression` with paint propery and filter expression. ([#16157](https://github.com/mapbox/mapbox-gl-native/pull/16157))
+   
+  The `within expression` enables checking whether a feature is inside a pre-defined geometry set/boundary or not. This `within expression` returns a boolean value, `true` indicates that the feature being evaluated is inside the geometry set. The returned value can be then consumed as input by another expression or used directly by a paint/layer property.
+ 
+  Support for using `within expression` with layout propery will be implemented separately.
+
+- [core] Add support for using `within expression` with layout propery. ([#16194](https://github.com/mapbox/mapbox-gl-native/pull/16194))
+
+### 🏁 Performance improvements
+
+ - [core] Loading images to style optimization ([#16187](https://github.com/mapbox/mapbox-gl-native/pull/16187))
+
+   This change enables attaching images to the style with batches and avoids massive re-allocations. Thus, it improves UI performance especially at start-up time.
+
+ - [core] Fix excessive onSpriteLoaded() notifications ([#16196](https://github.com/mapbox/mapbox-gl-native/pull/16196))
+
+   The excessive `onSpriteLoaded()` notifications affected the render orchestration logic and could have significant negative performance impact.
+
+### 🧩  Architectural changes
+
+##### ⚠️  Breaking changes
+
+ - [core] Loading images to style optimization ([#16187](https://github.com/mapbox/mapbox-gl-native/pull/16187))
+
+   The `style::Style::getImage()` semantics changed - it now returns `optional<style::Image>`.
+
+## maps-v1.0.1 (2020.01-release-unicorn)
+
+### 🐞 Bug fixes
+
+- [core] Use std::list instead of std::map for factory instance ([#16161](https://github.com/mapbox/mapbox-gl-native/pull/16161))
+
+  Factory 'get' method can be invoked recursively and stable iterators are required to guarantee safety.
+
+- [tile mode] Improvements in symbol placement on tile borders ([#16159](https://github.com/mapbox/mapbox-gl-native/pull/16159))
+
+  In tile mode, the placement order of two symbols crossing a tile border is defined by their anchor Y values.
+
+  Symbols crossing the borders between two neighboring tiles are placed with priority.
+
+  It improves symbol placement stability in the tile map mode.
+
+## maps-v1.0.0 (2020.01-release-unicorn)
 
 ### ✨ New features
 
@@ -33,6 +93,9 @@
   This patch introduces batch conversion between LatLng and ScreenCoordinate in Gl-Native core, so for multiple conversions with single point/latLng previously now it can be done with invoking one function call by passing vector of points/latLngs.
 
 ### 🐞 Bug fixes
+- [tile mode] Fix variable symbols placement ([#16141](https://github.com/mapbox/mapbox-gl-native/pull/16141)
+
+  This change allows the variable symbols to cross the tile border only if their anchor is the first anchor from the `text-variable-anchor` list.
 
 - [core] Use weak scheduler inside mailbox ([#16136](https://github.com/mapbox/mapbox-gl-native/pull/16136))
 
