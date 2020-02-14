@@ -82,6 +82,14 @@ protected:
     void scheduleSnapshot(std::unique_ptr<SnapshotCallback>);
 
 private:
+    struct MailboxData {
+        explicit MailboxData(Scheduler*);
+        std::shared_ptr<Mailbox> getMailbox() const noexcept;
+
+    private:
+        Scheduler* scheduler;
+        mutable std::shared_ptr<Mailbox> mailbox;
+    };
     // Called from the GL Thread //
 
     // Resets the renderer
@@ -107,7 +115,7 @@ private:
     optional<std::string> localIdeographFontFamily;
 
     std::shared_ptr<ThreadPool> threadPool;
-    std::shared_ptr<Mailbox> mailbox;
+    const MailboxData mailboxData;
 
     std::mutex initialisationMutex;
     std::shared_ptr<RendererObserver> rendererObserver;
