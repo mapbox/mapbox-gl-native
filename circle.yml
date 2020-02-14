@@ -557,6 +557,7 @@ jobs:
             testResult=$(gsutil ls gs://test-lab-186672a0qp5bq-ycr70axads3nc/benchmark-${CIRCLE_BUILD_NUM}/**/results/results.json)
             mkdir -p /tmp/tests/benchmark
             gsutil cp $testResult /tmp/tests/benchmark
+      - save
   android-api-breakage:
     executor: ubuntu-disco
     steps:
