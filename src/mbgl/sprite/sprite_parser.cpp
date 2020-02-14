@@ -1,5 +1,6 @@
 #include <mbgl/sprite/sprite_parser.hpp>
 #include <mbgl/style/image.hpp>
+#include <mbgl/style/image_impl.hpp>
 
 #include <mbgl/util/exception.hpp>
 #include <mbgl/util/logging.hpp>
@@ -8,6 +9,7 @@
 #include <mbgl/util/rapidjson.hpp>
 #include <mbgl/util/string.hpp>
 
+#include <algorithm>
 #include <cmath>
 #include <limits>
 
@@ -25,10 +27,9 @@ std::unique_ptr<style::Image> createStyleImage(const std::string& id,
                                                style::ImageStretches&& stretchY,
                                                optional<style::ImageContent> content) {
     // Disallow invalid parameter configurations.
-    if (width <= 0 || height <= 0 || width > 1024 || height > 1024 ||
-        ratio <= 0 || ratio > 10 ||
-        srcX >= image.size.width || srcY >= image.size.height ||
-        srcX + width > image.size.width || srcY + height > image.size.height) {
+    if (width <= 0 || height <= 0 || width > 1024 || height > 1024 || ratio <= 0 || ratio > 10 ||
+        srcX >= image.size.width || srcY >= image.size.height || srcX + width > image.size.width ||
+        srcY + height > image.size.height) {
         Log::Error(Event::Sprite,
                    "Can't create image with invalid metrics: %ux%u@%u,%u in %ux%u@%sx sprite",
                    width,
@@ -41,10 +42,10 @@ std::unique_ptr<style::Image> createStyleImage(const std::string& id,
         return nullptr;
     }
 
-    PremultipliedImage dstImage({ width, height });
+    PremultipliedImage dstImage({width, height});
 
     // Copy from the source image into our individual sprite image
-    PremultipliedImage::copy(image, dstImage, { srcX, srcY }, { 0, 0 }, { width, height });
+    PremultipliedImage::copy(image, dstImage, {srcX, srcY}, {0, 0}, {width, height});
 
     try {
         return std::make_unique<style::Image>(
@@ -196,6 +197,11 @@ std::vector<Immutable<style::Image::Impl>> parseSprite(const std::string& encode
             }
         }
     }
+
+    assert([&images] {
+        std::sort(images.begin(), images.end());
+        return std::unique(images.begin(), images.end()) == images.end();
+    }());
     return images;
 }
 

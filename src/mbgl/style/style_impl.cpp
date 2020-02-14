@@ -341,9 +341,23 @@ void Style::Impl::onSourceDescriptionChanged(Source& source) {
 
 void Style::Impl::onSpriteLoaded(std::vector<Immutable<style::Image::Impl>> images_) {
     auto newImages = makeMutable<ImageImpls>(*images);
+    assert(std::is_sorted(newImages->begin(), newImages->end()));
+
+    for (auto it = images_.begin(); it != images_.end();) {
+        const auto& image = *it;
+        const auto first = std::lower_bound(newImages->begin(), newImages->end(), image);
+        auto found = first != newImages->end() && (image->id == (*first)->id) ? first : newImages->end();
+        if (found != newImages->end()) {
+            *found = std::move(*it);
+            it = images_.erase(it);
+        } else {
+            ++it;
+        }
+    }
+
     newImages->insert(
         newImages->end(), std::make_move_iterator(images_.begin()), std::make_move_iterator(images_.end()));
-    std::sort(newImages->begin(), newImages->end(), [](const auto& a, const auto& b) { return a->id < b->id; });
+    std::sort(newImages->begin(), newImages->end());
     images = std::move(newImages);
     spriteLoaded = true;
     observer->onUpdate(); // For *-pattern properties.
