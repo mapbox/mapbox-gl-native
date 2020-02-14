@@ -8,7 +8,7 @@ public:
     TestRunner() = default;
     ~TestRunner() = default;
 
-    bool startTest(const std::string& manifest);
+    bool startTest(const std::string& path);
 };
 
 #endif /* ios_test_runner_hpp */

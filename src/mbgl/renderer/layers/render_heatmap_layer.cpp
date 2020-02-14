@@ -4,7 +4,6 @@
 #include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/renderer/render_static_data.hpp>
 #include <mbgl/programs/programs.hpp>
-#include <mbgl/programs/heatmap_program.hpp>
 #include <mbgl/tile/tile.hpp>
 #include <mbgl/style/layers/heatmap_layer.hpp>
 #include <mbgl/style/layers/heatmap_layer_impl.hpp>
@@ -21,7 +20,7 @@ using namespace style;
 
 namespace {
 
-inline const HeatmapLayer::Impl& impl(const Immutable<Layer::Impl>& impl) {
+inline const HeatmapLayer::Impl& impl_cast(const Immutable<Layer::Impl>& impl) {
     assert(impl->getTypeInfo() == HeatmapLayer::Impl::staticTypeInfo());
     return static_cast<const HeatmapLayer::Impl&>(*impl);
 }
@@ -30,13 +29,13 @@ inline const HeatmapLayer::Impl& impl(const Immutable<Layer::Impl>& impl) {
 
 RenderHeatmapLayer::RenderHeatmapLayer(Immutable<HeatmapLayer::Impl> _impl)
     : RenderLayer(makeMutable<HeatmapLayerProperties>(std::move(_impl))),
-    unevaluated(impl(baseImpl).paint.untransitioned()), colorRamp({256, 1}) {
-}
+      unevaluated(impl_cast(baseImpl).paint.untransitioned()),
+      colorRamp({256, 1}) {}
 
 RenderHeatmapLayer::~RenderHeatmapLayer() = default;
 
 void RenderHeatmapLayer::transition(const TransitionParameters& parameters) {
-    unevaluated = impl(baseImpl).paint.transitioned(parameters, std::move(unevaluated));
+    unevaluated = impl_cast(baseImpl).paint.transitioned(parameters, std::move(unevaluated));
     updateColorRamp();
 }
 
@@ -177,6 +176,10 @@ void RenderHeatmapLayer::render(PaintParameters& parameters) {
 
         checkRenderability(parameters, programInstance.activeBindingCount(allAttributeBindings));
 
+        if (segments.empty()) {
+            // Copy over the segments so that we can create our own DrawScopes.
+            segments = parameters.staticData.heatmapTextureSegments();
+        }
         programInstance.draw(
             parameters.context,
             *parameters.renderPass,
@@ -186,15 +189,14 @@ void RenderHeatmapLayer::render(PaintParameters& parameters) {
             parameters.colorModeForRenderPass(),
             gfx::CullFaceMode::disabled(),
             *parameters.staticData.quadTriangleIndexBuffer,
-            parameters.staticData.heatmapTextureSegments,
+            segments,
             allUniformValues,
             allAttributeBindings,
             HeatmapTextureProgram::TextureBindings{
-                textures::image::Value{ renderTexture->getTexture().getResource(), gfx::TextureFilterType::Linear },
-                textures::color_ramp::Value{ colorRampTexture->getResource(), gfx::TextureFilterType::Linear },
+                textures::image::Value{renderTexture->getTexture().getResource(), gfx::TextureFilterType::Linear},
+                textures::color_ramp::Value{colorRampTexture->getResource(), gfx::TextureFilterType::Linear},
             },
-            getID()
-        );
+            getID());
     }
 }
 

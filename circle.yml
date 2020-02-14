@@ -20,6 +20,7 @@ workflows:
       - android-render-test-runner
       - android-unit-test-runner
       - ios-render-test-runner
+      - ios-unit-test-runner
       - baselines:
           requires:
             - android-arm64-v8a-release
@@ -151,7 +152,12 @@ workflows:
             - macos-xcode11-release
           config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_BUILD_TYPE=Debug'
           style_tests: true
-      - ios-xcode11-release
+      - build-template:
+          name: ios-xcode11-release
+          executor_name: macos-11_0_0
+          target_is_macos: true
+          config_params: '-G Xcode -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_ARCHITECTURES=arm64e -DCMAKE_OSX_SYSROOT=iphoneos'
+          build_params: '--config Release'
 
 #
 # Executors: we currently support two executors, one based on Ubuntu 19.04 aka Disco
@@ -236,7 +242,7 @@ commands:
           name: Build
           command: |
             ccache --zero-stats --max-size=2G
-            cmake --build build -j $(nproc) << parameters.build_params >>
+            cmake --build build -j $(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null) << parameters.build_params >>
             ccache --show-stats
   install:
     steps:
@@ -311,18 +317,6 @@ commands:
           gcloud auth activate-service-account --key-file secret.json --project android-gl-native
           rm secret.json
 jobs:
-  ios-xcode11-release:
-    executor: macos-11_0_0
-    steps:
-      - checkout
-      - prepare
-      - prepare-macos
-      - run:
-          name: Build
-          command: |
-            cmake . -B Build -G Xcode -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_OSX_SYSROOT=iphonesimulator
-            cd Build && xcodebuild -sdk iphonesimulator -project Mapbox\ GL\ Native.xcodeproj -configuration Release
-      - save
   ios-render-test-runner:
     executor: macos-11_0_0
     steps:
@@ -341,16 +335,15 @@ jobs:
           name: Build IOS RenderTestApp
           command: |
             cd render-test/ios
-            cmake ../.. -B Build -G Xcode -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_SYSROOT=iphoneos -DMBGL_IOS_RENDER_TEST=ON
-            cd Build
-            xcodebuild -sdk iphoneos -project Mapbox\ GL\ Native.xcodeproj -scheme RenderTestApp build-for-testing -arch arm64 CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -configuration Release
-            xcodebuild -sdk iphoneos -project Mapbox\ GL\ Native.xcodeproj build -target RenderTestAppTests -arch arm64 CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -configuration Release
+            ccache --zero-stats --max-size=2G
+            cmake ../.. -B Build -G Xcode -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_SYSROOT=iphoneos -DMBGL_IOS_RENDER_TEST=ON -DCMAKE_OSX_ARCHITECTURES=arm64e
+            cmake --build Build --config Release
+            ccache --show-stats
       - run:
           name: Codesign RenderTestApp for running on a physical device
           command: |
             cd render-test/ios
             ./codesigning/generate-entitlements.swift
-            ls codesigning
             cd Build
             ../codesigning/codesign_all.sh
             codesign -dv --verbose=4 Release-iphoneos/RenderTestApp.app # for debugging that app is signed or not
@@ -396,6 +389,74 @@ jobs:
                 unzip *.zip
                 rm -rf *.zip
               fi
+            fi
+      - save
+  ios-unit-test-runner:
+    executor: macos-11_0_0
+    steps:
+      - checkout
+      - prepare
+      - prepare-macos
+      - run:
+          name: Prepare codesign keychain
+          command: |
+            cd test/ios
+            fastlane run create_keychain name:fastlane_keychain password:$FASTLANE_PASSWORD timeout:false unlock:true
+            fastlane match
+            security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k $FASTLANE_PASSWORD fastlane_keychain
+            /usr/bin/env xcrun security find-identity -v -p codesigning
+      - run:
+          name: Build IOS UnitTestsApp
+          command: |
+            cd test/ios
+            ccache --zero-stats --max-size=2G
+            cmake ../.. -B Build -G Xcode -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_SYSROOT=iphoneos -DMBGL_IOS_UNIT_TEST=1 -DCMAKE_OSX_ARCHITECTURES=arm64e
+            cmake --build Build --config Release
+            ccache --show-stats
+      - run:
+          name: Codesign UnitTestsApp for running on a physical device
+          command: |
+            cd test/ios
+            ./codesigning/generate-entitlements.swift
+            cd Build
+            ../codesigning/codesign_all.sh
+            codesign -dv --verbose=4 Release-iphoneos/UnitTestsApp.app
+      - run:
+          name: Login to IOS Google Cloud Platform
+          command: |
+            if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON_IOS}" ]]; then
+              echo "${GCLOUD_SERVICE_ACCOUNT_JSON_IOS}" > iosAccount.json
+              gcloud auth activate-service-account --key-file iosAccount.json --project ios-mapbox-gl-native
+              rm iosAccount.json
+            fi
+      - run:
+          name: Run UnitTestsApp on Firebase
+          no_output_timeout: 20m
+          command: |
+            if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON_IOS}" ]]; then
+              # arrange files in a way Firebase expects it, and package them in a zip file
+              cd test/ios/Build
+              cp ../UnitTestsApp_iphoneos13.2-arm64e-release.xctestrun .
+              zip testapp.zip -r Release-iphoneos/UnitTestsApp.app --quiet
+              zip testapp.zip UnitTestsApp_iphoneos13.2-arm64e-release.xctestrun
+              gcloud firebase test ios models list
+              gcloud firebase test ios run \
+                --test testapp.zip \
+                --device model=iphonexs,version=12.0,locale=en,orientation=portrait --xcode-version=11.1 --timeout 20m \
+                --verbosity=debug --no-record-video --results-dir ios-unit-test-app-${CIRCLE_BUILD_NUM}
+            fi
+      - run:
+          name: Retrieve Test Result from gcloud
+          when: always
+          command: |
+            if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON_IOS}" ]]; then
+              testResult=$(gsutil ls -d gs://test-lab-hn7kwqcz3108z-hjm4qtbqqkymk/ios-unit-test-app-${CIRCLE_BUILD_NUM}/iphonexs-12.0-en-portrait/TestLogs/)
+              mkdir -p unit-test-app
+              gsutil -m cp -r $testResult unit-test-app
+              cd unit-test-app/TestLogs
+              xcparse attachments *.xcresult && ls
+              cd ../.. && mkdir -p /tmp/tests/unit-test
+              if ls unit-test-app/TestLogs/*.xml 1> /dev/null 2>&1; then cp unit-test-app/TestLogs/*.xml /tmp/tests/unit-test/results.xml; fi
             fi
       - save
   android-benchmark-runner:

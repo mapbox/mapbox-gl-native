@@ -26,15 +26,23 @@
 
 - [core] Add support for using `within expression` with layout propery. ([#16194](https://github.com/mapbox/mapbox-gl-native/pull/16194))
 
+### 🐞 Bug fixes
+
+- [core] Don't provide multiple responses with the same data for 304 replies ([#16200](https://github.com/mapbox/mapbox-gl-native/pull/16200))
+
+  In cases when cached resource is useable, yet don't have an expiration timestamp, we provided data to the requester from the cache and the same data was returned once 304 response was received from the network.
+
+- [core] Fix potential visual artifact for line-dasharray ([#16202](https://github.com/mapbox/mapbox-gl-native/pull/16202))
+
+- Store gfx::DrawScope objects with associated render objects. ([#15395](https://github.com/mapbox/mapbox-gl-native/pull/15395))
+
+  We used some shared SegmentVectors, e.g. for drawing raster or background tiles. In longer running maps, this lead to resource accumulation. By storing the SegmentVectors and the contained gfx::DrawScope objects, we ensure that resources get released when the associated render objects vanish.
+
 ### 🏁 Performance improvements
 
  - [core] Loading images to style optimization ([#16187](https://github.com/mapbox/mapbox-gl-native/pull/16187))
 
    This change enables attaching images to the style with batches and avoids massive re-allocations. Thus, it improves UI performance especially at start-up time.
-
- - [core] Fix excessive onSpriteLoaded() notifications ([#16196](https://github.com/mapbox/mapbox-gl-native/pull/16196))
-
-   The excessive `onSpriteLoaded()` notifications affected the render orchestration logic and could have significant negative performance impact.
 
 ### 🧩  Architectural changes
 

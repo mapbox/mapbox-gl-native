@@ -2,7 +2,6 @@
 #include <mbgl/geometry/debug_font_data.hpp>
 #include <mbgl/tile/tile_id.hpp>
 #include <mbgl/util/string.hpp>
-#include <mbgl/util/id.hpp>
 
 #include <cmath>
 #include <string>
@@ -20,9 +19,7 @@ DebugBucket::DebugBucket(const OverscaledTileID& id,
       complete(complete_),
       modified(std::move(modified_)),
       expires(std::move(expires_)),
-      debugMode(debugMode_),
-      drawScopeID("__debug/" + util::toHex(util::nextID())) {
-
+      debugMode(debugMode_) {
     auto addText = [&] (const std::string& text, double left, double baseline, double scale) {
         for (uint8_t c : text) {
             if (c < 32 || c >= 127)

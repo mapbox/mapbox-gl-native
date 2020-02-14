@@ -2,21 +2,15 @@
 #include <mbgl/renderer/layers/render_raster_layer.hpp>
 #include <mbgl/programs/raster_program.hpp>
 #include <mbgl/gfx/upload_pass.hpp>
-#include <mbgl/util/id.hpp>
 
 namespace mbgl {
 
 using namespace style;
 
 RasterBucket::RasterBucket(PremultipliedImage&& image_)
-    : image(std::make_shared<PremultipliedImage>(std::move(image_))),
-      drawScopeID(util::toHex(util::nextID())) {
-}
+    : image(std::make_shared<PremultipliedImage>(std::move(image_))) {}
 
-RasterBucket::RasterBucket(std::shared_ptr<PremultipliedImage> image_)
-    : image(std::move(image_)),
-      drawScopeID(util::toHex(util::nextID())) {
-}
+RasterBucket::RasterBucket(std::shared_ptr<PremultipliedImage> image_) : image(std::move(image_)) {}
 
 RasterBucket::~RasterBucket() = default;
 
@@ -27,8 +21,10 @@ void RasterBucket::upload(gfx::UploadPass& uploadPass) {
     if (!texture) {
         texture = uploadPass.createTexture(*image);
     }
-    if (!segments.empty()) {
+    if (!vertices.empty()) {
         vertexBuffer = uploadPass.createVertexBuffer(std::move(vertices));
+    }
+    if (!indices.empty()) {
         indexBuffer = uploadPass.createIndexBuffer(std::move(indices));
     }
     uploaded = true;

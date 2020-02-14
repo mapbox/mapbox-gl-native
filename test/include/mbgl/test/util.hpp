@@ -4,17 +4,12 @@
 #include <TargetConditionals.h>
 #endif
 
-#if ANDROID
-    #define TEST_READ_ONLY 0
-#elif TARGET_OS_IOS
-    #define TEST_READ_ONLY 1
-    #undef TEST_HAS_SERVER
-    #define TEST_HAS_SERVER 0
-#else
-    #define TEST_READ_ONLY 0
-    #ifndef TEST_HAS_SERVER
-        #define TEST_HAS_SERVER 1
-    #endif
+#define TEST_READ_ONLY 0
+
+#if !ANDROID
+#ifndef TEST_HAS_SERVER
+#define TEST_HAS_SERVER 1
+#endif
 #endif
 
 #if TARGET_OS_SIMULATOR

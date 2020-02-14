@@ -91,6 +91,8 @@ TEST(VectorTileData, ParseResults) {
         ASSERT_TRUE(false) << "should throw: feature index is out of range.";
     } catch (const std::out_of_range&) {
         ASSERT_TRUE(true);
+    } catch (...) { // needed for iOS when MBGL_WITH_RTTI=OFF
+        ASSERT_TRUE(true);
     }
 
     std::unique_ptr<GeometryTileFeature> feature = layer->getFeature(0u);

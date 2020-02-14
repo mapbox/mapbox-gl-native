@@ -17,7 +17,7 @@ using namespace style;
 
 namespace {
 
-inline const style::CircleLayer::Impl& impl(const Immutable<style::Layer::Impl>& impl) {
+inline const style::CircleLayer::Impl& impl_cast(const Immutable<style::Layer::Impl>& impl) {
     assert(impl->getTypeInfo() == CircleLayer::Impl::staticTypeInfo());
     return static_cast<const style::CircleLayer::Impl&>(*impl);
 }
@@ -26,11 +26,10 @@ inline const style::CircleLayer::Impl& impl(const Immutable<style::Layer::Impl>&
 
 RenderCircleLayer::RenderCircleLayer(Immutable<style::CircleLayer::Impl> _impl)
     : RenderLayer(makeMutable<CircleLayerProperties>(std::move(_impl))),
-      unevaluated(impl(baseImpl).paint.untransitioned()) {
-}
+      unevaluated(impl_cast(baseImpl).paint.untransitioned()) {}
 
 void RenderCircleLayer::transition(const TransitionParameters& parameters) {
-    unevaluated = impl(baseImpl).paint.transitioned(parameters, std::move(unevaluated));
+    unevaluated = impl_cast(baseImpl).paint.transitioned(parameters, std::move(unevaluated));
 }
 
 void RenderCircleLayer::evaluate(const PropertyEvaluationParameters& parameters) {
