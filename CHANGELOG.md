@@ -22,9 +22,13 @@
    
   The `within expression` enables checking whether a feature is inside a pre-defined geometry set/boundary or not. This `within expression` returns a boolean value, `true` indicates that the feature being evaluated is inside the geometry set. The returned value can be then consumed as input by another expression or used directly by a paint/layer property.
  
-  Support for using `within expression` with layout propery will be implemented separately.
+  Support for using `within expression` with layout property will be implemented separately.
 
-- [core] Add support for using `within expression` with layout propery. ([#16194](https://github.com/mapbox/mapbox-gl-native/pull/16194))
+- [core] Add support for using `within expression` with layout property. ([#16194](https://github.com/mapbox/mapbox-gl-native/pull/16194))
+
+- [core] Add support for `in expression`. ([#16162](https://github.com/mapbox/mapbox-gl-native/pull/16162))
+   
+  The `in expression` enables checking whether a Number/String/Boolean type item is in a String/Array and returns a boolean value.
 
 ### 🐞 Bug fixes
 

@@ -15,6 +15,7 @@
 #include <mbgl/style/expression/expression.hpp>
 #include <mbgl/style/expression/format_expression.hpp>
 #include <mbgl/style/expression/image_expression.hpp>
+#include <mbgl/style/expression/in.hpp>
 #include <mbgl/style/expression/interpolate.hpp>
 #include <mbgl/style/expression/length.hpp>
 #include <mbgl/style/expression/let.hpp>
@@ -114,6 +115,7 @@ MAPBOX_ETERNAL_CONSTEXPR const auto expressionRegistry =
         {"any", Any::parse},
         {"array", Assertion::parse},
         {"at", At::parse},
+        {"in", In::parse},
         {"boolean", Assertion::parse},
         {"case", Case::parse},
         {"coalesce", Coalesce::parse},
