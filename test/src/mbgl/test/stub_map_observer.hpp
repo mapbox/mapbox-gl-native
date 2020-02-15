@@ -38,11 +38,18 @@ public:
         }
     }
 
+    void onDidBecomeIdle() final {
+        if (didBecomeIdleCallback) {
+            didBecomeIdleCallback();
+        }
+    }
+
     std::function<void()> willStartLoadingMapCallback;
     std::function<void()> didFinishLoadingMapCallback;
     std::function<void()> didFailLoadingMapCallback;
     std::function<void()> didFinishLoadingStyleCallback;
     std::function<void(RenderFrameStatus)> didFinishRenderingFrameCallback;
+    std::function<void()> didBecomeIdleCallback;
 };
 
 

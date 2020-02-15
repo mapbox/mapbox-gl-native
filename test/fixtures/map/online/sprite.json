@@ -1,0 +1,26 @@
+{
+  "c": {
+    "x": 0,
+    "y": 0,
+    "width": 32,
+    "height": 32,
+    "pixelRatio": 1,
+    "sdf": false
+  },
+  "a": {
+    "x": 0,
+    "y": 0,
+    "width": 32,
+    "height": 32,
+    "pixelRatio": 1,
+    "sdf": false
+  },
+  "b": {
+    "x": 0,
+    "y": 0,
+    "width": 32,
+    "height": 32,
+    "pixelRatio": 1,
+    "sdf": false
+  }
+}

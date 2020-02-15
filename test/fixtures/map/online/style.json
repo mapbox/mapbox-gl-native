@@ -1,0 +1,27 @@
+{
+  "version": 8,
+  "name": "Water",
+  "sources": {
+    "mapbox": {
+      "type": "vector",
+      "url": "http://127.0.0.1:3000/online/streets.json"
+    }
+  },
+  "sprite": "http://127.0.0.1:3000/online/sprite",
+  "layers": [{
+    "id": "background",
+    "type": "background",
+    "paint": {
+      "background-color": "red"
+    }
+  }, {
+    "id": "water",
+    "type": "fill",
+    "source": "mapbox",
+    "source-layer": "water",
+    "paint": {
+      "fill-pattern": "noise",
+      "fill-antialias": false
+    }
+  }]
+}

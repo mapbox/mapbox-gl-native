@@ -1,6 +1,7 @@
 #include <mbgl/test/util.hpp>
 
 #include <mbgl/util/chrono.hpp>
+#include <mbgl/util/io.hpp>
 #include <mbgl/util/logging.hpp>
 
 // Limit to 4 threads (default is the nbr of CPU cores)
@@ -8,6 +9,8 @@
 #include <httplib.h>
 
 #include <atomic>
+
+using namespace std::literals::string_literals;
 
 namespace mbgl {
 namespace test {
@@ -180,6 +183,13 @@ void runServer(std::unique_ptr<httplib::Server>& server) {
     server->Get(R"(/load/(\d+))", [](const Request req, Response& res) {
         auto numbers = req.matches[1];
         res.set_content("Request " + std::string(numbers), "text/plain");
+    });
+
+    server->Get(R"(/online/(.*))", [](const Request req, Response& res) {
+        res.status = 200;
+        auto file = "test/fixtures/map/online/"s + std::string(req.matches[1]);
+        auto content = util::read_file(file);
+        res.set_content(content, "text/plain");
     });
 
     server->listen("127.0.0.1", 3000);
