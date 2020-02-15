@@ -42,6 +42,10 @@
 
   We used some shared SegmentVectors, e.g. for drawing raster or background tiles. In longer running maps, this lead to resource accumulation. By storing the SegmentVectors and the contained gfx::DrawScope objects, we ensure that resources get released when the associated render objects vanish.
 
+- [core] Fix sprite sheet merging in Style::Impl::onSpriteLoaded ([#16211](https://github.com/mapbox/mapbox-gl-native/pull/16211))
+
+  If we get a new sprite sheet from the server, we need to merge current sprite sheet with a new one, while overwriting duplicates and keeping old unique images in a style.
+
 ### 🏁 Performance improvements
 
  - [core] Loading images to style optimization ([#16187](https://github.com/mapbox/mapbox-gl-native/pull/16187))
