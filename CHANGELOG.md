@@ -28,7 +28,7 @@
 
 - [core] Add support for `in expression`. ([#16162](https://github.com/mapbox/mapbox-gl-native/pull/16162))
    
-  The `in expression` enables checking whether a Number/String/Boolean type needle is in a String/Array and returns a boolean value.
+  The `in expression` enables checking whether a Number/String/Boolean type item is in a String/Array and returns a boolean value.
 
 ### 🐞 Bug fixes
 
