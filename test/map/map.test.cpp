@@ -10,12 +10,14 @@
 #include <mbgl/gl/context.hpp>
 #include <mbgl/map/map_options.hpp>
 #include <mbgl/math/log2.hpp>
+#include <mbgl/renderer/update_parameters.hpp>
 #include <mbgl/storage/file_source_manager.hpp>
 #include <mbgl/storage/main_resource_loader.hpp>
 #include <mbgl/storage/network_status.hpp>
 #include <mbgl/storage/online_file_source.hpp>
 #include <mbgl/storage/resource_options.hpp>
 #include <mbgl/style/image.hpp>
+#include <mbgl/style/image_impl.hpp>
 #include <mbgl/style/layers/background_layer.hpp>
 #include <mbgl/style/layers/raster_layer.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
@@ -36,13 +38,13 @@ using namespace mbgl;
 using namespace mbgl::style;
 using namespace std::literals::string_literals;
 
-template <class FileSource = StubFileSource>
+template <class FileSource = StubFileSource, class Frontend = HeadlessFrontend>
 class MapTest {
 public:
     util::RunLoop runLoop;
     std::shared_ptr<FileSource> fileSource;
     StubMapObserver observer;
-    HeadlessFrontend frontend;
+    Frontend frontend;
     MapAdapter map;
 
     MapTest(float pixelRatio = 1, MapMode mode = MapMode::Static)
@@ -1252,4 +1254,53 @@ TEST(Map, PrefetchDeltaOverrideCustomSource) {
     // Source was significantly mutated, therefore, tile pyramid would be cleared
     // and current zoom level + parent tiles would be re-requested.
     EXPECT_EQ(8, requestedTiles);
+}
+
+// Test verifies that Style::Impl::onSpriteLoaded does not create duplicate
+// images when we get new spritesheet from the server and we merge it with
+// currently used spritesheet.
+TEST(Map, TEST_REQUIRES_SERVER(ExpiredSpriteSheet)) {
+    class ForwardingHeadlessFrontend : public HeadlessFrontend {
+    public:
+        using HeadlessFrontend::HeadlessFrontend;
+        ~ForwardingHeadlessFrontend() override = default;
+        void update(std::shared_ptr<UpdateParameters> params) override {
+            if (checkParams) checkParams(params);
+            HeadlessFrontend::update(std::move(params));
+        }
+        std::function<void(std::shared_ptr<UpdateParameters>)> checkParams;
+    };
+
+    MapTest<MainResourceLoader, ForwardingHeadlessFrontend> test{":memory:", ".", 1, MapMode::Continuous};
+
+    auto makeResponse = [](const std::string& path, bool expires = false) {
+        Response response;
+        response.data = std::make_shared<std::string>(util::read_file("test/fixtures/map/online/"s + path));
+        response.expires = expires ? Timestamp{Seconds(0)} : Timestamp::max();
+        return response;
+    };
+
+    test.observer.didFinishLoadingMapCallback = [&test] {
+        test.frontend.checkParams = [](std::shared_ptr<UpdateParameters> params) {
+            EXPECT_TRUE(std::is_sorted(params->images->begin(), params->images->end()));
+            EXPECT_TRUE(params->images->size() < 4u);
+        };
+
+        NetworkStatus::Set(NetworkStatus::Status::Online);
+
+        test.observer.didBecomeIdleCallback = [&test] { test.runLoop.stop(); };
+    };
+
+    NetworkStatus::Set(NetworkStatus::Status::Offline);
+    const std::string prefix = "http://127.0.0.1:3000/online/";
+    auto dbfs = FileSourceManager::get()->getFileSource(FileSourceType::Database, ResourceOptions{});
+    dbfs->forward(Resource::style(prefix + "style.json"), makeResponse("style.json"));
+    dbfs->forward(Resource::source(prefix + "streets.json"), makeResponse("streets.json"));
+    dbfs->forward(Resource::spriteJSON(prefix + "sprite", 1.0), makeResponse("sprite.json", true));
+    dbfs->forward(Resource::spriteImage(prefix + "sprite", 1.0), makeResponse("sprite.png", true));
+    dbfs->forward(Resource::tile(prefix + "{z}-{x}-{y}.vector.pbf", 1.0, 0, 0, 0, Tileset::Scheme::XYZ),
+                  makeResponse("0-0-0.vector.pbf"),
+                  [&] { test.map.getStyle().loadURL(prefix + "style.json"); });
+
+    test.runLoop.run();
 }
