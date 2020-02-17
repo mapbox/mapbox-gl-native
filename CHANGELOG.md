@@ -2,6 +2,8 @@
 
 ## master
 
+## maps-v1.2.0 (2020.02-release-vanillashake)
+
 ### ✨ New features
 
 - [core] Global settings API ([#16174](https://github.com/mapbox/mapbox-gl-native/pull/16174))
