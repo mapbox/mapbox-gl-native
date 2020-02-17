@@ -23,18 +23,12 @@ public:
 
     void eachChild(const std::function<void(const Expression&)>&) const override {}
 
-    bool operator==(const Expression& e) const override {
-        if (e.getKind() == Kind::Within) {
-            auto rhs = static_cast<const Within*>(&e);
-            return geoJSONSource == rhs->geoJSONSource;
-        }
-        return false;
-    }
+    bool operator==(const Expression& e) const override;
 
-    std::vector<optional<Value>> possibleOutputs() const override { return {{true}, {false}}; }
+    std::vector<optional<Value>> possibleOutputs() const override;
 
     mbgl::Value serialize() const override;
-    std::string getOperator() const override { return "within"; }
+    std::string getOperator() const override;
 
 private:
     GeoJSON geoJSONSource;
