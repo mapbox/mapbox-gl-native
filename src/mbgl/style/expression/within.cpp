@@ -7,6 +7,7 @@
 
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/string.hpp>
+#include <mbgl/util/geometry_within.hpp>
 
 #include <rapidjson/document.h>
 #include <mbgl/style/conversion/json.hpp>
@@ -35,144 +36,14 @@ public:
     }
 };
 
-void printPolygon(const Polygon<double>& polygon) {
-    mbgl::Log::Debug(mbgl::Event::General, "-------Print Polygon------");
-    for (auto ring : polygon) {
-        auto length = ring.size();
-        mbgl::Log::Debug(mbgl::Event::General, "-------Print New ring with size: %d ------", length);
-        // loop through every edge of the ring
-        for (std::size_t i = 0; i < length - 1; ++i) {
-            mbgl::Log::Debug(mbgl::Event::General, "point [%.15f, %.15f],", ring[i].x, ring[i].y);
-        }
-    }
-}
-
-void printLine(const LineString<double>& lineString) {
-    mbgl::Log::Debug(mbgl::Event::General, "-------Print LineString------");
-    for (std::size_t i = 0; i < lineString.size(); ++i) {
-        mbgl::Log::Debug(mbgl::Event::General, "point [%.15f, %.15f],", lineString[i].x, lineString[i].y);
-    }
-}
-
-bool rayIntersect(const mbgl::Point<double>& p, const mbgl::Point<double>& p1, const mbgl::Point<double>& p2) {
-    return ((p1.y > p.y) != (p2.y > p.y)) && (p.x < (p2.x - p1.x) * (p.y - p1.y) / (p2.y - p1.y) + p1.x);
-}
-
-// ray casting algorithm for detecting if point is in polygon
-bool pointWithinPolygon(const mbgl::Point<double>& point, const mapbox::geometry::polygon<double>& polygon) {
-    bool within = false;
-    for (auto ring : polygon) {
-        auto length = ring.size();
-        // loop through every edge of the ring
-        for (std::size_t i = 0; i < length - 1; ++i) {
-            if (rayIntersect(point, ring[i], ring[i + 1])) {
-                within = !within;
-            }
-        }
-    }
-    return within;
-}
-
-bool pointWithinPolygons(const mbgl::Point<double>& point, const mapbox::geometry::multi_polygon<double>& polygons) {
-    for (auto polygon : polygons) {
-        if (pointWithinPolygon(point, polygon)) return true;
-    }
-    return false;
-}
-
-bool lineIntersectLine(const mbgl::Point<double>& p1,
-                       const mbgl::Point<double>& p2,
-                       const mbgl::Point<double>& q1,
-                       const mbgl::Point<double>& q2) {
-    // precondition is p1, p2 is inside polygon, so p1, p2 is not on line q1->q2
-    const auto perp = [](const mbgl::Point<double>& v1, const mbgl::Point<double>& v2) {
-        return (v1.x * v2.y - v1.y * v2.x);
-    };
-
-    // check if p1 and p2 are in different sides of line segment q1->q2
-    const auto twoSided = [](const mbgl::Point<double>& p1,
-                             const mbgl::Point<double>& p2,
-                             const mbgl::Point<double>& q1,
-                             const mbgl::Point<double>& q2) {
-        double x1, y1, x2, y2, x3, y3;
-
-        // q1->p1 (x1, y1), q1->p2 (x2, y2), q1->q2 (x3, y3)
-        x1 = p1.x - q1.x;
-        y1 = p1.y - q1.y;
-        x2 = p2.x - q1.x;
-        y2 = p2.y - q1.y;
-        x3 = q2.x - q1.x;
-        y3 = q2.y - q1.y;
-        if ((x1 * y3 - x3 * y1) * (x2 * y3 - x3 * y2) < 0) return true;
-        return false;
-    };
-    auto vectorP = mbgl::Point<double>(p2.x - p1.x, p2.y - p1.y);
-    auto vectorQ = mbgl::Point<double>(q2.x - q1.x, q2.y - q1.y);
-
-    // check if two segments are parallel or not
-    if (perp(vectorQ, vectorP) == 0) return false;
-
-    // check if there are intersecting with each other
-    // p1 and p2 lie in separate side of segment q1->q2
-    // q1 and q2 lie in separate side of segment p1->p2
-    if (twoSided(p1, p2, q1, q2) && twoSided(q1, q2, p1, p2)) return true;
-    return false;
-}
-
-bool lineIntersectPolygon(const mbgl::Point<double>& p1,
-                          const mbgl::Point<double>& p2,
-                          const mapbox::geometry::polygon<double>& polygon) {
-    for (auto ring : polygon) {
-        auto length = ring.size();
-        // loop through every edge of the ring
-        for (std::size_t i = 0; i < length - 1; ++i) {
-            if (lineIntersectLine(p1, p2, ring[i], ring[i + 1])) {
-                //               mbgl::Log::Debug(mbgl::Event::General,
-                //                                       "intersecting with edge from %.15f to %.15f", i, i+ 1);
-                return true;
-            }
-        }
-    }
-    return false;
-}
-
-bool lineStringWithinPolygon(const mbgl::LineString<double>& lineString,
-                             const mapbox::geometry::polygon<double>& polygon) {
-    // First, check if endpoints of line are all inside polygon
-    for (std::size_t i = 0; i < lineString.size() - 1; ++i) {
-        if (!pointWithinPolygon(lineString[i], polygon)) {
-            mbgl::Log::Debug(
-                mbgl::Event::General, "point %.15f, %.15f is not inside polygon", lineString[i].x, lineString[i].y);
-            return false;
-        }
-    }
-
-    // Second, check if there was line segment intersecting polygon edge
-    for (std::size_t i = 0; i < lineString.size() - 1; ++i) {
-        if (lineIntersectPolygon(lineString[i], lineString[i + 1], polygon)) {
-            mbgl::Log::Debug(mbgl::Event::General,
-                             "---------line [%.15f, %.15f] to [%.15f, %.15f] is not inside polygon",
-                             lineString[i].x,
-                             lineString[i].y,
-                             lineString[i + 1].x,
-                             lineString[i + 1].y);
-            return false;
-        }
-    }
-
-    mbgl::Log::Debug(mbgl::Event::General, "---------line is inside polygon, line point size: %d: ", lineString.size());
-    return true;
-}
-
 bool pointsWithinPolygons(const mbgl::GeometryTileFeature& feature,
                           const mbgl::CanonicalTileID& canonical,
                           const mbgl::GeoJSON& geoJson) {
     return geoJson.match(
         [&feature, &canonical](const mapbox::geometry::geometry<double>& geometrySet) -> bool {
             mbgl::Feature f(geometrySet);
-
-            PolygonFeature polyFeature(f, canonical);
-            auto refinedGeoSet = convertGeometry(polyFeature, canonical);
+            PolygonFeature polyFeature(f, CanonicalTileID(0, 0, 0));
+            auto refinedGeoSet = convertGeometry(polyFeature, CanonicalTileID(0, 0, 0));
             return refinedGeoSet.match(
                 [&feature, &canonical](const mapbox::geometry::multi_polygon<double>& polygons) -> bool {
                     return convertGeometry(feature, canonical)
@@ -185,9 +56,7 @@ bool pointsWithinPolygons(const mbgl::GeometryTileFeature& feature,
                                     return pointWithinPolygons(p, polygons);
                                 });
                             },
-                            [](const auto&) -> bool {
-                                return false;
-                            });
+                            [](const auto&) -> bool {return false;});
                 },
                 [&feature, &canonical](const mapbox::geometry::polygon<double>& polygon) -> bool {
                     return convertGeometry(feature, canonical)
@@ -207,12 +76,7 @@ bool pointsWithinPolygons(const mbgl::GeometryTileFeature& feature,
         [](const auto&) -> bool { return false; });
 }
 
-bool lineStringWithinPolygons(const mbgl::LineString<double>& line, const MultiPolygon<double>& polygons) {
-    for (auto polygon : polygons) {
-        if (lineStringWithinPolygon(line, polygon)) return true;
-    }
-    return false;
-}
+
 
 bool linesWithinPolygons(const mbgl::GeometryTileFeature& feature,
                          const mbgl::CanonicalTileID& canonical,
@@ -228,9 +92,6 @@ bool linesWithinPolygons(const mbgl::GeometryTileFeature& feature,
             auto refinedGeoSet = convertGeometry(polyFeature, CanonicalTileID(0, 0, 0));
             return refinedGeoSet.match(
                 [&feature, &canonical](const MultiPolygon<double>& polygons) -> bool {
-                    for (auto polygon : polygons) {
-                        printPolygon(polygon);
-                    }
                     return convertGeometry(feature, canonical)
                         .match(
                             [&polygons](const LineString<double>& line) -> bool {
@@ -248,7 +109,6 @@ bool linesWithinPolygons(const mbgl::GeometryTileFeature& feature,
                             });
                 },
                 [&feature, &canonical](const Polygon<double>& polygon) -> bool {
-                    printPolygon(polygon);
                     return convertGeometry(feature, canonical)
                         .match(
                             [&polygon](const LineString<double>& line) -> bool {
@@ -312,8 +172,7 @@ EvaluationResult Within::evaluate(const EvaluationContext& params) const {
     auto geometryType = params.feature->getType();
     // Currently only support Point/Points in Polygon/Polygons
     if (geometryType == FeatureType::Point) {
-        pointsWithinPolygons(*params.feature, *params.canonical, geoJSONSource);
-        return true;
+        return pointsWithinPolygons(*params.feature, *params.canonical, geoJSONSource);
     } else if (geometryType == FeatureType::LineString) {
         return linesWithinPolygons(*params.feature, *params.canonical, geoJSONSource);
     }
