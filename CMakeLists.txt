@@ -765,6 +765,8 @@ add_library(
     ${PROJECT_SOURCE_DIR}/src/mbgl/util/font_stack.cpp
     ${PROJECT_SOURCE_DIR}/src/mbgl/util/geo.cpp
     ${PROJECT_SOURCE_DIR}/src/mbgl/util/geojson_impl.cpp
+    ${PROJECT_SOURCE_DIR}/src/mbgl/util/geometry_within.cpp
+    ${PROJECT_SOURCE_DIR}/src/mbgl/util/geometry_within.hpp
     ${PROJECT_SOURCE_DIR}/src/mbgl/util/grid_index.cpp
     ${PROJECT_SOURCE_DIR}/src/mbgl/util/grid_index.hpp
     ${PROJECT_SOURCE_DIR}/src/mbgl/util/hash.hpp
