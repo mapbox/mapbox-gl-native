@@ -306,6 +306,22 @@ void Map::setBounds(const BoundOptions& options) {
         }
     }
 
+    if (options.maxPitch) {
+        impl->transform.setMaxPitch(*options.maxPitch);
+        if (impl->transform.getPitch() > impl->transform.getState().getMaxPitch()) {
+            changeCamera = true;
+            cameraOptions.withPitch(*options.maxPitch);
+        }
+    }
+
+    if (options.minPitch) {
+        impl->transform.setMinPitch(*options.minPitch);
+        if (impl->transform.getPitch() < impl->transform.getState().getMinPitch()) {
+            changeCamera = true;
+            cameraOptions.withPitch(*options.minPitch);
+        }
+    }
+
     if (changeCamera) {
         jumpTo(cameraOptions);
     }
@@ -315,7 +331,9 @@ BoundOptions Map::getBounds() const {
     return BoundOptions()
         .withLatLngBounds(impl->transform.getState().getLatLngBounds())
         .withMinZoom(impl->transform.getState().getMinZoom())
-        .withMaxZoom(impl->transform.getState().getMaxZoom());
+        .withMaxZoom(impl->transform.getState().getMaxZoom())
+        .withMinPitch(impl->transform.getState().getMinPitch())
+        .withMaxPitch(impl->transform.getState().getMaxPitch());
 }
 
 #pragma mark - Map options
