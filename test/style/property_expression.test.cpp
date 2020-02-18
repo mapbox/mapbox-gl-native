@@ -265,15 +265,35 @@ TEST(PropertyExpression, WithinExpression) {
     ASSERT_TRUE(expression);
     PropertyExpression<bool> propExpr(std::move(expression));
 
-    // evaluation test with valid geojson source but FeatureType is not Point (currently only support
+    // evaluation test with valid geojson source but FeatureType is not Point/LineString (currently only support
     // FeatureType::Point)
     {
-        // testLine is inside polygon, but will return false
-        LineString<double> testLine{{-9.228515625, -17.560246503294888}, {-2.4609375, -16.04581345375217}};
-        auto geoLine = convertGeometry(testLine, canonicalTileID);
-        StubGeometryTileFeature lineFeature(FeatureType::LineString, geoLine);
+        // testPoly is inside polygon, but will return false
+        Polygon<double> testRing{{{-9.228515625, -17.560246503294888},
+                                  {-2.4609375, -16.04581345375217},
+                                  {-9.228515625, -17.560246503294888}}};
+        auto geoPoly = convertGeometry(testRing, canonicalTileID);
+        StubGeometryTileFeature polyFeature(FeatureType::Polygon, geoPoly);
 
-        auto evaluatedResult = propExpr.evaluate(EvaluationContext(&lineFeature).withCanonicalTileID(&canonicalTileID));
+        auto evaluatedResult = propExpr.evaluate(EvaluationContext(&polyFeature).withCanonicalTileID(&canonicalTileID));
+        EXPECT_FALSE(evaluatedResult);
+    }
+    // evaluation test with valid geojson source and valid linestring features
+    {
+        // testLine is inside polygon, but will return true
+        LineString<double> testLine0{{-9.228515625, -17.560246503294888}, {-2.4609375, -16.04581345375217}};
+        auto geoLine0 = convertGeometry(testLine0, canonicalTileID);
+        StubGeometryTileFeature lineFeature0(FeatureType::LineString, geoLine0);
+
+        // testLine is intersecting polygon even though end points are all inside polygon, but will return false
+        LineString<double> testLine1{{-10.4150390625, -10.082445532162465}, {-8.8275146484375, -9.194292714912638}};
+        auto geoLine1 = convertGeometry(testLine1, canonicalTileID);
+        StubGeometryTileFeature lineFeature1(FeatureType::LineString, geoLine1);
+
+        auto evaluatedResult =
+            propExpr.evaluate(EvaluationContext(&lineFeature0).withCanonicalTileID(&canonicalTileID));
+        EXPECT_TRUE(evaluatedResult);
+        evaluatedResult = propExpr.evaluate(EvaluationContext(&lineFeature1).withCanonicalTileID(&canonicalTileID));
         EXPECT_FALSE(evaluatedResult);
     }
 
