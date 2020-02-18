@@ -13,6 +13,7 @@ namespace mbgl {
 
 class FileSource;
 class SpriteLoaderObserver;
+class Scheduler;
 
 class SpriteLoader {
 public:
@@ -28,15 +29,15 @@ private:
 
     // Invoked by SpriteAtlasWorker
     friend class SpriteLoaderWorker;
-    void onParsed(std::vector<Immutable<style::Image::Impl>>);
-    void onError(std::exception_ptr);
 
     const float pixelRatio;
 
-    struct Loader;
-    std::unique_ptr<Loader> loader;
+    struct Data;
+    std::unique_ptr<Data> data;
 
     SpriteLoaderObserver* observer = nullptr;
+    std::shared_ptr<Scheduler> threadPool;
+    mapbox::base::WeakPtrFactory<SpriteLoader> weakFactory{this};
 };
 
 } // namespace mbgl

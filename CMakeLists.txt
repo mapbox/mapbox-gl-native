@@ -532,8 +532,6 @@ add_library(
     ${PROJECT_SOURCE_DIR}/src/mbgl/sprite/sprite_loader.cpp
     ${PROJECT_SOURCE_DIR}/src/mbgl/sprite/sprite_loader.hpp
     ${PROJECT_SOURCE_DIR}/src/mbgl/sprite/sprite_loader_observer.hpp
-    ${PROJECT_SOURCE_DIR}/src/mbgl/sprite/sprite_loader_worker.cpp
-    ${PROJECT_SOURCE_DIR}/src/mbgl/sprite/sprite_loader_worker.hpp
     ${PROJECT_SOURCE_DIR}/src/mbgl/sprite/sprite_parser.cpp
     ${PROJECT_SOURCE_DIR}/src/mbgl/sprite/sprite_parser.hpp
     ${PROJECT_SOURCE_DIR}/src/mbgl/storage/asset_file_source.hpp
