@@ -5,9 +5,9 @@
 #include <mbgl/style/conversion_impl.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
 
+#include <mbgl/util/geometry_within.hpp>
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/string.hpp>
-#include <mbgl/util/geometry_within.hpp>
 
 #include <rapidjson/document.h>
 #include <mbgl/style/conversion/json.hpp>
@@ -38,100 +38,64 @@ public:
 
 bool pointsWithinPolygons(const mbgl::GeometryTileFeature& feature,
                           const mbgl::CanonicalTileID& canonical,
-                          const mbgl::GeoJSON& geoJson) {
-    return geoJson.match(
-        [&feature, &canonical](const mapbox::geometry::geometry<double>& geometrySet) -> bool {
-            mbgl::Feature f(geometrySet);
-            PolygonFeature polyFeature(f, CanonicalTileID(0, 0, 0));
-            auto refinedGeoSet = convertGeometry(polyFeature, CanonicalTileID(0, 0, 0));
-            return refinedGeoSet.match(
-                [&feature, &canonical](const mapbox::geometry::multi_polygon<double>& polygons) -> bool {
-                    return convertGeometry(feature, canonical)
-                        .match(
-                            [&polygons](const mapbox::geometry::point<double>& point) -> bool {
-                                return pointWithinPolygons(point, polygons);
-                            },
-                            [&polygons](const mapbox::geometry::multi_point<double>& points) -> bool {
-                                return std::all_of(points.begin(), points.end(), [&polygons](const auto& p) {
-                                    return pointWithinPolygons(p, polygons);
-                                });
-                            },
-                            [](const auto&) -> bool {return false;});
-                },
-                [&feature, &canonical](const mapbox::geometry::polygon<double>& polygon) -> bool {
-                    return convertGeometry(feature, canonical)
-                        .match(
-                            [&polygon](const mapbox::geometry::point<double>& point) -> bool {
-                                return pointWithinPolygon(point, polygon);
-                            },
-                            [&polygon](const mapbox::geometry::multi_point<double>& points) -> bool {
-                                return std::all_of(points.begin(), points.end(), [&polygon](const auto& p) {
-                                    return pointWithinPolygon(p, polygon);
-                                });
-                            },
-                            [](const auto&) -> bool { return false; });
-                },
-                [](const auto&) -> bool { return false; });
+                          const Feature::geometry_type& polygonGeoSet) {
+    return polygonGeoSet.match(
+        [&feature, &canonical](const mapbox::geometry::multi_polygon<double>& polygons) -> bool {
+            return convertGeometry(feature, canonical)
+                .match(
+                    [&polygons](const mapbox::geometry::point<double>& point) -> bool {
+                        return pointWithinPolygons(point, polygons);
+                    },
+                    [&polygons](const mapbox::geometry::multi_point<double>& points) -> bool {
+                        return std::all_of(points.begin(), points.end(), [&polygons](const auto& p) {
+                            return pointWithinPolygons(p, polygons);
+                        });
+                    },
+                    [](const auto&) -> bool { return false; });
+        },
+        [&feature, &canonical](const mapbox::geometry::polygon<double>& polygon) -> bool {
+            return convertGeometry(feature, canonical)
+                .match(
+                    [&polygon](const mapbox::geometry::point<double>& point) -> bool {
+                        return pointWithinPolygon(point, polygon);
+                    },
+                    [&polygon](const mapbox::geometry::multi_point<double>& points) -> bool {
+                        return std::all_of(points.begin(), points.end(), [&polygon](const auto& p) {
+                            return pointWithinPolygon(p, polygon);
+                        });
+                    },
+                    [](const auto&) -> bool { return false; });
         },
         [](const auto&) -> bool { return false; });
 }
 
-
-
 bool linesWithinPolygons(const mbgl::GeometryTileFeature& feature,
                          const mbgl::CanonicalTileID& canonical,
-                         const mbgl::GeoJSON& geoJson) {
-    mbgl::Log::Debug(mbgl::Event::General, "------------------------Canonical ID is-------------------------------");
-    mbgl::Log::Debug(
-        mbgl::Event::General, "----- '%d' / '%d' / '%d'-------------", canonical.z, canonical.x, canonical.y);
-
-    return geoJson.match(
-        [&feature, &canonical](const mapbox::geometry::geometry<double>& geometrySet) -> bool {
-            mbgl::Feature f(geometrySet);
-            PolygonFeature polyFeature(f, CanonicalTileID(0, 0, 0));
-            auto refinedGeoSet = convertGeometry(polyFeature, CanonicalTileID(0, 0, 0));
-            return refinedGeoSet.match(
-                [&feature, &canonical](const MultiPolygon<double>& polygons) -> bool {
-                    return convertGeometry(feature, canonical)
-                        .match(
-                            [&polygons](const LineString<double>& line) -> bool {
-                                printLine(line);
-                                return lineStringWithinPolygons(line, polygons);
-                            },
-                            [&polygons](const MultiLineString<double>& lines) -> bool {
-                                return std::all_of(lines.begin(), lines.end(), [&polygons](const auto& line) {
-                                    printLine(line);
-                                    return lineStringWithinPolygons(line, polygons);
-                                });
-                            },
-                            [](const auto&) -> bool {
-                                return false;
-                            });
-                },
-                [&feature, &canonical](const Polygon<double>& polygon) -> bool {
-                    return convertGeometry(feature, canonical)
-                        .match(
-                            [&polygon](const LineString<double>& line) -> bool {
-                                printLine(line);
-                                return lineStringWithinPolygon(line, polygon);
-                            },
-                            [&polygon](const MultiLineString<double>& lines) -> bool {
-                                return std::all_of(lines.begin(), lines.end(), [&polygon](const auto& line) {
-                                    printLine(line);
-                                    return lineStringWithinPolygon(line, polygon);
-                                });
-                            },
-                            [](const auto&) -> bool {
-                                return false;
-                            });
-                },
-                [](const auto&) -> bool {
-                    return false;
-                });
+                         const Feature::geometry_type& polygonGeoSet) {
+    return polygonGeoSet.match(
+        [&feature, &canonical](const MultiPolygon<double>& polygons) -> bool {
+            return convertGeometry(feature, canonical)
+                .match([&polygons](
+                           const LineString<double>& line) -> bool { return lineStringWithinPolygons(line, polygons); },
+                       [&polygons](const MultiLineString<double>& lines) -> bool {
+                           return std::all_of(lines.begin(), lines.end(), [&polygons](const auto& line) {
+                               return lineStringWithinPolygons(line, polygons);
+                           });
+                       },
+                       [](const auto&) -> bool { return false; });
         },
-        [](const auto&) -> bool {
-            return false;
-        });
+        [&feature, &canonical](const Polygon<double>& polygon) -> bool {
+            return convertGeometry(feature, canonical)
+                .match([&polygon](
+                           const LineString<double>& line) -> bool { return lineStringWithinPolygon(line, polygon); },
+                       [&polygon](const MultiLineString<double>& lines) -> bool {
+                           return std::all_of(lines.begin(), lines.end(), [&polygon](const auto& line) {
+                               return lineStringWithinPolygon(line, polygon);
+                           });
+                       },
+                       [](const auto&) -> bool { return false; });
+        },
+        [](const auto&) -> bool { return false; });
 }
 
 mbgl::optional<mbgl::GeoJSON> parseValue(const mbgl::style::conversion::Convertible& value_,
@@ -150,7 +114,7 @@ mbgl::optional<mbgl::GeoJSON> parseValue(const mbgl::style::conversion::Converti
             }
         }
     }
-    ctx.error("'Within' expression requires valid geojson source that contains polygon geometry type.");
+    ctx.error("'within' expression requires valid geojson source that contains polygon geometry type.");
     return nullopt;
 }
 
@@ -159,7 +123,8 @@ mbgl::optional<mbgl::GeoJSON> parseValue(const mbgl::style::conversion::Converti
 namespace style {
 namespace expression {
 
-Within::Within(GeoJSON geojson) : Expression(Kind::Within, type::Boolean), geoJSONSource(std::move(geojson)) {}
+Within::Within(GeoJSON geojson, Feature::geometry_type geometries_)
+    : Expression(Kind::Within, type::Boolean), geoJSONSource(std::move(geojson)), geometries(std::move(geometries_)) {}
 
 Within::~Within() = default;
 
@@ -172,11 +137,12 @@ EvaluationResult Within::evaluate(const EvaluationContext& params) const {
     auto geometryType = params.feature->getType();
     // Currently only support Point/Points in Polygon/Polygons
     if (geometryType == FeatureType::Point) {
-        return pointsWithinPolygons(*params.feature, *params.canonical, geoJSONSource);
+        return pointsWithinPolygons(*params.feature, *params.canonical, geometries);
     } else if (geometryType == FeatureType::LineString) {
-        return linesWithinPolygons(*params.feature, *params.canonical, geoJSONSource);
+        return linesWithinPolygons(*params.feature, *params.canonical, geometries);
     }
-    mbgl::Log::Warning(mbgl::Event::General, "within expression currently only support 'Point' geometry type");
+    mbgl::Log::Warning(mbgl::Event::General,
+                       "within expression currently only support Point/LineString geometry type.");
 
     return false;
 }
@@ -194,8 +160,20 @@ ParseResult Within::parse(const Convertible& value, ParsingContext& ctx) {
         if (!parsedValue) {
             return ParseResult();
         }
-        return ParseResult(std::make_unique<Within>(*parsedValue));
+
+        return parsedValue->match(
+            [&parsedValue](const mapbox::geometry::geometry<double>& geometrySet) {
+                mbgl::Feature f(geometrySet);
+                PolygonFeature polyFeature(f, CanonicalTileID(0, 0, 0));
+                auto refinedGeoSet = convertGeometry(polyFeature, CanonicalTileID(0, 0, 0));
+                return ParseResult(std::make_unique<Within>(*parsedValue, refinedGeoSet));
+            },
+            [&ctx](const auto&) {
+                ctx.error("'within' expression requires geojson source that contains valid geometry data.");
+                return ParseResult();
+            });
     }
+    ctx.error("'within' expression needs to be an array with exactly one argument.");
     return ParseResult();
 }
 
