@@ -123,7 +123,7 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
 
     // Constrain camera options.
     zoom = util::clamp(zoom, state.getMinZoom(), state.getMaxZoom());
-    pitch = util::clamp(pitch, util::PITCH_MIN, util::PITCH_MAX);
+    pitch = util::clamp(pitch, state.getMinPitch(), state.getMaxPitch());
 
     // Minimize rotation by taking the shorter path around the circle.
     bearing = _normalizeAngle(bearing, state.getBearing());
@@ -196,7 +196,7 @@ void Transform::flyTo(const CameraOptions& camera, const AnimationOptions& anima
 
     // Constrain camera options.
     zoom = util::clamp(zoom, state.getMinZoom(), state.getMaxZoom());
-    pitch = util::clamp(pitch, util::PITCH_MIN, util::PITCH_MAX);
+    pitch = util::clamp(pitch, state.getMinPitch(), state.getMaxPitch());
 
     // Minimize rotation by taking the shorter path around the circle.
     bearing = _normalizeAngle(bearing, state.getBearing());
@@ -377,6 +377,26 @@ void Transform::setMinZoom(const double minZoom) {
 void Transform::setMaxZoom(const double maxZoom) {
     if (std::isnan(maxZoom)) return;
     state.setMaxZoom(maxZoom);
+}
+
+void Transform::setMinPitch(const double minPitch) {
+    if (std::isnan(minPitch)) return;
+    if (minPitch * util::DEG2RAD < util::PITCH_MIN) {
+        Log::Warning(Event::General,
+                     "Trying to set minimum pitch below the limit (%.0f degrees), the value will be clamped.",
+                     util::PITCH_MIN * util::RAD2DEG);
+    }
+    state.setMinPitch(minPitch * util::DEG2RAD);
+}
+
+void Transform::setMaxPitch(const double maxPitch) {
+    if (std::isnan(maxPitch)) return;
+    if (maxPitch * util::DEG2RAD > util::PITCH_MAX) {
+        Log::Warning(Event::General,
+                     "Trying to set maximum pitch above the limit (%.0f degrees), the value will be clamped.",
+                     util::PITCH_MAX * util::RAD2DEG);
+    }
+    state.setMaxPitch(maxPitch * util::DEG2RAD);
 }
 
 #pragma mark - Bearing
