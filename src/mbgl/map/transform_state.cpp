@@ -1,11 +1,12 @@
 #include <mbgl/map/transform_state.hpp>
+#include <mbgl/math/clamp.hpp>
+#include <mbgl/math/log2.hpp>
 #include <mbgl/tile/tile_id.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/interpolate.hpp>
+#include <mbgl/util/logging.hpp>
 #include <mbgl/util/projection.hpp>
 #include <mbgl/util/tile_coordinate.hpp>
-#include <mbgl/math/log2.hpp>
-#include <mbgl/math/clamp.hpp>
 
 namespace mbgl {
 TransformState::TransformState(ConstrainMode constrainMode_, ViewportMode viewportMode_)
@@ -338,6 +339,30 @@ void TransformState::setMaxZoom(const double maxZoom) {
 
 double TransformState::getMaxZoom() const {
     return scaleZoom(max_scale);
+}
+
+void TransformState::setMinPitch(const double pitch_) {
+    if (pitch_ <= maxPitch) {
+        minPitch = util::clamp(pitch_, util::PITCH_MIN, maxPitch);
+    } else {
+        Log::Warning(Event::General, "Trying to set minimum pitch to larger than maximum pitch, no changes made.");
+    }
+}
+
+double TransformState::getMinPitch() const {
+    return minPitch;
+}
+
+void TransformState::setMaxPitch(const double pitch_) {
+    if (pitch_ >= minPitch) {
+        maxPitch = util::clamp(pitch_, minPitch, util::PITCH_MAX);
+    } else {
+        Log::Warning(Event::General, "Trying to set maximum pitch to smaller than minimum pitch, no changes made.");
+    }
+}
+
+double TransformState::getMaxPitch() const {
+    return maxPitch;
 }
 
 #pragma mark - Scale

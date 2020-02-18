@@ -16,6 +16,16 @@ struct BoundOptions {
     BoundOptions& withMinZoom(double z) { minZoom = z; return *this; }
     /// Sets the maximum zoom level
     BoundOptions& withMaxZoom(double z) { maxZoom = z; return *this; }
+    /// Sets the minimum pitch
+    BoundOptions& withMinPitch(double p) {
+        minPitch = p;
+        return *this;
+    }
+    /// Sets the maximum pitch
+    BoundOptions& withMaxPitch(double p) {
+        maxPitch = p;
+        return *this;
+    }
 
     /// Constrain the center of the camera to be within these bounds.
     optional<LatLngBounds> bounds;
@@ -25,6 +35,12 @@ struct BoundOptions {
 
     /// Minimum zoom level allowed.
     optional<double> minZoom;
+
+    /// Maximum pitch allowed.
+    optional<double> maxPitch;
+
+    /// Minimum pitch allowed.
+    optional<double> minPitch;
 };
 
 }  // namespace mbgl

@@ -59,6 +59,9 @@ public:
     void setMinZoom(double);
     void setMaxZoom(double);
 
+    void setMinPitch(double);
+    void setMaxPitch(double);
+
     // Zoom
 
     /** Returns the zoom level. */

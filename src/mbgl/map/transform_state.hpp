@@ -163,6 +163,10 @@ public:
     double getMinZoom() const;
     void setMaxZoom(double);
     double getMaxZoom() const;
+    void setMinPitch(double);
+    double getMinPitch() const;
+    void setMaxPitch(double);
+    double getMaxPitch() const;
 
     // Rotation
     double getBearing() const;
@@ -224,6 +228,10 @@ private:
     // Limit the amount of zooming possible on the map.
     double min_scale = std::pow(2, 0);
     double max_scale = std::pow(2, util::DEFAULT_MAX_ZOOM);
+
+    // Limit the amount of pitch
+    double minPitch = util::PITCH_MIN;
+    double maxPitch = util::PITCH_MAX;
 
     NorthOrientation orientation = NorthOrientation::Upwards;
 
