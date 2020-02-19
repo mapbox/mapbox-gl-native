@@ -1,5 +1,4 @@
 #include <mbgl/util/geometry_within.hpp>
-#include <mbgl/util/logging.hpp>
 
 namespace mbgl {
 

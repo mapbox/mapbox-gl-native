@@ -1,11 +1,8 @@
 #pragma once
 
-#include <mbgl/style/conversion.hpp>
 #include <mbgl/style/expression/expression.hpp>
-#include <mbgl/style/expression/parsing_context.hpp>
 #include <mbgl/util/geojson.hpp>
-
-#include <memory>
+#include <mbgl/util/optional.hpp>
 
 namespace mbgl {
 namespace style {
