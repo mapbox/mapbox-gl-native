@@ -214,7 +214,7 @@ private: // Private utilities for converting from mgl to mbgl values
 
     // Color
     void getMBGLValue(MGLColor *rawValue, mbgl::Color &mbglValue) {
-        mbglValue = rawValue.mgl_color;
+        mbglValue = rawValue.mgl_colorForPremultipliedValue;
     }
 
     // Image

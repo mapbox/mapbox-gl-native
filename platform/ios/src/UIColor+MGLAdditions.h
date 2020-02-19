@@ -7,6 +7,8 @@
 
 - (mbgl::Color)mgl_color;
 
+- (mbgl::Color)mgl_colorForPremultipliedValue;
+
 - (mbgl::style::PropertyValue<mbgl::Color>)mgl_colorPropertyValue;
 
 + (UIColor *)mgl_colorWithColor:(mbgl::Color)color;

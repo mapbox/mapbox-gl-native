@@ -1014,11 +1014,11 @@ CLLocationCoordinate2D randomWorldCoordinate() {
 - (void)styleWaterLayer
 {
     MGLFillStyleLayer *waterLayer = (MGLFillStyleLayer *)[self.mapView.style layerWithIdentifier:@"water"];
-    NSDictionary *waterColorStops = @{@6.0f: [UIColor yellowColor],
-                                      @8.0f: [UIColor blueColor],
-                                      @10.0f: [UIColor redColor],
-                                      @12.0f: [UIColor greenColor],
-                                      @14.0f: [UIColor blueColor]};
+    NSDictionary *waterColorStops = @{@6.0f: [[UIColor yellowColor] colorWithAlphaComponent:0.5],
+                                      @8.0f: [[UIColor blueColor] colorWithAlphaComponent:0.5],
+                                      @10.0f: [[UIColor redColor] colorWithAlphaComponent:0.5],
+                                      @12.0f: [[UIColor greenColor] colorWithAlphaComponent:0.5],
+                                      @14.0f: [[UIColor blueColor] colorWithAlphaComponent:0.5]};
     NSExpression *fillColorExpression = [NSExpression mgl_expressionForInterpolatingExpression:NSExpression.zoomLevelVariableExpression
                                                                                  withCurveType:MGLExpressionInterpolationModeLinear
                                                                                     parameters:nil
@@ -1084,9 +1084,13 @@ CLLocationCoordinate2D randomWorldCoordinate() {
     [self.mapView.style addSource:source];
 
     MGLFillStyleLayer *fillLayer = [[MGLFillStyleLayer alloc] initWithIdentifier:@"test" source:source];
-    fillLayer.fillColor = [NSExpression expressionForConstantValue:[UIColor purpleColor]];
+    fillLayer.fillColor = [NSExpression expressionForConstantValue:[[UIColor blueColor] colorWithAlphaComponent:0.75]];
     [self.mapView.style addLayer:fillLayer];
+    [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(52.3667, 4.8945) zoomLevel:9 animated:NO];
 
+    UIView *blueView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 120, 140)];
+    blueView.backgroundColor = [[UIColor blueColor] colorWithAlphaComponent:0.75];
+    [self.view addSubview:blueView];
 }
 
 - (void)styleSymbolLayer
