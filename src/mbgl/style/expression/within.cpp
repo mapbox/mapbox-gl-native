@@ -165,7 +165,7 @@ ParseResult Within::parse(const Convertible& value, ParsingContext& ctx) {
                 mbgl::Feature f(geometrySet);
                 PolygonFeature polyFeature(f, CanonicalTileID(0, 0, 0));
                 auto refinedGeoSet = convertGeometry(polyFeature, CanonicalTileID(0, 0, 0));
-                return ParseResult(std::make_unique<Within>(*parsedValue, refinedGeoSet));
+                return ParseResult(std::make_unique<Within>(*parsedValue, std::move(refinedGeoSet)));
             },
             [&ctx](const auto&) {
                 ctx.error("'within' expression requires geojson source that contains valid geometry data.");
