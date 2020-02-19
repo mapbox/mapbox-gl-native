@@ -2,7 +2,7 @@
 
 #include <mapbox/geojson.hpp>
 #include <mapbox/geometry.hpp>
-#include <mbgl/style/conversion_impl.hpp>
+#include <mbgl/style/conversion/json.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
 
 #include <mbgl/util/geometry_within.hpp>
@@ -10,7 +10,6 @@
 #include <mbgl/util/string.hpp>
 
 #include <rapidjson/document.h>
-#include <mbgl/style/conversion/json.hpp>
 
 namespace mbgl {
 namespace {

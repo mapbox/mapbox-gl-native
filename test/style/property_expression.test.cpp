@@ -266,7 +266,7 @@ TEST(PropertyExpression, WithinExpression) {
     PropertyExpression<bool> propExpr(std::move(expression));
 
     // evaluation test with valid geojson source but FeatureType is not Point/LineString (currently only support
-    // FeatureType::Point)
+    // FeatureType::Point and FeatureType::LineString)
     {
         // testPoly is inside polygon, but will return false
         Polygon<double> testRing{{{-9.228515625, -17.560246503294888},
@@ -280,12 +280,12 @@ TEST(PropertyExpression, WithinExpression) {
     }
     // evaluation test with valid geojson source and valid linestring features
     {
-        // testLine is inside polygon, but will return true
+        // testLine is inside polygon
         LineString<double> testLine0{{-9.228515625, -17.560246503294888}, {-2.4609375, -16.04581345375217}};
         auto geoLine0 = convertGeometry(testLine0, canonicalTileID);
         StubGeometryTileFeature lineFeature0(FeatureType::LineString, geoLine0);
 
-        // testLine is intersecting polygon even though end points are all inside polygon, but will return false
+        // testLine is intersecting polygon even though end points are all inside polygon, will return false
         LineString<double> testLine1{{-10.4150390625, -10.082445532162465}, {-8.8275146484375, -9.194292714912638}};
         auto geoLine1 = convertGeometry(testLine1, canonicalTileID);
         StubGeometryTileFeature lineFeature1(FeatureType::LineString, geoLine1);
