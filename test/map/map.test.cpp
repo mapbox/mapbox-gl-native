@@ -241,6 +241,27 @@ TEST(Map, LatLngsToCameraWithBearingAndPitch) {
     ASSERT_DOUBLE_EQ(*virtualCamera.pitch, 20.0);
 }
 
+TEST(Map, LatLngsToCameraWithBearingAndPitchMinMax) {
+    MapTest<> test;
+
+    std::vector<LatLng> latLngs{{40.712730, 74.005953}, {15.68169, 73.499857}, {30.82678, 83.4082}};
+
+    test.map.setBounds(BoundOptions().withMinPitch(0).withMaxPitch(0));
+    CameraOptions virtualCamera = test.map.cameraForLatLngs(latLngs, {}, 23, 45);
+    EXPECT_NEAR(virtualCamera.bearing.value_or(0), 23.0, 1e-5);
+    EXPECT_NEAR(virtualCamera.zoom.value_or(0), 2.75434, 1e-5);
+    EXPECT_NEAR(virtualCamera.center->latitude(), 28.49288, 1e-5);
+    EXPECT_NEAR(virtualCamera.center->longitude(), 74.97437, 1e-5);
+    ASSERT_DOUBLE_EQ(*virtualCamera.pitch, 0);
+
+    test.map.setBounds(BoundOptions().withMinPitch(20).withMaxPitch(60));
+    virtualCamera = test.map.cameraForLatLngs(latLngs, {}, 23, 0);
+    EXPECT_NEAR(virtualCamera.bearing.value_or(0), 23.0, 1e-5);
+    EXPECT_NEAR(virtualCamera.zoom.value_or(0), 3.04378, 1e-5);
+    EXPECT_NEAR(virtualCamera.center->latitude(), 28.53718, 1e-5);
+    EXPECT_NEAR(virtualCamera.center->longitude(), 74.31746, 1e-5);
+    ASSERT_DOUBLE_EQ(*virtualCamera.pitch, 20.0);
+}
 
 TEST(Map, CameraToLatLngBounds) {
     MapTest<> test;

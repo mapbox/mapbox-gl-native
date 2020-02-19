@@ -788,3 +788,75 @@ TEST(Transform, LatLngBounds) {
     transform.moveBy(ScreenCoordinate { 500, 0 });
     ASSERT_DOUBLE_EQ(transform.getLatLng().longitude(), 120.0);
 }
+
+TEST(Transform, InvalidPitch) {
+    Transform transform;
+    transform.resize({1, 1});
+
+    ASSERT_DOUBLE_EQ(0, transform.getLatLng().latitude());
+    ASSERT_DOUBLE_EQ(0, transform.getLatLng().longitude());
+    ASSERT_DOUBLE_EQ(0, transform.getZoom());
+    ASSERT_DOUBLE_EQ(0, transform.getPitch());
+
+    transform.jumpTo(CameraOptions().withZoom(1.0).withPitch(45));
+    ASSERT_DOUBLE_EQ(1, transform.getZoom());
+    ASSERT_DOUBLE_EQ(45 * util::DEG2RAD, transform.getPitch());
+
+    const double invalid = NAN;
+
+    transform.jumpTo(CameraOptions().withPitch(invalid));
+    ASSERT_DOUBLE_EQ(45 * util::DEG2RAD, transform.getPitch());
+
+    transform.jumpTo(CameraOptions().withPitch(60));
+    ASSERT_DOUBLE_EQ(60 * util::DEG2RAD, transform.getPitch());
+}
+
+TEST(Transform, MinMaxPitch) {
+    Transform transform;
+    transform.resize({1, 1});
+
+    ASSERT_DOUBLE_EQ(0, transform.getLatLng().latitude());
+    ASSERT_DOUBLE_EQ(0, transform.getLatLng().longitude());
+    ASSERT_DOUBLE_EQ(0, transform.getZoom());
+    ASSERT_DOUBLE_EQ(0, transform.getPitch());
+
+    transform.jumpTo(CameraOptions().withZoom(1.0).withPitch(60));
+    ASSERT_DOUBLE_EQ(1, transform.getZoom());
+    ASSERT_DOUBLE_EQ(transform.getState().getMaxPitch(), transform.getPitch());
+    ASSERT_DOUBLE_EQ(60 * util::DEG2RAD, transform.getPitch());
+
+    transform.setMaxPitch(70);
+    transform.jumpTo(CameraOptions().withPitch(70));
+    ASSERT_DOUBLE_EQ(transform.getState().getMaxPitch(), transform.getPitch());
+    ASSERT_DOUBLE_EQ(60 * util::DEG2RAD, transform.getPitch());
+
+    transform.setMaxPitch(45);
+    transform.jumpTo(CameraOptions().withPitch(60));
+    ASSERT_DOUBLE_EQ(transform.getState().getMaxPitch(), transform.getPitch());
+    ASSERT_DOUBLE_EQ(45 * util::DEG2RAD, transform.getPitch());
+
+    transform.jumpTo(CameraOptions().withPitch(0));
+    ASSERT_DOUBLE_EQ(transform.getState().getMinPitch(), transform.getPitch());
+    ASSERT_DOUBLE_EQ(0, transform.getPitch());
+
+    transform.setMinPitch(-10);
+    transform.jumpTo(CameraOptions().withPitch(-10));
+    ASSERT_DOUBLE_EQ(transform.getState().getMinPitch(), transform.getPitch());
+    ASSERT_DOUBLE_EQ(0, transform.getPitch());
+
+    transform.setMinPitch(15);
+    transform.jumpTo(CameraOptions().withPitch(0));
+    ASSERT_DOUBLE_EQ(transform.getState().getMinPitch(), transform.getPitch());
+    ASSERT_DOUBLE_EQ(15 * util::DEG2RAD, transform.getPitch());
+
+    transform.setMinPitch(45);
+    ASSERT_DOUBLE_EQ(45 * util::DEG2RAD, transform.getState().getMinPitch());
+    transform.setMaxPitch(45);
+    ASSERT_DOUBLE_EQ(45 * util::DEG2RAD, transform.getState().getMaxPitch());
+
+    transform.setMaxPitch(10);
+    ASSERT_DOUBLE_EQ(45 * util::DEG2RAD, transform.getState().getMaxPitch());
+
+    transform.setMinPitch(60);
+    ASSERT_DOUBLE_EQ(45 * util::DEG2RAD, transform.getState().getMinPitch());
+}
