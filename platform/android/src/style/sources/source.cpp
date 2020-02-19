@@ -93,6 +93,15 @@ namespace android {
         return attribution ? jni::Make<jni::String>(env, attribution.value()) : jni::Make<jni::String>(env,"");
     }
 
+    void Source::setPrefetchZoomDelta(jni::JNIEnv&, jint delta) {
+        source.setPrefetchZoomDelta(delta);
+    }
+
+    jint Source::getPrefetchZoomDelta(jni::JNIEnv&) {
+        auto delta = source.getPrefetchZoomDelta();
+        return delta ? delta.value() : 0;
+    }
+
     void Source::addToMap(JNIEnv& env, const jni::Object<Source>& obj, mbgl::Map& map, AndroidRendererFrontend& frontend) {
         // Check to see if we own the source first
         if (!ownedSource) {
@@ -149,10 +158,13 @@ namespace android {
         #define METHOD(MethodPtr, name) jni::MakeNativePeerMethod<decltype(MethodPtr), (MethodPtr)>(name)
 
         // Register the peer
-        jni::RegisterNativePeer<Source>(env, javaClass, "nativePtr",
-            METHOD(&Source::getId, "nativeGetId"),
-            METHOD(&Source::getAttribution, "nativeGetAttribution")
-        );
+        jni::RegisterNativePeer<Source>(env,
+                                        javaClass,
+                                        "nativePtr",
+                                        METHOD(&Source::getId, "nativeGetId"),
+                                        METHOD(&Source::getAttribution, "nativeGetAttribution"),
+                                        METHOD(&Source::setPrefetchZoomDelta, "nativeSetPrefetchZoomDelta"),
+                                        METHOD(&Source::getPrefetchZoomDelta, "nativeGetPrefetchZoomDelta"));
 
         // Register subclasses
         GeoJSONSource::registerNative(env);

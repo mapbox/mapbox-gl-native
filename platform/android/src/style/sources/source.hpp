@@ -43,6 +43,10 @@ public:
 
     jni::Local<jni::String> getAttribution(jni::JNIEnv&);
 
+    void setPrefetchZoomDelta(jni::JNIEnv&, jint delta);
+
+    jint getPrefetchZoomDelta(jni::JNIEnv&);
+
 protected:
     // Set on newly created sources until added to the map.
     std::unique_ptr<mbgl::style::Source> ownedSource;
