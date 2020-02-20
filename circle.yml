@@ -85,6 +85,7 @@ workflows:
             - linux-gcc8-release
           config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=gcc-8 -DCMAKE_CXX_COMPILER=g++-8 -DCMAKE_BUILD_TYPE=Debug -DMBGL_WITH_COVERAGE=ON'
           style_tests: true
+          upload_coverage: true
       - build-template:
           name: linux-clang8-release
           executor_name: ubuntu-disco
@@ -374,7 +375,12 @@ commands:
                 --device model=iphone11,version=13.3,locale=en,orientation=portrait --xcode-version=11.3.1 --timeout 20m \
                 --verbosity=debug --no-record-video --results-dir ios-test-app-${CIRCLE_BUILD_NUM}
             fi
-
+  upload-coverage-results:
+    steps:
+    - run:
+        name: Upload coverage results to codecov.io
+        command: |
+          bash <(curl -sSfL https://codecov.io/bash) || echo 'Codecov failed to upload'
 jobs:
   ios-render-test-runner:
     executor: macos-11_3_1
@@ -670,6 +676,9 @@ jobs:
       style_tests:
         type: boolean
         default: false
+      upload_coverage:
+        type: boolean
+        default: false
     executor: << parameters.executor_name >>
     steps:
       - checkout
@@ -719,4 +728,8 @@ jobs:
             - metrics:
                 step_name: 'Metrics'
                 metrics_params: '-u rebaseline -p metrics/$CIRCLE_JOB-metrics.json'
+      - when:
+          condition: << parameters.upload_coverage >>
+          steps:
+            - upload-coverage-results
       - save
