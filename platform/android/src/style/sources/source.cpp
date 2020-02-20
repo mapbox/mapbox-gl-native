@@ -93,13 +93,21 @@ namespace android {
         return attribution ? jni::Make<jni::String>(env, attribution.value()) : jni::Make<jni::String>(env,"");
     }
 
-    void Source::setPrefetchZoomDelta(jni::JNIEnv&, jint delta) {
-        source.setPrefetchZoomDelta(delta);
+    void Source::setPrefetchZoomDelta(jni::JNIEnv& env, jni::String& delta) {
+        if (!delta) {
+            source.setPrefetchZoomDelta(nullopt);
+        } else {
+            const std::string deltaString = jni::Make<std::string>(env, delta);
+            source.setPrefetchZoomDelta(stoi(deltaString));
+        }
     }
 
-    jint Source::getPrefetchZoomDelta(jni::JNIEnv&) {
+    jni::Local<jni::String> Source::getPrefetchZoomDelta(jni::JNIEnv& env) {
         auto delta = source.getPrefetchZoomDelta();
-        return delta ? delta.value() : 0;
+        if (delta.has_value()) {
+            return jni::Make<jni::String>(env, std::to_string(delta.value()));
+        }
+        return jni::Make<jni::String>(env, "");
     }
 
     void Source::addToMap(JNIEnv& env, const jni::Object<Source>& obj, mbgl::Map& map, AndroidRendererFrontend& frontend) {
