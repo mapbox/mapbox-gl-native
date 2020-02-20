@@ -737,7 +737,7 @@ double QMapboxGL::maximumZoom() const
 */
 Coordinate QMapboxGL::coordinate() const
 {
-    const mbgl::LatLng& latLng = *d_ptr->mapObj->getCameraOptions(d_ptr->margins).center;
+    const mbgl::LatLng latLng = *d_ptr->mapObj->getCameraOptions(d_ptr->margins).center;
     return Coordinate(latLng.latitude(), latLng.longitude());
 }
 
