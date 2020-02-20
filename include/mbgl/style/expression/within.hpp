@@ -2,6 +2,7 @@
 
 #include <mbgl/style/expression/expression.hpp>
 #include <mbgl/util/geojson.hpp>
+#include <mbgl/util/geometry_within.hpp>
 #include <mbgl/util/optional.hpp>
 
 namespace mbgl {
@@ -10,7 +11,7 @@ namespace expression {
 
 class Within final : public Expression {
 public:
-    explicit Within(GeoJSON geojson, Feature::geometry_type geometries_);
+    explicit Within(GeoJSON geojson, Feature::geometry_type geometries_, WithinBBox polygonBBox_);
 
     ~Within() override;
 
@@ -30,6 +31,7 @@ public:
 private:
     GeoJSON geoJSONSource;
     Feature::geometry_type geometries;
+    WithinBBox polygonBBox;
 };
 
 } // namespace expression

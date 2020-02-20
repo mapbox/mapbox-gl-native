@@ -1,5 +1,7 @@
 #include <mbgl/util/geometry_within.hpp>
 
+#include <algorithm>
+
 namespace mbgl {
 
 namespace {
@@ -53,7 +55,77 @@ bool lineIntersectPolygon(const Point<double>& p1, const Point<double>& p2, cons
     }
     return false;
 }
+
+void updateBBox(WithinBBox& bbox, const Point<double>& p) {
+    bbox[0] = std::min(p.x, bbox[0]);
+    bbox[1] = std::min(p.y, bbox[1]);
+    bbox[2] = std::max(p.x, bbox[2]);
+    bbox[3] = std::max(p.y, bbox[3]);
+}
+
+bool isBBoxValid(const WithinBBox& bbox) {
+    return bbox != DefaultBBox;
+}
+
 } // namespace
+
+bool boxWithinBox(const WithinBBox& bbox1, const WithinBBox& bbox2) {
+    if (!isBBoxValid(bbox1) || !isBBoxValid(bbox2)) return false;
+    if (bbox1[0] <= bbox2[0]) return false;
+    if (bbox1[2] >= bbox2[2]) return false;
+    if (bbox1[1] <= bbox2[1]) return false;
+    if (bbox1[3] >= bbox2[3]) return false;
+    return true;
+}
+
+WithinBBox calculateBBox(const Geometry<double>& geometries) {
+    WithinBBox result = DefaultBBox;
+
+    return geometries.match(
+        [&result](const Point<double>& point) {
+            updateBBox(result, point);
+            return result;
+        },
+        [&result](const MultiPoint<double>& points) {
+            for (const auto point : points) {
+                updateBBox(result, point);
+            }
+            return result;
+        },
+        [&result](const LineString<double>& line) {
+            for (const auto point : line) {
+                updateBBox(result, point);
+            }
+            return result;
+        },
+        [&result](const MultiLineString<double>& lines) {
+            for (const auto& line : lines) {
+                for (const auto point : line) {
+                    updateBBox(result, point);
+                }
+            }
+            return result;
+        },
+        [&result](const Polygon<double>& polygon) {
+            for (const auto& ring : polygon) {
+                for (const auto point : ring) {
+                    updateBBox(result, point);
+                }
+            }
+            return result;
+        },
+        [&result](const MultiPolygon<double>& polygons) {
+            for (const auto& polygon : polygons) {
+                for (const auto& ring : polygon) {
+                    for (const auto point : ring) {
+                        updateBBox(result, point);
+                    }
+                }
+            }
+            return result;
+        },
+        [](const auto&) { return DefaultBBox; });
+}
 
 // ray casting algorithm for detecting if point is in polygon
 bool pointWithinPolygon(const Point<double>& point, const Polygon<double>& polygon) {
