@@ -32,6 +32,10 @@
    
   The `in expression` enables checking whether a Number/String/Boolean type item is in a String/Array and returns a boolean value.
 
+- [core] Add support for using `within expression` with features having `'LineString'` geometry type. ([#16220](https://github.com/mapbox/mapbox-gl-native/pull/16220))
+  
+  `within expression` now supports features with geometry types: `'Point'` or `'LineString'`.
+
 ### 🐞 Bug fixes
 
 - [core] Don't provide multiple responses with the same data for 304 replies ([#16200](https://github.com/mapbox/mapbox-gl-native/pull/16200))
