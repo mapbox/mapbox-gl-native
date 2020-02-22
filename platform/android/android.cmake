@@ -348,20 +348,16 @@ if(ANDROID_NATIVE_API_LEVEL VERSION_LESS 24)
         PRIVATE ${PROJECT_SOURCE_DIR}/platform/android/src/test/http_file_source_test_stub.cpp
     )
 else()
-    set(CURL_DIR ${PROJECT_SOURCE_DIR}/vendor/curl-android-ios/prebuilt-with-ssl/android)
-    set(CURL_LIBRARY ${CURL_DIR}/${ANDROID_ABI}/libcurl.a)
-
     target_sources(
         mbgl-test-runner
         PRIVATE ${PROJECT_SOURCE_DIR}/platform/default/src/mbgl/storage/http_file_source.cpp
     )
-    target_include_directories(
-        mbgl-test-runner
-        PRIVATE ${CURL_DIR}/include
-    )
+
+    include(${PROJECT_SOURCE_DIR}/vendor/curl.cmake)
+
     target_link_libraries(
         mbgl-test-runner
-        PRIVATE ${CURL_LIBRARY}
+        PRIVATE mbgl-vendor-curl
     )
 endif()
 
