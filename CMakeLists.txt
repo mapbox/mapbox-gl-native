@@ -952,11 +952,7 @@ target_include_directories(
     PUBLIC ${PROJECT_SOURCE_DIR}/include
 )
 
-if(NOT TARGET mapbox-base)
-    add_subdirectory(${PROJECT_SOURCE_DIR}/vendor/mapbox-base/mapbox)
-    add_subdirectory(${PROJECT_SOURCE_DIR}/vendor/mapbox-base/extras)
-endif()
-
+include(${PROJECT_SOURCE_DIR}/vendor/mapbox-base.cmake)
 include(${PROJECT_SOURCE_DIR}/vendor/boost.cmake)
 include(${PROJECT_SOURCE_DIR}/vendor/earcut.hpp.cmake)
 include(${PROJECT_SOURCE_DIR}/vendor/eternal.cmake)
@@ -993,6 +989,17 @@ target_link_libraries(
         Mapbox::Base::variant
         Mapbox::Base::weak
 )
+
+set_target_properties(
+    mbgl-core
+    PROPERTIES
+        INTERFACE_MAPBOX_NAME "Mapbox GL Native"
+        INTERFACE_MAPBOX_URL "https://github.com/mapbox/mapbox-gl-native"
+        INTERFACE_MAPBOX_AUTHOR "Mapbox"
+        INTERFACE_MAPBOX_LICENSE ${PROJECT_SOURCE_DIR}/LICENSE.md
+)
+
+include(${PROJECT_SOURCE_DIR}/scripts/license.cmake)
 
 set_property(TARGET mbgl-core PROPERTY FOLDER Core)
 
