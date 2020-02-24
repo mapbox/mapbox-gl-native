@@ -93,6 +93,22 @@ namespace android {
         return attribution ? jni::Make<jni::String>(env, attribution.value()) : jni::Make<jni::String>(env,"");
     }
 
+    void Source::setPrefetchZoomDelta(jni::JNIEnv& env, jni::Integer& delta) {
+        if (!delta) {
+            source.setPrefetchZoomDelta(nullopt);
+        } else {
+            source.setPrefetchZoomDelta(jni::Unbox(env, delta));
+        }
+    }
+
+    jni::Local<jni::Integer> Source::getPrefetchZoomDelta(jni::JNIEnv& env) {
+        auto delta = source.getPrefetchZoomDelta();
+        if (delta.has_value()) {
+            return jni::Box(env, jni::jint(delta.value()));
+        }
+        return jni::Local<jni::Integer>(env, nullptr);
+    }
+
     void Source::addToMap(JNIEnv& env, const jni::Object<Source>& obj, mbgl::Map& map, AndroidRendererFrontend& frontend) {
         // Check to see if we own the source first
         if (!ownedSource) {
@@ -149,10 +165,13 @@ namespace android {
         #define METHOD(MethodPtr, name) jni::MakeNativePeerMethod<decltype(MethodPtr), (MethodPtr)>(name)
 
         // Register the peer
-        jni::RegisterNativePeer<Source>(env, javaClass, "nativePtr",
-            METHOD(&Source::getId, "nativeGetId"),
-            METHOD(&Source::getAttribution, "nativeGetAttribution")
-        );
+        jni::RegisterNativePeer<Source>(env,
+                                        javaClass,
+                                        "nativePtr",
+                                        METHOD(&Source::getId, "nativeGetId"),
+                                        METHOD(&Source::getAttribution, "nativeGetAttribution"),
+                                        METHOD(&Source::setPrefetchZoomDelta, "nativeSetPrefetchZoomDelta"),
+                                        METHOD(&Source::getPrefetchZoomDelta, "nativeGetPrefetchZoomDelta"));
 
         // Register subclasses
         GeoJSONSource::registerNative(env);
