@@ -7,15 +7,10 @@ add_library(
     ${PROJECT_SOURCE_DIR}/test/api/annotations.test.cpp
     ${PROJECT_SOURCE_DIR}/test/api/api_misuse.test.cpp
     ${PROJECT_SOURCE_DIR}/test/api/custom_geometry_source.test.cpp
-    ${PROJECT_SOURCE_DIR}/test/api/custom_layer.test.cpp
     ${PROJECT_SOURCE_DIR}/test/api/query.test.cpp
     ${PROJECT_SOURCE_DIR}/test/api/recycle_map.cpp
     ${PROJECT_SOURCE_DIR}/test/geometry/dem_data.test.cpp
     ${PROJECT_SOURCE_DIR}/test/geometry/line_atlas.test.cpp
-    ${PROJECT_SOURCE_DIR}/test/gl/bucket.test.cpp
-    ${PROJECT_SOURCE_DIR}/test/gl/context.test.cpp
-    ${PROJECT_SOURCE_DIR}/test/gl/gl_functions.test.cpp
-    ${PROJECT_SOURCE_DIR}/test/gl/object.test.cpp
     ${PROJECT_SOURCE_DIR}/test/map/map.test.cpp
     ${PROJECT_SOURCE_DIR}/test/map/prefetch.test.cpp
     ${PROJECT_SOURCE_DIR}/test/map/transform.test.cpp
@@ -24,7 +19,6 @@ add_library(
     ${PROJECT_SOURCE_DIR}/test/math/wrap.test.cpp
     ${PROJECT_SOURCE_DIR}/test/platform/settings.test.cpp
     ${PROJECT_SOURCE_DIR}/test/programs/symbol_program.test.cpp
-    ${PROJECT_SOURCE_DIR}/test/renderer/backend_scope.test.cpp
     ${PROJECT_SOURCE_DIR}/test/renderer/image_manager.test.cpp
     ${PROJECT_SOURCE_DIR}/test/renderer/pattern_atlas.test.cpp
     ${PROJECT_SOURCE_DIR}/test/sprite/sprite_loader.test.cpp
@@ -73,7 +67,6 @@ add_library(
     ${PROJECT_SOURCE_DIR}/test/text/glyph_manager.test.cpp
     ${PROJECT_SOURCE_DIR}/test/text/glyph_pbf.test.cpp
     ${PROJECT_SOURCE_DIR}/test/text/language_tag.test.cpp
-    ${PROJECT_SOURCE_DIR}/test/text/local_glyph_rasterizer.test.cpp
     ${PROJECT_SOURCE_DIR}/test/text/quads.test.cpp
     ${PROJECT_SOURCE_DIR}/test/text/shaping.test.cpp
     ${PROJECT_SOURCE_DIR}/test/text/tagged_string.test.cpp
@@ -96,7 +89,6 @@ add_library(
     ${PROJECT_SOURCE_DIR}/test/util/memory.test.cpp
     ${PROJECT_SOURCE_DIR}/test/util/merge_lines.test.cpp
     ${PROJECT_SOURCE_DIR}/test/util/number_conversions.test.cpp
-    ${PROJECT_SOURCE_DIR}/test/util/offscreen_texture.test.cpp
     ${PROJECT_SOURCE_DIR}/test/util/position.test.cpp
     ${PROJECT_SOURCE_DIR}/test/util/projection.test.cpp
     ${PROJECT_SOURCE_DIR}/test/util/run_loop.test.cpp
@@ -112,6 +104,17 @@ add_library(
 )
 
 if(MBGL_WITH_OPENGL)
+    target_sources(
+        mbgl-test PRIVATE
+        ${PROJECT_SOURCE_DIR}/test/api/custom_layer.test.cpp
+        ${PROJECT_SOURCE_DIR}/test/gl/bucket.test.cpp
+        ${PROJECT_SOURCE_DIR}/test/gl/context.test.cpp
+        ${PROJECT_SOURCE_DIR}/test/gl/gl_functions.test.cpp
+        ${PROJECT_SOURCE_DIR}/test/gl/object.test.cpp
+        ${PROJECT_SOURCE_DIR}/test/renderer/backend_scope.test.cpp
+        ${PROJECT_SOURCE_DIR}/test/text/local_glyph_rasterizer.test.cpp
+        ${PROJECT_SOURCE_DIR}/test/util/offscreen_texture.test.cpp
+    )
     target_compile_definitions(
         mbgl-test
         PRIVATE MBGL_RENDER_BACKEND_OPENGL=1

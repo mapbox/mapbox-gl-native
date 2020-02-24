@@ -1,8 +1,3 @@
-target_compile_definitions(
-    mbgl-core
-    PUBLIC MBGL_USE_GLES2 GLES_SILENCE_DEPRECATION
-)
-
 if(NOT DEFINED IOS_DEPLOYMENT_TARGET)
     set(IOS_DEPLOYMENT_TARGET "12.0")
 endif()
@@ -16,13 +11,27 @@ endmacro()
 
 set_target_properties(mbgl-core PROPERTIES XCODE_ATTRIBUTE_CLANG_ENABLE_OBJC_ARC YES)
 
+if(MBGL_WITH_OPENGL)
+    target_compile_definitions(
+        mbgl-core
+        PUBLIC MBGL_USE_GLES2 GLES_SILENCE_DEPRECATION
+    )
+    target_sources(mbgl-core PRIVATE
+        ${PROJECT_SOURCE_DIR}/platform/default/src/mbgl/gl/headless_backend.cpp
+        ${PROJECT_SOURCE_DIR}/platform/darwin/src/gl_functions.cpp
+        ${PROJECT_SOURCE_DIR}/platform/darwin/src/headless_backend_eagl.mm
+    )
+    target_link_libraries(mbgl-core PRIVATE
+        "-framework GLKit"
+        "-framework OpenGLES"
+    )
+endif()
+
 target_sources(
     mbgl-core
     PRIVATE
         ${PROJECT_SOURCE_DIR}/platform/darwin/src/async_task.cpp
         ${PROJECT_SOURCE_DIR}/platform/darwin/src/collator.mm
-        ${PROJECT_SOURCE_DIR}/platform/darwin/src/gl_functions.cpp
-        ${PROJECT_SOURCE_DIR}/platform/darwin/src/headless_backend_eagl.mm
         ${PROJECT_SOURCE_DIR}/platform/darwin/src/native_apple_interface.m
         ${PROJECT_SOURCE_DIR}/platform/darwin/src/http_file_source.mm
         ${PROJECT_SOURCE_DIR}/platform/darwin/src/native_apple_interface.m
@@ -37,7 +46,6 @@ target_sources(
         ${PROJECT_SOURCE_DIR}/platform/darwin/src/timer.cpp
         ${PROJECT_SOURCE_DIR}/platform/default/src/mbgl/gfx/headless_backend.cpp
         ${PROJECT_SOURCE_DIR}/platform/default/src/mbgl/gfx/headless_frontend.cpp
-        ${PROJECT_SOURCE_DIR}/platform/default/src/mbgl/gl/headless_backend.cpp
         ${PROJECT_SOURCE_DIR}/platform/default/src/mbgl/map/map_snapshotter.cpp
         ${PROJECT_SOURCE_DIR}/platform/default/src/mbgl/storage/asset_file_source.cpp
         ${PROJECT_SOURCE_DIR}/platform/default/src/mbgl/storage/database_file_source.cpp
@@ -80,9 +88,7 @@ target_link_libraries(
         "-framework CoreServices"
         "-framework CoreText"
         "-framework Foundation"
-        "-framework GLKit"
         "-framework ImageIO"
-        "-framework OpenGLES"
         "-framework QuartzCore"
         "-framework Security"
         "-framework SystemConfiguration"
