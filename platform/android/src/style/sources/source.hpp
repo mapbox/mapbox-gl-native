@@ -43,9 +43,9 @@ public:
 
     jni::Local<jni::String> getAttribution(jni::JNIEnv&);
 
-    void setPrefetchZoomDelta(jni::JNIEnv& env, jni::String& delta);
+    void setPrefetchZoomDelta(jni::JNIEnv& env, jni::Integer& delta);
 
-    jni::Local<jni::String> getPrefetchZoomDelta(jni::JNIEnv&);
+    jni::Local<jni::Integer> getPrefetchZoomDelta(jni::JNIEnv&);
 
 protected:
     // Set on newly created sources until added to the map.
