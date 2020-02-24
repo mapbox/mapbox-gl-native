@@ -54,6 +54,18 @@ additional_commands = {
       "PUBLIC": "*"
     }
   },
+  "set_target_properties": {
+    "kwargs": {
+      "PROPERTIES": {
+        "kwargs": {
+          "INTERFACE_MAPBOX_NAME": "*",
+          "INTERFACE_MAPBOX_URL": "*",
+          "INTERFACE_MAPBOX_AUTHOR": "*",
+          "INTERFACE_MAPBOX_LICENSE": "*"
+        }
+      }
+    }
+  },
   "target_sources": {
     "kwargs": {
       "INTERFACE": "*",
