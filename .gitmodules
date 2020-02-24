@@ -10,18 +10,12 @@
 [submodule "vendor/earcut.hpp"]
 	path = vendor/earcut.hpp
 	url = https://github.com/mapbox/earcut.hpp.git
-[submodule "vendor/geojson-vt-cpp"]
-	path = vendor/geojson-vt-cpp
-	url = https://github.com/mapbox/geojson-vt-cpp.git
 [submodule "vendor/polylabel"]
 	path = vendor/polylabel
 	url = https://github.com/mapbox/polylabel.git
 [submodule "vendor/protozero"]
 	path = vendor/protozero
 	url = https://github.com/mapbox/protozero.git
-[submodule "vendor/shelf-pack-cpp"]
-	path = vendor/shelf-pack-cpp
-	url = https://github.com/mapbox/shelf-pack-cpp.git
 [submodule "vendor/vector-tile"]
 	path = vendor/vector-tile
 	url = https://github.com/mapbox/vector-tile.git

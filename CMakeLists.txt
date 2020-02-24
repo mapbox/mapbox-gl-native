@@ -960,10 +960,8 @@ endif()
 include(${PROJECT_SOURCE_DIR}/vendor/boost.cmake)
 include(${PROJECT_SOURCE_DIR}/vendor/earcut.hpp.cmake)
 include(${PROJECT_SOURCE_DIR}/vendor/eternal.cmake)
-include(${PROJECT_SOURCE_DIR}/vendor/geojson-vt-cpp.cmake)
 include(${PROJECT_SOURCE_DIR}/vendor/polylabel.cmake)
 include(${PROJECT_SOURCE_DIR}/vendor/protozero.cmake)
-include(${PROJECT_SOURCE_DIR}/vendor/shelf-pack-cpp.cmake)
 include(${PROJECT_SOURCE_DIR}/vendor/unique_resource.cmake)
 include(${PROJECT_SOURCE_DIR}/vendor/vector-tile.cmake)
 include(${PROJECT_SOURCE_DIR}/vendor/wagyu.cmake)
@@ -973,14 +971,14 @@ target_link_libraries(
     PRIVATE
         Mapbox::Base::Extras::kdbush.hpp
         Mapbox::Base::supercluster.hpp
+        Mapbox::Base::shelf-pack-cpp
+        Mapbox::Base::geojson-vt-cpp
         mbgl-compiler-options
         mbgl-vendor-boost
         mbgl-vendor-earcut.hpp
         mbgl-vendor-eternal
-        mbgl-vendor-geojson-vt-cpp
         mbgl-vendor-polylabel
         mbgl-vendor-protozero
-        mbgl-vendor-shelf-pack-cpp
         mbgl-vendor-unique_resource
         mbgl-vendor-vector-tile
         mbgl-vendor-wagyu
