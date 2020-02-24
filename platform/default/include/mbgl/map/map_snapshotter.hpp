@@ -1,7 +1,6 @@
 #pragma once
 
 #include <mbgl/util/image.hpp>
-#include <mbgl/util/thread.hpp>
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/geo.hpp>
 
@@ -26,12 +25,12 @@ class Style;
 
 class MapSnapshotter {
 public:
-    MapSnapshotter(const std::pair<bool, std::string> style,
-                   const Size&,
-                   const float pixelRatio,
-                   const optional<CameraOptions> cameraOptions,
-                   const optional<LatLngBounds> region,
-                   const optional<std::string> localFontFamily,
+    MapSnapshotter(std::pair<bool, std::string> style,
+                   Size size,
+                   float pixelRatio,
+                   optional<CameraOptions> cameraOptions,
+                   optional<LatLngBounds> region,
+                   optional<std::string> localFontFamily,
                    const ResourceOptions&);
 
     ~MapSnapshotter();
@@ -59,7 +58,7 @@ public:
 
 private:
     class Impl;
-    std::unique_ptr<util::Thread<Impl>> impl;
+    std::unique_ptr<Impl> impl;
 };
 
 } // namespace mbgl
