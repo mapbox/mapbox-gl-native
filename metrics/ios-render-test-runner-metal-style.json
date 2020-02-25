@@ -12,7 +12,6 @@
     ],
     "metric_path": "ios-render-test-runner-metal",
     "probes": [
-        "probeGFX",
         "probeNetwork"
     ]
 }
