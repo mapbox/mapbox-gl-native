@@ -1,5 +1,7 @@
 #pragma once
 
+#include <mbgl/util/pass_types.hpp>
+
 #include <mapbox/weak.hpp>
 
 #include <functional>
@@ -8,23 +10,6 @@
 namespace mbgl {
 
 class Mailbox;
-
-// Using this type as a return type enforces the client to retain the returned object.
-// TODO:  Move to a separate file if/when other clients for this aux API turn up.
-template <typename T>
-class Pass {
-public:
-    Pass(T&& obj_) : obj(std::forward<T>(obj_)) {}
-    Pass(Pass&&) = default;
-    Pass(const Pass&) = delete;
-    operator T() && { return std::move(obj); }
-
-private:
-    T obj;
-};
-
-template <typename T>
-using PassRefPtr = Pass<std::shared_ptr<T>>;
 
 /*
     A `Scheduler` is responsible for coordinating the processing of messages by
