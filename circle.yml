@@ -465,7 +465,7 @@ jobs:
               cd unit-test-app/TestLogs
               xcparse attachments *.xcresult && ls
               cd ../.. && mkdir -p /tmp/tests/unit-test
-              if ls unit-test-app/TestLogs/*.xml 1> /dev/null 2>&1; then cp unit-test-app/TestLogs/*.xml /tmp/tests/unit-test/results.xml; fi
+              if ls unit-test-app/TestLogs/*.png 1> /dev/null 2>&1; then cp unit-test-app/TestLogs/*.png /tmp/tests/unit-test/; fi
             fi
       - save
   ios-benchmark-runner:
