@@ -163,10 +163,10 @@ int main(int argc, char *argv[]) {
 
 
     util::RunLoop loop;
-    std::shared_ptr<DatabaseFileSource> fileSource =
-        std::static_pointer_cast<DatabaseFileSource>(FileSourceManager::get()->getFileSource(
+    std::shared_ptr<DatabaseFileSource> fileSource = std::static_pointer_cast<DatabaseFileSource>(
+        std::shared_ptr<FileSource>(FileSourceManager::get()->getFileSource(
             FileSourceType::Database,
-            ResourceOptions().withAccessToken(token).withBaseURL(apiBaseURL).withCachePath(output)));
+            ResourceOptions().withAccessToken(token).withBaseURL(apiBaseURL).withCachePath(output))));
 
     std::unique_ptr<OfflineRegion> region;
 

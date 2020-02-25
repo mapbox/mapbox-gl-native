@@ -30,8 +30,7 @@ FileSourceManager::FileSourceManager() : impl(std::make_unique<Impl>()) {}
 
 FileSourceManager::~FileSourceManager() = default;
 
-std::shared_ptr<FileSource> FileSourceManager::getFileSource(FileSourceType type,
-                                                             const ResourceOptions& options) noexcept {
+PassRefPtr<FileSource> FileSourceManager::getFileSource(FileSourceType type, const ResourceOptions& options) noexcept {
     std::lock_guard<std::recursive_mutex> lock(impl->mutex);
 
     // Remove released file sources.
