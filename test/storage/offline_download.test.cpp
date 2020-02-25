@@ -1026,3 +1026,39 @@ TEST(OfflineDownload, InterruptAndResume) {
     download.setState(OfflineRegionDownloadState::Active);
     test.loop.run();
 }
+
+TEST(OfflineDownload, NoFreezingOnCachedTilesAndNewStyle) {
+    OfflineTest test;
+    auto region = test.createRegion();
+    ASSERT_TRUE(region);
+    OfflineDownload download(region->getID(),
+                             OfflineTilePyramidRegionDefinition(
+                                 "http://127.0.0.1:3000/style.json", LatLngBounds::world(), 1.0, 1.0, 1.0, true),
+                             test.db,
+                             test.fileSource);
+
+    test.fileSource.setProperty(MAX_CONCURRENT_REQUESTS_KEY, 2u);
+    test.fileSource.styleResponse = [&](const Resource&) { return test.response("inline_source.style.json"); };
+    // Number of resources must exceed MAX_CONCURRENT_REQUESTS_KEY
+    test.db.put(Resource::tile("http://127.0.0.1:3000/{z}-{x}-{y}.vector.pbf", 1, 0, 0, 1, Tileset::Scheme::XYZ),
+                test.response("0-0-0.vector.pbf"));
+    test.db.put(Resource::tile("http://127.0.0.1:3000/{z}-{x}-{y}.vector.pbf", 1, 0, 1, 1, Tileset::Scheme::XYZ),
+                test.response("0-0-0.vector.pbf"));
+    test.db.put(Resource::tile("http://127.0.0.1:3000/{z}-{x}-{y}.vector.pbf", 1, 1, 0, 1, Tileset::Scheme::XYZ),
+                test.response("0-0-0.vector.pbf"));
+    test.db.put(Resource::tile("http://127.0.0.1:3000/{z}-{x}-{y}.vector.pbf", 1, 1, 1, 1, Tileset::Scheme::XYZ),
+                test.response("0-0-0.vector.pbf"));
+
+    auto observer = std::make_unique<MockObserver>();
+    observer->statusChangedFn = [&](OfflineRegionStatus status) {
+        if (status.complete()) {
+            test.loop.stop();
+        }
+    };
+
+    download.setObserver(std::move(observer));
+    download.setState(OfflineRegionDownloadState::Active);
+
+    test.loop.run();
+    // Passes if does not freeze.
+}
