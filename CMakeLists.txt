@@ -266,6 +266,7 @@ add_library(
     ${PROJECT_SOURCE_DIR}/include/mbgl/util/logging.hpp
     ${PROJECT_SOURCE_DIR}/include/mbgl/util/noncopyable.hpp
     ${PROJECT_SOURCE_DIR}/include/mbgl/util/optional.hpp
+    ${PROJECT_SOURCE_DIR}/include/mbgl/util/pass_types.hpp
     ${PROJECT_SOURCE_DIR}/include/mbgl/util/platform.hpp
     ${PROJECT_SOURCE_DIR}/include/mbgl/util/premultiply.hpp
     ${PROJECT_SOURCE_DIR}/include/mbgl/util/projection.hpp
