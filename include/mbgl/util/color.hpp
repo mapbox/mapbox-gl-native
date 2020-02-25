@@ -41,6 +41,7 @@ public:
     std::string stringify() const;
     std::array<double, 4> toArray() const;
     mbgl::Value toObject() const;
+    mbgl::Value serialize() const;
 };
 
 inline bool operator==(const Color& colorA, const Color& colorB) {
