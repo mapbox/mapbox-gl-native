@@ -2,6 +2,16 @@
 
 ## master
 
+### 🐞 Bug fixes
+
+- [core] Fix offline region download freezing ([#16230](https://github.com/mapbox/mapbox-gl-native/pull/16230))
+
+  Downloaded resources are put in the buffer and inserted in the database in batches.
+
+  Before this change, the buffer was flushed only at the network response callback and thus it never got flushed if the last required resources were present locally and did not initiate network requests - it caused freezing.
+
+  Now the buffer is flushed every time the remaining resources container gets empty.
+
 ## maps-v1.2.1 (2020.02-release-vanillashake)
 
 ### 🐞 Bug fixes
