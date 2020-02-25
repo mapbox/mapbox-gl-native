@@ -70,6 +70,15 @@ void StubFileSource::remove(AsyncRequest* req) {
     }
 }
 
+void StubFileSource::setProperty(const std::string& key, const mapbox::base::Value& value) {
+    properties[key] = value;
+}
+
+mapbox::base::Value StubFileSource::getProperty(const std::string& key) const {
+    auto it = properties.find(key);
+    return (it != properties.end()) ? it->second : mapbox::base::Value();
+}
+
 optional<Response> StubFileSource::defaultResponse(const Resource& resource) {
     switch (resource.kind) {
     case Resource::Kind::Style:
