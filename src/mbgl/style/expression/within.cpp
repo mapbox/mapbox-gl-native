@@ -10,6 +10,8 @@
 
 #include <rapidjson/document.h>
 
+#include <utility>
+
 namespace mbgl {
 namespace {
 
@@ -17,14 +19,20 @@ class PolygonFeature : public GeometryTileFeature {
 public:
     const Feature& feature;
     mutable optional<GeometryCollection> geometry;
+    FeatureType type;
 
     PolygonFeature(const Feature& feature_, const CanonicalTileID& canonical) : feature(feature_) {
-        geometry = convertGeometry(feature.geometry, canonical);
-        assert(geometry);
-        geometry = fixupPolygons(*geometry);
+        type = apply_visitor(ToFeatureType(), feature.geometry);
+        if (type == FeatureType::Polygon) {
+            geometry = convertGeometry(feature.geometry, canonical);
+            assert(geometry);
+            geometry = fixupPolygons(*geometry);
+        } else {
+            mbgl::Log::Warning(mbgl::Event::General, "Provided feature does not contain polygon geometries.");
+        }
     }
 
-    FeatureType getType() const override { return FeatureType::Polygon; }
+    FeatureType getType() const override { return type; }
     const PropertyMap& getProperties() const override { return feature.properties; }
     FeatureIdentifier getID() const override { return feature.id; }
     optional<mbgl::Value> getValue(const std::string& /*key*/) const override { return optional<mbgl::Value>(); }
@@ -109,23 +117,28 @@ bool linesWithinPolygons(const mbgl::GeometryTileFeature& feature,
 mbgl::optional<mbgl::GeoJSON> parseValue(const mbgl::style::conversion::Convertible& value_,
                                          mbgl::style::expression::ParsingContext& ctx) {
     if (isObject(value_)) {
-        const auto geometryType = objectMember(value_, "type");
-        if (geometryType) {
-            const auto type = toString(*geometryType);
-            if (type && *type == "Polygon") {
-                mbgl::style::conversion::Error error;
-                auto geojson = toGeoJSON(value_, error);
-                if (geojson && error.message.empty()) {
-                    return geojson;
-                }
-                ctx.error(error.message);
-            }
+        mbgl::style::conversion::Error error;
+        auto geojson = toGeoJSON(value_, error);
+        if (geojson && error.message.empty()) {
+            return geojson;
         }
+        ctx.error(error.message);
     }
+
     ctx.error("'within' expression requires valid geojson source that contains polygon geometry type.");
     return nullopt;
 }
 
+mbgl::optional<std::pair<Feature::geometry_type, WithinBBox>> generateResult(
+    const PolygonFeature& polyFeature, mbgl::style::expression::ParsingContext& ctx) {
+    if (polyFeature.getType() == FeatureType::Polygon) {
+        auto refinedGeoSet = convertGeometry(polyFeature, CanonicalTileID(0, 0, 0));
+        auto bbox = calculateBBox(refinedGeoSet);
+        return std::make_pair(std::move(refinedGeoSet), bbox);
+    }
+    ctx.error("'within' expression requires valid geojson source that contains polygon geometry type.");
+    return nullopt;
+}
 } // namespace
 
 namespace style {
@@ -173,15 +186,31 @@ ParseResult Within::parse(const Convertible& value, ParsingContext& ctx) {
         }
 
         return parsedValue->match(
-            [&parsedValue](const mapbox::geometry::geometry<double>& geometrySet) {
-                mbgl::Feature f(geometrySet);
-                PolygonFeature polyFeature(f, CanonicalTileID(0, 0, 0));
-                auto refinedGeoSet = convertGeometry(polyFeature, CanonicalTileID(0, 0, 0));
-                auto bbox = calculateBBox(refinedGeoSet);
-                return ParseResult(std::make_unique<Within>(*parsedValue, std::move(refinedGeoSet), bbox));
+            [&parsedValue, &ctx](const mapbox::geometry::geometry<double>& geometrySet) {
+                PolygonFeature polyFeature(mbgl::Feature(geometrySet), CanonicalTileID(0, 0, 0));
+                if (auto ret = generateResult(polyFeature, ctx)) {
+                    return ParseResult(std::make_unique<Within>(*parsedValue, std::move(ret->first), ret->second));
+                }
+                return ParseResult();
+            },
+            [&parsedValue, &ctx](const mapbox::feature::feature<double>& feature) {
+                PolygonFeature polyFeature(mbgl::Feature(feature), CanonicalTileID(0, 0, 0));
+                if (auto ret = generateResult(polyFeature, ctx)) {
+                    return ParseResult(std::make_unique<Within>(*parsedValue, std::move(ret->first), ret->second));
+                }
+                return ParseResult();
+            },
+            [&parsedValue, &ctx](const mapbox::feature::feature_collection<double>& features) {
+                for (const auto& feature : features) {
+                    PolygonFeature polyFeature(mbgl::Feature(feature), CanonicalTileID(0, 0, 0));
+                    if (auto ret = generateResult(polyFeature, ctx)) {
+                        return ParseResult(std::make_unique<Within>(*parsedValue, std::move(ret->first), ret->second));
+                    }
+                }
+                return ParseResult();
             },
             [&ctx](const auto&) {
-                ctx.error("'within' expression requires geojson source that contains valid geometry data.");
+                ctx.error("'within' expression requires valid geojson source that contains polygon geometry type.");
                 return ParseResult();
             });
     }
