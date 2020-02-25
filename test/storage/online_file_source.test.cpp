@@ -449,7 +449,7 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(LowHighPriorityRequests)) {
     const std::size_t NUM_REQUESTS = 3;
 
     NetworkStatus::Set(NetworkStatus::Status::Offline);
-    fs.setProperty("max-concurrent-requests", 1u);
+    fs.setProperty(MAX_CONCURRENT_REQUESTS_KEY, 1u);
     // After DefaultFileSource was split, OnlineFileSource lives on a separate
     // thread. Pause OnlineFileSource, so that messages are queued for processing.
     fs.pause();
@@ -492,7 +492,7 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(LowHighPriorityRequestsMany)) {
     int correct_regular = 0;
 
     NetworkStatus::Set(NetworkStatus::Status::Offline);
-    fs.setProperty("max-concurrent-requests", 1u);
+    fs.setProperty(MAX_CONCURRENT_REQUESTS_KEY, 1u);
     fs.pause();
 
     std::vector<std::unique_ptr<AsyncRequest>> collector;
@@ -542,10 +542,10 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(MaximumConcurrentRequests)) {
     util::RunLoop loop;
     OnlineFileSource fs;
 
-    ASSERT_EQ(*fs.getProperty("max-concurrent-requests").getUint(), 20u);
+    ASSERT_EQ(*fs.getProperty(MAX_CONCURRENT_REQUESTS_KEY).getUint(), 20u);
 
-    fs.setProperty("max-concurrent-requests", 10u);
-    ASSERT_EQ(*fs.getProperty("max-concurrent-requests").getUint(), 10u);
+    fs.setProperty(MAX_CONCURRENT_REQUESTS_KEY, 10u);
+    ASSERT_EQ(*fs.getProperty(MAX_CONCURRENT_REQUESTS_KEY).getUint(), 10u);
 }
 
 TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RequestSameUrlMultipleTimes)) {

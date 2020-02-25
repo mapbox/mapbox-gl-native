@@ -385,7 +385,7 @@ TEST(OfflineDownload, DoesNotFloodTheFileSourceWithRequests) {
     fileSource.respond(Resource::Kind::Style, test.response("style.json"));
     test.loop.runOnce();
 
-    EXPECT_EQ(*fileSource.getProperty("max-concurrent-requests").getUint(), fileSource.requests.size());
+    EXPECT_EQ(*fileSource.getProperty(MAX_CONCURRENT_REQUESTS_KEY).getUint(), fileSource.requests.size());
 }
 
 TEST(OfflineDownload, GetStatusNoResources) {
