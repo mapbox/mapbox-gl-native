@@ -204,6 +204,8 @@ using namespace conversion;
 
 namespace {
 
+constexpr uint8_t kPaintPropertyCount = 10u;
+
 enum class Property : uint8_t {
     HeatmapColor,
     HeatmapIntensity,
@@ -233,7 +235,53 @@ MAPBOX_ETERNAL_CONSTEXPR const auto layerProperties = mapbox::eternal::hash_map<
      {"heatmap-opacity-transition", toUint8(Property::HeatmapOpacityTransition)},
      {"heatmap-radius-transition", toUint8(Property::HeatmapRadiusTransition)},
      {"heatmap-weight-transition", toUint8(Property::HeatmapWeightTransition)}});
+
+StyleProperty getLayerProperty(const HeatmapLayer& layer, Property property) {
+    switch (property) {
+        case Property::HeatmapColor:
+            return makeStyleProperty(layer.getHeatmapColor());
+        case Property::HeatmapIntensity:
+            return makeStyleProperty(layer.getHeatmapIntensity());
+        case Property::HeatmapOpacity:
+            return makeStyleProperty(layer.getHeatmapOpacity());
+        case Property::HeatmapRadius:
+            return makeStyleProperty(layer.getHeatmapRadius());
+        case Property::HeatmapWeight:
+            return makeStyleProperty(layer.getHeatmapWeight());
+        case Property::HeatmapColorTransition:
+            return makeStyleProperty(layer.getHeatmapColorTransition());
+        case Property::HeatmapIntensityTransition:
+            return makeStyleProperty(layer.getHeatmapIntensityTransition());
+        case Property::HeatmapOpacityTransition:
+            return makeStyleProperty(layer.getHeatmapOpacityTransition());
+        case Property::HeatmapRadiusTransition:
+            return makeStyleProperty(layer.getHeatmapRadiusTransition());
+        case Property::HeatmapWeightTransition:
+            return makeStyleProperty(layer.getHeatmapWeightTransition());
+    }
+    return {};
+}
+
+StyleProperty getLayerProperty(const HeatmapLayer& layer, const std::string& name) {
+    const auto it = layerProperties.find(name.c_str());
+    if (it == layerProperties.end()) {
+        return {};
+    }
+    return getLayerProperty(layer, static_cast<Property>(it->second));
+}
+
 } // namespace
+
+Value HeatmapLayer::serialize() const {
+    auto result = Layer::serialize();
+    assert(result.getObject());
+    for (const auto& property : layerProperties) {
+        auto styleProperty = getLayerProperty(*this, static_cast<Property>(property.second));
+        if (styleProperty.getKind() == StyleProperty::Kind::Undefined) continue;
+        serializeProperty(result, styleProperty, property.first.c_str(), property.second < kPaintPropertyCount);
+    }
+    return result;
+}
 
 optional<Error> HeatmapLayer::setProperty(const std::string& name, const Convertible& value) {
     const auto it = layerProperties.find(name.c_str());
@@ -324,34 +372,7 @@ optional<Error> HeatmapLayer::setProperty(const std::string& name, const Convert
 }
 
 StyleProperty HeatmapLayer::getProperty(const std::string& name) const {
-    const auto it = layerProperties.find(name.c_str());
-    if (it == layerProperties.end()) {
-        return {};
-    }
-
-    switch (static_cast<Property>(it->second)) {
-        case Property::HeatmapColor:
-            return makeStyleProperty(getHeatmapColor());
-        case Property::HeatmapIntensity:
-            return makeStyleProperty(getHeatmapIntensity());
-        case Property::HeatmapOpacity:
-            return makeStyleProperty(getHeatmapOpacity());
-        case Property::HeatmapRadius:
-            return makeStyleProperty(getHeatmapRadius());
-        case Property::HeatmapWeight:
-            return makeStyleProperty(getHeatmapWeight());
-        case Property::HeatmapColorTransition:
-            return makeStyleProperty(getHeatmapColorTransition());
-        case Property::HeatmapIntensityTransition:
-            return makeStyleProperty(getHeatmapIntensityTransition());
-        case Property::HeatmapOpacityTransition:
-            return makeStyleProperty(getHeatmapOpacityTransition());
-        case Property::HeatmapRadiusTransition:
-            return makeStyleProperty(getHeatmapRadiusTransition());
-        case Property::HeatmapWeightTransition:
-            return makeStyleProperty(getHeatmapWeightTransition());
-    }
-    return {};
+    return getLayerProperty(*this, name);
 }
 
 Mutable<Layer::Impl> HeatmapLayer::mutableBaseImpl() const {

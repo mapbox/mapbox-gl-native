@@ -441,6 +441,8 @@ using namespace conversion;
 
 namespace {
 
+constexpr uint8_t kPaintPropertyCount = 22u;
+
 enum class Property : uint8_t {
     LineBlur,
     LineColor,
@@ -464,7 +466,7 @@ enum class Property : uint8_t {
     LineTranslateTransition,
     LineTranslateAnchorTransition,
     LineWidthTransition,
-    LineCap,
+    LineCap = kPaintPropertyCount,
     LineJoin,
     LineMiterLimit,
     LineRoundLimit,
@@ -504,7 +506,87 @@ MAPBOX_ETERNAL_CONSTEXPR const auto layerProperties = mapbox::eternal::hash_map<
      {"line-miter-limit", toUint8(Property::LineMiterLimit)},
      {"line-round-limit", toUint8(Property::LineRoundLimit)},
      {"line-sort-key", toUint8(Property::LineSortKey)}});
+
+StyleProperty getLayerProperty(const LineLayer& layer, Property property) {
+    switch (property) {
+        case Property::LineBlur:
+            return makeStyleProperty(layer.getLineBlur());
+        case Property::LineColor:
+            return makeStyleProperty(layer.getLineColor());
+        case Property::LineDasharray:
+            return makeStyleProperty(layer.getLineDasharray());
+        case Property::LineGapWidth:
+            return makeStyleProperty(layer.getLineGapWidth());
+        case Property::LineGradient:
+            return makeStyleProperty(layer.getLineGradient());
+        case Property::LineOffset:
+            return makeStyleProperty(layer.getLineOffset());
+        case Property::LineOpacity:
+            return makeStyleProperty(layer.getLineOpacity());
+        case Property::LinePattern:
+            return makeStyleProperty(layer.getLinePattern());
+        case Property::LineTranslate:
+            return makeStyleProperty(layer.getLineTranslate());
+        case Property::LineTranslateAnchor:
+            return makeStyleProperty(layer.getLineTranslateAnchor());
+        case Property::LineWidth:
+            return makeStyleProperty(layer.getLineWidth());
+        case Property::LineBlurTransition:
+            return makeStyleProperty(layer.getLineBlurTransition());
+        case Property::LineColorTransition:
+            return makeStyleProperty(layer.getLineColorTransition());
+        case Property::LineDasharrayTransition:
+            return makeStyleProperty(layer.getLineDasharrayTransition());
+        case Property::LineGapWidthTransition:
+            return makeStyleProperty(layer.getLineGapWidthTransition());
+        case Property::LineGradientTransition:
+            return makeStyleProperty(layer.getLineGradientTransition());
+        case Property::LineOffsetTransition:
+            return makeStyleProperty(layer.getLineOffsetTransition());
+        case Property::LineOpacityTransition:
+            return makeStyleProperty(layer.getLineOpacityTransition());
+        case Property::LinePatternTransition:
+            return makeStyleProperty(layer.getLinePatternTransition());
+        case Property::LineTranslateTransition:
+            return makeStyleProperty(layer.getLineTranslateTransition());
+        case Property::LineTranslateAnchorTransition:
+            return makeStyleProperty(layer.getLineTranslateAnchorTransition());
+        case Property::LineWidthTransition:
+            return makeStyleProperty(layer.getLineWidthTransition());
+        case Property::LineCap:
+            return makeStyleProperty(layer.getLineCap());
+        case Property::LineJoin:
+            return makeStyleProperty(layer.getLineJoin());
+        case Property::LineMiterLimit:
+            return makeStyleProperty(layer.getLineMiterLimit());
+        case Property::LineRoundLimit:
+            return makeStyleProperty(layer.getLineRoundLimit());
+        case Property::LineSortKey:
+            return makeStyleProperty(layer.getLineSortKey());
+    }
+    return {};
+}
+
+StyleProperty getLayerProperty(const LineLayer& layer, const std::string& name) {
+    const auto it = layerProperties.find(name.c_str());
+    if (it == layerProperties.end()) {
+        return {};
+    }
+    return getLayerProperty(layer, static_cast<Property>(it->second));
+}
+
 } // namespace
+
+Value LineLayer::serialize() const {
+    auto result = Layer::serialize();
+    assert(result.getObject());
+    for (const auto& property : layerProperties) {
+        auto styleProperty = getLayerProperty(*this, static_cast<Property>(property.second));
+        if (styleProperty.getKind() == StyleProperty::Kind::Undefined) continue;
+        serializeProperty(result, styleProperty, property.first.c_str(), property.second < kPaintPropertyCount);
+    }
+    return result;
+}
 
 optional<Error> LineLayer::setProperty(const std::string& name, const Convertible& value) {
     const auto it = layerProperties.find(name.c_str());
@@ -716,68 +798,7 @@ optional<Error> LineLayer::setProperty(const std::string& name, const Convertibl
 }
 
 StyleProperty LineLayer::getProperty(const std::string& name) const {
-    const auto it = layerProperties.find(name.c_str());
-    if (it == layerProperties.end()) {
-        return {};
-    }
-
-    switch (static_cast<Property>(it->second)) {
-        case Property::LineBlur:
-            return makeStyleProperty(getLineBlur());
-        case Property::LineColor:
-            return makeStyleProperty(getLineColor());
-        case Property::LineDasharray:
-            return makeStyleProperty(getLineDasharray());
-        case Property::LineGapWidth:
-            return makeStyleProperty(getLineGapWidth());
-        case Property::LineGradient:
-            return makeStyleProperty(getLineGradient());
-        case Property::LineOffset:
-            return makeStyleProperty(getLineOffset());
-        case Property::LineOpacity:
-            return makeStyleProperty(getLineOpacity());
-        case Property::LinePattern:
-            return makeStyleProperty(getLinePattern());
-        case Property::LineTranslate:
-            return makeStyleProperty(getLineTranslate());
-        case Property::LineTranslateAnchor:
-            return makeStyleProperty(getLineTranslateAnchor());
-        case Property::LineWidth:
-            return makeStyleProperty(getLineWidth());
-        case Property::LineBlurTransition:
-            return makeStyleProperty(getLineBlurTransition());
-        case Property::LineColorTransition:
-            return makeStyleProperty(getLineColorTransition());
-        case Property::LineDasharrayTransition:
-            return makeStyleProperty(getLineDasharrayTransition());
-        case Property::LineGapWidthTransition:
-            return makeStyleProperty(getLineGapWidthTransition());
-        case Property::LineGradientTransition:
-            return makeStyleProperty(getLineGradientTransition());
-        case Property::LineOffsetTransition:
-            return makeStyleProperty(getLineOffsetTransition());
-        case Property::LineOpacityTransition:
-            return makeStyleProperty(getLineOpacityTransition());
-        case Property::LinePatternTransition:
-            return makeStyleProperty(getLinePatternTransition());
-        case Property::LineTranslateTransition:
-            return makeStyleProperty(getLineTranslateTransition());
-        case Property::LineTranslateAnchorTransition:
-            return makeStyleProperty(getLineTranslateAnchorTransition());
-        case Property::LineWidthTransition:
-            return makeStyleProperty(getLineWidthTransition());
-        case Property::LineCap:
-            return makeStyleProperty(getLineCap());
-        case Property::LineJoin:
-            return makeStyleProperty(getLineJoin());
-        case Property::LineMiterLimit:
-            return makeStyleProperty(getLineMiterLimit());
-        case Property::LineRoundLimit:
-            return makeStyleProperty(getLineRoundLimit());
-        case Property::LineSortKey:
-            return makeStyleProperty(getLineSortKey());
-    }
-    return {};
+    return getLayerProperty(*this, name);
 }
 
 Mutable<Layer::Impl> LineLayer::mutableBaseImpl() const {

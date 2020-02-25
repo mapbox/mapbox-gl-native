@@ -24,6 +24,7 @@ public:
     optional<conversion::Error> setProperty(const std::string& name, const conversion::Convertible& value) final;
 
     StyleProperty getProperty(const std::string& name) const final;
+    Value serialize() const final;
 
     // Paint properties
 
