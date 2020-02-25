@@ -22,6 +22,15 @@ workflows:
       - ios-render-test-runner
       - ios-unit-test-runner
       - ios-benchmark-runner
+      - ios-render-test-runner:
+          name: ios-render-test-runner-metal
+          config_params: '-DMBGL_WITH_OPENGL=OFF -DMBGL_WITH_METAL=ON'
+      - ios-unit-test-runner:
+          name: ios-unit-test-runner-metal
+          config_params: '-DMBGL_WITH_OPENGL=OFF -DMBGL_WITH_METAL=ON'
+      - ios-benchmark-runner:
+          name: ios-benchmark-runner-metal
+          config_params: '-DMBGL_WITH_OPENGL=OFF -DMBGL_WITH_METAL=ON'
       - baselines:
           requires:
             - android-arm64-v8a-release
@@ -383,6 +392,10 @@ commands:
 
 jobs:
   ios-render-test-runner:
+    parameters:
+      config_params:
+        type: string
+        default: ''
     executor: macos-11_3_1
     steps:
       - checkout
@@ -391,7 +404,7 @@ jobs:
       - prepare-ios-codesign-keychain:
           directory: render-test/ios
       - config:
-          config_params: '-G Xcode -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_SYSROOT=iphoneos -DMBGL_IOS_RENDER_TEST=ON -DCMAKE_OSX_ARCHITECTURES=arm64e'
+          config_params: '-G Xcode -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_SYSROOT=iphoneos -DMBGL_IOS_RENDER_TEST=ON -DCMAKE_OSX_ARCHITECTURES=arm64e << parameters.config_params >>'
       - build:
           build_params: '--config Release'
       - codesign-ios-test-runner:
@@ -421,6 +434,10 @@ jobs:
             fi
       - save
   ios-unit-test-runner:
+    parameters:
+      config_params:
+        type: string
+        default: ''
     executor: macos-11_3_1
     steps:
       - checkout
@@ -429,7 +446,7 @@ jobs:
       - prepare-ios-codesign-keychain:
           directory: test/ios
       - config:
-          config_params: '-G Xcode -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_SYSROOT=iphoneos -DMBGL_IOS_UNIT_TEST=ON -DCMAKE_OSX_ARCHITECTURES=arm64e'
+          config_params: '-G Xcode -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_SYSROOT=iphoneos -DMBGL_IOS_UNIT_TEST=ON -DCMAKE_OSX_ARCHITECTURES=arm64e << parameters.config_params >>'
       - build:
           build_params: '--config Release'
       - codesign-ios-test-runner:
@@ -452,6 +469,10 @@ jobs:
             fi
       - save
   ios-benchmark-runner:
+    parameters:
+      config_params:
+        type: string
+        default: ''
     executor: macos-11_3_1
     steps:
       - checkout
@@ -460,7 +481,7 @@ jobs:
       - prepare-ios-codesign-keychain:
           directory: benchmark/ios
       - config:
-          config_params: '-G Xcode -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_SYSROOT=iphoneos -DMBGL_IOS_BENCHMARK=ON -DCMAKE_OSX_ARCHITECTURES=arm64e'
+          config_params: '-G Xcode -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_SYSROOT=iphoneos -DMBGL_IOS_BENCHMARK=ON -DCMAKE_OSX_ARCHITECTURES=arm64e << parameters.config_params >>'
       - build:
           build_params: '--config Release'
       - codesign-ios-test-runner:
