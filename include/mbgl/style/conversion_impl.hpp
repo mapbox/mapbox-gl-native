@@ -306,14 +306,7 @@ struct ValueFactory<ColorRampPropertyValue> {
 
 template <>
 struct ValueFactory<TransitionOptions> {
-    static Value make(const TransitionOptions& value) {
-        return mapbox::base::ValueArray{
-            {std::chrono::duration_cast<std::chrono::milliseconds>(value.duration.value_or(mbgl::Duration::zero()))
-                 .count(),
-             std::chrono::duration_cast<std::chrono::milliseconds>(value.delay.value_or(mbgl::Duration::zero()))
-                 .count(),
-             value.enablePlacementTransitions}};
-    }
+    static Value make(const TransitionOptions& value) { return value.serialize(); }
 };
 
 template <>
@@ -370,10 +363,12 @@ StyleProperty makeStyleProperty(const PropertyValue<T>& value) {
 }
 
 inline StyleProperty makeStyleProperty(const TransitionOptions& value) {
+    if (!value.isDefined()) return {};
     return {makeValue(value), StyleProperty::Kind::Transition};
 }
 
 inline StyleProperty makeStyleProperty(const ColorRampPropertyValue& value) {
+    if (value.isUndefined()) return {};
     return {makeValue(value), StyleProperty::Kind::Expression};
 }
 
