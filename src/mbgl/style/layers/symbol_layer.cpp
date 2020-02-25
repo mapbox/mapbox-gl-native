@@ -1061,6 +1061,8 @@ using namespace conversion;
 
 namespace {
 
+constexpr uint8_t kPaintPropertyCount = 28u;
+
 enum class Property : uint8_t {
     IconColor,
     IconHaloBlur,
@@ -1090,7 +1092,7 @@ enum class Property : uint8_t {
     TextOpacityTransition,
     TextTranslateTransition,
     TextTranslateAnchorTransition,
-    IconAllowOverlap,
+    IconAllowOverlap = kPaintPropertyCount,
     IconAnchor,
     IconIgnorePlacement,
     IconImage,
@@ -1208,7 +1210,171 @@ MAPBOX_ETERNAL_CONSTEXPR const auto layerProperties = mapbox::eternal::hash_map<
      {"text-transform", toUint8(Property::TextTransform)},
      {"text-variable-anchor", toUint8(Property::TextVariableAnchor)},
      {"text-writing-mode", toUint8(Property::TextWritingMode)}});
+
+StyleProperty getLayerProperty(const SymbolLayer& layer, Property property) {
+    switch (property) {
+        case Property::IconColor:
+            return makeStyleProperty(layer.getIconColor());
+        case Property::IconHaloBlur:
+            return makeStyleProperty(layer.getIconHaloBlur());
+        case Property::IconHaloColor:
+            return makeStyleProperty(layer.getIconHaloColor());
+        case Property::IconHaloWidth:
+            return makeStyleProperty(layer.getIconHaloWidth());
+        case Property::IconOpacity:
+            return makeStyleProperty(layer.getIconOpacity());
+        case Property::IconTranslate:
+            return makeStyleProperty(layer.getIconTranslate());
+        case Property::IconTranslateAnchor:
+            return makeStyleProperty(layer.getIconTranslateAnchor());
+        case Property::TextColor:
+            return makeStyleProperty(layer.getTextColor());
+        case Property::TextHaloBlur:
+            return makeStyleProperty(layer.getTextHaloBlur());
+        case Property::TextHaloColor:
+            return makeStyleProperty(layer.getTextHaloColor());
+        case Property::TextHaloWidth:
+            return makeStyleProperty(layer.getTextHaloWidth());
+        case Property::TextOpacity:
+            return makeStyleProperty(layer.getTextOpacity());
+        case Property::TextTranslate:
+            return makeStyleProperty(layer.getTextTranslate());
+        case Property::TextTranslateAnchor:
+            return makeStyleProperty(layer.getTextTranslateAnchor());
+        case Property::IconColorTransition:
+            return makeStyleProperty(layer.getIconColorTransition());
+        case Property::IconHaloBlurTransition:
+            return makeStyleProperty(layer.getIconHaloBlurTransition());
+        case Property::IconHaloColorTransition:
+            return makeStyleProperty(layer.getIconHaloColorTransition());
+        case Property::IconHaloWidthTransition:
+            return makeStyleProperty(layer.getIconHaloWidthTransition());
+        case Property::IconOpacityTransition:
+            return makeStyleProperty(layer.getIconOpacityTransition());
+        case Property::IconTranslateTransition:
+            return makeStyleProperty(layer.getIconTranslateTransition());
+        case Property::IconTranslateAnchorTransition:
+            return makeStyleProperty(layer.getIconTranslateAnchorTransition());
+        case Property::TextColorTransition:
+            return makeStyleProperty(layer.getTextColorTransition());
+        case Property::TextHaloBlurTransition:
+            return makeStyleProperty(layer.getTextHaloBlurTransition());
+        case Property::TextHaloColorTransition:
+            return makeStyleProperty(layer.getTextHaloColorTransition());
+        case Property::TextHaloWidthTransition:
+            return makeStyleProperty(layer.getTextHaloWidthTransition());
+        case Property::TextOpacityTransition:
+            return makeStyleProperty(layer.getTextOpacityTransition());
+        case Property::TextTranslateTransition:
+            return makeStyleProperty(layer.getTextTranslateTransition());
+        case Property::TextTranslateAnchorTransition:
+            return makeStyleProperty(layer.getTextTranslateAnchorTransition());
+        case Property::IconAllowOverlap:
+            return makeStyleProperty(layer.getIconAllowOverlap());
+        case Property::IconAnchor:
+            return makeStyleProperty(layer.getIconAnchor());
+        case Property::IconIgnorePlacement:
+            return makeStyleProperty(layer.getIconIgnorePlacement());
+        case Property::IconImage:
+            return makeStyleProperty(layer.getIconImage());
+        case Property::IconKeepUpright:
+            return makeStyleProperty(layer.getIconKeepUpright());
+        case Property::IconOffset:
+            return makeStyleProperty(layer.getIconOffset());
+        case Property::IconOptional:
+            return makeStyleProperty(layer.getIconOptional());
+        case Property::IconPadding:
+            return makeStyleProperty(layer.getIconPadding());
+        case Property::IconPitchAlignment:
+            return makeStyleProperty(layer.getIconPitchAlignment());
+        case Property::IconRotate:
+            return makeStyleProperty(layer.getIconRotate());
+        case Property::IconRotationAlignment:
+            return makeStyleProperty(layer.getIconRotationAlignment());
+        case Property::IconSize:
+            return makeStyleProperty(layer.getIconSize());
+        case Property::IconTextFit:
+            return makeStyleProperty(layer.getIconTextFit());
+        case Property::IconTextFitPadding:
+            return makeStyleProperty(layer.getIconTextFitPadding());
+        case Property::SymbolAvoidEdges:
+            return makeStyleProperty(layer.getSymbolAvoidEdges());
+        case Property::SymbolPlacement:
+            return makeStyleProperty(layer.getSymbolPlacement());
+        case Property::SymbolSortKey:
+            return makeStyleProperty(layer.getSymbolSortKey());
+        case Property::SymbolSpacing:
+            return makeStyleProperty(layer.getSymbolSpacing());
+        case Property::SymbolZOrder:
+            return makeStyleProperty(layer.getSymbolZOrder());
+        case Property::TextAllowOverlap:
+            return makeStyleProperty(layer.getTextAllowOverlap());
+        case Property::TextAnchor:
+            return makeStyleProperty(layer.getTextAnchor());
+        case Property::TextField:
+            return makeStyleProperty(layer.getTextField());
+        case Property::TextFont:
+            return makeStyleProperty(layer.getTextFont());
+        case Property::TextIgnorePlacement:
+            return makeStyleProperty(layer.getTextIgnorePlacement());
+        case Property::TextJustify:
+            return makeStyleProperty(layer.getTextJustify());
+        case Property::TextKeepUpright:
+            return makeStyleProperty(layer.getTextKeepUpright());
+        case Property::TextLetterSpacing:
+            return makeStyleProperty(layer.getTextLetterSpacing());
+        case Property::TextLineHeight:
+            return makeStyleProperty(layer.getTextLineHeight());
+        case Property::TextMaxAngle:
+            return makeStyleProperty(layer.getTextMaxAngle());
+        case Property::TextMaxWidth:
+            return makeStyleProperty(layer.getTextMaxWidth());
+        case Property::TextOffset:
+            return makeStyleProperty(layer.getTextOffset());
+        case Property::TextOptional:
+            return makeStyleProperty(layer.getTextOptional());
+        case Property::TextPadding:
+            return makeStyleProperty(layer.getTextPadding());
+        case Property::TextPitchAlignment:
+            return makeStyleProperty(layer.getTextPitchAlignment());
+        case Property::TextRadialOffset:
+            return makeStyleProperty(layer.getTextRadialOffset());
+        case Property::TextRotate:
+            return makeStyleProperty(layer.getTextRotate());
+        case Property::TextRotationAlignment:
+            return makeStyleProperty(layer.getTextRotationAlignment());
+        case Property::TextSize:
+            return makeStyleProperty(layer.getTextSize());
+        case Property::TextTransform:
+            return makeStyleProperty(layer.getTextTransform());
+        case Property::TextVariableAnchor:
+            return makeStyleProperty(layer.getTextVariableAnchor());
+        case Property::TextWritingMode:
+            return makeStyleProperty(layer.getTextWritingMode());
+    }
+    return {};
+}
+
+StyleProperty getLayerProperty(const SymbolLayer& layer, const std::string& name) {
+    const auto it = layerProperties.find(name.c_str());
+    if (it == layerProperties.end()) {
+        return {};
+    }
+    return getLayerProperty(layer, static_cast<Property>(it->second));
+}
+
 } // namespace
+
+Value SymbolLayer::serialize() const {
+    auto result = Layer::serialize();
+    assert(result.getObject());
+    for (const auto& property : layerProperties) {
+        auto styleProperty = getLayerProperty(*this, static_cast<Property>(property.second));
+        if (styleProperty.getKind() == StyleProperty::Kind::Undefined) continue;
+        serializeProperty(result, styleProperty, property.first.c_str(), property.second < kPaintPropertyCount);
+    }
+    return result;
+}
 
 optional<Error> SymbolLayer::setProperty(const std::string& name, const Convertible& value) {
     const auto it = layerProperties.find(name.c_str());
@@ -1707,152 +1873,7 @@ optional<Error> SymbolLayer::setProperty(const std::string& name, const Converti
 }
 
 StyleProperty SymbolLayer::getProperty(const std::string& name) const {
-    const auto it = layerProperties.find(name.c_str());
-    if (it == layerProperties.end()) {
-        return {};
-    }
-
-    switch (static_cast<Property>(it->second)) {
-        case Property::IconColor:
-            return makeStyleProperty(getIconColor());
-        case Property::IconHaloBlur:
-            return makeStyleProperty(getIconHaloBlur());
-        case Property::IconHaloColor:
-            return makeStyleProperty(getIconHaloColor());
-        case Property::IconHaloWidth:
-            return makeStyleProperty(getIconHaloWidth());
-        case Property::IconOpacity:
-            return makeStyleProperty(getIconOpacity());
-        case Property::IconTranslate:
-            return makeStyleProperty(getIconTranslate());
-        case Property::IconTranslateAnchor:
-            return makeStyleProperty(getIconTranslateAnchor());
-        case Property::TextColor:
-            return makeStyleProperty(getTextColor());
-        case Property::TextHaloBlur:
-            return makeStyleProperty(getTextHaloBlur());
-        case Property::TextHaloColor:
-            return makeStyleProperty(getTextHaloColor());
-        case Property::TextHaloWidth:
-            return makeStyleProperty(getTextHaloWidth());
-        case Property::TextOpacity:
-            return makeStyleProperty(getTextOpacity());
-        case Property::TextTranslate:
-            return makeStyleProperty(getTextTranslate());
-        case Property::TextTranslateAnchor:
-            return makeStyleProperty(getTextTranslateAnchor());
-        case Property::IconColorTransition:
-            return makeStyleProperty(getIconColorTransition());
-        case Property::IconHaloBlurTransition:
-            return makeStyleProperty(getIconHaloBlurTransition());
-        case Property::IconHaloColorTransition:
-            return makeStyleProperty(getIconHaloColorTransition());
-        case Property::IconHaloWidthTransition:
-            return makeStyleProperty(getIconHaloWidthTransition());
-        case Property::IconOpacityTransition:
-            return makeStyleProperty(getIconOpacityTransition());
-        case Property::IconTranslateTransition:
-            return makeStyleProperty(getIconTranslateTransition());
-        case Property::IconTranslateAnchorTransition:
-            return makeStyleProperty(getIconTranslateAnchorTransition());
-        case Property::TextColorTransition:
-            return makeStyleProperty(getTextColorTransition());
-        case Property::TextHaloBlurTransition:
-            return makeStyleProperty(getTextHaloBlurTransition());
-        case Property::TextHaloColorTransition:
-            return makeStyleProperty(getTextHaloColorTransition());
-        case Property::TextHaloWidthTransition:
-            return makeStyleProperty(getTextHaloWidthTransition());
-        case Property::TextOpacityTransition:
-            return makeStyleProperty(getTextOpacityTransition());
-        case Property::TextTranslateTransition:
-            return makeStyleProperty(getTextTranslateTransition());
-        case Property::TextTranslateAnchorTransition:
-            return makeStyleProperty(getTextTranslateAnchorTransition());
-        case Property::IconAllowOverlap:
-            return makeStyleProperty(getIconAllowOverlap());
-        case Property::IconAnchor:
-            return makeStyleProperty(getIconAnchor());
-        case Property::IconIgnorePlacement:
-            return makeStyleProperty(getIconIgnorePlacement());
-        case Property::IconImage:
-            return makeStyleProperty(getIconImage());
-        case Property::IconKeepUpright:
-            return makeStyleProperty(getIconKeepUpright());
-        case Property::IconOffset:
-            return makeStyleProperty(getIconOffset());
-        case Property::IconOptional:
-            return makeStyleProperty(getIconOptional());
-        case Property::IconPadding:
-            return makeStyleProperty(getIconPadding());
-        case Property::IconPitchAlignment:
-            return makeStyleProperty(getIconPitchAlignment());
-        case Property::IconRotate:
-            return makeStyleProperty(getIconRotate());
-        case Property::IconRotationAlignment:
-            return makeStyleProperty(getIconRotationAlignment());
-        case Property::IconSize:
-            return makeStyleProperty(getIconSize());
-        case Property::IconTextFit:
-            return makeStyleProperty(getIconTextFit());
-        case Property::IconTextFitPadding:
-            return makeStyleProperty(getIconTextFitPadding());
-        case Property::SymbolAvoidEdges:
-            return makeStyleProperty(getSymbolAvoidEdges());
-        case Property::SymbolPlacement:
-            return makeStyleProperty(getSymbolPlacement());
-        case Property::SymbolSortKey:
-            return makeStyleProperty(getSymbolSortKey());
-        case Property::SymbolSpacing:
-            return makeStyleProperty(getSymbolSpacing());
-        case Property::SymbolZOrder:
-            return makeStyleProperty(getSymbolZOrder());
-        case Property::TextAllowOverlap:
-            return makeStyleProperty(getTextAllowOverlap());
-        case Property::TextAnchor:
-            return makeStyleProperty(getTextAnchor());
-        case Property::TextField:
-            return makeStyleProperty(getTextField());
-        case Property::TextFont:
-            return makeStyleProperty(getTextFont());
-        case Property::TextIgnorePlacement:
-            return makeStyleProperty(getTextIgnorePlacement());
-        case Property::TextJustify:
-            return makeStyleProperty(getTextJustify());
-        case Property::TextKeepUpright:
-            return makeStyleProperty(getTextKeepUpright());
-        case Property::TextLetterSpacing:
-            return makeStyleProperty(getTextLetterSpacing());
-        case Property::TextLineHeight:
-            return makeStyleProperty(getTextLineHeight());
-        case Property::TextMaxAngle:
-            return makeStyleProperty(getTextMaxAngle());
-        case Property::TextMaxWidth:
-            return makeStyleProperty(getTextMaxWidth());
-        case Property::TextOffset:
-            return makeStyleProperty(getTextOffset());
-        case Property::TextOptional:
-            return makeStyleProperty(getTextOptional());
-        case Property::TextPadding:
-            return makeStyleProperty(getTextPadding());
-        case Property::TextPitchAlignment:
-            return makeStyleProperty(getTextPitchAlignment());
-        case Property::TextRadialOffset:
-            return makeStyleProperty(getTextRadialOffset());
-        case Property::TextRotate:
-            return makeStyleProperty(getTextRotate());
-        case Property::TextRotationAlignment:
-            return makeStyleProperty(getTextRotationAlignment());
-        case Property::TextSize:
-            return makeStyleProperty(getTextSize());
-        case Property::TextTransform:
-            return makeStyleProperty(getTextTransform());
-        case Property::TextVariableAnchor:
-            return makeStyleProperty(getTextVariableAnchor());
-        case Property::TextWritingMode:
-            return makeStyleProperty(getTextWritingMode());
-    }
-    return {};
+    return getLayerProperty(*this, name);
 }
 
 Mutable<Layer::Impl> SymbolLayer::mutableBaseImpl() const {

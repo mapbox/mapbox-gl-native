@@ -272,6 +272,8 @@ using namespace conversion;
 
 namespace {
 
+constexpr uint8_t kPaintPropertyCount = 14u;
+
 enum class Property : uint8_t {
     FillAntialias,
     FillColor,
@@ -287,7 +289,7 @@ enum class Property : uint8_t {
     FillPatternTransition,
     FillTranslateTransition,
     FillTranslateAnchorTransition,
-    FillSortKey,
+    FillSortKey = kPaintPropertyCount,
 };
 
 template <typename T>
@@ -311,7 +313,63 @@ MAPBOX_ETERNAL_CONSTEXPR const auto layerProperties = mapbox::eternal::hash_map<
      {"fill-translate-transition", toUint8(Property::FillTranslateTransition)},
      {"fill-translate-anchor-transition", toUint8(Property::FillTranslateAnchorTransition)},
      {"fill-sort-key", toUint8(Property::FillSortKey)}});
+
+StyleProperty getLayerProperty(const FillLayer& layer, Property property) {
+    switch (property) {
+        case Property::FillAntialias:
+            return makeStyleProperty(layer.getFillAntialias());
+        case Property::FillColor:
+            return makeStyleProperty(layer.getFillColor());
+        case Property::FillOpacity:
+            return makeStyleProperty(layer.getFillOpacity());
+        case Property::FillOutlineColor:
+            return makeStyleProperty(layer.getFillOutlineColor());
+        case Property::FillPattern:
+            return makeStyleProperty(layer.getFillPattern());
+        case Property::FillTranslate:
+            return makeStyleProperty(layer.getFillTranslate());
+        case Property::FillTranslateAnchor:
+            return makeStyleProperty(layer.getFillTranslateAnchor());
+        case Property::FillAntialiasTransition:
+            return makeStyleProperty(layer.getFillAntialiasTransition());
+        case Property::FillColorTransition:
+            return makeStyleProperty(layer.getFillColorTransition());
+        case Property::FillOpacityTransition:
+            return makeStyleProperty(layer.getFillOpacityTransition());
+        case Property::FillOutlineColorTransition:
+            return makeStyleProperty(layer.getFillOutlineColorTransition());
+        case Property::FillPatternTransition:
+            return makeStyleProperty(layer.getFillPatternTransition());
+        case Property::FillTranslateTransition:
+            return makeStyleProperty(layer.getFillTranslateTransition());
+        case Property::FillTranslateAnchorTransition:
+            return makeStyleProperty(layer.getFillTranslateAnchorTransition());
+        case Property::FillSortKey:
+            return makeStyleProperty(layer.getFillSortKey());
+    }
+    return {};
+}
+
+StyleProperty getLayerProperty(const FillLayer& layer, const std::string& name) {
+    const auto it = layerProperties.find(name.c_str());
+    if (it == layerProperties.end()) {
+        return {};
+    }
+    return getLayerProperty(layer, static_cast<Property>(it->second));
+}
+
 } // namespace
+
+Value FillLayer::serialize() const {
+    auto result = Layer::serialize();
+    assert(result.getObject());
+    for (const auto& property : layerProperties) {
+        auto styleProperty = getLayerProperty(*this, static_cast<Property>(property.second));
+        if (styleProperty.getKind() == StyleProperty::Kind::Undefined) continue;
+        serializeProperty(result, styleProperty, property.first.c_str(), property.second < kPaintPropertyCount);
+    }
+    return result;
+}
 
 optional<Error> FillLayer::setProperty(const std::string& name, const Convertible& value) {
     const auto it = layerProperties.find(name.c_str());
@@ -442,44 +500,7 @@ optional<Error> FillLayer::setProperty(const std::string& name, const Convertibl
 }
 
 StyleProperty FillLayer::getProperty(const std::string& name) const {
-    const auto it = layerProperties.find(name.c_str());
-    if (it == layerProperties.end()) {
-        return {};
-    }
-
-    switch (static_cast<Property>(it->second)) {
-        case Property::FillAntialias:
-            return makeStyleProperty(getFillAntialias());
-        case Property::FillColor:
-            return makeStyleProperty(getFillColor());
-        case Property::FillOpacity:
-            return makeStyleProperty(getFillOpacity());
-        case Property::FillOutlineColor:
-            return makeStyleProperty(getFillOutlineColor());
-        case Property::FillPattern:
-            return makeStyleProperty(getFillPattern());
-        case Property::FillTranslate:
-            return makeStyleProperty(getFillTranslate());
-        case Property::FillTranslateAnchor:
-            return makeStyleProperty(getFillTranslateAnchor());
-        case Property::FillAntialiasTransition:
-            return makeStyleProperty(getFillAntialiasTransition());
-        case Property::FillColorTransition:
-            return makeStyleProperty(getFillColorTransition());
-        case Property::FillOpacityTransition:
-            return makeStyleProperty(getFillOpacityTransition());
-        case Property::FillOutlineColorTransition:
-            return makeStyleProperty(getFillOutlineColorTransition());
-        case Property::FillPatternTransition:
-            return makeStyleProperty(getFillPatternTransition());
-        case Property::FillTranslateTransition:
-            return makeStyleProperty(getFillTranslateTransition());
-        case Property::FillTranslateAnchorTransition:
-            return makeStyleProperty(getFillTranslateAnchorTransition());
-        case Property::FillSortKey:
-            return makeStyleProperty(getFillSortKey());
-    }
-    return {};
+    return getLayerProperty(*this, name);
 }
 
 Mutable<Layer::Impl> FillLayer::mutableBaseImpl() const {
