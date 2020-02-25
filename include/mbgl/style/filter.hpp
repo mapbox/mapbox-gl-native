@@ -28,6 +28,8 @@ public:
     
     bool operator()(const expression::EvaluationContext& context) const;
 
+    operator bool() const { return expression || legacyFilter; }
+
     friend bool operator==(const Filter& lhs, const Filter& rhs) {
         if (!lhs.expression || !rhs.expression) {
             return lhs.expression == rhs.expression;

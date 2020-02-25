@@ -114,6 +114,7 @@ public:
     optional<conversion::Error> setVisibility(const conversion::Convertible& value);
 
     virtual StyleProperty getProperty(const std::string&) const = 0;
+    virtual Value serialize() const;
 
     // Private implementation
     // TODO : We should not have public mutable data members.
@@ -140,6 +141,7 @@ public:
 
 protected:
     virtual Mutable<Impl> mutableBaseImpl() const = 0;
+    void serializeProperty(Value&, const StyleProperty&, const char* propertyName, bool isPaint) const;
 
     LayerObserver* observer;
     mapbox::base::WeakPtrFactory<Layer> weakFactory {this};
