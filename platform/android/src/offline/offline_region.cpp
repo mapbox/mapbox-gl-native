@@ -16,8 +16,9 @@ namespace android {
 
 OfflineRegion::OfflineRegion(jni::JNIEnv& env, jni::jlong offlineRegionPtr, const jni::Object<FileSource>& jFileSource)
     : region(reinterpret_cast<mbgl::OfflineRegion*>(offlineRegionPtr)),
-      fileSource(std::static_pointer_cast<mbgl::DatabaseFileSource>(mbgl::FileSourceManager::get()->getFileSource(
-          mbgl::FileSourceType::Database, FileSource::getSharedResourceOptions(env, jFileSource)))) {
+      fileSource(std::static_pointer_cast<mbgl::DatabaseFileSource>(
+          std::shared_ptr<mbgl::FileSource>(mbgl::FileSourceManager::get()->getFileSource(
+              mbgl::FileSourceType::Database, FileSource::getSharedResourceOptions(env, jFileSource))))) {
     if (!fileSource) {
         ThrowNew(env, jni::FindClass(env, "java/lang/IllegalStateException"), "Offline functionality is disabled.");
     }

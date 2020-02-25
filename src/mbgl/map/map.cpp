@@ -33,7 +33,9 @@ Map::Map(RendererFrontend& frontend,
     : impl(std::make_unique<Impl>(
           frontend,
           observer,
-          FileSourceManager::get() ? FileSourceManager::get()->getFileSource(ResourceLoader, resourceOptions) : nullptr,
+          FileSourceManager::get()
+              ? std::shared_ptr<FileSource>(FileSourceManager::get()->getFileSource(ResourceLoader, resourceOptions))
+              : nullptr,
           mapOptions)) {}
 
 Map::Map(std::unique_ptr<Impl> impl_) : impl(std::move(impl_)) {}
