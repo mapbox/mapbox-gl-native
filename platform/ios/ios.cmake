@@ -33,12 +33,11 @@ target_sources(
     PRIVATE
         ${PROJECT_SOURCE_DIR}/platform/darwin/src/async_task.cpp
         ${PROJECT_SOURCE_DIR}/platform/darwin/src/collator.mm
-        ${PROJECT_SOURCE_DIR}/platform/darwin/src/native_apple_interface.m
         ${PROJECT_SOURCE_DIR}/platform/darwin/src/http_file_source.mm
-        ${PROJECT_SOURCE_DIR}/platform/darwin/src/native_apple_interface.m
         ${PROJECT_SOURCE_DIR}/platform/darwin/src/image.mm
         ${PROJECT_SOURCE_DIR}/platform/darwin/src/local_glyph_rasterizer.mm
         ${PROJECT_SOURCE_DIR}/platform/darwin/src/logging_nslog.mm
+        ${PROJECT_SOURCE_DIR}/platform/darwin/src/native_apple_interface.m
         ${PROJECT_SOURCE_DIR}/platform/darwin/src/nsthread.mm
         ${PROJECT_SOURCE_DIR}/platform/darwin/src/number_format.mm
         ${PROJECT_SOURCE_DIR}/platform/darwin/src/reachability.m
@@ -47,6 +46,7 @@ target_sources(
         ${PROJECT_SOURCE_DIR}/platform/darwin/src/timer.cpp
         ${PROJECT_SOURCE_DIR}/platform/default/src/mbgl/gfx/headless_backend.cpp
         ${PROJECT_SOURCE_DIR}/platform/default/src/mbgl/gfx/headless_frontend.cpp
+        ${PROJECT_SOURCE_DIR}/platform/default/src/mbgl/layermanager/layer_manager.cpp
         ${PROJECT_SOURCE_DIR}/platform/default/src/mbgl/map/map_snapshotter.cpp
         ${PROJECT_SOURCE_DIR}/platform/default/src/mbgl/storage/asset_file_source.cpp
         ${PROJECT_SOURCE_DIR}/platform/default/src/mbgl/storage/database_file_source.cpp
@@ -66,8 +66,6 @@ target_sources(
         ${PROJECT_SOURCE_DIR}/platform/default/src/mbgl/util/png_writer.cpp
         ${PROJECT_SOURCE_DIR}/platform/default/src/mbgl/util/thread_local.cpp
         ${PROJECT_SOURCE_DIR}/platform/default/src/mbgl/util/utf.cpp
-        ${PROJECT_SOURCE_DIR}/platform/default/src/mbgl/util/thread_local.cpp
-        ${PROJECT_SOURCE_DIR}/platform/default/src/mbgl/layermanager/layer_manager.cpp
 )
 
 target_include_directories(
