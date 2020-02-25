@@ -1035,7 +1035,11 @@ TEST(Map, UniversalStyleGetter) {
             "paint": {
                 "line-color": "red",
                 "line-opacity": 0.5,
-                "line-width": ["get", "width"]
+                "line-width": ["get", "width"],
+                "line-opacity-transition": {
+                    "duration": 400,
+                    "delay": 500
+                }
             },
             "layout": {
                 "line-cap": "butt"
@@ -1056,13 +1060,15 @@ TEST(Map, UniversalStyleGetter) {
 
     StyleProperty lineColor = lineLayer->getProperty("line-color");
     ASSERT_TRUE(lineColor.getValue());
-    EXPECT_EQ(StyleProperty::Kind::Constant, lineColor.getKind());
-    ASSERT_TRUE(lineColor.getValue().getObject());
-    const auto& color = *(lineColor.getValue().getObject());
-    EXPECT_EQ(1.0, *color.at("r").getDouble());
-    EXPECT_EQ(0.0, *color.at("g").getDouble());
-    EXPECT_EQ(0.0, *color.at("b").getDouble());
-    EXPECT_EQ(1.0, *color.at("a").getDouble());
+    EXPECT_EQ(StyleProperty::Kind::Expression, lineColor.getKind());
+    ASSERT_TRUE(lineColor.getValue().getArray());
+    const auto& color = *(lineColor.getValue().getArray());
+    EXPECT_EQ(5u, color.size());
+    EXPECT_EQ("rgba", *color[0].getString());
+    EXPECT_EQ(255.0, *color[1].getDouble());
+    EXPECT_EQ(0.0, *color[2].getDouble());
+    EXPECT_EQ(0.0, *color[3].getDouble());
+    EXPECT_EQ(1.0, *color[4].getDouble());
 
     StyleProperty lineOpacity = lineLayer->getProperty("line-opacity");
     ASSERT_TRUE(lineOpacity.getValue());
@@ -1073,8 +1079,11 @@ TEST(Map, UniversalStyleGetter) {
     StyleProperty lineOpacityTransition = lineLayer->getProperty("line-opacity-transition");
     ASSERT_TRUE(lineOpacityTransition.getValue());
     EXPECT_EQ(StyleProperty::Kind::Transition, lineOpacityTransition.getKind());
-    ASSERT_TRUE(lineOpacityTransition.getValue().getArray());
-    EXPECT_EQ(3u, lineOpacityTransition.getValue().getArray()->size());
+    ASSERT_TRUE(lineOpacityTransition.getValue().getObject());
+    EXPECT_EQ(2u, lineOpacityTransition.getValue().getObject()->size());
+
+    StyleProperty lineColorTransition = lineLayer->getProperty("line-color-transition");
+    EXPECT_EQ(StyleProperty::Kind::Undefined, lineColorTransition.getKind());
 
     StyleProperty lineWidth = lineLayer->getProperty("line-width");
     ASSERT_TRUE(lineWidth.getValue());
