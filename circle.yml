@@ -323,6 +323,64 @@ commands:
           echo "${GCLOUD_SERVICE_ACCOUNT_JSON}" > secret.json
           gcloud auth activate-service-account --key-file secret.json --project android-gl-native
           rm secret.json
+  login-google-cloud-platform-ios:
+    steps:
+    - run:
+        name: Login to IOS Google Cloud Platform
+        command: |
+          if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON_IOS}" ]]; then
+            echo "${GCLOUD_SERVICE_ACCOUNT_JSON_IOS}" > iosAccount.json
+            gcloud auth activate-service-account --key-file iosAccount.json --project ios-mapbox-gl-native
+            rm iosAccount.json
+          fi
+  prepare-ios-codesign-keychain:
+    parameters:
+      directory:
+        type: string
+    steps:
+      - run:
+          name: Prepare codesign keychain
+          command: |
+            cd << parameters.directory >>
+            fastlane run create_keychain name:fastlane_keychain password:$FASTLANE_PASSWORD timeout:false unlock:true
+            fastlane match
+            security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k $FASTLANE_PASSWORD fastlane_keychain
+            /usr/bin/env xcrun security find-identity -v -p codesigning
+  codesign-ios-test-runner:
+    parameters:
+      directory:
+        type: string
+    steps:
+      - run:
+          name: Codesign iOS TestApp for running on a physical device
+          command: |
+            cp -r << parameters.directory >>/codesigning build
+            cd build
+            ./codesigning/generate-entitlements.swift
+            ./codesigning/codesign_all.sh
+            codesign -dv --verbose=4 Release-iphoneos/*.app # for debugging that app is signed or not
+  run-ios-test-app:
+    parameters:
+      directory:
+        type: string
+    steps:
+      - run:
+          name: Run iOS Test App on Firebase
+          no_output_timeout: 20m
+          command: |
+            if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON_IOS}" ]]; then
+              # arrange files in a way Firebase expects it, and package them in a zip file
+              cp << parameters.directory >>/*_iphoneos13.2-arm64e-release.xctestrun build
+              cd build
+              zip testapp.zip -r Release-iphoneos/*.app --quiet
+              zip testapp.zip *_iphoneos13.2-arm64e-release.xctestrun
+              gcloud firebase test ios models list
+              gcloud firebase test ios run \
+                --test testapp.zip \
+                --device model=iphone11,version=13.3,locale=en,orientation=portrait --xcode-version=11.3.1 --timeout 20m \
+                --verbosity=debug --no-record-video --results-dir ios-test-app-${CIRCLE_BUILD_NUM}
+            fi
+
 jobs:
   ios-render-test-runner:
     executor: macos-11_3_1
@@ -330,60 +388,23 @@ jobs:
       - checkout
       - prepare
       - prepare-macos
-      - run:
-          name: Prepare codesign keychain 
-          command: |
-            cd render-test/ios
-            fastlane run create_keychain name:fastlane_keychain password:$FASTLANE_PASSWORD timeout:false unlock:true
-            fastlane match
-            security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k $FASTLANE_PASSWORD fastlane_keychain
-            /usr/bin/env xcrun security find-identity -v -p codesigning
-      - run:
-          name: Build IOS RenderTestApp
-          command: |
-            cd render-test/ios
-            ccache --zero-stats --max-size=2G
-            cmake ../.. -B Build -G Xcode -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_SYSROOT=iphoneos -DMBGL_IOS_RENDER_TEST=ON -DCMAKE_OSX_ARCHITECTURES=arm64e
-            cmake --build Build --config Release
-            ccache --show-stats
-      - run:
-          name: Codesign RenderTestApp for running on a physical device
-          command: |
-            cd render-test/ios
-            ./codesigning/generate-entitlements.swift
-            cd Build
-            ../codesigning/codesign_all.sh
-            codesign -dv --verbose=4 Release-iphoneos/RenderTestApp.app # for debugging that app is signed or not
-      - run:
-          name: Login to IOS Google Cloud Platform
-          command: |
-            if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON_IOS}" ]]; then
-              echo "${GCLOUD_SERVICE_ACCOUNT_JSON_IOS}" > iosAccount.json
-              gcloud auth activate-service-account --key-file iosAccount.json --project ios-mapbox-gl-native
-              rm iosAccount.json
-            fi
-      - run:
-          name: Run IOSRenderTestApp Tests on Firebase
-          no_output_timeout: 20m
-          command: |
-            if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON_IOS}" ]]; then
-              # arrange files in a way Firebase expects it, and package them in a zip file
-              cd render-test/ios/Build
-              cp ../RenderTestApp_iphoneos13.2-arm64e-release.xctestrun .
-              zip testapp.zip -r Release-iphoneos/RenderTestApp.app --quiet
-              zip testapp.zip RenderTestApp_iphoneos13.2-arm64e-release.xctestrun
-              gcloud firebase test ios models list
-              gcloud firebase test ios run \
-                --test testapp.zip \
-                --device model=iphone11,version=13.3,locale=en,orientation=portrait --xcode-version=11.3.1 --timeout 20m \
-                --verbosity=debug --no-record-video --results-dir ios-render-test-app-${CIRCLE_BUILD_NUM}
-            fi
+      - prepare-ios-codesign-keychain:
+          directory: render-test/ios
+      - config:
+          config_params: '-G Xcode -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_SYSROOT=iphoneos -DMBGL_IOS_RENDER_TEST=ON -DCMAKE_OSX_ARCHITECTURES=arm64e'
+      - build:
+          build_params: '--config Release'
+      - codesign-ios-test-runner:
+          directory: render-test/ios
+      - login-google-cloud-platform-ios
+      - run-ios-test-app:
+          directory: render-test/ios
       - run:
           name: Retrieve Test Result from gcloud
           when: always
           command: |
             if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON_IOS}" ]]; then
-              testResult=$(gsutil ls -d gs://test-lab-hn7kwqcz3108z-hjm4qtbqqkymk/ios-render-test-app-${CIRCLE_BUILD_NUM}/iphone11-13.3-en-portrait/TestLogs/)
+              testResult=$(gsutil ls -d gs://test-lab-hn7kwqcz3108z-hjm4qtbqqkymk/ios-test-app-${CIRCLE_BUILD_NUM}/iphone11-13.3-en-portrait/TestLogs/)
               mkdir -p render-test-app
               gsutil -m cp -r $testResult render-test-app
               cd render-test-app/TestLogs
@@ -404,60 +425,23 @@ jobs:
       - checkout
       - prepare
       - prepare-macos
-      - run:
-          name: Prepare codesign keychain
-          command: |
-            cd test/ios
-            fastlane run create_keychain name:fastlane_keychain password:$FASTLANE_PASSWORD timeout:false unlock:true
-            fastlane match
-            security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k $FASTLANE_PASSWORD fastlane_keychain
-            /usr/bin/env xcrun security find-identity -v -p codesigning
-      - run:
-          name: Build IOS UnitTestsApp
-          command: |
-            cd test/ios
-            ccache --zero-stats --max-size=2G
-            cmake ../.. -B Build -G Xcode -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_SYSROOT=iphoneos -DMBGL_IOS_UNIT_TEST=1 -DCMAKE_OSX_ARCHITECTURES=arm64e
-            cmake --build Build --config Release
-            ccache --show-stats
-      - run:
-          name: Codesign UnitTestsApp for running on a physical device
-          command: |
-            cd test/ios
-            ./codesigning/generate-entitlements.swift
-            cd Build
-            ../codesigning/codesign_all.sh
-            codesign -dv --verbose=4 Release-iphoneos/UnitTestsApp.app
-      - run:
-          name: Login to IOS Google Cloud Platform
-          command: |
-            if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON_IOS}" ]]; then
-              echo "${GCLOUD_SERVICE_ACCOUNT_JSON_IOS}" > iosAccount.json
-              gcloud auth activate-service-account --key-file iosAccount.json --project ios-mapbox-gl-native
-              rm iosAccount.json
-            fi
-      - run:
-          name: Run UnitTestsApp on Firebase
-          no_output_timeout: 20m
-          command: |
-            if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON_IOS}" ]]; then
-              # arrange files in a way Firebase expects it, and package them in a zip file
-              cd test/ios/Build
-              cp ../UnitTestsApp_iphoneos13.2-arm64e-release.xctestrun .
-              zip testapp.zip -r Release-iphoneos/UnitTestsApp.app --quiet
-              zip testapp.zip UnitTestsApp_iphoneos13.2-arm64e-release.xctestrun
-              gcloud firebase test ios models list
-              gcloud firebase test ios run \
-                --test testapp.zip \
-                --device model=iphone11,version=13.3,locale=en,orientation=portrait --xcode-version=11.3.1 --timeout 20m \
-                --verbosity=debug --no-record-video --results-dir ios-unit-test-app-${CIRCLE_BUILD_NUM}
-            fi
+      - prepare-ios-codesign-keychain:
+          directory: test/ios
+      - config:
+          config_params: '-G Xcode -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_SYSROOT=iphoneos -DMBGL_IOS_UNIT_TEST=ON -DCMAKE_OSX_ARCHITECTURES=arm64e'
+      - build:
+          build_params: '--config Release'
+      - codesign-ios-test-runner:
+          directory: test/ios
+      - login-google-cloud-platform-ios
+      - run-ios-test-app:
+          directory: test/ios
       - run:
           name: Retrieve Test Result from gcloud
           when: always
           command: |
             if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON_IOS}" ]]; then
-              testResult=$(gsutil ls -d gs://test-lab-hn7kwqcz3108z-hjm4qtbqqkymk/ios-unit-test-app-${CIRCLE_BUILD_NUM}/iphone11-13.3-en-portrait/TestLogs/)
+              testResult=$(gsutil ls -d gs://test-lab-hn7kwqcz3108z-hjm4qtbqqkymk/ios-test-app-${CIRCLE_BUILD_NUM}/iphone11-13.3-en-portrait/TestLogs/)
               mkdir -p unit-test-app
               gsutil -m cp -r $testResult unit-test-app
               cd unit-test-app/TestLogs
@@ -472,60 +456,23 @@ jobs:
       - checkout
       - prepare
       - prepare-macos
-      - run:
-          name: Prepare codesign keychain
-          command: |
-            cd benchmark/ios
-            fastlane run create_keychain name:fastlane_keychain password:$FASTLANE_PASSWORD timeout:false unlock:true
-            fastlane match
-            security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k $FASTLANE_PASSWORD fastlane_keychain
-            /usr/bin/env xcrun security find-identity -v -p codesigning
-      - run:
-          name: Build IOS BenchmarkApp
-          command: |
-            cd benchmark/ios
-            ccache --zero-stats --max-size=2G
-            cmake ../.. -B Build -G Xcode -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_SYSROOT=iphoneos -DMBGL_IOS_BENCHMARK=1 -DCMAKE_OSX_ARCHITECTURES=arm64e
-            cmake --build Build --config Release
-            ccache --show-stats
-      - run:
-          name: Codesign BenchmarkApp for running on a physical device
-          command: |
-            cd benchmark/ios
-            ./codesigning/generate-entitlements.swift
-            cd Build
-            ../codesigning/codesign_all.sh
-            codesign -dv --verbose=4 Release-iphoneos/BenchmarkApp.app
-      - run:
-          name: Login to IOS Google Cloud Platform
-          command: |
-            if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON_IOS}" ]]; then
-              echo "${GCLOUD_SERVICE_ACCOUNT_JSON_IOS}" > iosAccount.json
-              gcloud auth activate-service-account --key-file iosAccount.json --project ios-mapbox-gl-native
-              rm iosAccount.json
-            fi
-      - run:
-          name: Run BenchmarkApp on Firebase
-          no_output_timeout: 20m
-          command: |
-            if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON_IOS}" ]]; then
-              # arrange files in a way Firebase expects it, and package them in a zip file
-              cd benchmark/ios/Build
-              cp ../BenchmarkApp_iphoneos13.2-arm64e-release.xctestrun .
-              zip testapp.zip -r Release-iphoneos/BenchmarkApp.app --quiet
-              zip testapp.zip BenchmarkApp_iphoneos13.2-arm64e-release.xctestrun
-              gcloud firebase test ios models list
-              gcloud firebase test ios run \
-                --test testapp.zip \
-                --device model=iphone11,version=13.3,locale=en,orientation=portrait --xcode-version=11.3.1 --timeout 20m \
-                --verbosity=debug --no-record-video --results-dir ios-benchmark-app-${CIRCLE_BUILD_NUM}
-            fi
+      - prepare-ios-codesign-keychain:
+          directory: benchmark/ios
+      - config:
+          config_params: '-G Xcode -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_SYSROOT=iphoneos -DMBGL_IOS_BENCHMARK=ON -DCMAKE_OSX_ARCHITECTURES=arm64e'
+      - build:
+          build_params: '--config Release'
+      - codesign-ios-test-runner:
+          directory: benchmark/ios
+      - login-google-cloud-platform-ios
+      - run-ios-test-app:
+          directory: benchmark/ios
       - run:
           name: Retrieve Test Result from gcloud
           when: always
           command: |
             if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON_IOS}" ]]; then
-              testResult=$(gsutil ls -d gs://test-lab-hn7kwqcz3108z-hjm4qtbqqkymk/ios-benchmark-app-${CIRCLE_BUILD_NUM}/iphone11-13.3-en-portrait/TestLogs/)
+              testResult=$(gsutil ls -d gs://test-lab-hn7kwqcz3108z-hjm4qtbqqkymk/ios-test-app-${CIRCLE_BUILD_NUM}/iphone11-13.3-en-portrait/TestLogs/)
               mkdir -p benchmark-app
               gsutil -m cp -r $testResult benchmark-app
               cd benchmark-app/TestLogs
