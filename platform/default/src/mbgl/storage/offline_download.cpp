@@ -373,7 +373,7 @@ void OfflineDownload::continueDownload() {
     if (resourcesToBeMarkedAsUsed.size() >= kMarkBatchSize) markPendingUsedResources();
 
     uint32_t maxConcurrentRequests = util::DEFAULT_MAXIMUM_CONCURRENT_REQUESTS;
-    auto value = onlineFileSource.getProperty("max-concurrent-requests");
+    auto value = onlineFileSource.getProperty(MAX_CONCURRENT_REQUESTS_KEY);
     if (uint64_t* maxRequests = value.getUint()) {
         maxConcurrentRequests = static_cast<uint32_t>(*maxRequests);
     }
