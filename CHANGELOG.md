@@ -16,6 +16,10 @@
   
   This is a back porting from GL JS [#9333](https://github.com/mapbox/mapbox-gl-js/pull/9333)
 
+- [core] Add Layer::serialize() method ([#16231](https://github.com/mapbox/mapbox-gl-native/pull/16231))
+
+  New method allows serialization of a layer into a Value type, including all modifications done via runtime style API. New method is also an enabler for Style object serialization (sources, layers, etc).
+
 ## maps-v1.2.0 (2020.02-release-vanillashake)
 
 ### ✨ New features
