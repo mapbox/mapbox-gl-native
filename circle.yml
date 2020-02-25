@@ -413,8 +413,9 @@ jobs:
               if ls render-test-app/TestLogs/*.html 1> /dev/null 2>&1; then cp render-test-app/TestLogs/*.html /tmp/tests/ios-render-test; fi
               if [[ -n $(ls render-test-app/TestLogs/*.zip 2>/dev/null) ]]; then
                 cp render-test-app/TestLogs/*.zip metrics/ios-render-test-runner/
+                cp render-test-app/TestLogs/*.zip /tmp/tests/ios-render-test
                 cd metrics/ios-render-test-runner/
-                unzip *.zip
+                unzip -o *.zip
                 rm -rf *.zip
               fi
             fi
