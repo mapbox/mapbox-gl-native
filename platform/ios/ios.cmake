@@ -27,6 +27,10 @@ if(MBGL_WITH_OPENGL)
     )
 endif()
 
+if(MBGL_WITH_METAL)
+    include(${PROJECT_SOURCE_DIR}/platform/ios/mbgl-metal.cmake)
+endif()
+
 target_sources(
     mbgl-core
     PRIVATE

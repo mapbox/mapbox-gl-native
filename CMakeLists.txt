@@ -41,6 +41,13 @@ option(MBGL_WITH_QT "Build Mapbox GL Qt bindings" OFF)
 option(MBGL_WITH_SANITIZER "Use [address|thread|undefined] here" OFF)
 option(MBGL_WITH_RTTI "Compile with runtime type information" OFF)
 option(MBGL_WITH_OPENGL "Build with OpenGL renderer" ON)
+option(MBGL_WITH_METAL "Build with Metal renderer" OFF)
+
+if(MBGL_WITH_OPENGL AND MBGL_WITH_METAL)
+    message("!! Both OpenGL and Metal renderer backend options selected")
+    message("!! Configuring GL-Native with Metal renderer backend")
+    set(MBGL_WITH_OPENGL OFF)
+endif()
 
 add_library(
     mbgl-compiler-options INTERFACE
