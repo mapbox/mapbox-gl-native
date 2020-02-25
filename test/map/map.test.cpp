@@ -342,7 +342,8 @@ TEST(Map, Offline) {
 
     NetworkStatus::Set(NetworkStatus::Status::Offline);
     const std::string prefix = "http://127.0.0.1:3000/";
-    auto dbfs = FileSourceManager::get()->getFileSource(FileSourceType::Database, ResourceOptions{});
+    std::shared_ptr<FileSource> dbfs =
+        FileSourceManager::get()->getFileSource(FileSourceType::Database, ResourceOptions{});
     dbfs->forward(Resource::style(prefix + "style.json"), expiredItem("style.json"));
     dbfs->forward(Resource::source(prefix + "streets.json"), expiredItem("streets.json"));
     dbfs->forward(Resource::spriteJSON(prefix + "sprite", 1.0), expiredItem("sprite.json"));
@@ -882,7 +883,8 @@ TEST(Map, NoContentTiles) {
     Response response;
     response.noContent = true;
     response.expires = util::now() + 1h;
-    auto dbfs = FileSourceManager::get()->getFileSource(FileSourceType::Database, ResourceOptions{});
+    std::shared_ptr<FileSource> dbfs =
+        FileSourceManager::get()->getFileSource(FileSourceType::Database, ResourceOptions{});
     dbfs->forward(
         Resource::tile("http://example.com/{z}-{x}-{y}.vector.pbf", 1.0, 0, 0, 0, Tileset::Scheme::XYZ), response, [&] {
             test.map.getStyle().loadJSON(R"STYLE({
@@ -1327,7 +1329,8 @@ TEST(Map, TEST_REQUIRES_SERVER(ExpiredSpriteSheet)) {
 
     NetworkStatus::Set(NetworkStatus::Status::Offline);
     const std::string prefix = "http://127.0.0.1:3000/online/";
-    auto dbfs = FileSourceManager::get()->getFileSource(FileSourceType::Database, ResourceOptions{});
+    std::shared_ptr<FileSource> dbfs =
+        FileSourceManager::get()->getFileSource(FileSourceType::Database, ResourceOptions{});
     dbfs->forward(Resource::style(prefix + "style.json"), makeResponse("style.json"));
     dbfs->forward(Resource::source(prefix + "streets.json"), makeResponse("streets.json"));
     dbfs->forward(Resource::spriteJSON(prefix + "sprite", 1.0), makeResponse("sprite.json", true));

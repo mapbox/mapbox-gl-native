@@ -41,10 +41,10 @@ FileSource::FileSource(jni::JNIEnv& _env, const jni::String& accessToken, const 
     // TODO: Split Android FileSource API to smaller interfaces
     resourceLoader =
         mbgl::FileSourceManager::get()->getFileSource(mbgl::FileSourceType::ResourceLoader, resourceOptions);
-    databaseSource = std::static_pointer_cast<mbgl::DatabaseFileSource>(
-        mbgl::FileSourceManager::get()->getFileSource(mbgl::FileSourceType::Database, resourceOptions));
-    onlineSource = std::static_pointer_cast<mbgl::OnlineFileSource>(
-        mbgl::FileSourceManager::get()->getFileSource(mbgl::FileSourceType::Network, resourceOptions));
+    databaseSource = std::static_pointer_cast<mbgl::DatabaseFileSource>(std::shared_ptr<mbgl::FileSource>(
+        mbgl::FileSourceManager::get()->getFileSource(mbgl::FileSourceType::Database, resourceOptions)));
+    onlineSource = std::static_pointer_cast<mbgl::OnlineFileSource>(std::shared_ptr<mbgl::FileSource>(
+        mbgl::FileSourceManager::get()->getFileSource(mbgl::FileSourceType::Network, resourceOptions)));
 }
 
 FileSource::~FileSource() {

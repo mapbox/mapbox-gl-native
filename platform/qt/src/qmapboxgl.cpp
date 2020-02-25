@@ -1751,7 +1751,8 @@ QMapboxGLPrivate::QMapboxGLPrivate(QMapboxGL *q, const QMapboxGLSettings &settin
                                                mbgl::ResourceTransform::FinishedCallback onFinished) {
              actorRef.invoke(&mbgl::ResourceTransform::TransformCallback::operator(), kind, url, std::move(onFinished));
          }};
-         auto fs = mbgl::FileSourceManager::get()->getFileSource(mbgl::FileSourceType::Network, resourceOptions);
+         std::shared_ptr<mbgl::FileSource> fs =
+             mbgl::FileSourceManager::get()->getFileSource(mbgl::FileSourceType::Network, resourceOptions);
          std::static_pointer_cast<mbgl::OnlineFileSource>(fs)->setResourceTransform(std::move(transform));
      }
 
