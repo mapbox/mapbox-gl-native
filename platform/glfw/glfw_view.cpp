@@ -132,6 +132,8 @@ GLFWView::GLFWView(bool fullscreen_, bool benchmark_)
     printf("- Press `B` to cycle through the color, stencil, and depth buffer\n");
     printf("- Press `D` to cycle through camera bounds: inside, crossing IDL at left, crossing IDL at right, and disabled\n");
     printf("- Press `T` to add custom geometry source\n");
+    printf("- Press `F` to enable feature-state demo\n");
+    printf("- Press `U` to toggle pitch bounds\n");
     printf("\n");
     printf("- Press `1` through `6` to add increasing numbers of point annotations for testing\n");
     printf("- Press `7` through `0` to add increasing numbers of shape annotations for testing\n");
@@ -386,6 +388,17 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
             } else {
                 mbgl::Log::Error(mbgl::Event::General,
                                  "Fail to create render test! Base directory does not exist or permission denied.");
+            }
+        } break;
+        case GLFW_KEY_U: {
+            auto bounds = view->map->getBounds();
+            if (bounds.minPitch == mbgl::util::PITCH_MIN * mbgl::util::RAD2DEG &&
+                bounds.maxPitch == mbgl::util::PITCH_MAX * mbgl::util::RAD2DEG) {
+                mbgl::Log::Info(mbgl::Event::General, "Limiting pitch bounds to [30, 40] degrees");
+                view->map->setBounds(mbgl::BoundOptions().withMinPitch(30).withMaxPitch(40));
+            } else {
+                mbgl::Log::Info(mbgl::Event::General, "Resetting pitch bounds to [0, 60] degrees");
+                view->map->setBounds(mbgl::BoundOptions().withMinPitch(0).withMaxPitch(60));
             }
         } break;
         }
