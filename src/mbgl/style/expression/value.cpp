@@ -126,16 +126,7 @@ Value ValueConverter<mbgl::Value>::toExpressionValue(const mbgl::Value& value) {
 
 mbgl::Value ValueConverter<mbgl::Value>::fromExpressionValue(const Value& value) {
     return value.match(
-        [&](const Color& color) -> mbgl::Value {
-            std::array<double, 4> array = color.toArray();
-            return std::vector<mbgl::Value>{
-                std::string("rgba"),
-                array[0],
-                array[1],
-                array[2],
-                array[3],
-            };
-        },
+        [&](const Color& color) -> mbgl::Value { return color.serialize(); },
         [&](const Collator&) -> mbgl::Value {
             // fromExpressionValue can't be used for Collator values,
             // because they have no meaningful representation as an mbgl::Value

@@ -318,7 +318,7 @@ struct ValueFactory<TransitionOptions> {
 
 template <>
 struct ValueFactory<Color> {
-    static Value make(const Color& color) { return color.toObject(); }
+    static Value make(const Color& color) { return color.serialize(); }
 };
 
 template <typename T>
@@ -358,11 +358,14 @@ Value makeValue(T&& arg) {
 template <typename T>
 StyleProperty makeStyleProperty(const PropertyValue<T>& value) {
     return value.match([](const Undefined&) -> StyleProperty { return {}; },
-                       [](const T& t) -> StyleProperty {
-                           return {makeValue(t), StyleProperty::Kind::Constant};
+                       [](const Color& c) -> StyleProperty {
+                           return {makeValue(c), StyleProperty::Kind::Expression};
                        },
                        [](const PropertyExpression<T>& fn) -> StyleProperty {
                            return {fn.getExpression().serialize(), StyleProperty::Kind::Expression};
+                       },
+                       [](const auto& t) -> StyleProperty {
+                           return {makeValue(t), StyleProperty::Kind::Constant};
                        });
 }
 
