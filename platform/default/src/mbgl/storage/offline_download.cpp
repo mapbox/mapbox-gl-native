@@ -360,10 +360,14 @@ void OfflineDownload::activateDownload() {
    the first few errors is fruitless anyway.
 */
 void OfflineDownload::continueDownload() {
-    if (resourcesRemaining.empty() && status.complete()) {
-        markPendingUsedResources();
-        setState(OfflineRegionDownloadState::Inactive);
-        return;
+    if (resourcesRemaining.empty()) {
+        // Flush pending buffers.
+        if (!flushResourcesBuffer()) return;
+        if (status.complete()) {
+            markPendingUsedResources();
+            setState(OfflineRegionDownloadState::Inactive);
+            return;
+        }
     }
 
     if (resourcesToBeMarkedAsUsed.size() >= kMarkBatchSize) markPendingUsedResources();
@@ -385,6 +389,19 @@ void OfflineDownload::deactivateDownload() {
     resourcesRemaining.clear();
     requests.clear();
     buffer.clear();
+}
+
+bool OfflineDownload::flushResourcesBuffer() {
+    if (buffer.empty()) return true;
+    try {
+        offlineDatabase.putRegionResources(id, buffer, status);
+        buffer.clear();
+        observer->statusChanged(status);
+        return true;
+    } catch (const MapboxTileLimitExceededException&) {
+        onMapboxTileCountLimitExceeded();
+        return false;
+    }
 }
 
 void OfflineDownload::queueResource(Resource&& resource) {
@@ -479,18 +496,10 @@ void OfflineDownload::ensureResource(Resource&& resource,
             // Queue up for batched insertion
             buffer.emplace_back(resource, onlineResponse);
 
-            // Flush buffer periodically
-            if (buffer.size() == kResourcesBatchSize || resourcesRemaining.empty()) {
-                try {
-                    offlineDatabase.putRegionResources(id, buffer, status);
-                } catch (const MapboxTileLimitExceededException&) {
-                    onMapboxTileCountLimitExceeded();
-                    return;
-                }
-
-                buffer.clear();
-                observer->statusChanged(status);
-            }
+            // Flush buffer periodically.
+            // Have to keep `resourcesRemaining.empty()` as the following condition would fail otherwise.
+            // TODO: Simplify the tile count limit check code path!
+            if ((buffer.size() == kResourcesBatchSize || resourcesRemaining.empty()) && !flushResourcesBuffer()) return;
 
             if (offlineDatabase.exceedsOfflineMapboxTileCountLimit(resource)) {
                 onMapboxTileCountLimitExceeded();

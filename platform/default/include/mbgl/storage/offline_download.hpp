@@ -40,6 +40,7 @@ private:
     void activateDownload();
     void continueDownload();
     void deactivateDownload();
+    bool flushResourcesBuffer();
 
     /*
      * Ensure that the resource is stored in the database, requesting it if necessary.
