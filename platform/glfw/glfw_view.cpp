@@ -37,15 +37,50 @@
 
 #include <cassert>
 #include <cstdlib>
+#include <fstream>
 #include <iostream>
+
+namespace {
+void addFillExtrusionLayer(mbgl::style::Style &style, bool visible) {
+    using namespace mbgl::style;
+    using namespace mbgl::style::expression::dsl;
+
+    // Satellite-only style does not contain building extrusions data.
+    if (!style.getSource("composite")) {
+        return;
+    }
+
+    if (auto layer = style.getLayer("3d-buildings")) {
+        layer->setVisibility(VisibilityType(!visible));
+        return;
+    }
+
+    auto extrusionLayer = std::make_unique<FillExtrusionLayer>("3d-buildings", "composite");
+    extrusionLayer->setSourceLayer("building");
+    extrusionLayer->setMinZoom(15.0f);
+    extrusionLayer->setFilter(Filter(eq(get("extrude"), literal("true"))));
+    extrusionLayer->setFillExtrusionColor(PropertyExpression<mbgl::Color>(interpolate(linear(),
+                                                                                      number(get("height")),
+                                                                                      0.f,
+                                                                                      toColor(literal("#160e23")),
+                                                                                      50.f,
+                                                                                      toColor(literal("#00615f")),
+                                                                                      100.f,
+                                                                                      toColor(literal("#55e9ff")))));
+    extrusionLayer->setFillExtrusionOpacity(0.6f);
+    extrusionLayer->setFillExtrusionHeight(PropertyExpression<float>(get("height")));
+    extrusionLayer->setFillExtrusionBase(PropertyExpression<float>(get("min_height")));
+    style.addLayer(std::move(extrusionLayer));
+}
+} // namespace
 
 void glfwError(int error, const char *description) {
     mbgl::Log::Error(mbgl::Event::OpenGL, "GLFW error (%i): %s", error, description);
     assert(false);
 }
 
-GLFWView::GLFWView(bool fullscreen_, bool benchmark_)
-    : fullscreen(fullscreen_), benchmark(benchmark_) {
+GLFWView::GLFWView(bool fullscreen_, bool benchmark_, const mbgl::ResourceOptions &options)
+    : fullscreen(fullscreen_), benchmark(benchmark_), mapResourceOptions(options.clone()) {
     glfwSetErrorCallback(glfwError);
 
     std::srand(static_cast<unsigned int>(std::time(nullptr)));
@@ -134,6 +169,8 @@ GLFWView::GLFWView(bool fullscreen_, bool benchmark_)
     printf("- Press `T` to add custom geometry source\n");
     printf("- Press `F` to enable feature-state demo\n");
     printf("- Press `U` to toggle pitch bounds\n");
+    printf("- Press `H` to take a snapshot of a current map.\n");
+    printf("- Press `J` to take a snapshot of a current map with an extrusions overlay.\n");
     printf("\n");
     printf("- Press `1` through `6` to add increasing numbers of point annotations for testing\n");
     printf("- Press `7` through `0` to add increasing numbers of shape annotations for testing\n");
@@ -182,23 +219,23 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
             view->animateRouteCallback = nullptr;
 
         switch (key) {
-        case GLFW_KEY_ESCAPE:
-            glfwSetWindowShouldClose(window, true);
-            break;
-        case GLFW_KEY_TAB:
-            view->cycleDebugOptions();
-            break;
-        case GLFW_KEY_X:
-            if (!mods)
-                view->map->jumpTo(mbgl::CameraOptions().withCenter(mbgl::LatLng {}).withZoom(0.0).withBearing(0.0).withPitch(0.0));
-            break;
-        case GLFW_KEY_O:
-            view->onlineStatusCallback();
-            break;
-        case GLFW_KEY_S:
-            if (view->changeStyleCallback)
-                view->changeStyleCallback();
-            break;
+            case GLFW_KEY_ESCAPE:
+                glfwSetWindowShouldClose(window, true);
+                break;
+            case GLFW_KEY_TAB:
+                view->cycleDebugOptions();
+                break;
+            case GLFW_KEY_X:
+                if (!mods)
+                    view->map->jumpTo(
+                        mbgl::CameraOptions().withCenter(mbgl::LatLng{}).withZoom(0.0).withBearing(0.0).withPitch(0.0));
+                break;
+            case GLFW_KEY_O:
+                view->onlineStatusCallback();
+                break;
+            case GLFW_KEY_S:
+                if (view->changeStyleCallback) view->changeStyleCallback();
+                break;
 #if not MBGL_USE_GLES2
         case GLFW_KEY_B: {
             auto debug = view->map->getDebug();
@@ -401,6 +438,13 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
                 view->map->setBounds(mbgl::BoundOptions().withMinPitch(0).withMaxPitch(60));
             }
         } break;
+        case GLFW_KEY_H: {
+            view->makeSnapshot();
+        } break;
+        case GLFW_KEY_J: {
+            // Snapshot with overlay
+            view->makeSnapshot(true);
+        } break;
         }
     }
 
@@ -572,6 +616,42 @@ void GLFWView::popAnnotation() {
 
     map->removeAnnotation(annotationIDs.back());
     annotationIDs.pop_back();
+}
+
+void GLFWView::makeSnapshot(bool withOverlay) {
+    if (!snapshotter || snapshotter->getStyleURL() != map->getStyle().getURL()) {
+        snapshotter =
+            std::make_unique<mbgl::MapSnapshotter>(std::pair<bool, std::string>{false, map->getStyle().getURL()},
+                                                   map->getMapOptions().size(),
+                                                   map->getMapOptions().pixelRatio(),
+                                                   map->getCameraOptions(),
+                                                   mbgl::nullopt,
+                                                   mbgl::nullopt,
+                                                   mapResourceOptions);
+    } else {
+        snapshotter->setCameraOptions(map->getCameraOptions());
+    }
+
+    if (withOverlay) {
+        addFillExtrusionLayer(snapshotter->getStyle(), withOverlay);
+    }
+
+    snapshotter->snapshot([](std::exception_ptr ptr,
+                             mbgl::PremultipliedImage image,
+                             mbgl::MapSnapshotter::Attributions,
+                             mbgl::MapSnapshotter::PointForFn,
+                             mbgl::MapSnapshotter::LatLngForFn) {
+        if (!ptr) {
+            mbgl::Log::Info(mbgl::Event::General,
+                            "Made snapshot './snapshot.png' with size w:%dpx h:%dpx",
+                            image.size.width,
+                            image.size.height);
+            std::ofstream file("./snapshot.png");
+            file << mbgl::encodePNG(image);
+        } else {
+            mbgl::Log::Error(mbgl::Event::General, "Failed to make a snapshot!");
+        }
+    });
 }
 
 void GLFWView::onScroll(GLFWwindow *window, double /*xOffset*/, double yOffset) {
@@ -790,35 +870,8 @@ void GLFWView::onDidFinishLoadingStyle() {
 }
 
 void GLFWView::toggle3DExtrusions(bool visible) {
-    using namespace mbgl::style;
-    using namespace mbgl::style::expression::dsl;
-
     show3DExtrusions = visible;
-
-    // Satellite-only style does not contain building extrusions data.
-    if (!map->getStyle().getSource("composite")) {
-        return;
-    }
-
-    if (auto layer = map->getStyle().getLayer("3d-buildings")) {
-        layer->setVisibility(VisibilityType(!show3DExtrusions));
-        return;
-    }
-
-    auto extrusionLayer = std::make_unique<FillExtrusionLayer>("3d-buildings", "composite");
-    extrusionLayer->setSourceLayer("building");
-    extrusionLayer->setMinZoom(15.0f);
-    extrusionLayer->setFilter(Filter(eq(get("extrude"), literal("true"))));
-    extrusionLayer->setFillExtrusionColor(PropertyExpression<mbgl::Color>(
-        interpolate(linear(), number(get("height")),
-                    0.f, toColor(literal("#160e23")),
-                    50.f, toColor(literal("#00615f")),
-                    100.f, toColor(literal("#55e9ff")))));
-    extrusionLayer->setFillExtrusionOpacity(0.6f);
-    extrusionLayer->setFillExtrusionHeight(PropertyExpression<float>(get("height")));
-    extrusionLayer->setFillExtrusionBase(PropertyExpression<float>(get("min_height")));
-
-    map->getStyle().addLayer(std::move(extrusionLayer));
+    addFillExtrusionLayer(map->getStyle(), show3DExtrusions);
 }
 
 void GLFWView::toggleCustomSource() {
