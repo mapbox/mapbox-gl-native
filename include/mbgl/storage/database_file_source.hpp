@@ -15,14 +15,6 @@ public:
     explicit DatabaseFileSource(const ResourceOptions& options);
     ~DatabaseFileSource() override;
 
-    // FileSource overrides
-    std::unique_ptr<AsyncRequest> request(const Resource&, Callback) override;
-    void forward(const Resource&, const Response&, std::function<void()> callback) override;
-    bool canRequest(const Resource&) const override;
-    void setProperty(const std::string&, const mapbox::base::Value&) override;
-    void pause() override;
-    void resume() override;
-
     // Methods common to Ambient cache and Offline functionality
 
     /*
@@ -233,6 +225,14 @@ public:
     virtual void setOfflineMapboxTileCountLimit(uint64_t) const;
 
 private:
+    // FileSource overrides
+    std::unique_ptr<AsyncRequest> request(const Resource&, Callback) override;
+    void forward(const Resource&, const Response&, std::function<void()> callback) override;
+    bool canRequest(const Resource&) const override;
+    void setProperty(const std::string&, const mapbox::base::Value&) override;
+    void pause() override;
+    void resume() override;
+
     class Impl;
     const std::unique_ptr<Impl> impl;
 };
