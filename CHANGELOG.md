@@ -2,6 +2,13 @@
 
 ## master
 
+### 🐞 Bug fixes
+
+- [core] Revert shader changes from [#16189](https://github.com/mapbox/mapbox-gl-native/pull/16189), which will cause incorrect label positioning ([#16235](https://github.com/mapbox/mapbox-gl-native/pull/16235))
+  
+  This is a back porting from GL JS [#9333](https://github.com/mapbox/mapbox-gl-js/pull/9333)
+
+
 ## maps-v1.2.0 (2020.02-release-vanillashake)
 
 ### ✨ New features
