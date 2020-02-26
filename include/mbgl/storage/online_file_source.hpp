@@ -10,6 +10,7 @@ public:
     OnlineFileSource();
     ~OnlineFileSource() override;
 
+private:
     // FileSource overrides
     std::unique_ptr<AsyncRequest> request(const Resource&, Callback) override;
     bool canRequest(const Resource&) const override;
@@ -19,7 +20,6 @@ public:
     mapbox::base::Value getProperty(const std::string&) const override;
     void setResourceTransform(ResourceTransform) override;
 
-private:
     class Impl;
     const std::unique_ptr<Impl> impl;
 };

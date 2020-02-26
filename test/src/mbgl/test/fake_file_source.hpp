@@ -75,10 +75,10 @@ public:
     }
 
     mapbox::base::Value getProperty(const std::string& property) const override {
-        return onlineFs.getProperty(property);
+        return onlineFs->getProperty(property);
     }
 
-    OnlineFileSource onlineFs;
+    std::unique_ptr<FileSource> onlineFs = std::make_unique<OnlineFileSource>();
 };
 
 } // namespace mbgl

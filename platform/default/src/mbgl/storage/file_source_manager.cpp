@@ -27,7 +27,7 @@ public:
                                   [](const ResourceOptions&) { return std::make_unique<LocalFileSource>(); });
 
         registerFileSourceFactory(FileSourceType::Network, [](const ResourceOptions& options) {
-            auto networkSource = std::make_unique<OnlineFileSource>();
+            std::unique_ptr<FileSource> networkSource = std::make_unique<OnlineFileSource>();
             networkSource->setProperty(ACCESS_TOKEN_KEY, options.accessToken());
             networkSource->setProperty(API_BASE_URL_KEY, options.baseURL());
             return networkSource;
