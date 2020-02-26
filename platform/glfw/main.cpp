@@ -95,9 +95,6 @@ int main(int argc, char *argv[]) {
         mbgl::Log::Info(mbgl::Event::General, "BENCHMARK MODE: Some optimizations are disabled.");
     }
 
-    GLFWView backend(fullscreen, benchmark);
-    view = &backend;
-
     // Set access token if present
     std::string token(getenv("MAPBOX_ACCESS_TOKEN") ?: "");
     if (token.empty()) {
@@ -106,6 +103,9 @@ int main(int argc, char *argv[]) {
 
     mbgl::ResourceOptions resourceOptions;
     resourceOptions.withCachePath(cacheDB).withAccessToken(token);
+
+    GLFWView backend(fullscreen, benchmark, resourceOptions);
+    view = &backend;
 
     std::shared_ptr<mbgl::FileSource> onlineFileSource =
         mbgl::FileSourceManager::get()->getFileSource(mbgl::FileSourceType::Network, resourceOptions);

@@ -11,11 +11,15 @@ add_executable(
     ${PROJECT_SOURCE_DIR}/platform/glfw/glfw_renderer_frontend.cpp
     ${PROJECT_SOURCE_DIR}/platform/glfw/settings_json.cpp
     ${PROJECT_SOURCE_DIR}/platform/glfw/test_writer.cpp
+    ${PROJECT_SOURCE_DIR}/platform/default/src/mbgl/map/map_snapshotter.cpp
 )
 
 target_include_directories(
     mbgl-glfw
-    PRIVATE ${GLFW_INCLUDE_DIRS}
+    PRIVATE
+        ${GLFW_INCLUDE_DIRS}
+        # For /platform/default/src/mbgl/map/map_snapshotter.hpp
+    PRIVATE ${PROJECT_SOURCE_DIR}/src
 )
 
 include(${PROJECT_SOURCE_DIR}/vendor/cheap-ruler-cpp.cmake)
