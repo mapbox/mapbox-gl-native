@@ -160,6 +160,23 @@ workflows:
           target_is_macos: true
           config_params: '-G Xcode -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_ARCHITECTURES=arm64e -DCMAKE_OSX_SYSROOT=iphoneos'
           build_params: '--config Release'
+  nightly:
+    triggers:
+      - schedule:
+          cron: "0 5 * * *"
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - build-template:
+          name: linux-gcc8-debug-coverage-nightly
+          executor_name: ubuntu-disco
+          target_is_linux: true
+          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=gcc-8 -DCMAKE_CXX_COMPILER=g++-8 -DCMAKE_BUILD_TYPE=Debug -DMBGL_WITH_COVERAGE=ON'
+          style_tests: true
+          upload_coverage: true
+          publish_coverage: true
 
 #
 # Executors: we currently support two executors, one based on Ubuntu 19.04 aka Disco
@@ -392,6 +409,14 @@ commands:
         name: Upload coverage results to codecov.io
         command: |
           bash <(curl -sSfL https://codecov.io/bash) -X gcov || echo 'Codecov failed to upload'
+  publish-coverage-metrics:
+    steps:
+    - run:
+        name: Upload coverage metrics to s3
+        command: |
+          if [[ $CIRCLE_BRANCH == master ]]; then
+              scripts/publish_core_codecoverage.js -p Linux -s Core
+          fi
 
 jobs:
   ios-render-test-runner:
@@ -690,6 +715,9 @@ jobs:
       upload_coverage:
         type: boolean
         default: false
+      publish_coverage:
+        type: boolean
+        default: false
     executor: << parameters.executor_name >>
     steps:
       - checkout
@@ -743,4 +771,8 @@ jobs:
           condition: << parameters.upload_coverage >>
           steps:
             - upload-coverage-results
+      - when:
+          condition: << parameters.publish_coverage >>
+          steps:
+            - publish-coverage-metrics
       - save
