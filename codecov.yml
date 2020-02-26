@@ -1,4 +1,7 @@
 ignore:
+  - "benchmark/"
+  - "expression-test/"
+  - "render-test/"
   - "test/"
   - "vendor/"
 
