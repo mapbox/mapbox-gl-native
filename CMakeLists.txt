@@ -284,8 +284,6 @@ add_library(
     ${PROJECT_SOURCE_DIR}/include/mbgl/util/work_request.hpp
     ${PROJECT_SOURCE_DIR}/include/mbgl/util/work_task.hpp
     ${PROJECT_SOURCE_DIR}/include/mbgl/util/work_task_impl.hpp
-    ${PROJECT_SOURCE_DIR}/src/csscolorparser/csscolorparser.cpp
-    ${PROJECT_SOURCE_DIR}/src/csscolorparser/csscolorparser.hpp
     ${PROJECT_SOURCE_DIR}/src/mbgl/actor/mailbox.cpp
     ${PROJECT_SOURCE_DIR}/src/mbgl/actor/scheduler.cpp
     ${PROJECT_SOURCE_DIR}/src/mbgl/algorithm/update_renderables.hpp
@@ -818,8 +816,6 @@ add_library(
     ${PROJECT_SOURCE_DIR}/src/mbgl/util/version.cpp
     ${PROJECT_SOURCE_DIR}/src/mbgl/util/version.hpp
     ${PROJECT_SOURCE_DIR}/src/mbgl/util/work_request.cpp
-    ${PROJECT_SOURCE_DIR}/src/parsedate/parsedate.cpp
-    ${PROJECT_SOURCE_DIR}/src/parsedate/parsedate.hpp
 )
 
 if(MBGL_WITH_OPENGL)
@@ -952,10 +948,12 @@ target_include_directories(
     PUBLIC ${PROJECT_SOURCE_DIR}/include
 )
 
-include(${PROJECT_SOURCE_DIR}/vendor/mapbox-base.cmake)
 include(${PROJECT_SOURCE_DIR}/vendor/boost.cmake)
+include(${PROJECT_SOURCE_DIR}/vendor/csscolorparser.cmake)
 include(${PROJECT_SOURCE_DIR}/vendor/earcut.hpp.cmake)
 include(${PROJECT_SOURCE_DIR}/vendor/eternal.cmake)
+include(${PROJECT_SOURCE_DIR}/vendor/mapbox-base.cmake)
+include(${PROJECT_SOURCE_DIR}/vendor/parsedate.cmake)
 include(${PROJECT_SOURCE_DIR}/vendor/polylabel.cmake)
 include(${PROJECT_SOURCE_DIR}/vendor/protozero.cmake)
 include(${PROJECT_SOURCE_DIR}/vendor/unique_resource.cmake)
@@ -971,8 +969,10 @@ target_link_libraries(
         Mapbox::Base::geojson-vt-cpp
         mbgl-compiler-options
         mbgl-vendor-boost
+        mbgl-vendor-csscolorparser
         mbgl-vendor-earcut.hpp
         mbgl-vendor-eternal
+        mbgl-vendor-parsedate
         mbgl-vendor-polylabel
         mbgl-vendor-protozero
         mbgl-vendor-unique_resource
