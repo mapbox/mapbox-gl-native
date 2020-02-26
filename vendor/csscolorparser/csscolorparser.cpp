@@ -22,7 +22,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 
-#include "csscolorparser.hpp"
+#include "csscolorparser/csscolorparser.hpp"
 
 #include <cstdint>
 #include <vector>
@@ -176,7 +176,7 @@ std::vector<std::string> split(const std::string& s, char delim) {
     return elems;
 }
 
-mbgl::optional<Color> parse(const std::string& css_str) {
+std::experimental::optional<Color> parse(const std::string& css_str) {
     std::string str = css_str;
 
     // Remove all whitespace, not compliant, but should just be more accepting.
