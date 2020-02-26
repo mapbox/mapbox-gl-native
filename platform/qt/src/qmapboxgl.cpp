@@ -1753,7 +1753,7 @@ QMapboxGLPrivate::QMapboxGLPrivate(QMapboxGL *q, const QMapboxGLSettings &settin
          }};
          std::shared_ptr<mbgl::FileSource> fs =
              mbgl::FileSourceManager::get()->getFileSource(mbgl::FileSourceType::Network, resourceOptions);
-         std::static_pointer_cast<mbgl::OnlineFileSource>(fs)->setResourceTransform(std::move(transform));
+         fs->setResourceTransform(std::move(transform));
      }
 
     // Needs to be Queued to give time to discard redundant draw calls via the `renderQueued` flag.

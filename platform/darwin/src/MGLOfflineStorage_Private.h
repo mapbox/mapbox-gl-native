@@ -19,7 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  The shared online file source object owned by the shared offline storage object.
  */
-@property (nonatomic) std::shared_ptr<mbgl::OnlineFileSource> mbglOnlineFileSource;
+@property (nonatomic) std::shared_ptr<mbgl::FileSource> mbglOnlineFileSource;
 
 /**
  The shared resource loader file source object owned by the shared offline storage object.
