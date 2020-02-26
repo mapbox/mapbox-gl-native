@@ -16,9 +16,33 @@
   
   This is a back porting from GL JS [#9333](https://github.com/mapbox/mapbox-gl-js/pull/9333)
 
+### ✨ New features
+
 - [core] Add Layer::serialize() method ([#16231](https://github.com/mapbox/mapbox-gl-native/pull/16231))
 
   New method allows serialization of a layer into a Value type, including all modifications done via runtime style API. New method is also an enabler for Style object serialization (sources, layers, etc).
+
+##### ⚠️  Breaking changes
+
+- Changes to `mbgl::FileSourceManager::getFileSource()` ([#16238](https://github.com/mapbox/mapbox-gl-native/pull/16238))
+
+  It returns now `mbgl::PassRefPtr<FileSource>` (previously was `std::shared_ptr<FileSource>`) in order to enforce keeping the strong reference to the returned object.
+
+  Breaking code example:
+  `auto fs = FileSourceManager::getFileSource(); fs->..`
+  
+  Posible fix:
+  `std::shared_ptr<FileSource> fs = `;
+
+- The `mbgl::OnlineFileSource` class cannot be used directly ([#16238](https://github.com/mapbox/mapbox-gl-native/pull/16238))
+
+  Clients must use the parent `mbgl::FileSource` interface instead.
+
+  Breaking code example:
+  `std::shared_ptr<OnlineFileSource> onlineSource = std::static_pointer_cast<OnlineFileSource>(FileSourceManager::get()->getFileSource(..));`
+
+  Possible fix:
+  `std::shared_ptr<FileSource> onlineSource = FileSourceManager::get()->getFileSource(..);`
 
 ## maps-v1.2.0 (2020.02-release-vanillashake)
 
