@@ -530,9 +530,8 @@ TEST(MainResourceLoader, TEST_REQUIRES_SERVER(NoCacheRefreshModifiedModified)) {
 TEST(MainResourceLoader, TEST_REQUIRES_SERVER(SetResourceTransform)) {
     util::RunLoop loop;
     MainResourceLoader resourceLoader(ResourceOptions{});
-    std::shared_ptr<FileSource> fs =
+    std::shared_ptr<FileSource> onlinefs =
         FileSourceManager::get()->getFileSource(FileSourceType::Network, ResourceOptions{});
-    auto onlinefs = std::static_pointer_cast<OnlineFileSource>(fs);
 
     // Translates the URL "localhost://test to http://127.0.0.1:3000/test
     Actor<ResourceTransform::TransformCallback> transform(

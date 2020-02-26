@@ -43,8 +43,7 @@ FileSource::FileSource(jni::JNIEnv& _env, const jni::String& accessToken, const 
         mbgl::FileSourceManager::get()->getFileSource(mbgl::FileSourceType::ResourceLoader, resourceOptions);
     databaseSource = std::static_pointer_cast<mbgl::DatabaseFileSource>(std::shared_ptr<mbgl::FileSource>(
         mbgl::FileSourceManager::get()->getFileSource(mbgl::FileSourceType::Database, resourceOptions)));
-    onlineSource = std::static_pointer_cast<mbgl::OnlineFileSource>(std::shared_ptr<mbgl::FileSource>(
-        mbgl::FileSourceManager::get()->getFileSource(mbgl::FileSourceType::Network, resourceOptions)));
+    onlineSource = mbgl::FileSourceManager::get()->getFileSource(mbgl::FileSourceType::Network, resourceOptions);
 }
 
 FileSource::~FileSource() {

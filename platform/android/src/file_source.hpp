@@ -75,7 +75,7 @@ private:
     std::unique_ptr<Actor<ResourceTransform::TransformCallback>> resourceTransform;
     std::function<void()> pathChangeCallback;
     std::shared_ptr<mbgl::DatabaseFileSource> databaseSource;
-    std::shared_ptr<mbgl::OnlineFileSource> onlineSource;
+    std::shared_ptr<mbgl::FileSource> onlineSource;
     std::shared_ptr<mbgl::FileSource> resourceLoader;
 };
 
