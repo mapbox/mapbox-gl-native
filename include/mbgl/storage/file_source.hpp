@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mbgl/storage/resource_transform.hpp>
 #include <mbgl/storage/response.hpp>
 
 #include <mapbox/value.hpp>
@@ -79,6 +80,9 @@ public:
      */
     virtual void setProperty(const std::string&, const mapbox::base::Value&){};
     virtual mapbox::base::Value getProperty(const std::string&) const { return {}; };
+
+    // When supported, sets the modifier of the requested resources.
+    virtual void setResourceTransform(ResourceTransform) {}
 
 protected:
     FileSource() = default;

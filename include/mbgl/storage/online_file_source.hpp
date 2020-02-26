@@ -5,8 +5,6 @@
 
 namespace mbgl {
 
-class ResourceTransform;
-
 class OnlineFileSource : public FileSource {
 public:
     OnlineFileSource();
@@ -19,10 +17,7 @@ public:
     void resume() override;
     void setProperty(const std::string&, const mapbox::base::Value&) override;
     mapbox::base::Value getProperty(const std::string&) const override;
-
-    // OnlineFileSource interface.
-    // TODO: Would be nice to drop it to get uniform interface.
-    virtual void setResourceTransform(ResourceTransform);
+    void setResourceTransform(ResourceTransform) override;
 
 private:
     class Impl;
