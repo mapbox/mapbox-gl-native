@@ -15,9 +15,9 @@ struct ShaderSource;
 template <>
 struct ShaderSource<SymbolSDFTextProgram> {
     static constexpr const char* name = "symbol_sdf_text";
-    static constexpr const uint8_t hash[8] = {0x5a, 0xe9, 0x60, 0x5b, 0xb1, 0xc3, 0x2b, 0x3b};
-    static constexpr const auto vertexOffset = 53482;
-    static constexpr const auto fragmentOffset = 57603;
+    static constexpr const uint8_t hash[8] = {0x46, 0xe9, 0x60, 0xde, 0x1e, 0x85, 0x36, 0x54};
+    static constexpr const auto vertexOffset = 53401;
+    static constexpr const auto fragmentOffset = 57441;
 };
 
 constexpr const char* ShaderSource<SymbolSDFTextProgram>::name;
@@ -216,10 +216,6 @@ void main() {
     vec4 projected_pos = u_label_plane_matrix * vec4(a_projected_pos.xy, 0.0, 1.0);
     gl_Position = u_coord_matrix * vec4(projected_pos.xy / projected_pos.w + rotation_matrix * (a_offset / 32.0 * fontScale + a_pxoffset), 0.0, 1.0);
     float gamma_scale = gl_Position.w;
-
-    // Symbols might end up being behind the camera. Modify z-value to be out of visible bounds
-    // if this is the case, otherwise ignore depth. -1.1 is safely out of the visible depth range [-1, 1]
-    gl_Position.z = mix(-1.1 * gl_Position.w, gl_Position.z, float(projected_pos.w > 0.0));
 
     vec2 fade_opacity = unpack_opacity(a_fade_opacity);
     float fade_change = fade_opacity[1] > 0.5 ? u_fade_change : -u_fade_change;
