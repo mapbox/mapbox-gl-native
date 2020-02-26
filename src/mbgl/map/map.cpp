@@ -332,8 +332,8 @@ BoundOptions Map::getBounds() const {
         .withLatLngBounds(impl->transform.getState().getLatLngBounds())
         .withMinZoom(impl->transform.getState().getMinZoom())
         .withMaxZoom(impl->transform.getState().getMaxZoom())
-        .withMinPitch(impl->transform.getState().getMinPitch())
-        .withMaxPitch(impl->transform.getState().getMaxPitch());
+        .withMinPitch(impl->transform.getState().getMinPitch() * util::RAD2DEG)
+        .withMaxPitch(impl->transform.getState().getMaxPitch() * util::RAD2DEG);
 }
 
 #pragma mark - Map options

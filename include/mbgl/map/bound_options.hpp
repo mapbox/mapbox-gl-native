@@ -36,10 +36,10 @@ struct BoundOptions {
     /// Minimum zoom level allowed.
     optional<double> minZoom;
 
-    /// Maximum pitch allowed.
+    /// Maximum pitch allowed in degrees.
     optional<double> maxPitch;
 
-    /// Minimum pitch allowed.
+    /// Minimum pitch allowed in degrees.
     optional<double> minPitch;
 };
 
