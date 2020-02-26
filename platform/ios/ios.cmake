@@ -80,7 +80,9 @@ include(${PROJECT_SOURCE_DIR}/platform/ios/ccache.cmake)
 include(${PROJECT_SOURCE_DIR}/platform/ios/ios-test-runners.cmake)
 
 initialize_ios_target(mbgl-core)
+initialize_ios_target(mbgl-vendor-csscolorparser)
 initialize_ios_target(mbgl-vendor-icu)
+initialize_ios_target(mbgl-vendor-parsedate)
 
 target_link_libraries(
     mbgl-core
