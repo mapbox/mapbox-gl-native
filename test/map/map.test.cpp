@@ -253,6 +253,8 @@ TEST(Map, LatLngsToCameraWithBearingAndPitchMinMax) {
     EXPECT_NEAR(virtualCamera.center->latitude(), 28.49288, 1e-5);
     EXPECT_NEAR(virtualCamera.center->longitude(), 74.97437, 1e-5);
     ASSERT_DOUBLE_EQ(*virtualCamera.pitch, 0);
+    ASSERT_DOUBLE_EQ(*test.map.getBounds().minPitch, 0);
+    ASSERT_DOUBLE_EQ(*test.map.getBounds().maxPitch, 0);
 
     test.map.setBounds(BoundOptions().withMinPitch(20).withMaxPitch(60));
     virtualCamera = test.map.cameraForLatLngs(latLngs, {}, 23, 0);
@@ -261,6 +263,8 @@ TEST(Map, LatLngsToCameraWithBearingAndPitchMinMax) {
     EXPECT_NEAR(virtualCamera.center->latitude(), 28.53718, 1e-5);
     EXPECT_NEAR(virtualCamera.center->longitude(), 74.31746, 1e-5);
     ASSERT_DOUBLE_EQ(*virtualCamera.pitch, 20.0);
+    ASSERT_DOUBLE_EQ(*test.map.getBounds().minPitch, 20);
+    ASSERT_DOUBLE_EQ(*test.map.getBounds().maxPitch, 60);
 }
 
 TEST(Map, CameraToLatLngBounds) {
