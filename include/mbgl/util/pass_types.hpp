@@ -8,7 +8,7 @@ namespace mbgl {
 template <typename T>
 class Pass {
 public:
-    Pass(T&& obj_) : obj(std::forward<T>(obj_)) {}
+    Pass(T obj_) : obj(std::move(obj_)) {}
     Pass(Pass&&) noexcept = default;
     Pass(const Pass&) = delete;
     Pass& operator=(const Pass&) = delete;
