@@ -9,13 +9,9 @@
 #include <string>
 #include <vector>
 #include <functional>
-
 namespace mbgl {
 
-template<class> class ActorRef;
 struct CameraOptions;
-class FileSource;
-class Size;
 class LatLngBounds;
 class ResourceOptions;
 
@@ -54,7 +50,7 @@ public:
     using LatLngForFn = std::function<LatLng (const ScreenCoordinate&)>;
     using Attributions = std::vector<std::string>;
     using Callback = std::function<void (std::exception_ptr, PremultipliedImage, Attributions, PointForFn, LatLngForFn)>;
-    void snapshot(ActorRef<Callback>);
+    void snapshot(Callback);
 
 private:
     class Impl;
