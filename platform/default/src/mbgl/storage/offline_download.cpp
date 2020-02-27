@@ -484,6 +484,13 @@ void OfflineDownload::ensureResource(Resource&& resource,
         *fileRequestsIt = onlineFileSource.request(resource, [=](Response onlineResponse) {
             if (onlineResponse.error) {
                 observer->responseError(*onlineResponse.error);
+                if (onlineResponse.error->reason == Response::Error::Reason::NotFound) {
+                    // On error 404, we skip this request and go further.
+                    requests.erase(fileRequestsIt);
+                    assert(status.requiredResourceCount > 0);
+                    status.requiredResourceCount--;
+                    continueDownload();
+                }
                 return;
             }
 
