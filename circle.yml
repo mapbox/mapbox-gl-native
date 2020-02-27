@@ -225,12 +225,6 @@ commands:
           command: |
             brew install cmake ccache glfw ninja pkgconfig qt chargepoint/xcparse/xcparse
             brew cask install google-cloud-sdk
-      - run:
-          name: Code Generators macOS
-          command: |
-              platform/darwin/scripts/generate-style-code.js
-              platform/darwin/scripts/update-examples.js
-              git add -A && git diff --staged --exit-code | tee nitpick.patch
   config:
     parameters:
       config_params:
