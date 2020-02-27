@@ -14,8 +14,6 @@
 namespace mbgl {
 namespace android {
 
-class SnapshotterRendererFrontend;
-
 class MapSnapshotter {
 public:
 
@@ -61,7 +59,6 @@ private:
     float pixelRatio;
     bool showLogo;
 
-    std::unique_ptr<Actor<mbgl::MapSnapshotter::Callback>> snapshotCallback;
     std::unique_ptr<mbgl::MapSnapshotter> snapshotter;
 
     FileSource *jFileSource;

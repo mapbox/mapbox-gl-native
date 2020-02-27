@@ -36,34 +36,29 @@ MapSnapshotter::MapSnapshotter(jni::JNIEnv& _env,
     jFileSource = FileSource::getNativePeer(_env, _jFileSource);
     auto size = mbgl::Size { static_cast<uint32_t>(width), static_cast<uint32_t>(height) };
 
-    optional<mbgl::CameraOptions> cameraOptions;
-    if (position) {
-        cameraOptions = CameraPosition::getCameraOptions(_env, position, pixelRatio);
-    }
-
-    optional<mbgl::LatLngBounds> bounds;
-    if (region) {
-        bounds = LatLngBounds::getLatLngBounds(_env, region);
-    }
-
-    std::pair<bool, std::string> style;
-    if (styleJSON) {
-        style = std::make_pair(true, jni::Make<std::string>(_env, styleJSON));
-    } else {
-        style = std::make_pair(false, jni::Make<std::string>(_env, styleURL));
-    }
-
     showLogo = _showLogo;
+
     // Create the core snapshotter
-    snapshotter = std::make_unique<mbgl::MapSnapshotter>(style,
-                                                         size,
-                                                         pixelRatio,
-                                                         cameraOptions,
-                                                         bounds,
-                                                         _localIdeographFontFamily ?
-                                                            jni::Make<std::string>(_env, _localIdeographFontFamily) :
-                                                            optional<std::string>{},
-                                                         mbgl::android::FileSource::getSharedResourceOptions(_env, _jFileSource));
+    snapshotter = std::make_unique<mbgl::MapSnapshotter>(
+        size,
+        pixelRatio,
+        mbgl::android::FileSource::getSharedResourceOptions(_env, _jFileSource),
+        mbgl::MapSnapshotterObserver::nullObserver(),
+        _localIdeographFontFamily ? jni::Make<std::string>(_env, _localIdeographFontFamily) : optional<std::string>{});
+
+    if (position) {
+        snapshotter->setCameraOptions(CameraPosition::getCameraOptions(_env, position, pixelRatio));
+    }
+
+    if (region) {
+        snapshotter->setRegion(LatLngBounds::getLatLngBounds(_env, region));
+    }
+
+    if (styleJSON) {
+        snapshotter->setStyleJSON(jni::Make<std::string>(_env, styleJSON));
+    } else {
+        snapshotter->setStyleJSON(jni::Make<std::string>(_env, styleURL));
+    }
 }
 
 MapSnapshotter::~MapSnapshotter() = default;
@@ -71,10 +66,11 @@ MapSnapshotter::~MapSnapshotter() = default;
 void MapSnapshotter::start(JNIEnv& env) {
     MBGL_VERIFY_THREAD(tid);
     activateFilesource(env);
-
-    snapshotCallback = std::make_unique<Actor<mbgl::MapSnapshotter::Callback>>(
-            *Scheduler::GetCurrent(),
-            [this](std::exception_ptr err, PremultipliedImage image, std::vector<std::string> attributions, mbgl::MapSnapshotter::PointForFn pointForFn, mbgl::MapSnapshotter::LatLngForFn latLngForFn) {
+    snapshotter->snapshot([this](std::exception_ptr err,
+                                 PremultipliedImage image,
+                                 std::vector<std::string> attributions,
+                                 mbgl::MapSnapshotter::PointForFn pointForFn,
+                                 mbgl::MapSnapshotter::LatLngForFn latLngForFn) {
         MBGL_VERIFY_THREAD(tid);
         android::UniqueEnv _env = android::AttachEnv();
         static auto& javaClass = jni::Class<MapSnapshotter>::Singleton(*_env);
@@ -100,13 +96,11 @@ void MapSnapshotter::start(JNIEnv& env) {
 
         deactivateFilesource(*_env);
     });
-
-    snapshotter->snapshot(snapshotCallback->self());
 }
 
 void MapSnapshotter::cancel(JNIEnv& env) {
     MBGL_VERIFY_THREAD(tid);
-    snapshotCallback.reset();
+    snapshotter->cancel();
     deactivateFilesource(env);
 }
 
