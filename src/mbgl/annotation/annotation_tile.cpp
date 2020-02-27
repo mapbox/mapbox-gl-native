@@ -11,11 +11,17 @@ AnnotationTile::AnnotationTile(const OverscaledTileID& overscaledTileID,
                                const TileParameters& parameters)
     : GeometryTile(overscaledTileID, AnnotationManager::SourceID, parameters),
       annotationManager(parameters.annotationManager) {
-    annotationManager.addTile(*this);
+    auto guard = annotationManager.lock();
+    if (annotationManager) {
+        annotationManager->addTile(*this);
+    }
 }
 
 AnnotationTile::~AnnotationTile() {
-    annotationManager.removeTile(*this);
+    auto guard = annotationManager.lock();
+    if (annotationManager) {
+        annotationManager->removeTile(*this);
+    }
 }
 
 class AnnotationTileFeatureData {

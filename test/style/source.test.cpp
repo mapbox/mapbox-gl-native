@@ -69,7 +69,7 @@ public:
                 transformState,
                 fileSource,
                 mapMode,
-                annotationManager,
+                annotationManager.makeWeakPtr(),
                 imageManager,
                 glyphManager,
                 0};

@@ -144,7 +144,10 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(
     }
 
     if (LayerManager::annotationsEnabled) {
-        updateParameters->annotationManager.updateData();
+        auto guard = updateParameters->annotationManager.lock();
+        if (updateParameters->annotationManager) {
+            updateParameters->annotationManager->updateData();
+        }
     }
 
     const bool zoomChanged =

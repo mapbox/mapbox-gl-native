@@ -15,7 +15,7 @@ public:
     ~AnnotationTile() override;
 
 private:
-    AnnotationManager& annotationManager;
+    mapbox::base::WeakPtr<AnnotationManager> annotationManager;
 };
 
 class AnnotationTileFeatureData;
