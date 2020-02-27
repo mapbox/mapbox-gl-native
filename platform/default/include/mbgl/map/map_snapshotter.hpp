@@ -46,6 +46,9 @@ public:
     void setRegion(const LatLngBounds&);
     LatLngBounds getRegion() const;
 
+    style::Style& getStyle();
+    const style::Style& getStyle() const;
+
     using PointForFn = std::function<ScreenCoordinate (const LatLng&)>;
     using LatLngForFn = std::function<LatLng (const ScreenCoordinate&)>;
     using Attributions = std::vector<std::string>;

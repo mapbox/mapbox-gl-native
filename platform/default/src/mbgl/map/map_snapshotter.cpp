@@ -230,6 +230,7 @@ public:
     }
 
     Map& getMap() { return map; }
+    const Map& getMap() const { return map; }
     SnapshotterRendererFrontend& getRenderer() { return frontend; }
 
 private:
@@ -299,6 +300,14 @@ void MapSnapshotter::setRegion(const LatLngBounds& region) {
 
 LatLngBounds MapSnapshotter::getRegion() const {
     return impl->getMap().latLngBoundsForCamera(getCameraOptions());
+}
+
+style::Style& MapSnapshotter::getStyle() {
+    return impl->getMap().getStyle();
+}
+
+const style::Style& MapSnapshotter::getStyle() const {
+    return impl->getMap().getStyle();
 }
 
 } // namespace mbgl
