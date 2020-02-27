@@ -35,7 +35,6 @@ target_sources(
         ${PROJECT_SOURCE_DIR}/platform/darwin/src/native_apple_interface.m
         ${PROJECT_SOURCE_DIR}/platform/darwin/src/nsthread.mm
         ${PROJECT_SOURCE_DIR}/platform/darwin/src/number_format.mm
-        ${PROJECT_SOURCE_DIR}/platform/darwin/src/reachability.m
         ${PROJECT_SOURCE_DIR}/platform/darwin/src/run_loop.cpp
         ${PROJECT_SOURCE_DIR}/platform/darwin/src/string_nsstring.mm
         ${PROJECT_SOURCE_DIR}/platform/darwin/src/timer.cpp

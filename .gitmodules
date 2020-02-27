@@ -1,9 +1,6 @@
 [submodule "mapbox-gl-js"]
 	path = mapbox-gl-js
 	url = https://github.com/mapbox/mapbox-gl-js.git
-[submodule "platform/ios/vendor/mapbox-events-ios"]
-	path = platform/ios/vendor/mapbox-events-ios
-	url = https://github.com/mapbox/mapbox-events-ios.git
 [submodule "vendor/nunicode"]
 	path = vendor/nunicode
 	url = https://bitbucket.org/alekseyt/nunicode.git
@@ -55,9 +52,6 @@
 [submodule "platform/android/vendor/mapbox-events-android"]
 	path = platform/android/vendor/mapbox-events-android
 	url = https://github.com/mapbox/mapbox-events-android.git
-[submodule "platform/darwin/docs/theme"]
-	path = platform/darwin/docs/theme
-	url = https://github.com/mapbox/jazzy-theme.git
 [submodule "vendor/mapbox-base"]
 	path = vendor/mapbox-base
 	url = https://github.com/mapbox/mapbox-base.git
