@@ -232,6 +232,7 @@ public:
     Map& getMap() { return map; }
     const Map& getMap() const { return map; }
     SnapshotterRendererFrontend& getRenderer() { return frontend; }
+    void cancel() { renderStillCallback.reset(); }
 
 private:
     std::unique_ptr<Actor<MapSnapshotter::Callback>> renderStillCallback;
@@ -255,10 +256,6 @@ MapSnapshotter::MapSnapshotter(std::pair<bool, std::string> style,
                                                   resourceOptions.clone())) {}
 
 MapSnapshotter::~MapSnapshotter() = default;
-
-void MapSnapshotter::snapshot(MapSnapshotter::Callback callback) {
-    impl->snapshot(std::move(callback));
-}
 
 void MapSnapshotter::setStyleURL(const std::string& styleURL) {
     impl->getMap().getStyle().loadURL(styleURL);
@@ -308,6 +305,14 @@ style::Style& MapSnapshotter::getStyle() {
 
 const style::Style& MapSnapshotter::getStyle() const {
     return impl->getMap().getStyle();
+}
+
+void MapSnapshotter::snapshot(MapSnapshotter::Callback callback) {
+    impl->snapshot(std::move(callback));
+}
+
+void MapSnapshotter::cancel() {
+    impl->cancel();
 }
 
 } // namespace mbgl
