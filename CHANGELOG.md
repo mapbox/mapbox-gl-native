@@ -8,6 +8,7 @@
   
   This is a back porting from GL JS [#9333](https://github.com/mapbox/mapbox-gl-js/pull/9333)
 
+- [ios] Restored support for iOS 9–11 by default ([#16241](https://github.com/mapbox/mapbox-gl-native/pull/16242))
 
 ## maps-v1.2.0 (2020.02-release-vanillashake)
 
