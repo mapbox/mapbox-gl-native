@@ -16,6 +16,8 @@
   
   This is a back porting from GL JS [#9333](https://github.com/mapbox/mapbox-gl-js/pull/9333)
 
+- [ios] Restored support for iOS 9–11 by default ([#16241](https://github.com/mapbox/mapbox-gl-native/pull/16242))
+
 ### ✨ New features
 
 - [core] Add Layer::serialize() method ([#16231](https://github.com/mapbox/mapbox-gl-native/pull/16231))
