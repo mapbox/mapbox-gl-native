@@ -459,6 +459,15 @@ void OnlineFileRequest::schedule(optional<Timestamp> expires) {
     });
 }
 
+namespace {
+
+inline std::string sanitizeURL(std::string& url) {
+    std::size_t queryIndex = url.find('?');
+    return (queryIndex != std::string::npos) ? std::string(url, 0, queryIndex) : url;
+}
+
+} // namespace
+
 void OnlineFileRequest::completed(Response response) {
     // If we didn't get various caching headers in the response, continue using the
     // previous values. Otherwise, update the previous values to the new values.
@@ -498,6 +507,9 @@ void OnlineFileRequest::completed(Response response) {
     }
 
     if (response.error) {
+        if (response.error->reason == Response::Error::Reason::NotFound) {
+            Log::Error(Event::General, "The resource `%s` not found", sanitizeURL(resource.url).c_str());
+        }
         failedRequests++;
         failedRequestReason = response.error->reason;
         retryAfter = response.error->retryAfter;
