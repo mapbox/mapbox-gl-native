@@ -20,6 +20,10 @@
 
 - [android] Add jni binding for min and max pitch ([#16236](https://github.com/mapbox/mapbox-gl-native/pull/16236))
 
+- [offline] Offline tool does not hang on 404 error ([#16240](https://github.com/mapbox/mapbox-gl-native/pull/16240))
+
+  The missing resource gets skipped and teh offline region download continues.
+
 ##### ⚠️  Breaking changes
 
 - Changes to `mbgl::FileSourceManager::getFileSource()` ([#16238](https://github.com/mapbox/mapbox-gl-native/pull/16238))
@@ -47,7 +51,7 @@
 ### 🐞 Bug fixes
 
 - [core] Revert shader changes from [#16189](https://github.com/mapbox/mapbox-gl-native/pull/16189), which will cause incorrect label positioning ([#16235](https://github.com/mapbox/mapbox-gl-native/pull/16235))
-  
+
   This is a back porting from GL JS [#9333](https://github.com/mapbox/mapbox-gl-js/pull/9333)
 
 - [ios] Restored support for iOS 9–11 by default ([#16241](https://github.com/mapbox/mapbox-gl-native/pull/16242))
