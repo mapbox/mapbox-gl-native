@@ -54,6 +54,7 @@ public:
     using Attributions = std::vector<std::string>;
     using Callback = std::function<void (std::exception_ptr, PremultipliedImage, Attributions, PointForFn, LatLngForFn)>;
     void snapshot(Callback);
+    void cancel();
 
 private:
     class Impl;
