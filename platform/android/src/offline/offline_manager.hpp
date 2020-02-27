@@ -104,7 +104,7 @@ public:
     void runPackDatabaseAutomatically(jni::JNIEnv&, jboolean autopack);
 
 private:
-    std::shared_ptr<mbgl::DatabaseFileSource> fileSource;
+    std::shared_ptr<JointDatabaseStorage> databaseStorage;
 };
 
 } // namespace android

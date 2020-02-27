@@ -74,7 +74,7 @@ private:
     mbgl::ResourceOptions resourceOptions;
     std::unique_ptr<Actor<ResourceTransform::TransformCallback>> resourceTransform;
     std::function<void()> pathChangeCallback;
-    std::shared_ptr<mbgl::DatabaseFileSource> databaseSource;
+    std::shared_ptr<mbgl::JointDatabaseStorage> databaseStorage;
     std::shared_ptr<mbgl::FileSource> onlineSource;
     std::shared_ptr<mbgl::FileSource> resourceLoader;
 };

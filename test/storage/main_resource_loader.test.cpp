@@ -586,10 +586,9 @@ TEST(MainResourceLoader, TEST_REQUIRES_SERVER(SetResourceTransform)) {
 TEST(MainResourceLoader, SetResourceCachePath) {
     util::RunLoop loop;
     MainResourceLoader resourceLoader(ResourceOptions{});
-    std::shared_ptr<FileSource> fs =
-        FileSourceManager::get()->getFileSource(FileSourceType::Database, ResourceOptions{});
-    auto dbfs = std::static_pointer_cast<DatabaseFileSource>(fs);
-    dbfs->setDatabasePath("./new_offline.db", [&loop] { loop.stop(); });
+    std::shared_ptr<mbgl::JointDatabaseStorage> database =
+        mbgl::FileSourceManager::get()->getDatabaseStorage(ResourceOptions{});
+    database->setDatabasePath("./new_offline.db", [&loop] { loop.stop(); });
     loop.run();
 }
 

@@ -12,9 +12,9 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MGLOfflineStorage (Private)
 
 /**
- The shared database file source object owned by the shared offline storage object.
+ The shared database file storage object.
  */
-@property (nonatomic) std::shared_ptr<mbgl::DatabaseFileSource> mbglDatabaseFileSource;
+@property (nonatomic) std::shared_ptr<mbgl::JointDatabaseStorage> mbglDatabaseStorage;
 
 /**
  The shared online file source object owned by the shared offline storage object.

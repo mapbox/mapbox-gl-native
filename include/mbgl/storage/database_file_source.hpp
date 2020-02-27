@@ -231,6 +231,7 @@ public:
     explicit DatabaseFileSource(const ResourceOptions& options);
     ~DatabaseFileSource() override;
 
+private:
     // JointDatabaseStorage overrides
     void setDatabasePath(const std::string&, std::function<void()> callback) override;
     void resetDatabase(std::function<void(std::exception_ptr)>) override;

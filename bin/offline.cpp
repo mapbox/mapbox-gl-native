@@ -163,29 +163,28 @@ int main(int argc, char *argv[]) {
 
 
     util::RunLoop loop;
-    std::shared_ptr<DatabaseFileSource> fileSource = std::static_pointer_cast<DatabaseFileSource>(
-        std::shared_ptr<FileSource>(FileSourceManager::get()->getFileSource(
-            FileSourceType::Database,
-            ResourceOptions().withAccessToken(token).withBaseURL(apiBaseURL).withCachePath(output))));
+    std::shared_ptr<JointDatabaseStorage> databaseStorage = FileSourceManager::get()->getDatabaseStorage(
+        ResourceOptions().withAccessToken(token).withBaseURL(apiBaseURL).withCachePath(output));
 
     std::unique_ptr<OfflineRegion> region;
 
     if (inputDb && mergePath) {
         DatabaseFileSource inputSource(ResourceOptions().withCachePath(*inputDb));
+        JointDatabaseStorage* storage = &inputSource;
 
         int retCode = 0;
         std::cout << "Start Merge" << std::endl;
-        inputSource.mergeOfflineRegions(*mergePath,  [&] (mbgl::expected<std::vector<OfflineRegion>, std::exception_ptr> result) {
-
-            if (!result) {
-                std::cerr << "Error merging database: " << util::toString(result.error()) << std::endl;
-                retCode = 1;
-            } else {
-                std::cout << " Added " << result->size() << " Regions" << std::endl;
-                std::cout << "Finished Merge" << std::endl;
-            }
-            loop.stop();
-        });
+        storage->mergeOfflineRegions(
+            *mergePath, [&](mbgl::expected<std::vector<OfflineRegion>, std::exception_ptr> result) {
+                if (!result) {
+                    std::cerr << "Error merging database: " << util::toString(result.error()) << std::endl;
+                    retCode = 1;
+                } else {
+                    std::cout << " Added " << result->size() << " Regions" << std::endl;
+                    std::cout << "Finished Merge" << std::endl;
+                }
+                loop.stop();
+            });
         loop.run();
         return retCode;
     }
@@ -195,11 +194,11 @@ int main(int argc, char *argv[]) {
     class Observer : public OfflineRegionObserver {
     public:
         Observer(OfflineRegion& region_,
-                 std::shared_ptr<DatabaseFileSource> fileSource_,
+                 std::shared_ptr<JointDatabaseStorage> databaseStorage_,
                  util::RunLoop& loop_,
                  mbgl::optional<std::string> mergePath_)
             : region(region_),
-              fileSource(std::move(fileSource_)),
+              databaseStorage(std::move(databaseStorage_)),
               loop(loop_),
               mergePath(std::move(mergePath_)),
               start(util::now()) {}
@@ -239,7 +238,7 @@ int main(int argc, char *argv[]) {
         }
 
         OfflineRegion& region;
-        std::shared_ptr<DatabaseFileSource> fileSource;
+        std::shared_ptr<JointDatabaseStorage> databaseStorage;
         util::RunLoop& loop;
         mbgl::optional<std::string> mergePath;
         Timestamp start;
@@ -248,13 +247,13 @@ int main(int argc, char *argv[]) {
     static auto stop = [&] {
         if (region) {
             std::cout << "Stopping download... ";
-            fileSource->setOfflineRegionDownloadState(*region, OfflineRegionDownloadState::Inactive);
+            databaseStorage->setOfflineRegionDownloadState(*region, OfflineRegionDownloadState::Inactive);
         }
     };
 
     std::signal(SIGINT, [] (int) { stop(); });
 
-    fileSource->createOfflineRegion(
+    databaseStorage->createOfflineRegion(
         definition, metadata, [&](mbgl::expected<OfflineRegion, std::exception_ptr> region_) {
             if (!region_) {
                 std::cerr << "Error creating region: " << util::toString(region_.error()) << std::endl;
@@ -263,9 +262,9 @@ int main(int argc, char *argv[]) {
             } else {
                 assert(region_);
                 region = std::make_unique<OfflineRegion>(std::move(*region_));
-                fileSource->setOfflineRegionObserver(*region,
-                                                     std::make_unique<Observer>(*region, fileSource, loop, mergePath));
-                fileSource->setOfflineRegionDownloadState(*region, OfflineRegionDownloadState::Active);
+                databaseStorage->setOfflineRegionObserver(
+                    *region, std::make_unique<Observer>(*region, databaseStorage, loop, mergePath));
+                databaseStorage->setOfflineRegionDownloadState(*region, OfflineRegionDownloadState::Active);
             }
         });
 

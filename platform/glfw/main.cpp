@@ -180,10 +180,11 @@ int main(int argc, char *argv[]) {
     });
 
     // Database file source.
-    auto databaseFileSource = std::static_pointer_cast<mbgl::DatabaseFileSource>(std::shared_ptr<mbgl::FileSource>(
-        mbgl::FileSourceManager::get()->getFileSource(mbgl::FileSourceType::Database, resourceOptions)));
-    view->setResetCacheCallback([databaseFileSource]() {
-        databaseFileSource->resetDatabase([](std::exception_ptr ex) {
+    std::shared_ptr<mbgl::JointDatabaseStorage> database =
+        mbgl::FileSourceManager::get()->getDatabaseStorage(resourceOptions);
+    assert(database);
+    view->setResetCacheCallback([database]() {
+        database->resetDatabase([](std::exception_ptr ex) {
             if (ex) {
                 mbgl::Log::Error(mbgl::Event::Database, "Failed to reset cache:: %s", mbgl::util::toString(ex).c_str());
             }

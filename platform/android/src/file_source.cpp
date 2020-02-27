@@ -41,8 +41,7 @@ FileSource::FileSource(jni::JNIEnv& _env, const jni::String& accessToken, const 
     // TODO: Split Android FileSource API to smaller interfaces
     resourceLoader =
         mbgl::FileSourceManager::get()->getFileSource(mbgl::FileSourceType::ResourceLoader, resourceOptions);
-    databaseSource = std::static_pointer_cast<mbgl::DatabaseFileSource>(std::shared_ptr<mbgl::FileSource>(
-        mbgl::FileSourceManager::get()->getFileSource(mbgl::FileSourceType::Database, resourceOptions)));
+    databaseStorage = mbgl::FileSourceManager::get()->getDatabaseStorage(resourceOptions);
     onlineSource = mbgl::FileSourceManager::get()->getFileSource(mbgl::FileSourceType::Network, resourceOptions);
 }
 
@@ -110,7 +109,7 @@ void FileSource::setResourceTransform(jni::JNIEnv& env, const jni::Object<FileSo
 void FileSource::setResourceCachePath(jni::JNIEnv& env,
                                       const jni::String& path,
                                       const jni::Object<FileSource::ResourcesCachePathChangeCallback>& _callback) {
-    if (!databaseSource) {
+    if (!databaseStorage) {
         ThrowNew(env, jni::FindClass(env, "java/lang/IllegalStateException"), "Offline functionality is disabled.");
         return;
     }
@@ -132,7 +131,7 @@ void FileSource::setResourceCachePath(jni::JNIEnv& env,
             pathChangeCallback = {};
         });
 
-    databaseSource->setDatabasePath(newPath + DATABASE_FILE, pathChangeCallback);
+    databaseStorage->setDatabasePath(newPath + DATABASE_FILE, pathChangeCallback);
 }
 
 void FileSource::resume(jni::JNIEnv&) {

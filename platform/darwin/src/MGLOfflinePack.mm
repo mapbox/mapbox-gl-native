@@ -59,7 +59,7 @@ private:
 
 @implementation MGLOfflinePack {
     BOOL _isSuspending;
-    std::shared_ptr<mbgl::DatabaseFileSource> _mbglDatabaseFileSource;
+    std::shared_ptr<mbgl::JointDatabaseStorage> _mbglDatabaseStorage;
 }
 
 - (instancetype)init {
@@ -76,8 +76,8 @@ private:
         _mbglOfflineRegion = region;
         _state = MGLOfflinePackStateUnknown;
 
-        _mbglDatabaseFileSource = [[MGLOfflineStorage sharedOfflineStorage] mbglDatabaseFileSource];
-        _mbglDatabaseFileSource->setOfflineRegionObserver(*_mbglOfflineRegion, std::make_unique<MBGLOfflineRegionObserver>(self));
+        _mbglDatabaseStorage = [[MGLOfflineStorage sharedOfflineStorage] mbglDatabaseStorage];
+        _mbglDatabaseStorage->setOfflineRegionObserver(*_mbglOfflineRegion, std::make_unique<MBGLOfflineRegionObserver>(self));
     }
     return self;
 }
@@ -117,7 +117,7 @@ private:
 
     self.state = MGLOfflinePackStateActive;
 
-    _mbglDatabaseFileSource->setOfflineRegionDownloadState(*_mbglOfflineRegion, mbgl::OfflineRegionDownloadState::Active);
+    _mbglDatabaseStorage->setOfflineRegionDownloadState(*_mbglOfflineRegion, mbgl::OfflineRegionDownloadState::Active);
 }
 
 - (void)suspend {
@@ -129,7 +129,7 @@ private:
         _isSuspending = YES;
     }
 
-    _mbglDatabaseFileSource->setOfflineRegionDownloadState(*_mbglOfflineRegion, mbgl::OfflineRegionDownloadState::Inactive);
+    _mbglDatabaseStorage->setOfflineRegionDownloadState(*_mbglOfflineRegion, mbgl::OfflineRegionDownloadState::Inactive);
 }
 
 - (void)invalidate {
@@ -140,7 +140,7 @@ private:
     @synchronized (self) {
         self.state = MGLOfflinePackStateInvalid;
         if (self.mbglOfflineRegion) {
-            _mbglDatabaseFileSource->setOfflineRegionObserver(*self.mbglOfflineRegion, nullptr);
+            _mbglDatabaseStorage->setOfflineRegionObserver(*self.mbglOfflineRegion, nullptr);
         }
         self.mbglOfflineRegion = nil;
     }
@@ -169,7 +169,7 @@ private:
     MGLAssertOfflinePackIsValid();
 
     __weak MGLOfflinePack *weakSelf = self;
-    _mbglDatabaseFileSource->getOfflineRegionStatus(*_mbglOfflineRegion, [&, weakSelf](mbgl::expected<mbgl::OfflineRegionStatus, std::exception_ptr> status) {
+    _mbglDatabaseStorage->getOfflineRegionStatus(*_mbglOfflineRegion, [&, weakSelf](mbgl::expected<mbgl::OfflineRegionStatus, std::exception_ptr> status) {
         if (status) {
             mbgl::OfflineRegionStatus checkedStatus = *status;
             dispatch_async(dispatch_get_main_queue(), ^{

@@ -25,10 +25,9 @@ void handleException(std::exception_ptr exception,
 
 // OfflineManager //
 OfflineManager::OfflineManager(jni::JNIEnv& env, const jni::Object<FileSource>& jFileSource)
-    : fileSource(std::static_pointer_cast<mbgl::DatabaseFileSource>(
-          std::shared_ptr<mbgl::FileSource>(mbgl::FileSourceManager::get()->getFileSource(
-              mbgl::FileSourceType::Database, FileSource::getSharedResourceOptions(env, jFileSource))))) {
-    if (!fileSource) {
+    : databaseStorage(
+          FileSourceManager::get()->getDatabaseStorage(FileSource::getSharedResourceOptions(env, jFileSource))) {
+    if (!databaseStorage) {
         ThrowNew(env, jni::FindClass(env, "java/lang/IllegalStateException"), "Offline functionality is disabled.");
     }
 }
@@ -36,30 +35,29 @@ OfflineManager::OfflineManager(jni::JNIEnv& env, const jni::Object<FileSource>& 
 OfflineManager::~OfflineManager() {}
 
 void OfflineManager::setOfflineMapboxTileCountLimit(jni::JNIEnv&, jni::jlong limit) {
-    fileSource->setOfflineMapboxTileCountLimit(limit);
+    databaseStorage->setOfflineMapboxTileCountLimit(limit);
 }
 
 void OfflineManager::listOfflineRegions(jni::JNIEnv& env_, const jni::Object<FileSource>& jFileSource_, const jni::Object<ListOfflineRegionsCallback>& callback_) {
     auto globalCallback = jni::NewGlobal<jni::EnvAttachingDeleter>(env_, callback_);
     auto globalFilesource = jni::NewGlobal<jni::EnvAttachingDeleter>(env_, jFileSource_);
 
-    fileSource->listOfflineRegions([
-        //Keep a shared ptr to a global reference of the callback and file source so they are not GC'd in the meanwhile
-        callback = std::make_shared<decltype(globalCallback)>(std::move(globalCallback)),
-        jFileSource = std::make_shared<decltype(globalFilesource)>(std::move(globalFilesource))
-    ](mbgl::expected<mbgl::OfflineRegions, std::exception_ptr> regions) mutable {
+    databaseStorage->listOfflineRegions(
+        [
+            // Keep a shared ptr to a global reference of the callback and file source so they are not GC'd in the
+            // meanwhile
+            callback = std::make_shared<decltype(globalCallback)>(std::move(globalCallback)),
+            jFileSource = std::make_shared<decltype(globalFilesource)>(std::move(globalFilesource))](
+            mbgl::expected<mbgl::OfflineRegions, std::exception_ptr> regions) mutable {
+            // Reattach, the callback comes from a different thread
+            android::UniqueEnv env = android::AttachEnv();
 
-        // Reattach, the callback comes from a different thread
-        android::UniqueEnv env = android::AttachEnv();
-
-        if (regions) {
-            OfflineManager::ListOfflineRegionsCallback::onList(
-                *env, *jFileSource, *callback, *regions);
-        } else {
-            OfflineManager::ListOfflineRegionsCallback::onError(
-                *env, *callback, regions.error());
-        }
-    });
+            if (regions) {
+                OfflineManager::ListOfflineRegionsCallback::onList(*env, *jFileSource, *callback, *regions);
+            } else {
+                OfflineManager::ListOfflineRegionsCallback::onError(*env, *callback, regions.error());
+            }
+        });
 }
 
 void OfflineManager::createOfflineRegion(jni::JNIEnv& env_,
@@ -79,24 +77,24 @@ void OfflineManager::createOfflineRegion(jni::JNIEnv& env_,
     auto globalFilesource = jni::NewGlobal<jni::EnvAttachingDeleter>(env_, jFileSource_);
 
     // Create region
-    fileSource->createOfflineRegion(definition, metadata, [
-        //Keep a shared ptr to a global reference of the callback and file source so they are not GC'd in the meanwhile
-        callback = std::make_shared<decltype(globalCallback)>(std::move(globalCallback)),
-        jFileSource = std::make_shared<decltype(globalFilesource)>(std::move(globalFilesource))
-    ](mbgl::expected<mbgl::OfflineRegion, std::exception_ptr> region) mutable {
+    databaseStorage->createOfflineRegion(
+        definition,
+        metadata,
+        [
+            // Keep a shared ptr to a global reference of the callback and file source so they are not GC'd in the
+            // meanwhile
+            callback = std::make_shared<decltype(globalCallback)>(std::move(globalCallback)),
+            jFileSource = std::make_shared<decltype(globalFilesource)>(std::move(globalFilesource))](
+            mbgl::expected<mbgl::OfflineRegion, std::exception_ptr> region) mutable {
+            // Reattach, the callback comes from a different thread
+            android::UniqueEnv env = android::AttachEnv();
 
-        // Reattach, the callback comes from a different thread
-        android::UniqueEnv env = android::AttachEnv();
-
-        if (region) {
-            OfflineManager::CreateOfflineRegionCallback::onCreate(
-                *env, *jFileSource, *callback, *region
-            );
-        } else {
-            OfflineManager::CreateOfflineRegionCallback::onError(
-                *env, *callback, region.error());
-        }
-    });
+            if (region) {
+                OfflineManager::CreateOfflineRegionCallback::onCreate(*env, *jFileSource, *callback, *region);
+            } else {
+                OfflineManager::CreateOfflineRegionCallback::onError(*env, *callback, region.error());
+            }
+        });
 }
 
 void OfflineManager::mergeOfflineRegions(jni::JNIEnv& env_, const jni::Object<FileSource>& jFileSource_,
@@ -106,29 +104,29 @@ void OfflineManager::mergeOfflineRegions(jni::JNIEnv& env_, const jni::Object<Fi
     auto globalFilesource = jni::NewGlobal<jni::EnvAttachingDeleter>(env_, jFileSource_);
 
     auto path = jni::Make<std::string>(env_, jString_);
-    fileSource->mergeOfflineRegions(path, [
-        //Keep a shared ptr to a global reference of the callback and file source so they are not GC'd in the meanwhile
-        callback = std::make_shared<decltype(globalCallback)>(std::move(globalCallback)),
-        jFileSource = std::make_shared<decltype(globalFilesource)>(std::move(globalFilesource))
-    ](mbgl::expected<mbgl::OfflineRegions, std::exception_ptr> regions) mutable {
+    databaseStorage->mergeOfflineRegions(
+        path,
+        [
+            // Keep a shared ptr to a global reference of the callback and file source so they are not GC'd in the
+            // meanwhile
+            callback = std::make_shared<decltype(globalCallback)>(std::move(globalCallback)),
+            jFileSource = std::make_shared<decltype(globalFilesource)>(std::move(globalFilesource))](
+            mbgl::expected<mbgl::OfflineRegions, std::exception_ptr> regions) mutable {
+            // Reattach, the callback comes from a different thread
+            android::UniqueEnv env = android::AttachEnv();
 
-        // Reattach, the callback comes from a different thread
-        android::UniqueEnv env = android::AttachEnv();
-
-        if (regions) {
-            OfflineManager::MergeOfflineRegionsCallback::onMerge(
-                *env, *jFileSource, *callback, *regions);
-        } else {
-            OfflineManager::MergeOfflineRegionsCallback::onError(
-                *env, *callback, regions.error());
-        }
-    });
+            if (regions) {
+                OfflineManager::MergeOfflineRegionsCallback::onMerge(*env, *jFileSource, *callback, *regions);
+            } else {
+                OfflineManager::MergeOfflineRegionsCallback::onError(*env, *callback, regions.error());
+            }
+        });
 }
 
 void OfflineManager::resetDatabase(jni::JNIEnv& env_, const jni::Object<FileSourceCallback>& callback_) {
     auto globalCallback = jni::NewGlobal<jni::EnvAttachingDeleter>(env_, callback_);
 
-    fileSource->resetDatabase(
+    databaseStorage->resetDatabase(
         [
             // Keep a shared ptr to a global reference of the callback so they are not GC'd in the meanwhile
             callback = std::make_shared<decltype(globalCallback)>(std::move(globalCallback))](
@@ -138,7 +136,7 @@ void OfflineManager::resetDatabase(jni::JNIEnv& env_, const jni::Object<FileSour
 void OfflineManager::packDatabase(jni::JNIEnv& env_, const jni::Object<FileSourceCallback>& callback_) {
     auto globalCallback = jni::NewGlobal<jni::EnvAttachingDeleter>(env_, callback_);
 
-    fileSource->packDatabase(
+    databaseStorage->packDatabase(
         [
             // Keep a shared ptr to a global reference of the callback so they are not GC'd in the meanwhile
             callback = std::make_shared<decltype(globalCallback)>(std::move(globalCallback))](
@@ -148,7 +146,7 @@ void OfflineManager::packDatabase(jni::JNIEnv& env_, const jni::Object<FileSourc
 void OfflineManager::invalidateAmbientCache(jni::JNIEnv& env_, const jni::Object<FileSourceCallback>& callback_) {
     auto globalCallback = jni::NewGlobal<jni::EnvAttachingDeleter>(env_, callback_);
 
-    fileSource->invalidateAmbientCache(
+    databaseStorage->invalidateAmbientCache(
         [
             // Keep a shared ptr to a global reference of the callback so they are not GC'd in the meanwhile
             callback = std::make_shared<decltype(globalCallback)>(std::move(globalCallback))](
@@ -158,7 +156,7 @@ void OfflineManager::invalidateAmbientCache(jni::JNIEnv& env_, const jni::Object
 void OfflineManager::clearAmbientCache(jni::JNIEnv& env_, const jni::Object<FileSourceCallback>& callback_) {
     auto globalCallback = jni::NewGlobal<jni::EnvAttachingDeleter>(env_, callback_);
 
-    fileSource->clearAmbientCache(
+    databaseStorage->clearAmbientCache(
         [
             // Keep a shared ptr to a global reference of the callback so they are not GC'd in the meanwhile
             callback = std::make_shared<decltype(globalCallback)>(std::move(globalCallback))](
@@ -168,7 +166,7 @@ void OfflineManager::clearAmbientCache(jni::JNIEnv& env_, const jni::Object<File
 void OfflineManager::setMaximumAmbientCacheSize(jni::JNIEnv& env_, const jni::jlong size_, const jni::Object<FileSourceCallback>& callback_) {
     auto globalCallback = jni::NewGlobal<jni::EnvAttachingDeleter>(env_, callback_);
 
-    fileSource->setMaximumAmbientCacheSize(
+    databaseStorage->setMaximumAmbientCacheSize(
         size_,
         [
             // Keep a shared ptr to a global reference of the callback so they are not GC'd in the meanwhile
@@ -177,7 +175,7 @@ void OfflineManager::setMaximumAmbientCacheSize(jni::JNIEnv& env_, const jni::jl
 }
 
 void OfflineManager::runPackDatabaseAutomatically(jni::JNIEnv&, jboolean autopack) {
-    fileSource->runPackDatabaseAutomatically(autopack);
+    databaseStorage->runPackDatabaseAutomatically(autopack);
 }
 
 // FileSource::FileSourceCallback //
@@ -328,7 +326,7 @@ void OfflineManager::putResourceWithUrl(jni::JNIEnv& env,
         response.expires = Timestamp(mbgl::Seconds(expires));
     }
 
-    fileSource->put(resource, response);
+    databaseStorage->put(resource, response);
 }
 
 } // namespace android

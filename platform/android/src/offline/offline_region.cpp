@@ -16,10 +16,9 @@ namespace android {
 
 OfflineRegion::OfflineRegion(jni::JNIEnv& env, jni::jlong offlineRegionPtr, const jni::Object<FileSource>& jFileSource)
     : region(reinterpret_cast<mbgl::OfflineRegion*>(offlineRegionPtr)),
-      fileSource(std::static_pointer_cast<mbgl::DatabaseFileSource>(
-          std::shared_ptr<mbgl::FileSource>(mbgl::FileSourceManager::get()->getFileSource(
-              mbgl::FileSourceType::Database, FileSource::getSharedResourceOptions(env, jFileSource))))) {
-    if (!fileSource) {
+      databaseStorage(
+          FileSourceManager::get()->getDatabaseStorage(FileSource::getSharedResourceOptions(env, jFileSource))) {
+    if (!databaseStorage) {
         ThrowNew(env, jni::FindClass(env, "java/lang/IllegalStateException"), "Offline functionality is disabled.");
     }
 }
@@ -69,7 +68,8 @@ void OfflineRegion::setOfflineRegionObserver(jni::JNIEnv& env_, const jni::Objec
     };
 
     // Set the observer
-    fileSource->setOfflineRegionObserver(*region, std::make_unique<Observer>(jni::NewGlobal<jni::EnvAttachingDeleter>(env_, callback)));
+    databaseStorage->setOfflineRegionObserver(
+        *region, std::make_unique<Observer>(jni::NewGlobal<jni::EnvAttachingDeleter>(env_, callback)));
 }
 
 void OfflineRegion::setOfflineRegionDownloadState(jni::JNIEnv&, jni::jint jState) {
@@ -87,83 +87,88 @@ void OfflineRegion::setOfflineRegionDownloadState(jni::JNIEnv&, jni::jint jState
           return;
     }
 
-    fileSource->setOfflineRegionDownloadState(*region, state);
+    databaseStorage->setOfflineRegionDownloadState(*region, state);
 }
 
 void OfflineRegion::getOfflineRegionStatus(jni::JNIEnv& env_, const jni::Object<OfflineRegionStatusCallback>& callback_) {
     auto globalCallback = jni::NewGlobal<jni::EnvAttachingDeleter>(env_, callback_);
 
-    fileSource->getOfflineRegionStatus(*region, [
-        //Ensure the object is not gc'd in the meanwhile
-        callback = std::make_shared<decltype(globalCallback)>(std::move(globalCallback))
-    ](mbgl::expected<mbgl::OfflineRegionStatus, std::exception_ptr> status) mutable {
-        // Reattach, the callback comes from a different thread
-        android::UniqueEnv env = android::AttachEnv();
+    databaseStorage->getOfflineRegionStatus(
+        *region,
+        [
+            // Ensure the object is not gc'd in the meanwhile
+            callback = std::make_shared<decltype(globalCallback)>(std::move(globalCallback))](
+            mbgl::expected<mbgl::OfflineRegionStatus, std::exception_ptr> status) mutable {
+            // Reattach, the callback comes from a different thread
+            android::UniqueEnv env = android::AttachEnv();
 
-        if (status) {
-            OfflineRegionStatusCallback::onStatus(*env, *callback, std::move(*status));
-        } else {
-            OfflineRegionStatusCallback::onError(*env, *callback, status.error());
-        }
-    });
+            if (status) {
+                OfflineRegionStatusCallback::onStatus(*env, *callback, std::move(*status));
+            } else {
+                OfflineRegionStatusCallback::onError(*env, *callback, status.error());
+            }
+        });
 }
 
 void OfflineRegion::deleteOfflineRegion(jni::JNIEnv& env_, const jni::Object<OfflineRegionDeleteCallback>& callback_) {
     auto globalCallback = jni::NewGlobal<jni::EnvAttachingDeleter>(env_, callback_);
 
-    fileSource->deleteOfflineRegion(std::move(*region),
-                                    [
-                                        // Ensure the object is not gc'd in the meanwhile
-                                        callback = std::make_shared<decltype(globalCallback)>(
-                                            std::move(globalCallback))](std::exception_ptr error) mutable {
-                                        // Reattach, the callback comes from a different thread
-                                        android::UniqueEnv env = android::AttachEnv();
+    databaseStorage->deleteOfflineRegion(std::move(*region),
+                                         [
+                                             // Ensure the object is not gc'd in the meanwhile
+                                             callback = std::make_shared<decltype(globalCallback)>(
+                                                 std::move(globalCallback))](std::exception_ptr error) mutable {
+                                             // Reattach, the callback comes from a different thread
+                                             android::UniqueEnv env = android::AttachEnv();
 
-                                        if (error) {
-                                            OfflineRegionDeleteCallback::onError(*env, *callback, error);
-                                        } else {
-                                            OfflineRegionDeleteCallback::onDelete(*env, *callback);
-                                        }
-                                    });
+                                             if (error) {
+                                                 OfflineRegionDeleteCallback::onError(*env, *callback, error);
+                                             } else {
+                                                 OfflineRegionDeleteCallback::onDelete(*env, *callback);
+                                             }
+                                         });
 }
 
 void OfflineRegion::invalidateOfflineRegion(jni::JNIEnv& env_,
                                             const jni::Object<OfflineRegionInvalidateCallback>& callback_) {
     auto globalCallback = jni::NewGlobal<jni::EnvAttachingDeleter>(env_, callback_);
 
-    fileSource->invalidateOfflineRegion(*region,
-                                        [
-                                            // Ensure the object is not gc'd in the meanwhile
-                                            callback = std::make_shared<decltype(globalCallback)>(
-                                                std::move(globalCallback))](std::exception_ptr error) mutable {
-                                            // Reattach, the callback comes from a different thread
-                                            android::UniqueEnv env = android::AttachEnv();
+    databaseStorage->invalidateOfflineRegion(*region,
+                                             [
+                                                 // Ensure the object is not gc'd in the meanwhile
+                                                 callback = std::make_shared<decltype(globalCallback)>(
+                                                     std::move(globalCallback))](std::exception_ptr error) mutable {
+                                                 // Reattach, the callback comes from a different thread
+                                                 android::UniqueEnv env = android::AttachEnv();
 
-                                            if (error) {
-                                                OfflineRegionInvalidateCallback::onError(*env, *callback, error);
-                                            } else {
-                                                OfflineRegionInvalidateCallback::onInvalidate(*env, *callback);
-                                            }
-                                        });
+                                                 if (error) {
+                                                     OfflineRegionInvalidateCallback::onError(*env, *callback, error);
+                                                 } else {
+                                                     OfflineRegionInvalidateCallback::onInvalidate(*env, *callback);
+                                                 }
+                                             });
 }
 
 void OfflineRegion::updateOfflineRegionMetadata(jni::JNIEnv& env_, const jni::Array<jni::jbyte>& jMetadata, const jni::Object<OfflineRegionUpdateMetadataCallback>& callback_) {
     auto metadata = OfflineRegion::metadata(env_, jMetadata);
     auto globalCallback = jni::NewGlobal<jni::EnvAttachingDeleter>(env_, callback_);
 
-    fileSource->updateOfflineMetadata(region->getID(), metadata, [
-        //Ensure the object is not gc'd in the meanwhile
-        callback = std::make_shared<decltype(globalCallback)>(std::move(globalCallback))
-    ](mbgl::expected<mbgl::OfflineRegionMetadata, std::exception_ptr> data) mutable {
-        // Reattach, the callback comes from a different thread
-        android::UniqueEnv env = android::AttachEnv();
+    databaseStorage->updateOfflineMetadata(
+        region->getID(),
+        metadata,
+        [
+            // Ensure the object is not gc'd in the meanwhile
+            callback = std::make_shared<decltype(globalCallback)>(std::move(globalCallback))](
+            mbgl::expected<mbgl::OfflineRegionMetadata, std::exception_ptr> data) mutable {
+            // Reattach, the callback comes from a different thread
+            android::UniqueEnv env = android::AttachEnv();
 
-        if (data) {
-            OfflineRegionUpdateMetadataCallback::onUpdate(*env, *callback, std::move(*data));
-        } else {
-            OfflineRegionUpdateMetadataCallback::onError(*env, *callback, data.error());
-        }
-    });
+            if (data) {
+                OfflineRegionUpdateMetadataCallback::onUpdate(*env, *callback, std::move(*data));
+            } else {
+                OfflineRegionUpdateMetadataCallback::onError(*env, *callback, data.error());
+            }
+        });
 }
 
 jni::Local<jni::Object<OfflineRegion>> OfflineRegion::New(jni::JNIEnv& env,
