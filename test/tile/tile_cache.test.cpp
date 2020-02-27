@@ -39,7 +39,7 @@ public:
                                   transformState,
                                   fileSource,
                                   MapMode::Continuous,
-                                  annotationManager,
+                                  annotationManager.makeWeakPtr(),
                                   imageManager,
                                   glyphManager,
                                   0};

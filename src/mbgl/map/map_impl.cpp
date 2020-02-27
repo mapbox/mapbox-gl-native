@@ -48,26 +48,24 @@ void Map::Impl::onUpdate() {
 
     transform.updateTransitions(timePoint);
 
-    UpdateParameters params = {
-        style->impl->isLoaded(),
-        mode,
-        pixelRatio,
-        debugOptions,
-        timePoint,
-        transform.getState(),
-        style->impl->getGlyphURL(),
-        style->impl->spriteLoaded,
-        style->impl->getTransitionOptions(),
-        style->impl->getLight()->impl,
-        style->impl->getImageImpls(),
-        style->impl->getSourceImpls(),
-        style->impl->getLayerImpls(),
-        annotationManager,
-        fileSource,
-        prefetchZoomDelta,
-        bool(stillImageRequest),
-        crossSourceCollisions
-    };
+    UpdateParameters params = {style->impl->isLoaded(),
+                               mode,
+                               pixelRatio,
+                               debugOptions,
+                               timePoint,
+                               transform.getState(),
+                               style->impl->getGlyphURL(),
+                               style->impl->spriteLoaded,
+                               style->impl->getTransitionOptions(),
+                               style->impl->getLight()->impl,
+                               style->impl->getImageImpls(),
+                               style->impl->getSourceImpls(),
+                               style->impl->getLayerImpls(),
+                               annotationManager.makeWeakPtr(),
+                               fileSource,
+                               prefetchZoomDelta,
+                               bool(stillImageRequest),
+                               crossSourceCollisions};
 
     rendererFrontend.update(std::make_shared<UpdateParameters>(std::move(params)));
 }

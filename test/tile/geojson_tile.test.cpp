@@ -31,17 +31,15 @@ public:
     GlyphManager glyphManager;
     Tileset tileset { { "https://example.com" }, { 0, 22 }, "none" };
 
-    TileParameters tileParameters {
-        1.0,
-        MapDebugOptions(),
-        transformState,
-        fileSource,
-        MapMode::Continuous,
-        annotationManager,
-        imageManager,
-        glyphManager,
-        0
-    };
+    TileParameters tileParameters{1.0,
+                                  MapDebugOptions(),
+                                  transformState,
+                                  fileSource,
+                                  MapMode::Continuous,
+                                  annotationManager.makeWeakPtr(),
+                                  imageManager,
+                                  glyphManager,
+                                  0};
 };
 
 namespace {

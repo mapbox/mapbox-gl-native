@@ -4,6 +4,8 @@
 
 #include <memory>
 
+#include <mapbox/weak.hpp>
+
 namespace mbgl {
 
 class TransformState;
@@ -19,7 +21,7 @@ public:
     const TransformState& transformState;
     std::shared_ptr<FileSource> fileSource;
     const MapMode mode;
-    AnnotationManager& annotationManager;
+    mapbox::base::WeakPtr<AnnotationManager> annotationManager;
     ImageManager& imageManager;
     GlyphManager& glyphManager;
     const uint8_t prefetchZoomDelta;

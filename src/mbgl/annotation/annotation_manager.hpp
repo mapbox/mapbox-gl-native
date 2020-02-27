@@ -11,6 +11,8 @@
 #include <unordered_set>
 #include <unordered_map>
 
+#include <mapbox/weak.hpp>
+
 namespace mbgl {
 
 class LatLngBounds;
@@ -48,6 +50,8 @@ public:
     static const std::string PointLayerID;
     static const std::string ShapeLayerID;
 
+    mapbox::base::WeakPtr<AnnotationManager> makeWeakPtr() { return weakFactory.makeWeakPtr(); }
+
 private:
     void add(const AnnotationID&, const SymbolAnnotation&);
     void add(const AnnotationID&, const LineAnnotation&);
@@ -84,6 +88,7 @@ private:
     ImageMap images;
 
     std::unordered_set<AnnotationTile*> tiles;
+    mapbox::base::WeakPtrFactory<AnnotationManager> weakFactory{this};
 };
 
 } // namespace mbgl
