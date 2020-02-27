@@ -62,6 +62,10 @@ PassRefPtr<FileSource> FileSourceManager::getFileSource(FileSourceType type, con
     return fileSource;
 }
 
+PassRefPtr<JointDatabaseStorage> FileSourceManager::getDatabaseStorage(const ResourceOptions&) noexcept {
+    return {nullptr};
+}
+
 void FileSourceManager::registerFileSourceFactory(FileSourceType type, FileSourceFactory&& factory) noexcept {
     assert(factory);
     std::lock_guard<std::recursive_mutex> lock(impl->mutex);

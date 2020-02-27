@@ -33,6 +33,12 @@ public:
             return networkSource;
         });
     }
+
+    PassRefPtr<JointDatabaseStorage> getDatabaseStorage(const ResourceOptions& options) noexcept override {
+        auto dbFileSource = std::static_pointer_cast<mbgl::DatabaseFileSource>(
+            std::shared_ptr<FileSource>(getFileSource(FileSourceType::Database, options)));
+        return std::shared_ptr<JointDatabaseStorage>(dbFileSource);
+    }
 };
 
 FileSourceManager* FileSourceManager::get() noexcept {

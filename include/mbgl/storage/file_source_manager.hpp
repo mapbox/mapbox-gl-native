@@ -6,7 +6,7 @@
 namespace mbgl {
 
 class ResourceOptions;
-
+class JointDatabaseStorage;
 /**
  * @brief A singleton class responsible for managing file sources.
  *
@@ -31,6 +31,10 @@ public:
     // Creates new instance via registered factory if needed. If new instance cannot be
     // created, nullptr would be returned.
     PassRefPtr<FileSource> getFileSource(FileSourceType, const ResourceOptions&) noexcept;
+
+    // Returns shared instance of a joint database storage for the given options.
+    // Creates new instance, if needed. If new instance cannot be created, nullptr would be returned.
+    virtual PassRefPtr<JointDatabaseStorage> getDatabaseStorage(const ResourceOptions&) noexcept;
 
     // Registers file source factory for a provided FileSourceType type. If factory for the
     // same type was already registered, will unregister previously registered factory.
