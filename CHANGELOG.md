@@ -26,6 +26,10 @@
 
 - [android] Add jni binding for min and max pitch ([#16236](https://github.com/mapbox/mapbox-gl-native/pull/16236))
 
+- [offline] Offline tool does not hang on 404 error ([#16240](https://github.com/mapbox/mapbox-gl-native/pull/16240))
+
+  The missing resource gets skipped and teh offline region download continues.
+
 ##### ⚠️  Breaking changes
 
 - Changes to `mbgl::FileSourceManager::getFileSource()` ([#16238](https://github.com/mapbox/mapbox-gl-native/pull/16238))
