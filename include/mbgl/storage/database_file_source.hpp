@@ -9,53 +9,10 @@ namespace mbgl {
 
 class ResourceOptions;
 
-// TODO: Split DatabaseFileSource into Ambient cache and Database interfaces.
-class DatabaseFileSource : public FileSource {
+// This class represents ambient cache.
+class AmbientCache {
 public:
-    explicit DatabaseFileSource(const ResourceOptions& options);
-    ~DatabaseFileSource() override;
-
-    // Methods common to Ambient cache and Offline functionality
-
-    /*
-     * Sets path of a database to be used by DatabaseFileSource and invokes provided
-     * callback when a database path is set.
-     */
-    virtual void setDatabasePath(const std::string&, std::function<void()> callback);
-
-    /*
-     * Delete existing database and re-initialize.
-     *
-     * When the operation is complete or encounters an error, the given callback will be
-     * executed on the database thread; it is the responsibility of the SDK bindings
-     * to re-execute a user-provided callback on the main thread.
-     */
-    virtual void resetDatabase(std::function<void(std::exception_ptr)>);
-
-    /*
-     * Packs the existing database file into a minimal amount of disk space.
-     *
-     * This operation has a performance impact as it will vacuum the database,
-     * forcing it to move pages on the filesystem.
-     *
-     * When the operation is complete or encounters an error, the given callback will be
-     * executed on the database thread; it is the responsibility of the SDK bindings
-     * to re-execute a user-provided callback on the main thread.
-     */
-    virtual void packDatabase(std::function<void(std::exception_ptr)> callback);
-
-    /*
-     * Sets whether packing the database file occurs automatically after an offline
-     * region is deleted (deleteOfflineRegion()) or the ambient cache is cleared
-     * (clearAmbientCache()).
-     *
-     * By default, packing is enabled. If disabled, disk space will not be freed
-     * after resources are removed unless packDatabase() is explicitly called.
-     */
-    virtual void runPackDatabaseAutomatically(bool);
-
-    // Ambient cache
-
+    virtual ~AmbientCache() = default;
     /*
      * Insert the provided resource into the ambient cache
      *
@@ -65,7 +22,7 @@ public:
      * for in-progress requests, although subsequent requests should have
      * access to the cached data.
      */
-    virtual void put(const Resource&, const Response&);
+    virtual void put(const Resource&, const Response&) = 0;
 
     /*
      * Forces revalidation of the ambient cache.
@@ -79,7 +36,7 @@ public:
      * Resources overlapping with offline regions will not be affected
      * by this call.
      */
-    virtual void invalidateAmbientCache(std::function<void(std::exception_ptr)>);
+    virtual void invalidateAmbientCache(std::function<void(std::exception_ptr)>) = 0;
 
     /*
      * Erase resources from the ambient cache, freeing storage space.
@@ -92,7 +49,7 @@ public:
      * Resources overlapping with offline regions will not be affected
      * by this call.
      */
-    virtual void clearAmbientCache(std::function<void(std::exception_ptr)>);
+    virtual void clearAmbientCache(std::function<void(std::exception_ptr)>) = 0;
 
     /*
      * Sets the maximum size in bytes for the ambient cache.
@@ -114,10 +71,13 @@ public:
      * This method should always be called before using the database,
      * otherwise the default maximum size will be used.
      */
-    virtual void setMaximumAmbientCacheSize(uint64_t size, std::function<void(std::exception_ptr)> callback);
+    virtual void setMaximumAmbientCacheSize(uint64_t size, std::function<void(std::exception_ptr)> callback) = 0;
+};
 
-    // Offline
-
+// This class represents offline regions storage.
+class OfflineRegionsStorage {
+public:
+    virtual ~OfflineRegionsStorage() = default;
     /*
      * Retrieve all regions in the offline database.
      *
@@ -125,7 +85,7 @@ public:
      * callback, which will be executed on the database thread; it is the responsibility
      * of the SDK bindings to re-execute a user-provided callback on the main thread.
      */
-    virtual void listOfflineRegions(std::function<void(expected<OfflineRegions, std::exception_ptr>)>);
+    virtual void listOfflineRegions(std::function<void(expected<OfflineRegions, std::exception_ptr>)>) = 0;
 
     /*
      * Create an offline region in the database.
@@ -140,23 +100,23 @@ public:
      */
     virtual void createOfflineRegion(const OfflineRegionDefinition& definition,
                                      const OfflineRegionMetadata& metadata,
-                                     std::function<void(expected<OfflineRegion, std::exception_ptr>)>);
+                                     std::function<void(expected<OfflineRegion, std::exception_ptr>)>) = 0;
     /*
      * Update an offline region metadata in the database.
      */
     virtual void updateOfflineMetadata(const int64_t regionID,
                                        const OfflineRegionMetadata& metadata,
-                                       std::function<void(expected<OfflineRegionMetadata, std::exception_ptr>)>);
+                                       std::function<void(expected<OfflineRegionMetadata, std::exception_ptr>)>) = 0;
 
     /*
      * Register an observer to be notified when the state of the region changes.
      */
-    virtual void setOfflineRegionObserver(OfflineRegion&, std::unique_ptr<OfflineRegionObserver>);
+    virtual void setOfflineRegionObserver(OfflineRegion&, std::unique_ptr<OfflineRegionObserver>) = 0;
 
     /*
      * Pause or resume downloading of regional resources.
      */
-    virtual void setOfflineRegionDownloadState(OfflineRegion&, OfflineRegionDownloadState);
+    virtual void setOfflineRegionDownloadState(OfflineRegion&, OfflineRegionDownloadState) = 0;
 
     /*
      * Retrieve the current status of the region. The query will be executed
@@ -164,8 +124,8 @@ public:
      * executed on the database thread; it is the responsibility of the SDK bindings
      * to re-execute a user-provided callback on the main thread.
      */
-    virtual void getOfflineRegionStatus(OfflineRegion&,
-                                        std::function<void(expected<OfflineRegionStatus, std::exception_ptr>)>) const;
+    virtual void getOfflineRegionStatus(
+        OfflineRegion&, std::function<void(expected<OfflineRegionStatus, std::exception_ptr>)>) const = 0;
 
     /*
      * Merge offline regions from a secondary database into the main offline database.
@@ -188,7 +148,7 @@ public:
      * does not contain all the tiles or resources required by the region definition.
      */
     virtual void mergeOfflineRegions(const std::string& sideDatabasePath,
-                                     std::function<void(expected<OfflineRegions, std::exception_ptr>)>);
+                                     std::function<void(expected<OfflineRegions, std::exception_ptr>)>) = 0;
 
     /*
      * Remove an offline region from the database and perform any resources evictions
@@ -208,7 +168,7 @@ public:
      * executed on the database thread; it is the responsibility of the SDK bindings
      * to re-execute a user-provided callback on the main thread.
      */
-    virtual void deleteOfflineRegion(OfflineRegion, std::function<void(std::exception_ptr)>);
+    virtual void deleteOfflineRegion(OfflineRegion, std::function<void(std::exception_ptr)>) = 0;
 
     /*
      * Invalidate all the tiles from an offline region forcing Mapbox GL to revalidate
@@ -216,13 +176,90 @@ public:
      * offline region and downloading it again because if the data on the cache matches
      * the server, no new data gets transmitted.
      */
-    virtual void invalidateOfflineRegion(OfflineRegion&, std::function<void(std::exception_ptr)>);
+    virtual void invalidateOfflineRegion(OfflineRegion&, std::function<void(std::exception_ptr)>) = 0;
 
     /*
      * Changing or bypassing this limit without permission from Mapbox is prohibited
      * by the Mapbox Terms of Service.
      */
-    virtual void setOfflineMapboxTileCountLimit(uint64_t) const;
+    virtual void setOfflineMapboxTileCountLimit(uint64_t) const = 0;
+};
+
+// This class represents the local database storage, which is used for storing both ambient cache and offline regions.
+class JointDatabaseStorage : public AmbientCache, public OfflineRegionsStorage {
+public:
+    virtual ~JointDatabaseStorage() = default;
+    /*
+     * Sets path of a database to be used by DatabaseFileSource and invokes provided
+     * callback when a database path is set.
+     */
+    virtual void setDatabasePath(const std::string&, std::function<void()> callback) = 0;
+
+    /*
+     * Delete existing database and re-initialize.
+     *
+     * When the operation is complete or encounters an error, the given callback will be
+     * executed on the database thread; it is the responsibility of the SDK bindings
+     * to re-execute a user-provided callback on the main thread.
+     */
+    virtual void resetDatabase(std::function<void(std::exception_ptr)>) = 0;
+
+    /*
+     * Packs the existing database file into a minimal amount of disk space.
+     *
+     * This operation has a performance impact as it will vacuum the database,
+     * forcing it to move pages on the filesystem.
+     *
+     * When the operation is complete or encounters an error, the given callback will be
+     * executed on the database thread; it is the responsibility of the SDK bindings
+     * to re-execute a user-provided callback on the main thread.
+     */
+    virtual void packDatabase(std::function<void(std::exception_ptr)> callback) = 0;
+
+    /*
+     * Sets whether packing the database file occurs automatically after an offline
+     * region is deleted (deleteOfflineRegion()) or the ambient cache is cleared
+     * (clearAmbientCache()).
+     *
+     * By default, packing is enabled. If disabled, disk space will not be freed
+     * after resources are removed unless packDatabase() is explicitly called.
+     */
+    virtual void runPackDatabaseAutomatically(bool) = 0;
+};
+class DatabaseFileSource : public FileSource, public JointDatabaseStorage {
+public:
+    explicit DatabaseFileSource(const ResourceOptions& options);
+    ~DatabaseFileSource() override;
+
+    // JointDatabaseStorage overrides
+    void setDatabasePath(const std::string&, std::function<void()> callback) override;
+    void resetDatabase(std::function<void(std::exception_ptr)>) override;
+    void packDatabase(std::function<void(std::exception_ptr)> callback) override;
+    void runPackDatabaseAutomatically(bool) override;
+
+    // AmbientCache overrides
+    void put(const Resource&, const Response&) override;
+    void invalidateAmbientCache(std::function<void(std::exception_ptr)>) override;
+    void clearAmbientCache(std::function<void(std::exception_ptr)>) override;
+    void setMaximumAmbientCacheSize(uint64_t size, std::function<void(std::exception_ptr)> callback) override;
+
+    // OfflineRegionsStorage overrides
+    void listOfflineRegions(std::function<void(expected<OfflineRegions, std::exception_ptr>)>) override;
+    void createOfflineRegion(const OfflineRegionDefinition& definition,
+                             const OfflineRegionMetadata& metadata,
+                             std::function<void(expected<OfflineRegion, std::exception_ptr>)>) override;
+    void updateOfflineMetadata(const int64_t regionID,
+                               const OfflineRegionMetadata& metadata,
+                               std::function<void(expected<OfflineRegionMetadata, std::exception_ptr>)>) override;
+    void setOfflineRegionObserver(OfflineRegion&, std::unique_ptr<OfflineRegionObserver>) override;
+    void setOfflineRegionDownloadState(OfflineRegion&, OfflineRegionDownloadState) override;
+    void getOfflineRegionStatus(OfflineRegion&,
+                                std::function<void(expected<OfflineRegionStatus, std::exception_ptr>)>) const override;
+    void mergeOfflineRegions(const std::string& sideDatabasePath,
+                             std::function<void(expected<OfflineRegions, std::exception_ptr>)>) override;
+    void deleteOfflineRegion(OfflineRegion, std::function<void(std::exception_ptr)>) override;
+    void invalidateOfflineRegion(OfflineRegion&, std::function<void(std::exception_ptr)>) override;
+    void setOfflineMapboxTileCountLimit(uint64_t) const override;
 
 private:
     // FileSource overrides
