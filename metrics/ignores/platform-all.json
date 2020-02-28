@@ -16,8 +16,6 @@
     "expression-tests/legacy/interval/composite-default": "https://github.com/mapbox/mapbox-gl-native/issues/12747",
     "expression-tests/legacy/interval/tokens-zoom": "https://github.com/mapbox/mapbox-gl-native/issues/12747",
     "expression-tests/resolved-locale/basic": "Even the 'en' locale may not be present on some test systems.",
-    "expression-tests/within/invalid-geojson": "skip - to be released in 1.3.0",
-    "expression-tests/within/line-within-polygon": "skip - to be released in 1.3.0",
     "probes/file-size/fail-file-doesnt-match": "Should fail, doesn't match the expectation.",
     "probes/file-size/fail-file-not-found": "Should fail, file not found.",
     "probes/file-size/fail-size-is-over": "Should fail, size is bigger than expected.",
@@ -133,6 +131,5 @@
     "render-tests/feature-state/promote-id-fill-extrusion": "https://github.com/mapbox/mapbox-gl-js/pull/9202",
     "render-tests/text-variable-anchor/left-top-right-buttom-offset-tile-map-mode":"https://github.com/mapbox/mapbox-gl-js/pull/9202",
     "render-tests/line-pattern/with-dasharray":"https://github.com/mapbox/mapbox-gl-js/pull/9189",
-    "render-tests/symbol-sort-key/placement-tile-boundary-right-then-left": "https://github.com/mapbox/mapbox-gl-js/pull/9054",
-    "render-tests/within/paint-line": "skip - to be released in 1.3.0"
+    "render-tests/symbol-sort-key/placement-tile-boundary-right-then-left": "https://github.com/mapbox/mapbox-gl-js/pull/9054"
 }
