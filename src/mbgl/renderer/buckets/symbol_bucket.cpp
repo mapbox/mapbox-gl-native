@@ -275,8 +275,8 @@ void SymbolBucket::sortFeatures(const float angle) {
     featureSortOrder = std::move(symbolsSortOrder);
 }
 
-std::vector<std::reference_wrapper<const SymbolInstance>> SymbolBucket::getSortedSymbols(const float angle) const {
-    std::vector<std::reference_wrapper<const SymbolInstance>> result(symbolInstances.begin(), symbolInstances.end());
+SymbolInstanceReferences SymbolBucket::getSortedSymbols(const float angle) const {
+    SymbolInstanceReferences result(symbolInstances.begin(), symbolInstances.end());
     const float sin = std::sin(angle);
     const float cos = std::cos(angle);
 
@@ -290,6 +290,15 @@ std::vector<std::reference_wrapper<const SymbolInstance>> SymbolBucket::getSorte
     });
 
     return result;
+}
+
+SymbolInstanceReferences SymbolBucket::getSymbols(const optional<SortKeyRange>& range) const {
+    if (!range) return SymbolInstanceReferences(symbolInstances.begin(), symbolInstances.end());
+    assert(range->start < range->end);
+    assert(range->end <= symbolInstances.size());
+    auto begin = symbolInstances.begin() + range->start;
+    auto end = symbolInstances.begin() + range->end;
+    return SymbolInstanceReferences(begin, end);
 }
 
 bool SymbolBucket::hasFormatSectionOverrides() const {
