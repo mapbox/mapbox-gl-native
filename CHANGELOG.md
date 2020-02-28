@@ -2,6 +2,14 @@
 
 ## master
 
+## maps-v1.2.2 (2020.02-release-vanillashake)
+
+### 🐞 Bug fixes
+
+- [core] Fix iterators in addRegularDash() ([#16249](https://github.com/mapbox/mapbox-gl-native/pull/16249))
+
+  Fixes possible crashes when using styles with line patterns.
+
 ## maps-v1.2.1 (2020.02-release-vanillashake)
 
 ### 🐞 Bug fixes
