@@ -110,11 +110,24 @@ public:
     }
 
     static optional<GeoJSON> toGeoJSON(const mbgl::android::Value &value, Error &error) {
-        if (value.isNull() || !value.isString()) {
+        if (value.isNull()) {
             error = { "no json data found" };
             return {};
+        } else if (value.isString()) {
+            return parseGeoJSON(value.toString(), error);
+        } else if (value.isObject()) {
+            mbgl::android::Value keys = value.keyArray();
+            std::size_t length = arrayLength(keys);
+            for (std::size_t i = 0; i < length; ++i) {
+                const auto k = keys.get(i).toString();
+                if (k == "json") {
+                    auto v = value.get(k.c_str());
+                    return parseGeoJSON(v.toString(), error);
+                }
+            }
         }
-        return parseGeoJSON(value.toString(), error);
+        error = {"no json data found"};
+        return {};
     }
 };
 
