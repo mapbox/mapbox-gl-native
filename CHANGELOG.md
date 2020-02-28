@@ -24,6 +24,8 @@
 
   New method allows serialization of a layer into a Value type, including all modifications done via runtime style API. New method is also an enabler for Style object serialization (sources, layers, etc).
 
+- [android] Add jni binding for min and max pitch ([#16236](https://github.com/mapbox/mapbox-gl-native/pull/16236))
+
 ##### ⚠️  Breaking changes
 
 - Changes to `mbgl::FileSourceManager::getFileSource()` ([#16238](https://github.com/mapbox/mapbox-gl-native/pull/16238))

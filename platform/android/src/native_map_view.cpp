@@ -479,6 +479,22 @@ jni::jdouble NativeMapView::getMaxZoom(jni::JNIEnv&) {
     return *map->getBounds().maxZoom;
 }
 
+void NativeMapView::setMinPitch(jni::JNIEnv&, jni::jdouble pitch) {
+    map->setBounds(BoundOptions().withMinPitch(pitch));
+}
+
+jni::jdouble NativeMapView::getMinPitch(jni::JNIEnv&) {
+    return *map->getBounds().minPitch;
+}
+
+void NativeMapView::setMaxPitch(jni::JNIEnv&, jni::jdouble pitch) {
+    map->setBounds(BoundOptions().withMaxPitch(pitch));
+}
+
+jni::jdouble NativeMapView::getMaxPitch(jni::JNIEnv&) {
+    return *map->getBounds().maxPitch;
+}
+
 void NativeMapView::rotateBy(jni::JNIEnv&, jni::jdouble sx, jni::jdouble sy, jni::jdouble ex, jni::jdouble ey, jni::jlong duration) {
     mbgl::ScreenCoordinate first(sx, sy);
     mbgl::ScreenCoordinate second(ex, ey);
@@ -1172,6 +1188,10 @@ void NativeMapView::registerNative(jni::JNIEnv& env) {
         METHOD(&NativeMapView::getMinZoom, "nativeGetMinZoom"),
         METHOD(&NativeMapView::setMaxZoom, "nativeSetMaxZoom"),
         METHOD(&NativeMapView::getMaxZoom, "nativeGetMaxZoom"),
+        METHOD(&NativeMapView::setMinPitch, "nativeSetMinPitch"),
+        METHOD(&NativeMapView::getMinPitch, "nativeGetMinPitch"),
+        METHOD(&NativeMapView::setMaxPitch, "nativeSetMaxPitch"),
+        METHOD(&NativeMapView::getMaxPitch, "nativeGetMaxPitch"),
         METHOD(&NativeMapView::rotateBy, "nativeRotateBy"),
         METHOD(&NativeMapView::setBearing, "nativeSetBearing"),
         METHOD(&NativeMapView::setBearingXY, "nativeSetBearingXY"),
