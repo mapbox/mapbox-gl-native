@@ -613,8 +613,8 @@ void SymbolLayout::addFeature(const std::size_t layoutFeatureIndex,
                                          iconType);
 
             if (sortFeaturesByKey) {
-                if (sortKeyRanges.size() && sortKeyRanges.back().sortKey == feature.sortKey) {
-                    sortKeyRanges.back().symbolInstanceEnd = symbolInstances.size();
+                if (!sortKeyRanges.empty() && sortKeyRanges.back().sortKey == feature.sortKey) {
+                    sortKeyRanges.back().end = symbolInstances.size();
                 } else {
                     sortKeyRanges.push_back({feature.sortKey, symbolInstances.size() - 1, symbolInstances.size()});
                 }

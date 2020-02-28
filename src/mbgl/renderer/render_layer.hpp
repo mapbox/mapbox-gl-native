@@ -28,18 +28,20 @@ public:
     Immutable<style::LayerProperties> layerProperties;
 };
 
+class SortKeyRange {
+public:
+    float sortKey;
+    size_t start;
+    size_t end;
+};
+
 class LayerPlacementData {
 public:
-    friend bool operator<(const LayerPlacementData& lhs, const LayerPlacementData& rhs) {
-        return lhs.sortKey < rhs.sortKey;
-    }
     std::reference_wrapper<Bucket> bucket;
     std::reference_wrapper<const RenderTile> tile;
     std::shared_ptr<FeatureIndex> featureIndex;
     bool firstInBucket;
-    float sortKey;
-    size_t symbolInstanceStart;
-    size_t symbolInstanceEnd;
+    optional<SortKeyRange> sortKeyRange;
 };
 
 class LayerPrepareParameters {

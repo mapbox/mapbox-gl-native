@@ -123,11 +123,6 @@ public:
     static constexpr uint32_t invalidCrossTileID() { return std::numeric_limits<uint32_t>::max(); }
 };
 
-class SortKeyRange {
-public:
-    float sortKey;
-    size_t symbolInstanceStart;
-    size_t symbolInstanceEnd;
-};
+using SymbolInstanceReferences = std::vector<std::reference_wrapper<const SymbolInstance>>;
 
 } // namespace mbgl

@@ -113,12 +113,7 @@ void Placement::placeLayer(const RenderLayer& layer) {
     std::set<uint32_t> seenCrossTileIDs;
     for (const auto& item : layer.getPlacementData()) {
         Bucket& bucket = item.bucket;
-        BucketPlacementParameters params{item.tile,
-                                         layer.baseImpl->source,
-                                         item.featureIndex,
-                                         item.sortKey,
-                                         item.symbolInstanceStart,
-                                         item.symbolInstanceEnd};
+        BucketPlacementParameters params{item.tile, layer.baseImpl->source, item.featureIndex, item.sortKeyRange};
         bucket.place(*this, params, seenCrossTileIDs);
     }
 }
@@ -661,12 +656,8 @@ void Placement::placeBucket(const SymbolBucket& bucket,
         }
 
     } else {
-        auto beginIt = bucket.symbolInstances.begin() + params.symbolInstanceStart;
-        auto endIt = bucket.symbolInstances.begin() + params.symbolInstanceEnd;
-        assert(params.symbolInstanceStart < params.symbolInstanceEnd);
-        assert(params.symbolInstanceEnd <= bucket.symbolInstances.size());
-        for (auto it = beginIt; it != endIt; ++it) {
-            placeSymbol(*it);
+        for (const SymbolInstance& symbol : bucket.getSymbols(params.sortKeyRange)) {
+            placeSymbol(symbol);
         }
     }
 
