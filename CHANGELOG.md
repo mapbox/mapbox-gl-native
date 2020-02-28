@@ -2,6 +2,8 @@
 
 ## master
 
+## maps-v1.3.0 (2020.02-relvanillashake)
+
 ### 🐞 Bug fixes
 
 - [core] Fix offline region download freezing ([#16230](https://github.com/mapbox/mapbox-gl-native/pull/16230))
