@@ -9,6 +9,14 @@ bool rayIntersect(const Point<double>& p, const Point<double>& p1, const Point<d
     return ((p1.y > p.y) != (p2.y > p.y)) && (p.x < (p2.x - p1.x) * (p.y - p1.y) / (p2.y - p1.y) + p1.x);
 }
 
+bool onBoundary(const Point<double>& p, const Point<double>& p1, const Point<double>& p2) {
+    const auto x1 = p.x - p1.x;
+    const auto y1 = p.y - p1.y;
+    const auto x2 = p.x - p2.x;
+    const auto y2 = p.y - p2.y;
+    return (x1 * y2 - x2 * y1 == 0) && (x1 * x2 <= 0) && (y1 * y2 <= 0);
+}
+
 // a, b are end points for line segment1, c and d are end points for line segment2
 bool lineIntersectLine(const Point<double>& a, const Point<double>& b, const Point<double>& c, const Point<double>& d) {
     const auto perp = [](const Point<double>& v1, const Point<double>& v2) { return (v1.x * v2.y - v1.y * v2.x); };
@@ -134,6 +142,7 @@ bool pointWithinPolygon(const Point<double>& point, const Polygon<double>& polyg
         const auto length = ring.size();
         // loop through every edge of the ring
         for (std::size_t i = 0; i < length - 1; ++i) {
+            if (onBoundary(point, ring[i], ring[i + 1])) return false;
             if (rayIntersect(point, ring[i], ring[i + 1])) {
                 within = !within;
             }
