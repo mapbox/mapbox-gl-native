@@ -51,15 +51,17 @@ void addRoundDash(
     const std::vector<DashRange>& ranges, uint32_t yOffset, float stretch, const int n, AlphaImage& image) {
     const float halfStretch = stretch * 0.5f;
 
+    if (ranges.empty()) return;
+
     for (int y = -n; y <= n; y++) {
         int row = yOffset + n + y;
         const uint32_t index = image.size.width * row;
         uint32_t currIndex = 0;
         DashRange range = ranges[currIndex];
 
-        for (uint32_t x = 0; x < image.size.width; x++) {
-            if (x / range.right > 1.0f) {
-                range = ranges[++currIndex];
+        for (uint32_t x = 0; x < image.size.width; ++x) {
+            if (x / range.right > 1.0f && ++currIndex < ranges.size()) {
+                range = ranges[currIndex];
             }
 
             float distLeft = fabsf(x - range.left);
@@ -84,22 +86,24 @@ void addRegularDash(std::vector<DashRange>& ranges, uint32_t yOffset, AlphaImage
     // Collapse any zero-length range
     for (auto it = ranges.begin(); it != ranges.end();) {
         if (it->isZeroLength) {
-            ranges.erase(it);
+            it = ranges.erase(it);
         } else {
             ++it;
         }
     }
 
-    if (ranges.size() >= 2) {
+    if (ranges.empty()) return;
+
+    if (ranges.size() > 1) {
         // Collapse neighbouring same-type parts into a single part
-        for (auto curr = ranges.begin(), next = ranges.begin() + 1; curr != ranges.end() && next != ranges.end();) {
+        for (auto curr = ranges.begin(), next = ranges.begin() + 1; next != ranges.end();) {
             if (next->isDash == curr->isDash) {
                 next->left = curr->left;
-                ranges.erase(curr);
+                curr = ranges.erase(curr);
             } else {
                 ++curr;
-                ++next;
             }
+            next = curr + 1;
         }
     }
 
@@ -115,8 +119,8 @@ void addRegularDash(std::vector<DashRange>& ranges, uint32_t yOffset, AlphaImage
     DashRange range = ranges[currIndex];
 
     for (uint32_t x = 0; x < image.size.width; ++x) {
-        if (x / range.right > 1.0f) {
-            range = ranges[++currIndex];
+        if (x / range.right > 1.0f && ++currIndex < ranges.size()) {
+            range = ranges[currIndex];
         }
 
         float distLeft = fabsf(x - range.left);
