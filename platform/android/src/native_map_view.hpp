@@ -127,6 +127,14 @@ public:
 
     jni::jdouble getMaxZoom(jni::JNIEnv&);
 
+    void setMinPitch(jni::JNIEnv&, jni::jdouble);
+
+    jni::jdouble getMinPitch(jni::JNIEnv&);
+
+    void setMaxPitch(jni::JNIEnv&, jni::jdouble);
+
+    jni::jdouble getMaxPitch(jni::JNIEnv&);
+
     void rotateBy(jni::JNIEnv&, jni::jdouble, jni::jdouble, jni::jdouble, jni::jdouble, jni::jlong);
 
     void setBearing(jni::JNIEnv&, jni::jdouble, jni::jlong);
