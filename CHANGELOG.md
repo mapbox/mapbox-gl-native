@@ -12,12 +12,6 @@
 
   Now the buffer is flushed every time the remaining resources container gets empty.
 
-- [core] Revert shader changes from [#16189](https://github.com/mapbox/mapbox-gl-native/pull/16189), which will cause incorrect label positioning ([#16235](https://github.com/mapbox/mapbox-gl-native/pull/16235))
-  
-  This is a back porting from GL JS [#9333](https://github.com/mapbox/mapbox-gl-js/pull/9333)
-
-- [ios] Restored support for iOS 9–11 by default ([#16241](https://github.com/mapbox/mapbox-gl-native/pull/16242))
-
 ### ✨ New features
 
 - [core] Add Layer::serialize() method ([#16231](https://github.com/mapbox/mapbox-gl-native/pull/16231))
@@ -51,6 +45,16 @@
 
   Possible fix:
   `std::shared_ptr<FileSource> onlineSource = FileSourceManager::get()->getFileSource(..);`
+
+## maps-v1.2.1 (2020.02-release-vanillashake)
+
+### 🐞 Bug fixes
+
+- [core] Revert shader changes from [#16189](https://github.com/mapbox/mapbox-gl-native/pull/16189), which will cause incorrect label positioning ([#16235](https://github.com/mapbox/mapbox-gl-native/pull/16235))
+
+  This is a back porting from GL JS [#9333](https://github.com/mapbox/mapbox-gl-js/pull/9333)
+
+- [ios] Restored support for iOS 9–11 by default ([#16241](https://github.com/mapbox/mapbox-gl-native/pull/16242))
 
 ## maps-v1.2.0 (2020.02-release-vanillashake)
 
