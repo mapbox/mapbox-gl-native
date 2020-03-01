@@ -8,6 +8,8 @@
 
   Fixes possible crashes when using styles with line patterns.
 
+- [default] Fix possible crash at RunLoop::wake() ([#16255](https://github.com/mapbox/mapbox-gl-native/pull/16255))
+
 ## maps-v1.3.0 (2020.02-relvanillashake)
 
 ### 🐞 Bug fixes
