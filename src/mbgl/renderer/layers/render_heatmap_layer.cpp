@@ -130,21 +130,19 @@ void RenderHeatmapLayer::render(PaintParameters& parameters) {
 
             checkRenderability(parameters, programInstance.activeBindingCount(allAttributeBindings));
 
-            programInstance.draw(
-                parameters.context,
-                *renderPass,
-                gfx::Triangles(),
-                parameters.depthModeForSublayer(0, gfx::DepthMaskType::ReadOnly),
-                gfx::StencilMode::disabled(),
-                gfx::ColorMode::additive(),
-                gfx::CullFaceMode::disabled(),
-                *bucket.indexBuffer,
-                bucket.segments,
-                allUniformValues,
-                allAttributeBindings,
-                HeatmapProgram::TextureBindings{},
-                getID()
-            );
+            programInstance.draw(parameters.context,
+                                 *renderPass,
+                                 gfx::Triangles(),
+                                 gfx::DepthMode::disabled(),
+                                 gfx::StencilMode::disabled(),
+                                 gfx::ColorMode::additive(),
+                                 gfx::CullFaceMode::disabled(),
+                                 *bucket.indexBuffer,
+                                 bucket.segments,
+                                 allUniformValues,
+                                 allAttributeBindings,
+                                 HeatmapProgram::TextureBindings{},
+                                 getID());
         }
 
     } else if (parameters.pass == RenderPass::Translucent) {
