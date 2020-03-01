@@ -2,13 +2,19 @@
 
 ## master
 
-## maps-v1.3.0 (2020.02-relvanillashake)
+## maps-v1.3.1 (2020.02-release-vanillashake)
 
 ### 🐞 Bug fixes
 
 - [core] Fix iterators in addRegularDash() ([#16249](https://github.com/mapbox/mapbox-gl-native/pull/16249))
 
   Fixes possible crashes when using styles with line patterns.
+
+- [default] Fix possible crash at RunLoop::wake() ([#16255](https://github.com/mapbox/mapbox-gl-native/pull/16255))
+
+## maps-v1.3.0 (2020.02-release-vanillashake)
+
+### 🐞 Bug fixes
 
 - [core] Fix offline region download freezing ([#16230](https://github.com/mapbox/mapbox-gl-native/pull/16230))
 
