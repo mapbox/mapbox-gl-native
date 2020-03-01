@@ -55,7 +55,7 @@ public:
 #if defined(__APPLE__)
 
 TEST(LocalGlyphRasterizer, PingFang) {
-    LocalGlyphRasterizerTest test(std::string("PingFang"));
+    LocalGlyphRasterizerTest test(std::string("PingFang TC"));
 
     test.fileSource->glyphsResponse = [&] (const Resource& resource) {
         EXPECT_EQ(Resource::Kind::Glyphs, resource.kind);
