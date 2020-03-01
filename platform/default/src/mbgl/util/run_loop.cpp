@@ -130,7 +130,7 @@ LOOP_HANDLE RunLoop::getLoopHandle() {
 }
 
 void RunLoop::wake() {
-    impl->async->send();
+    if (impl->async) impl->async->send();
 }
 
 void RunLoop::run() {
