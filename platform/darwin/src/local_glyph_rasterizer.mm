@@ -45,7 +45,9 @@ using CGColorSpaceHandle = CFHandle<CGColorSpaceRef, CGColorSpaceRef, CGColorSpa
 using CGContextHandle = CFHandle<CGContextRef, CGContextRef, CGContextRelease>;
 using CFStringRefHandle = CFHandle<CFStringRef, CFTypeRef, CFRelease>;
 using CFAttributedStringRefHandle = CFHandle<CFAttributedStringRef, CFTypeRef, CFRelease>;
+using CFMutableArrayRefHandle = CFHandle<CFMutableArrayRef, CFTypeRef, CFRelease>;
 using CFDictionaryRefHandle = CFHandle<CFDictionaryRef, CFTypeRef, CFRelease>;
+using CTFontRefHandle = CFHandle<CTFontRef, CFTypeRef, CFRelease>;
 using CTFontDescriptorRefHandle = CFHandle<CTFontDescriptorRef, CFTypeRef, CFRelease>;
 using CTLineRefHandle = CFHandle<CTLineRef, CFTypeRef, CFRelease>;
 
@@ -62,19 +64,36 @@ public:
         }
     }
 
-    
     CTFontRef getFont() {
         if (!fontFamily) {
             return NULL;
         }
         
         if (!fontHandle) {
-          NSDictionary *fontAttributes = @{
-                (NSString *)kCTFontSizeAttribute: [NSNumber numberWithFloat:24.0],
-                (NSString *)kCTFontFamilyNameAttribute: [[NSString alloc] initWithCString:fontFamily->c_str() encoding:NSUTF8StringEncoding]
-            };
+            NSArray<NSString *> *fontFamilyNames = [@(fontFamily->c_str()) componentsSeparatedByString:@"\n"];
+            CFMutableArrayRefHandle fontDescriptors(CFArrayCreateMutable(kCFAllocatorDefault, fontFamilyNames.count, &kCFTypeArrayCallBacks));
+            for (NSString *name in fontFamilyNames) {
+                NSDictionary *fontAttributes = @{
+                    (NSString *)kCTFontSizeAttribute: @(24.0),
+                    (NSString *)kCTFontNameAttribute: name,
+                    (NSString *)kCTFontDisplayNameAttribute: name,
+                    (NSString *)kCTFontFamilyNameAttribute: name,
+                };
+                
+                CTFontDescriptorRefHandle descriptor(CTFontDescriptorCreateWithAttributes((CFDictionaryRef)fontAttributes));
+                CFArrayAppendValue(*fontDescriptors, *descriptor);
+            }
 
-            CTFontDescriptorRefHandle descriptor(CTFontDescriptorCreateWithAttributes((CFDictionaryRef)fontAttributes));
+            CFStringRef keys[] = { kCTFontSizeAttribute,          kCTFontCascadeListAttribute };
+            CFTypeRef values[] = { (__bridge CFNumberRef)@(24.0), *fontDescriptors };
+
+            CFDictionaryRefHandle attributes(
+                CFDictionaryCreate(kCFAllocatorDefault, (const void**)&keys,
+                    (const void**)&values, sizeof(keys) / sizeof(keys[0]),
+                    &kCFTypeDictionaryKeyCallBacks,
+                    &kCFTypeDictionaryValueCallBacks));
+            
+            CTFontDescriptorRefHandle descriptor(CTFontDescriptorCreateWithAttributes(*attributes));
             fontHandle = CTFontCreateWithFontDescriptor(*descriptor, 0.0, NULL);
             if (!fontHandle) {
                 throw std::runtime_error("CTFontCreateWithFontDescriptor failed");
