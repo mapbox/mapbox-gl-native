@@ -26,7 +26,11 @@
 
   By default, the source is not volatile.
 
-### Bug fixes
+- [ios, macos] Allow specifying multiple fonts or font families for local font rendering ([#16253](https://github.com/mapbox/mapbox-gl-native/pull/16253))
+
+  The `localFontFamily` parameter of `mbgl::Renderer::Renderer()` and `mbgl::MapSnapshotter::MapSnapshotter()` can now contain a list of font family names, font display names, and font PostScript names, each name separated by a newline.
+
+### 🐞 Bug fixes
 
 - [ios, macos] Fixed error receiving local file URL response ([#16428](https://github.com/mapbox/mapbox-gl-native/pull/16428))
 
@@ -204,7 +208,6 @@
 ##### 📌 Known issues
 
 - When feature is exactly on the geometry boundary, `within` expression returns inconsistent values for different zoom levels  ([#16301](https://github.com/mapbox/mapbox-gl-native/issues/16301))
-
 
 ## maps-v1.3.0 (2020.02-relvanillashake)
 
