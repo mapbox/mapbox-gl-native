@@ -19,15 +19,25 @@ namespace style {
 class Style;
 } // namespace style
 
+class MapSnapshotterObserver {
+public:
+    virtual ~MapSnapshotterObserver() = default;
+
+    static MapSnapshotterObserver& nullObserver();
+    virtual void onDidFailLoadingStyle(const std::string&) {}
+    virtual void onDidFinishLoadingStyle() {}
+    virtual void onStyleImageMissing(const std::string&) {}
+};
+
 class MapSnapshotter {
 public:
-    MapSnapshotter(std::pair<bool, std::string> style,
-                   Size size,
+    MapSnapshotter(Size size,
                    float pixelRatio,
-                   optional<CameraOptions> cameraOptions,
-                   optional<LatLngBounds> region,
-                   optional<std::string> localFontFamily,
-                   const ResourceOptions&);
+                   const ResourceOptions&,
+                   MapSnapshotterObserver&,
+                   optional<std::string> localFontFamily = nullopt);
+
+    MapSnapshotter(Size size, float pixelRatio, const ResourceOptions&);
 
     ~MapSnapshotter();
 
