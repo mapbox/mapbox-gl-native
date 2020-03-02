@@ -40,6 +40,17 @@
 #include <fstream>
 #include <iostream>
 
+class SnapshotObserver final : public mbgl::MapSnapshotterObserver {
+public:
+    ~SnapshotObserver() = default;
+    void onDidFinishLoadingStyle() override {
+        if (didFinishLoadingStyleCallback) {
+            didFinishLoadingStyleCallback();
+        }
+    }
+    std::function<void()> didFinishLoadingStyleCallback;
+};
+
 namespace {
 void addFillExtrusionLayer(mbgl::style::Style &style, bool visible) {
     using namespace mbgl::style;
@@ -80,7 +91,10 @@ void glfwError(int error, const char *description) {
 }
 
 GLFWView::GLFWView(bool fullscreen_, bool benchmark_, const mbgl::ResourceOptions &options)
-    : fullscreen(fullscreen_), benchmark(benchmark_), mapResourceOptions(options.clone()) {
+    : fullscreen(fullscreen_),
+      benchmark(benchmark_),
+      snapshotterObserver(std::make_unique<SnapshotObserver>()),
+      mapResourceOptions(options.clone()) {
     glfwSetErrorCallback(glfwError);
 
     std::srand(static_cast<unsigned int>(std::time(nullptr)));
@@ -207,7 +221,7 @@ void GLFWView::setRenderFrontend(GLFWRendererFrontend* rendererFrontend_) {
     rendererFrontend = rendererFrontend_;
 }
 
-mbgl::gfx::RendererBackend& GLFWView::getRendererBackend() {
+mbgl::gfx::RendererBackend &GLFWView::getRendererBackend() {
     return backend->getRendererBackend();
 }
 
@@ -215,8 +229,7 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
     auto *view = reinterpret_cast<GLFWView *>(glfwGetWindowUserPointer(window));
 
     if (action == GLFW_RELEASE) {
-        if (key != GLFW_KEY_R || key != GLFW_KEY_S)
-            view->animateRouteCallback = nullptr;
+        if (key != GLFW_KEY_R || key != GLFW_KEY_S) view->animateRouteCallback = nullptr;
 
         switch (key) {
             case GLFW_KEY_ESCAPE:
@@ -620,38 +633,39 @@ void GLFWView::popAnnotation() {
 
 void GLFWView::makeSnapshot(bool withOverlay) {
     if (!snapshotter || snapshotter->getStyleURL() != map->getStyle().getURL()) {
-        snapshotter =
-            std::make_unique<mbgl::MapSnapshotter>(std::pair<bool, std::string>{false, map->getStyle().getURL()},
-                                                   map->getMapOptions().size(),
-                                                   map->getMapOptions().pixelRatio(),
-                                                   map->getCameraOptions(),
-                                                   mbgl::nullopt,
-                                                   mbgl::nullopt,
-                                                   mapResourceOptions);
-    } else {
-        snapshotter->setCameraOptions(map->getCameraOptions());
+        snapshotter = std::make_unique<mbgl::MapSnapshotter>(
+            map->getMapOptions().size(), map->getMapOptions().pixelRatio(), mapResourceOptions, *snapshotterObserver);
+        snapshotter->setStyleURL(map->getStyle().getURL());
     }
+
+    auto snapshot = [&] {
+        snapshotter->setCameraOptions(map->getCameraOptions());
+        snapshotter->snapshot([](std::exception_ptr ptr,
+                                 mbgl::PremultipliedImage image,
+                                 mbgl::MapSnapshotter::Attributions,
+                                 mbgl::MapSnapshotter::PointForFn,
+                                 mbgl::MapSnapshotter::LatLngForFn) {
+            if (!ptr) {
+                mbgl::Log::Info(mbgl::Event::General,
+                                "Made snapshot './snapshot.png' with size w:%dpx h:%dpx",
+                                image.size.width,
+                                image.size.height);
+                std::ofstream file("./snapshot.png");
+                file << mbgl::encodePNG(image);
+            } else {
+                mbgl::Log::Error(mbgl::Event::General, "Failed to make a snapshot!");
+            }
+        });
+    };
 
     if (withOverlay) {
-        addFillExtrusionLayer(snapshotter->getStyle(), withOverlay);
+        snapshotterObserver->didFinishLoadingStyleCallback = [&] {
+            addFillExtrusionLayer(snapshotter->getStyle(), withOverlay);
+            snapshot();
+        };
+    } else {
+        snapshot();
     }
-
-    snapshotter->snapshot([](std::exception_ptr ptr,
-                             mbgl::PremultipliedImage image,
-                             mbgl::MapSnapshotter::Attributions,
-                             mbgl::MapSnapshotter::PointForFn,
-                             mbgl::MapSnapshotter::LatLngForFn) {
-        if (!ptr) {
-            mbgl::Log::Info(mbgl::Event::General,
-                            "Made snapshot './snapshot.png' with size w:%dpx h:%dpx",
-                            image.size.width,
-                            image.size.height);
-            std::ofstream file("./snapshot.png");
-            file << mbgl::encodePNG(image);
-        } else {
-            mbgl::Log::Error(mbgl::Event::General, "Failed to make a snapshot!");
-        }
-    });
 }
 
 void GLFWView::onScroll(GLFWwindow *window, double /*xOffset*/, double yOffset) {

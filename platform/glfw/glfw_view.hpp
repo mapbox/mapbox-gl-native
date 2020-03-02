@@ -10,6 +10,7 @@
 struct GLFWwindow;
 class GLFWBackend;
 class GLFWRendererFrontend;
+class SnapshotObserver;
 
 namespace mbgl {
 namespace gfx {
@@ -145,5 +146,6 @@ private:
     bool dirty = false;
     mbgl::optional<std::string> featureID;
     std::unique_ptr<mbgl::MapSnapshotter> snapshotter;
+    std::unique_ptr<SnapshotObserver> snapshotterObserver;
     mbgl::ResourceOptions mapResourceOptions;
 };
