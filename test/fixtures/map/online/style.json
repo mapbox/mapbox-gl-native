@@ -12,7 +12,7 @@
     "id": "background",
     "type": "background",
     "paint": {
-      "background-color": "red"
+      "background-color": "green"
     }
   }, {
     "id": "water",
@@ -20,7 +20,7 @@
     "source": "mapbox",
     "source-layer": "water",
     "paint": {
-      "fill-pattern": "noise",
+      "fill-pattern": "a",
       "fill-antialias": false
     }
   }]
