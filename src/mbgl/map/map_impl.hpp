@@ -60,7 +60,7 @@ public:
     const float pixelRatio;
     const bool crossSourceCollisions;
 
-    MapDebugOptions debugOptions { MapDebugOptions::NoDebug };
+    MapDebugOptions debugOptions { MapDebugOptions::Collision };
 
     std::shared_ptr<FileSource> fileSource;
 
