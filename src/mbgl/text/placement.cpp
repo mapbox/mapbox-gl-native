@@ -144,7 +144,7 @@ void Placement::placeBucket(const SymbolBucket& bucket,
                             std::set<uint32_t>& seenCrossTileIDs) {
     assert(updateParameters);
     const auto& layout = *bucket.layout;
-    const auto& renderTile = params.tile;
+    const RenderTile& renderTile = params.tile;
     const auto& state = collisionIndex.getTransformState();
     const float pixelsToTileUnits = renderTile.id.pixelsToTileUnits(1, placementZoom);
     const OverscaledTileID& overscaledID = renderTile.getOverscaledTileID();
@@ -735,7 +735,7 @@ void Placement::commit() {
 void Placement::updateLayerBuckets(const RenderLayer& layer, const TransformState& state, bool updateOpacities) const {
     std::set<uint32_t> seenCrossTileIDs;
     for (const auto& item : layer.getPlacementData()) {
-        if (item.firstInBucket) {
+        if (!item.sortKeyRange || item.sortKeyRange->isFirstRange()) {
             item.bucket.get().updateVertices(*this, updateOpacities, state, item.tile, seenCrossTileIDs);
         }
     }

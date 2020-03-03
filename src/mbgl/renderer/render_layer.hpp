@@ -30,6 +30,7 @@ public:
 
 class SortKeyRange {
 public:
+    bool isFirstRange() const { return start == 0u; }
     float sortKey;
     size_t start;
     size_t end;
@@ -40,7 +41,6 @@ public:
     std::reference_wrapper<Bucket> bucket;
     std::reference_wrapper<const RenderTile> tile;
     std::shared_ptr<FeatureIndex> featureIndex;
-    bool firstInBucket;
     optional<SortKeyRange> sortKeyRange;
 };
 
