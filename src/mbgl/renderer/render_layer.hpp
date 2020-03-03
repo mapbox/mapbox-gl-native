@@ -41,6 +41,7 @@ public:
     std::reference_wrapper<Bucket> bucket;
     std::reference_wrapper<const RenderTile> tile;
     std::shared_ptr<FeatureIndex> featureIndex;
+    std::string sourceId;
     optional<SortKeyRange> sortKeyRange;
 };
 

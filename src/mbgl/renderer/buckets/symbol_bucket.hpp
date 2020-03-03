@@ -84,7 +84,7 @@ public:
     void upload(gfx::UploadPass&) override;
     bool hasData() const override;
     std::pair<uint32_t, bool> registerAtCrossTileIndex(CrossTileSymbolLayerIndex&, const RenderTile&) override;
-    void place(Placement&, const BucketPlacementParameters&, std::set<uint32_t>&) override;
+    void place(Placement&, const BucketPlacementData&, std::set<uint32_t>&) override;
     void updateVertices(
         const Placement&, bool updateOpacities, const TransformState&, const RenderTile&, std::set<uint32_t>&) override;
     bool hasTextData() const;

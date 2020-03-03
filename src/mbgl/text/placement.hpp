@@ -86,14 +86,6 @@ private:
     bool crossSourceCollisions;
 };
 
-class BucketPlacementParameters {
-public:
-    std::reference_wrapper<const RenderTile> tile;
-    std::string sourceId;
-    std::shared_ptr<FeatureIndex> featureIndex;
-    optional<SortKeyRange> sortKeyRange;
-};
-
 class Placement;
 
 class PlacementController {
@@ -132,7 +124,7 @@ public:
 
 private:
     friend SymbolBucket;
-    void placeBucket(const SymbolBucket&, const BucketPlacementParameters&, std::set<uint32_t>& seenCrossTileIDs);
+    void placeSymbolBucket(const BucketPlacementData&, std::set<uint32_t>& seenCrossTileIDs);
     // Returns `true` if bucket vertices were updated; returns `false` otherwise.
     bool updateBucketDynamicVertices(SymbolBucket&, const TransformState&, const RenderTile& tile) const;
     void updateBucketOpacities(SymbolBucket&, const TransformState&, std::set<uint32_t>&) const;

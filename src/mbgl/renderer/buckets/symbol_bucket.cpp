@@ -314,8 +314,8 @@ std::pair<uint32_t, bool> SymbolBucket::registerAtCrossTileIndex(CrossTileSymbol
     return std::make_pair(bucketInstanceId, firstTimeAdded);
 }
 
-void SymbolBucket::place(Placement& placement, const BucketPlacementParameters& params, std::set<uint32_t>& seenIds) {
-    placement.placeBucket(*this, params, seenIds);
+void SymbolBucket::place(Placement& placement, const BucketPlacementData& data, std::set<uint32_t>& seenIds) {
+    placement.placeSymbolBucket(data, seenIds);
 }
 
 void SymbolBucket::updateVertices(const Placement& placement,

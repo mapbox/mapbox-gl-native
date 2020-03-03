@@ -111,10 +111,9 @@ Placement::Placement() : collisionIndex({}, MapMode::Static), collisionGroups(tr
 
 void Placement::placeLayer(const RenderLayer& layer) {
     std::set<uint32_t> seenCrossTileIDs;
-    for (const auto& item : layer.getPlacementData()) {
-        Bucket& bucket = item.bucket;
-        BucketPlacementParameters params{item.tile, layer.baseImpl->source, item.featureIndex, item.sortKeyRange};
-        bucket.place(*this, params, seenCrossTileIDs);
+    for (const BucketPlacementData& data : layer.getPlacementData()) {
+        Bucket& bucket = data.bucket;
+        bucket.place(*this, data, seenCrossTileIDs);
     }
 }
 
@@ -139,10 +138,9 @@ Point<float> calculateVariableLayoutOffset(style::SymbolAnchorType anchor,
 }
 } // namespace
 
-void Placement::placeBucket(const SymbolBucket& bucket,
-                            const BucketPlacementParameters& params,
-                            std::set<uint32_t>& seenCrossTileIDs) {
+void Placement::placeSymbolBucket(const BucketPlacementData& params, std::set<uint32_t>& seenCrossTileIDs) {
     assert(updateParameters);
+    const auto& bucket = static_cast<const SymbolBucket&>(params.bucket.get());
     const auto& layout = *bucket.layout;
     const RenderTile& renderTile = params.tile;
     const auto& state = collisionIndex.getTransformState();

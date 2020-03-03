@@ -19,7 +19,7 @@ class PatternDependency;
 using PatternLayerMap = std::map<std::string, PatternDependency>;
 class Placement;
 class TransformState;
-class BucketPlacementParameters;
+class BucketPlacementData;
 class RenderTile;
 
 class Bucket {
@@ -64,7 +64,7 @@ public:
         return std::make_pair(0u, false);
     }
     // Places this bucket to the given placement.
-    virtual void place(Placement&, const BucketPlacementParameters&, std::set<uint32_t>&) {}
+    virtual void place(Placement&, const BucketPlacementData&, std::set<uint32_t>&) {}
     virtual void updateVertices(
         const Placement&, bool /*updateOpacities*/, const TransformState&, const RenderTile&, std::set<uint32_t>&) {}
 
