@@ -589,7 +589,7 @@ void RenderSymbolLayer::prepare(const LayerPrepareParameters& params) {
                 placementData.push_back({*bucket, renderTile, featureIndex, nullopt});
             } else {
                 for (const auto& sortKeyRange : bucket->sortKeyRanges) {
-                    LayerPlacementData layerData{*bucket, renderTile, featureIndex, sortKeyRange};
+                    BucketPlacementData layerData{*bucket, renderTile, featureIndex, sortKeyRange};
                     auto sortPosition = std::upper_bound(
                         placementData.cbegin(), placementData.cend(), layerData, [](const auto& lhs, const auto& rhs) {
                             assert(lhs.sortKeyRange && rhs.sortKeyRange);

@@ -36,13 +36,15 @@ public:
     size_t end;
 };
 
-class LayerPlacementData {
+class BucketPlacementData {
 public:
     std::reference_wrapper<Bucket> bucket;
     std::reference_wrapper<const RenderTile> tile;
     std::shared_ptr<FeatureIndex> featureIndex;
     optional<SortKeyRange> sortKeyRange;
 };
+
+using LayerPlacementData = std::list<BucketPlacementData>;
 
 class LayerPrepareParameters {
 public:
@@ -105,7 +107,7 @@ public:
 
     virtual void prepare(const LayerPrepareParameters&);
 
-    const std::list<LayerPlacementData>& getPlacementData() const { return placementData; }
+    const LayerPlacementData& getPlacementData() const { return placementData; }
 
     // Latest evaluated properties.
     Immutable<style::LayerProperties> evaluatedProperties;
@@ -134,7 +136,7 @@ protected:
     // evaluated StyleProperties object and is updated accordingly.
     RenderPass passes = RenderPass::None;
 
-    std::list<LayerPlacementData> placementData;
+    LayerPlacementData placementData;
 
 private:
     // Some layers may not render correctly on some hardware when the vertex attribute limit of
