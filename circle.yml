@@ -671,7 +671,7 @@ jobs:
           command: |
             /tmp/attach/install/linux-gcc8-release/bin/mbgl-render-test-runner -u rebaseline -p metrics/binary-size.json
       - run:
-          name: 'Matrics Baselines'
+          name: 'Metrics Baselines'
           command: |
             cp -r /tmp/attach/metrics .
             git add -A && git diff --staged --exit-code | tee baselines.patch
