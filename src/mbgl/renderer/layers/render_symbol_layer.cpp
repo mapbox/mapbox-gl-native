@@ -575,6 +575,7 @@ void RenderSymbolLayer::prepare(const LayerPrepareParameters& params) {
     addRenderPassesFromTiles();
 
     placementData.clear();
+
     for (const RenderTile& renderTile : *renderTiles) {
         auto* bucket = static_cast<SymbolBucket*>(renderTile.getBucket(*baseImpl));
         if (bucket && bucket->bucketLeaderID == getID()) {
@@ -586,10 +587,10 @@ void RenderSymbolLayer::prepare(const LayerPrepareParameters& params) {
             auto featureIndex = static_cast<const GeometryTile*>(tile)->getFeatureIndex();
 
             if (bucket->sortKeyRanges.empty()) {
-                placementData.push_back({*bucket, renderTile, featureIndex, nullopt});
+                placementData.push_back({*bucket, renderTile, featureIndex, baseImpl->source, nullopt});
             } else {
                 for (const auto& sortKeyRange : bucket->sortKeyRanges) {
-                    BucketPlacementData layerData{*bucket, renderTile, featureIndex, sortKeyRange};
+                    BucketPlacementData layerData{*bucket, renderTile, featureIndex, baseImpl->source, sortKeyRange};
                     auto sortPosition = std::upper_bound(
                         placementData.cbegin(), placementData.cend(), layerData, [](const auto& lhs, const auto& rhs) {
                             assert(lhs.sortKeyRange && rhs.sortKeyRange);
