@@ -88,7 +88,7 @@ private:
 
 class BucketPlacementParameters {
 public:
-    const RenderTile& tile;
+    std::reference_wrapper<const RenderTile> tile;
     std::string sourceId;
     std::shared_ptr<FeatureIndex> featureIndex;
     optional<SortKeyRange> sortKeyRange;
