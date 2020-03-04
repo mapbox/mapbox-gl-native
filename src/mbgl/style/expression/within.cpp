@@ -13,33 +13,6 @@
 namespace mbgl {
 namespace {
 
-class PolygonFeature : public GeometryTileFeature {
-public:
-    const Feature& feature;
-    mutable optional<GeometryCollection> geometry;
-
-    PolygonFeature(const Feature& feature_, const CanonicalTileID& canonical) : feature(feature_) {
-        const auto type = apply_visitor(ToFeatureType(), feature.geometry);
-        if (type == FeatureType::Polygon) {
-            geometry = convertGeometry(feature.geometry, canonical);
-            assert(geometry);
-            geometry = fixupPolygons(*geometry);
-        } else {
-            mbgl::Log::Warning(mbgl::Event::General, "Provided feature does not contain polygon geometries.");
-        }
-    }
-
-    bool isFeatureValid() const { return geometry != nullopt; };
-    FeatureType getType() const override { return FeatureType::Polygon; }
-    const PropertyMap& getProperties() const override { return feature.properties; }
-    FeatureIdentifier getID() const override { return feature.id; }
-    optional<mbgl::Value> getValue(const std::string& /*key*/) const override { return optional<mbgl::Value>(); }
-    const GeometryCollection& getGeometries() const override {
-        assert(geometry);
-        return *geometry;
-    }
-};
-
 bool pointsWithinPolygons(const mbgl::GeometryTileFeature& feature,
                           const mbgl::CanonicalTileID& canonical,
                           const Feature::geometry_type& polygonGeoSet,
@@ -128,18 +101,15 @@ mbgl::optional<mbgl::GeoJSON> parseValue(const mbgl::style::conversion::Converti
 }
 
 struct PolygonInfo {
-    PolygonInfo(Feature::geometry_type geometry_, const WithinBBox& bbox_)
-        : geometry(std::move(geometry_)), bbox(bbox_){};
+    PolygonInfo(const Feature::geometry_type& geometry_) : geometry(geometry_), bbox(calculateBBox(geometry)){};
     Feature::geometry_type geometry;
     WithinBBox bbox;
 };
 
-mbgl::optional<PolygonInfo> getPolygonInfo(const PolygonFeature& polyFeature,
-                                           mbgl::style::expression::ParsingContext& ctx) {
-    if (polyFeature.isFeatureValid()) {
-        auto refinedGeoSet = convertGeometry(polyFeature, CanonicalTileID(0, 0, 0));
-        auto bbox = calculateBBox(refinedGeoSet);
-        return PolygonInfo(std::move(refinedGeoSet), bbox);
+mbgl::optional<PolygonInfo> getPolygonInfo(const Feature& polyFeature, mbgl::style::expression::ParsingContext& ctx) {
+    const auto type = apply_visitor(ToFeatureType(), polyFeature.geometry);
+    if (type == FeatureType::Polygon) {
+        return PolygonInfo(polyFeature.geometry);
     }
     ctx.error("'within' expression requires valid geojson source that contains polygon geometry type.");
     return nullopt;
@@ -192,23 +162,20 @@ ParseResult Within::parse(const Convertible& value, ParsingContext& ctx) {
 
         return parsedValue->match(
             [&parsedValue, &ctx](const mapbox::geometry::geometry<double>& geometrySet) {
-                PolygonFeature polyFeature(mbgl::Feature(geometrySet), CanonicalTileID(0, 0, 0));
-                if (auto ret = getPolygonInfo(polyFeature, ctx)) {
+                if (auto ret = getPolygonInfo(mbgl::Feature(geometrySet), ctx)) {
                     return ParseResult(std::make_unique<Within>(*parsedValue, std::move(ret->geometry), ret->bbox));
                 }
                 return ParseResult();
             },
             [&parsedValue, &ctx](const mapbox::feature::feature<double>& feature) {
-                PolygonFeature polyFeature(mbgl::Feature(feature), CanonicalTileID(0, 0, 0));
-                if (auto ret = getPolygonInfo(polyFeature, ctx)) {
+                if (auto ret = getPolygonInfo(mbgl::Feature(feature), ctx)) {
                     return ParseResult(std::make_unique<Within>(*parsedValue, std::move(ret->geometry), ret->bbox));
                 }
                 return ParseResult();
             },
             [&parsedValue, &ctx](const mapbox::feature::feature_collection<double>& features) {
                 for (const auto& feature : features) {
-                    PolygonFeature polyFeature(mbgl::Feature(feature), CanonicalTileID(0, 0, 0));
-                    if (auto ret = getPolygonInfo(polyFeature, ctx)) {
+                    if (auto ret = getPolygonInfo(mbgl::Feature(feature), ctx)) {
                         return ParseResult(std::make_unique<Within>(*parsedValue, std::move(ret->geometry), ret->bbox));
                     }
                 }

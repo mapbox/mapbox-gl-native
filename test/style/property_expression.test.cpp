@@ -335,7 +335,8 @@ TEST(PropertyExpression, WithinExpression) {
         evaluatedResult = propExpr.evaluate(EvaluationContext(&pointFeature).withCanonicalTileID(&canonicalTileID));
         EXPECT_TRUE(evaluatedResult);
 
-        pointFeature = getPointFeature(Point<double>(-5.9765625, -5.659718554577273));
+        // On the boundary
+        pointFeature = getPointFeature(Point<double>(3.076171875, -7.01366792756663));
         evaluatedResult = propExpr.evaluate(EvaluationContext(&pointFeature).withCanonicalTileID(&canonicalTileID));
         EXPECT_FALSE(evaluatedResult);
     }
