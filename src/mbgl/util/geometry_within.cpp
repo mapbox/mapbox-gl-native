@@ -9,7 +9,11 @@ bool rayIntersect(const Point<double>& p, const Point<double>& p1, const Point<d
     return ((p1.y > p.y) != (p2.y > p.y)) && (p.x < (p2.x - p1.x) * (p.y - p1.y) / (p2.y - p1.y) + p1.x);
 }
 
+// check if point p in on line segment with end points p1 and p2
 bool onBoundary(const Point<double>& p, const Point<double>& p1, const Point<double>& p2) {
+    // requirements of point p on line segment:
+    // 1. colinear: cross product of vector p->p1(x1, y1) and vector p->p2(x2, y2) equals to 0
+    // 2. p is between p1 and p2
     const auto x1 = p.x - p1.x;
     const auto y1 = p.y - p1.y;
     const auto x2 = p.x - p2.x;

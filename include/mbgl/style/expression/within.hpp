@@ -11,7 +11,7 @@ namespace expression {
 
 class Within final : public Expression {
 public:
-    explicit Within(GeoJSON geojson, Feature::geometry_type geometries_, WithinBBox polygonBBox_);
+    explicit Within(GeoJSON geojson, Feature::geometry_type geometries_, const WithinBBox& polygonBBox_);
 
     ~Within() override;
 
