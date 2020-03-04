@@ -2,6 +2,16 @@
 
 ## master
 
+### ✨ New features
+
+- [android] Add jni binding for line-sort-key and fill-sort-key ([#16256](https://github.com/mapbox/mapbox-gl-native/pull/16256))
+
+  With this change, android sdk will be able to get sort key for LineLayer and FillLayer.
+
+- Styleable MapSnapshotter ([#16268](https://github.com/mapbox/mapbox-gl-native/pull/16268))
+
+  New feature provides means of modifying style of a MapSnapshotter. The new API enables several use-cases, such as: adding route overlays, removing extra information (layers) from a base style, adding custom images that are missing from a style.
+
 ### 🐞 Bug fixes
 
 - [core] Fix iterators in addRegularDash() ([#16249](https://github.com/mapbox/mapbox-gl-native/pull/16249))
@@ -15,13 +25,18 @@
   Before this chage, `toGeoJSON` method in `android_conversion.hpp` can't convert Object(Map in android) to GeoJSON object. 
   
   But `within` expression need to accept an Object and then convert to GeoJSON object, now `toGeoJSON` method can convert both string and Object to GeoJSON.
- 
-### ✨ New features
 
-- [android] Add jni binding for line-sort-key and fill-sort-key ([#16256](https://github.com/mapbox/mapbox-gl-native/pull/16256))
+### 🧩  Architectural changes
 
-  With this change, android sdk will be able to get sort key for LineLayer and FillLayer.
-  
+- Changes to `MapSnapshotter` threading model ([#16268](https://github.com/mapbox/mapbox-gl-native/pull/16268))
+
+  Snapshotter's threading model has been changed. Previously, `Map` and `HeadlessFrontend` that is responsible for rendering snapshot, were running on a dedicated thread. After [#16268](https://github.com/mapbox/mapbox-gl-native/pull/16268), `Map` object lives on client thread, so that the client can access `Style` object, while `HeadlessFrontend` lives on a dedicated `Snapshotter` thread.
+
+##### ⚠️  Breaking changes
+
+- Signature of a `MapSnapshotter`'s constructor has been changed
+- Signature for a `MapSnapshotter::snapshot` method has been changed
+
 ## maps-v1.3.0 (2020.02-relvanillashake)
 
 ### 🐞 Bug fixes
