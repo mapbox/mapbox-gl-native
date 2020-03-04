@@ -238,6 +238,7 @@ add_library(
     ${PROJECT_SOURCE_DIR}/include/mbgl/util/geo.hpp
     ${PROJECT_SOURCE_DIR}/include/mbgl/util/geojson.hpp
     ${PROJECT_SOURCE_DIR}/include/mbgl/util/geometry.hpp
+    ${PROJECT_SOURCE_DIR}/include/mbgl/util/geometry_buffer.hpp
     ${PROJECT_SOURCE_DIR}/include/mbgl/util/ignore.hpp
     ${PROJECT_SOURCE_DIR}/include/mbgl/util/image.hpp
     ${PROJECT_SOURCE_DIR}/include/mbgl/util/immutable.hpp
