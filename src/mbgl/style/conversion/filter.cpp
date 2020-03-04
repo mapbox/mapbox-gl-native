@@ -53,8 +53,13 @@ bool isExpression(const Convertible& filter) {
         optional<std::string> operand = toString(arrayMember(filter, 1));
         return operand && *operand != "$id" && *operand != "$type";
 
-    } else if (*op == "in" || *op == "!in" || *op == "!has" || *op == "none") {
+    } else if (*op == "!in" || *op == "!has" || *op == "none") {
         return false;
+
+    } else if (*op == "in") {
+        optional<std::string> str = toString(arrayMember(filter, 1));
+
+        return arrayLength(filter) >= 3 && (!str || isArray(arrayMember(filter, 2)));
 
     } else if (*op == "==" || *op == "!=" || *op == ">" || *op == ">=" || *op == "<" || *op == "<=") {
         return arrayLength(filter) != 3 || isArray(arrayMember(filter, 1)) || isArray(arrayMember(filter, 2));
