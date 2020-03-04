@@ -10,6 +10,12 @@
 
 - [default] Fix possible crash at RunLoop::wake() ([#16255](https://github.com/mapbox/mapbox-gl-native/pull/16255))
 
+- [android] Update toGeoJSON in android_conversion.hpp [#16243](https://github.com/mapbox/mapbox-gl-native/pull/16243)
+  
+  Before this chage, `toGeoJSON` method in `android_conversion.hpp` can't convert Object(Map in android) to GeoJSON object. 
+  
+  But `within` expression need to accept an Object and then convert to GeoJSON object, now `toGeoJSON` method can convert both string and Object to GeoJSON.
+ 
 ## maps-v1.3.0 (2020.02-relvanillashake)
 
 ### 🐞 Bug fixes
