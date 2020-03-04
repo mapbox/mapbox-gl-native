@@ -33,6 +33,15 @@ workflows:
             - linux-gcc8-release
             - macos-xcode11-release
             - ios-render-test-runner
+      - trigger-pipeline:
+          requires:
+            - android-render-test-runner
+            - ios-render-test-runner
+            - linux-clang8-release
+            - linux-gcc8-release
+            - macos-xcode11-release
+          name: mapboxci
+          slug: mapbox/mapbox-gl-native-internal
       - build-template:
           name: android-armeabi-v7a-release
           executor_name: ubuntu-disco
@@ -631,6 +640,17 @@ jobs:
             metricsResult=$(gsutil ls -d gs://test-lab-186672a0qp5bq-ycr70axads3nc/render-test-app-${CIRCLE_BUILD_NUM}/*/*/sdcard/baselines/*) || true
             gsutil -m cp -r $metricsResult metrics/android-render-test-runner/ || true
       - save
+  trigger-pipeline:
+    executor: ubuntu-disco
+    parameters:
+      slug:
+        type: string
+    steps:
+      - checkout
+      - run:
+          name: Trigger Pipeline
+          command: |
+              scripts/ci-circleci-start-pipeline.py --target-slug << parameters.slug >>
   sanity-checks:
     executor: ubuntu-disco
     steps:
