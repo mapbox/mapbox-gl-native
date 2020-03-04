@@ -118,7 +118,9 @@ namespace android {
 
         // Register the peer
         jni::RegisterNativePeer<<%- camelize(type) %>Layer>(
-            env, javaClass, "nativePtr",
+            env,
+            javaClass,
+            "nativePtr",
 <% if (type === 'background') { -%>
             jni::MakePeer<<%- camelize(type) %>Layer, jni::String&>,
 <% } else { -%>

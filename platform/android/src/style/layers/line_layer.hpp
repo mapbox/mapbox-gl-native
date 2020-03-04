@@ -34,6 +34,8 @@ public:
 
     jni::Local<jni::Object<jni::ObjectTag>> getLineRoundLimit(jni::JNIEnv&);
 
+    jni::Local<jni::Object<jni::ObjectTag>> getLineSortKey(jni::JNIEnv&);
+
     jni::Local<jni::Object<jni::ObjectTag>> getLineOpacity(jni::JNIEnv&);
     void setLineOpacityTransition(jni::JNIEnv&, jlong duration, jlong delay);
     jni::Local<jni::Object<TransitionOptions>> getLineOpacityTransition(jni::JNIEnv&);
