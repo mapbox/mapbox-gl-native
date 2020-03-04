@@ -41,6 +41,11 @@ namespace android {
 
     // Property getters
 
+    jni::Local<jni::Object<>> FillLayer::getFillSortKey(jni::JNIEnv& env) {
+        using namespace mbgl::android::conversion;
+        return std::move(*convert<jni::Local<jni::Object<>>>(env, toFillLayer(layer).getFillSortKey()));
+    }
+
     jni::Local<jni::Object<>> FillLayer::getFillAntialias(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
         return std::move(*convert<jni::Local<jni::Object<>>>(env, toFillLayer(layer).getFillAntialias()));
@@ -172,10 +177,13 @@ namespace android {
 
         // Register the peer
         jni::RegisterNativePeer<FillLayer>(
-            env, javaClass, "nativePtr",
+            env,
+            javaClass,
+            "nativePtr",
             jni::MakePeer<FillLayer, jni::String&, jni::String&>,
             "initialize",
             "finalize",
+            METHOD(&FillLayer::getFillSortKey, "nativeGetFillSortKey"),
             METHOD(&FillLayer::getFillAntialias, "nativeGetFillAntialias"),
             METHOD(&FillLayer::getFillOpacityTransition, "nativeGetFillOpacityTransition"),
             METHOD(&FillLayer::setFillOpacityTransition, "nativeSetFillOpacityTransition"),

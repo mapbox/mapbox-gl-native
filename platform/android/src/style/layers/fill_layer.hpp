@@ -26,6 +26,8 @@ public:
 
     // Properties
 
+    jni::Local<jni::Object<jni::ObjectTag>> getFillSortKey(jni::JNIEnv&);
+
     jni::Local<jni::Object<jni::ObjectTag>> getFillAntialias(jni::JNIEnv&);
 
     jni::Local<jni::Object<jni::ObjectTag>> getFillOpacity(jni::JNIEnv&);

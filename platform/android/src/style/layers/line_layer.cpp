@@ -61,6 +61,11 @@ namespace android {
         return std::move(*convert<jni::Local<jni::Object<>>>(env, toLineLayer(layer).getLineRoundLimit()));
     }
 
+    jni::Local<jni::Object<>> LineLayer::getLineSortKey(jni::JNIEnv& env) {
+        using namespace mbgl::android::conversion;
+        return std::move(*convert<jni::Local<jni::Object<>>>(env, toLineLayer(layer).getLineSortKey()));
+    }
+
     jni::Local<jni::Object<>> LineLayer::getLineOpacity(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
         return std::move(*convert<jni::Local<jni::Object<>>>(env, toLineLayer(layer).getLineOpacity()));
@@ -264,7 +269,9 @@ namespace android {
 
         // Register the peer
         jni::RegisterNativePeer<LineLayer>(
-            env, javaClass, "nativePtr",
+            env,
+            javaClass,
+            "nativePtr",
             jni::MakePeer<LineLayer, jni::String&, jni::String&>,
             "initialize",
             "finalize",
@@ -272,6 +279,7 @@ namespace android {
             METHOD(&LineLayer::getLineJoin, "nativeGetLineJoin"),
             METHOD(&LineLayer::getLineMiterLimit, "nativeGetLineMiterLimit"),
             METHOD(&LineLayer::getLineRoundLimit, "nativeGetLineRoundLimit"),
+            METHOD(&LineLayer::getLineSortKey, "nativeGetLineSortKey"),
             METHOD(&LineLayer::getLineOpacityTransition, "nativeGetLineOpacityTransition"),
             METHOD(&LineLayer::setLineOpacityTransition, "nativeSetLineOpacityTransition"),
             METHOD(&LineLayer::getLineOpacity, "nativeGetLineOpacity"),

@@ -16,6 +16,12 @@
   
   But `within` expression need to accept an Object and then convert to GeoJSON object, now `toGeoJSON` method can convert both string and Object to GeoJSON.
  
+### ✨ New features
+
+- [android] Add jni binding for line-sort-key and fill-sort-key ([#16256](https://github.com/mapbox/mapbox-gl-native/pull/16256))
+
+  With this change, android sdk will be able to get sort key for LineLayer and FillLayer.
+  
 ## maps-v1.3.0 (2020.02-relvanillashake)
 
 ### 🐞 Bug fixes
