@@ -130,7 +130,6 @@
     "render-tests/feature-state/promote-id-line": "https://github.com/mapbox/mapbox-gl-js/pull/9202",
     "render-tests/feature-state/promote-id-circle": "https://github.com/mapbox/mapbox-gl-js/pull/9202",
     "render-tests/feature-state/promote-id-fill-extrusion": "https://github.com/mapbox/mapbox-gl-js/pull/9202",
-    "render-tests/text-variable-anchor/left-top-right-bottom-offset-tile-map-mode":"https://github.com/mapbox/mapbox-gl-js/pull/9202",
     "render-tests/line-pattern/with-dasharray":"https://github.com/mapbox/mapbox-gl-js/pull/9189",
     "render-tests/symbol-sort-key/placement-tile-boundary-right-then-left": "https://github.com/mapbox/mapbox-gl-js/pull/9054",
     "render-tests/tile-mode/streets-v11": "ignored due to flaky metrics results"
