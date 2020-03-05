@@ -7,8 +7,8 @@
 #include <mbgl/util/geojson.hpp>
 #include <mbgl/util/optional.hpp>
 
+#include <map>
 #include <memory>
-#include <unordered_map>
 #include <utility>
 
 namespace mbgl {
@@ -32,7 +32,7 @@ struct GeoJSONOptions {
     uint8_t clusterMaxZoom = 17;
     using ClusterExpression = std::pair<std::shared_ptr<mbgl::style::expression::Expression>,
                                         std::shared_ptr<mbgl::style::expression::Expression>>;
-    using ClusterProperties = std::unordered_map<std::string, ClusterExpression>;
+    using ClusterProperties = std::map<std::string, ClusterExpression>;
     ClusterProperties clusterProperties;
 
     static Immutable<GeoJSONOptions> defaultOptions();
