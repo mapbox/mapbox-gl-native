@@ -21,7 +21,7 @@ public:
     using CollisionGrid = GridIndex<IndexedSubfeature>;
 
     explicit CollisionIndex(const TransformState&, MapMode);
-    bool intercectsTileEdges(const CollisionBox&,
+    bool intersectsTileEdges(const CollisionBox&,
                              Point<float> shift,
                              const mat4& posMatrix,
                              const float textPixelRatio,

@@ -96,7 +96,7 @@ inline bool CollisionIndex::overlapsTile(const CollisionBoundaries& boundaries,
            boundaries[1] < tileBoundaries[3] && boundaries[3] > tileBoundaries[1];
 }
 
-bool CollisionIndex::intercectsTileEdges(const CollisionBox& box,
+bool CollisionIndex::intersectsTileEdges(const CollisionBox& box,
                                          Point<float> shift,
                                          const mat4& posMatrix,
                                          const float textPixelRatio,
