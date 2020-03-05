@@ -562,8 +562,7 @@ void Placement::placeSymbolBucket(const BucketPlacementData& params, std::set<ui
     } else if (mapMode == MapMode::Tile && !avoidEdges) {
         // In this case we first try to place symbols, which intersects the tile borders, so that
         // those symbols will remain even if each tile is handled independently.
-        std::vector<std::reference_wrapper<const SymbolInstance>> symbolInstances(bucket.symbolInstances.begin(),
-                                                                                  bucket.symbolInstances.end());
+        SymbolInstanceReferences symbolInstances = bucket.getSymbols(params.sortKeyRange);
         optional<style::TextVariableAnchorType> variableAnchor;
         if (!variableTextAnchors.empty()) variableAnchor = variableTextAnchors.front();
 
@@ -595,53 +594,60 @@ void Placement::placeSymbolBucket(const BucketPlacementData& params, std::set<ui
             {collisionIndex, UnwrappedTileID(z, x + 1, y), {-util::EXTENT, 0.0f}}  // right
         }};
 
-        auto intercectsTileEdges = [&](const CollisionBox& collisionBox, const SymbolInstance& symbol) -> bool {
+        auto collisionBoxIntersectsTileEdges = [&](const CollisionBox& collisionBox, Point<float> shift) -> bool {
+            bool intersects =
+                collisionIndex.intercectsTileEdges(collisionBox, shift, renderTile.matrix, pixelRatio, *tileBorders);
+            // Check if this symbol intersects the neighbor tile borders. If so, it also shall be placed with priority.
+            for (const auto& neighbor : neightbors) {
+                if (intersects) break;
+                intersects = collisionIndex.intercectsTileEdges(
+                    collisionBox, shift + neighbor.shift, neighbor.matrix, pixelRatio, neighbor.borders);
+            }
+            return intersects;
+        };
+
+        auto symbolIntersectsTileEdges = [&](const SymbolInstance& symbol) -> bool {
             auto it = locationCache.find(symbol.crossTileID);
             if (it != locationCache.end()) return it->second;
 
-            Point<float> offset{};
-            if (variableAnchor) {
-                const CollisionBox& textBox = symbol.textCollisionFeature.boxes.front();
-                float width = textBox.x2 - textBox.x1;
-                float height = textBox.y2 - textBox.y1;
-                offset = calculateVariableLayoutOffset(*variableAnchor,
-                                                       width,
-                                                       height,
-                                                       symbol.variableTextOffset,
-                                                       symbol.textBoxScale,
-                                                       rotateTextWithMap,
-                                                       pitchTextWithMap,
-                                                       state.getBearing());
-            }
+            bool intersects = false;
+            if (!symbol.textCollisionFeature.boxes.empty()) {
+                const auto& textCollisionBox = symbol.textCollisionFeature.boxes.front();
 
-            bool intercects =
-                collisionIndex.intercectsTileEdges(collisionBox, offset, renderTile.matrix, pixelRatio, *tileBorders);
-            if (!intercects) {
-                // Check if this symbol intersects the neighbor tile borders.
-                // If so, it also shall be placed with priority (location = FeatureLocation::IntersectsTileBorder).
-                for (const auto& neighbor : neightbors) {
-                    intercects = collisionIndex.intercectsTileEdges(
-                        collisionBox, offset + neighbor.shift, neighbor.matrix, pixelRatio, neighbor.borders);
-                    if (intercects) break;
+                Point<float> offset{};
+                if (variableAnchor) {
+                    float width = textCollisionBox.x2 - textCollisionBox.x1;
+                    float height = textCollisionBox.y2 - textCollisionBox.y1;
+                    offset = calculateVariableLayoutOffset(*variableAnchor,
+                                                           width,
+                                                           height,
+                                                           symbol.variableTextOffset,
+                                                           symbol.textBoxScale,
+                                                           rotateTextWithMap,
+                                                           pitchTextWithMap,
+                                                           state.getBearing());
                 }
+                intersects = collisionBoxIntersectsTileEdges(textCollisionBox, offset);
             }
 
-            locationCache.insert(std::make_pair(symbol.crossTileID, intercects));
-            return intercects;
+            if (!symbol.iconCollisionFeature.boxes.empty() && !intersects) {
+                const auto& iconCollisionBox = symbol.iconCollisionFeature.boxes.front();
+                intersects = collisionBoxIntersectsTileEdges(iconCollisionBox, {});
+            }
+
+            locationCache.insert(std::make_pair(symbol.crossTileID, intersects));
+            return intersects;
         };
 
         std::stable_sort(symbolInstances.begin(),
                          symbolInstances.end(),
-                         [&intercectsTileEdges](const SymbolInstance& a, const SymbolInstance& b) {
+                         [&symbolIntersectsTileEdges](const SymbolInstance& a, const SymbolInstance& b) {
                              assert(!a.textCollisionFeature.alongLine);
                              assert(!b.textCollisionFeature.alongLine);
-                             if (a.textCollisionFeature.boxes.empty() || b.textCollisionFeature.boxes.empty())
-                                 return false;
-
-                             auto intercectsA = intercectsTileEdges(a.textCollisionFeature.boxes.front(), a);
-                             auto intercectsB = intercectsTileEdges(b.textCollisionFeature.boxes.front(), b);
-                             if (intercectsA) {
-                                 if (!intercectsB) return true;
+                             auto intersectsA = symbolIntersectsTileEdges(a);
+                             auto intersectsB = symbolIntersectsTileEdges(b);
+                             if (intersectsA) {
+                                 if (!intersectsB) return true;
                                  // Both symbols are inrecepting the tile borders, we need a universal cross-tile rule
                                  // to define which of them shall be placed first - use anchor `y` point.
                                  return a.anchor.point.y < b.anchor.point.y;
