@@ -354,7 +354,7 @@ void Placement::placeSymbolBucket(const BucketPlacementData& params, std::set<ui
                         textBoxes.clear();
 
                         if (mapMode == MapMode::Tile && !isFirstAnchor &&
-                            collisionIndex.intercectsTileEdges(symbolInstance.textCollisionFeature.boxes.front(),
+                            collisionIndex.intersectsTileEdges(symbolInstance.textCollisionFeature.boxes.front(),
                                                                shift,
                                                                posMatrix,
                                                                pixelRatio,
@@ -596,11 +596,11 @@ void Placement::placeSymbolBucket(const BucketPlacementData& params, std::set<ui
 
         auto collisionBoxIntersectsTileEdges = [&](const CollisionBox& collisionBox, Point<float> shift) -> bool {
             bool intersects =
-                collisionIndex.intercectsTileEdges(collisionBox, shift, renderTile.matrix, pixelRatio, *tileBorders);
+                collisionIndex.intersectsTileEdges(collisionBox, shift, renderTile.matrix, pixelRatio, *tileBorders);
             // Check if this symbol intersects the neighbor tile borders. If so, it also shall be placed with priority.
             for (const auto& neighbor : neightbors) {
                 if (intersects) break;
-                intersects = collisionIndex.intercectsTileEdges(
+                intersects = collisionIndex.intersectsTileEdges(
                     collisionBox, shift + neighbor.shift, neighbor.matrix, pixelRatio, neighbor.borders);
             }
             return intersects;
