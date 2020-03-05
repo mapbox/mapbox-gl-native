@@ -466,14 +466,42 @@ TestMetadata parseTestMetadata(const TestPaths& paths) {
 
     const mbgl::JSValue& testValue = metadataValue["test"];
 
+    if (testValue.HasMember("mapMode")) {
+        metadata.outputsImage = true;
+        assert(testValue["mapMode"].IsString());
+        std::string mapModeStr = testValue["mapMode"].GetString();
+        if (mapModeStr == "tile") {
+            metadata.mapMode = mbgl::MapMode::Tile;
+            // In the tile mode, map is showing exactly one tile.
+            metadata.size = {uint32_t(mbgl::util::tileSize), uint32_t(mbgl::util::tileSize)};
+        } else if (mapModeStr == "continuous") {
+            metadata.mapMode = mbgl::MapMode::Continuous;
+            metadata.outputsImage = false;
+        } else if (mapModeStr == "static")
+            metadata.mapMode = mbgl::MapMode::Static;
+        else {
+            mbgl::Log::Warning(
+                mbgl::Event::ParseStyle, "Unknown map mode: %s. Falling back to static mode", mapModeStr.c_str());
+            metadata.mapMode = mbgl::MapMode::Static;
+        }
+    }
+
     if (testValue.HasMember("width")) {
         assert(testValue["width"].IsNumber());
-        metadata.size.width = testValue["width"].GetInt();
+        if (metadata.mapMode == mbgl::MapMode::Tile) {
+            mbgl::Log::Warning(mbgl::Event::ParseStyle, "The 'width' metadata field is ignored in tile map mode");
+        } else {
+            metadata.size.width = testValue["width"].GetInt();
+        }
     }
 
     if (testValue.HasMember("height")) {
         assert(testValue["height"].IsNumber());
-        metadata.size.height = testValue["height"].GetInt();
+        if (metadata.mapMode == mbgl::MapMode::Tile) {
+            mbgl::Log::Warning(mbgl::Event::ParseStyle, "The 'height' metadata field is ignored in tile map mode");
+        } else {
+            metadata.size.height = testValue["height"].GetInt();
+        }
     }
 
     if (testValue.HasMember("pixelRatio")) {
@@ -490,25 +518,6 @@ TestMetadata parseTestMetadata(const TestPaths& paths) {
         assert(testValue["description"].IsString());
         metadata.description =
             std::string{testValue["description"].GetString(), testValue["description"].GetStringLength()};
-    }
-
-    if (testValue.HasMember("mapMode")) {
-        metadata.outputsImage = true;
-        assert(testValue["mapMode"].IsString());
-        std::string mapModeStr = testValue["mapMode"].GetString();
-        if (mapModeStr == "tile") {
-            metadata.mapMode = mbgl::MapMode::Tile;
-            metadata.size = {uint32_t(mbgl::util::tileSize), uint32_t(mbgl::util::tileSize)};
-        } else if (mapModeStr == "continuous") {
-            metadata.mapMode = mbgl::MapMode::Continuous;
-            metadata.outputsImage = false;
-        } else if (mapModeStr == "static")
-            metadata.mapMode = mbgl::MapMode::Static;
-        else {
-            mbgl::Log::Warning(
-                mbgl::Event::ParseStyle, "Unknown map mode: %s. Falling back to static mode", mapModeStr.c_str());
-            metadata.mapMode = mbgl::MapMode::Static;
-        }
     }
 
     // Test operations handled in runner.cpp.
