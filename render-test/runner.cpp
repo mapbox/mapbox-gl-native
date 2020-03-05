@@ -658,15 +658,17 @@ LatLng getTileCenterCoordinates(const UnwrappedTileID& tileId) {
     return Projection::unproject(tileCenter, scale);
 }
 
-constexpr auto kTileSizeUint = uint32_t(util::tileSize);
+uint32_t getTileScreenPixelSize(float pixelRatio) {
+    return util::tileSize * pixelRatio;
+}
 
-uint32_t getImageTileOffset(const std::set<uint32_t>& dims, uint32_t dim) {
+uint32_t getImageTileOffset(const std::set<uint32_t>& dims, uint32_t dim, float pixelRatio) {
     auto it = dims.find(dim);
     if (it == dims.end()) {
         assert(false);
         return 0;
     }
-    return static_cast<uint32_t>(std::distance(dims.begin(), it)) * kTileSizeUint;
+    return static_cast<uint32_t>(std::distance(dims.begin(), it)) * getTileScreenPixelSize(pixelRatio);
 }
 
 } // namespace
@@ -757,9 +759,10 @@ void TestRunner::run(TestMetadata& metadata) {
             yDims.insert(tileId.canonical.y);
             assert(tileId.canonical.z == uint8_t(*camera.zoom));
         }
+        auto tileScreenSize = getTileScreenPixelSize(metadata.pixelRatio);
 
         result.image =
-            PremultipliedImage({uint32_t(xDims.size()) * kTileSizeUint, uint32_t(yDims.size()) * kTileSizeUint});
+            PremultipliedImage({uint32_t(xDims.size()) * tileScreenSize, uint32_t(yDims.size()) * tileScreenSize});
         for (const auto& tileId : tileIds) {
             resetContext(metadata, ctx);
             auto cameraForTile{camera};
@@ -772,8 +775,8 @@ void TestRunner::run(TestMetadata& metadata) {
                 return;
             }
 
-            auto xOffset = getImageTileOffset(xDims, tileId.canonical.x);
-            auto yOffset = getImageTileOffset(yDims, tileId.canonical.y);
+            auto xOffset = getImageTileOffset(xDims, tileId.canonical.x, metadata.pixelRatio);
+            auto yOffset = getImageTileOffset(yDims, tileId.canonical.y, metadata.pixelRatio);
             PremultipliedImage::copy(
                 resultForTile.image, result.image, {0, 0}, {xOffset, yOffset}, resultForTile.image.size);
             result.stats += resultForTile.stats;
