@@ -26,6 +26,10 @@
   
   But `within` expression need to accept an Object and then convert to GeoJSON object, now `toGeoJSON` method can convert both string and Object to GeoJSON.
 
+- [core] Fix `within` expression algorithm so that `false` value will be returned when point is on the boundary.  Allow using different GeoJSON formats as arguments of `within` expression.([#16232](https://github.com/mapbox/mapbox-gl-native/pull/16232))
+
+  A valid GeoJSON argument should contain one of the following types:  `"Feature"`, `"FeatureCollection"`,`"Polygon"` or `"MultiPolygon"`. 
+
 ### 🧩  Architectural changes
 
 - Changes to `MapSnapshotter` threading model ([#16268](https://github.com/mapbox/mapbox-gl-native/pull/16268))
