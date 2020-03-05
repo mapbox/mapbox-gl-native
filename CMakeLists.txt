@@ -980,8 +980,6 @@ set_target_properties(
         INTERFACE_MAPBOX_LICENSE ${PROJECT_SOURCE_DIR}/LICENSE.md
 )
 
-include(${PROJECT_SOURCE_DIR}/scripts/license.cmake)
-
 set_property(TARGET mbgl-core PROPERTY FOLDER Core)
 
 add_library(
@@ -994,7 +992,11 @@ endif()
 
 if(MBGL_WITH_CORE_ONLY)
     return()
-elseif(MBGL_WITH_QT)
+endif()
+
+include(${PROJECT_SOURCE_DIR}/scripts/license.cmake)
+
+if(MBGL_WITH_QT)
     include(${PROJECT_SOURCE_DIR}/platform/qt/qt.cmake)
 elseif(CMAKE_SYSTEM_NAME STREQUAL Android)
     include(${PROJECT_SOURCE_DIR}/platform/android/android.cmake)
