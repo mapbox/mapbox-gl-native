@@ -28,7 +28,13 @@
 
 - [core] Fix `within` expression algorithm so that `false` value will be returned when point is on the boundary.  Allow using different GeoJSON formats as arguments of `within` expression.([#16232](https://github.com/mapbox/mapbox-gl-native/pull/16232))
 
-  A valid GeoJSON argument should contain one of the following types:  `"Feature"`, `"FeatureCollection"`,`"Polygon"` or `"MultiPolygon"`. 
+  A valid GeoJSON argument should contain one of the following types:  `"Feature"`, `"FeatureCollection"`,`"Polygon"` or `"MultiPolygon"`.
+
+- [core] [tile mode] placement algorithm must consider icons bounding boxes [#16277](https://github.com/mapbox/mapbox-gl-native/pull/16277)
+
+  Tile mode placement algorithm now checks if bounding boxes for both label text and icon are intersecting the edges of the tiles.
+
+  Before, it checked only text bounding boxes and thus label icons might have got cut off.
 
 ### 🧩  Architectural changes
 
