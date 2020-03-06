@@ -36,6 +36,10 @@
 
   Before, it checked only text bounding boxes and thus label icons might have got cut off.
 
+- [core] Calculate size of an ambient cache without offline region's resources ([#15622](https://github.com/mapbox/mapbox-gl-native/pull/15622))
+
+  Resources that belong to an offline region, should not contribute to the amount of space available in the ambient cache.
+
 ### 🧩  Architectural changes
 
 - Changes to `MapSnapshotter` threading model ([#16268](https://github.com/mapbox/mapbox-gl-native/pull/16268))
@@ -46,6 +50,7 @@
 
 - Signature of a `MapSnapshotter`'s constructor has been changed
 - Signature for a `MapSnapshotter::snapshot` method has been changed
+- Size of an offline regions do not affect ambient cache size ([#15622](https://github.com/mapbox/mapbox-gl-native/pull/15622))
 
 ## maps-v1.3.0 (2020.02-relvanillashake)
 
