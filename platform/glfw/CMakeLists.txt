@@ -23,6 +23,7 @@ target_include_directories(
 )
 
 include(${PROJECT_SOURCE_DIR}/vendor/cheap-ruler-cpp.cmake)
+include(${PROJECT_SOURCE_DIR}/vendor/boost.cmake)
 
 # Use target_link_directories when we move away from CMake 3.10.
 target_link_libraries(
@@ -41,6 +42,7 @@ target_link_libraries(
         OpenGL::GL
         mbgl-compiler-options
         mbgl-vendor-cheap-ruler-cpp
+        mbgl-vendor-boost
 )
 
 set_property(TARGET mbgl-glfw PROPERTY FOLDER Executables)

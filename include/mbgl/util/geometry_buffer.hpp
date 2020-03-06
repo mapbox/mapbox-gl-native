@@ -9,12 +9,12 @@
 #include <rapidjson/stringbuffer.h>
 
 #include <mbgl/util/geometry.hpp>
+#include <mbgl/util/variant.hpp>
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/optional.hpp>
-#include <mbgl/util/variant.hpp>
 
-#include <mapbox/geojson_impl.hpp>
 #include <mapbox/geometry/geometry.hpp>
+#include <mapbox/geojson_impl.hpp>
 
 #include <cstdio>
 #include <fstream>
@@ -40,6 +40,16 @@ typedef boost::geometry::strategy::buffer::point_circle CircleStrategy;
 typedef boost::geometry::strategy::buffer::side_straight SideStrategy;
 
 static const double earthRadius = 6371008.8;
+
+void generateFile(const std::string& filename, const std::string& data) {
+    FILE* fd = fopen(filename.c_str(), "wb");
+    if (fd) {
+        fwrite(data.data(), sizeof(std::string::value_type), data.size(), fd);
+        fclose(fd);
+    } else {
+        throw std::runtime_error(std::string("Failed to open file ") + filename);
+    }
+}
 
 double mercatorXfromLng(double lng) {
     return (180 + lng) / 360;
@@ -113,16 +123,6 @@ mapbox::geometry::multi_polygon<double> lngLatPolygonFromMercator(const BoostMul
     return mapboxPolygons;
 }
 
-void generateFile(const std::string& filename, const std::string& data) {
-    FILE* fd = fopen(filename.c_str(), "wb");
-    if (fd) {
-        fwrite(data.data(), sizeof(std::string::value_type), data.size(), fd);
-        fclose(fd);
-    } else {
-        throw std::runtime_error(std::string("Failed to open file ") + filename);
-    }
-}
-
 // Convert geometry to geojson
 std::string getGeoStringBuffer(const mapbox::geometry::geometry<double> geometry, bool singleLine = false) {
     using JSValue = rapidjson::GenericValue<rapidjson::UTF8<>, rapidjson::CrtAllocator>;
@@ -138,7 +138,7 @@ std::string getGeoStringBuffer(const mapbox::geometry::geometry<double> geometry
     json.AddMember("type", "Feature", allocator);
     JSValue v;
     v.SetObject();
-    json.AddMember("properties", v, allocator);
+    json.AddMember("properties",v, allocator);
     json.AddMember("geometry", mapbox::geojson::convert(geometry, allocator), allocator);
     json.Accept(writer);
 
@@ -154,7 +154,7 @@ mapbox::geometry::multi_polygon<double> getPolygonBuffer(const mapbox::geometry:
         [&distanceInMeter, &bufferDistance, &pointsPerCircle](const mapbox::geometry::point<double>& point) {
             // Convert meter to boost geometry distance
             bufferDistance = meterInMercatorCoordinateUnits(point.y) * distanceInMeter;
-            // Convert geometry to Mercator
+
             const auto boostGeometry = mercatorPointFromLngLat(point);
             BoostMultiPolygon polygons;
             boost::geometry::buffer(boostGeometry,
@@ -174,6 +174,7 @@ mapbox::geometry::multi_polygon<double> getPolygonBuffer(const mapbox::geometry:
             bufferDistance = meterInMercatorCoordinateUnits(points.front().y) * distanceInMeter;
 
             BoostMultiPoint boostPoints;
+            boostPoints.reserve(points.size());
             for (const auto& p : points) {
                 boostPoints.push_back(mercatorPointFromLngLat(p));
             }
@@ -195,6 +196,7 @@ mapbox::geometry::multi_polygon<double> getPolygonBuffer(const mapbox::geometry:
             bufferDistance = meterInMercatorCoordinateUnits(line.front().y) * distanceInMeter;
 
             BoostLineString boostLine;
+            boostLine.reserve(line.size());
             for (const auto& p : line) {
                 boostLine.push_back(mercatorPointFromLngLat(p));
             }
@@ -217,8 +219,10 @@ mapbox::geometry::multi_polygon<double> getPolygonBuffer(const mapbox::geometry:
             bufferDistance = meterInMercatorCoordinateUnits(lines.front().front().y) * distanceInMeter;
 
             BoostMultiLineString boostLines;
+            boostLines.reserve(lines.size());
             for (const auto& line : lines) {
                 BoostLineString boostLine;
+                boostLine.reserve(line.size());
                 for (const auto& p : line) {
                     boostLine.push_back(mercatorPointFromLngLat(p));
                 }
@@ -238,7 +242,7 @@ mapbox::geometry::multi_polygon<double> getPolygonBuffer(const mapbox::geometry:
             return lngLatPolygonFromMercator(polygons);
         },
         [](const auto&) {
-            mbgl::Log::Warning(mbgl::Event::General, "Geometry only supports Point/LineString geometry type.");
+            mbgl::Log::Warning(mbgl::Event::General, "GeometryBuffer only supports Point/LineString geometry type.");
             return mapbox::geometry::multi_polygon<double>();
         });
 }
@@ -267,8 +271,7 @@ public:
         return {};
     }
 
-    static std::string geoJSONFromGeometryBuffer(const mapbox::geometry::multi_polygon<double>& geometryBuffer,
-                                                 bool singleLine = false) {
+    static std::string geoJSONFromGeometryBuffer(const mapbox::geometry::multi_polygon<double>& geometryBuffer, bool singleLine = false) {
         return getGeoStringBuffer(geometryBuffer, singleLine);
     }
 

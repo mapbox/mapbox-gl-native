@@ -467,53 +467,53 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
             using namespace mbgl::style;
             using namespace mbgl::style::conversion;
             using namespace mbgl::style::expression::dsl;
-            // Add new paint properties to the layer "country-label" that need to highlight country labels that are
-            // inside the polygon
+
             static mapbox::geojson::geojson route{mapbox::geojson::parse(mbgl::platform::glfw::helsinkiRoute)};
             const auto& geometry = route.match(
-                        [](const mapbox::geometry::geometry<double>& geometrySet) {
-                        return mbgl::Feature(geometrySet).geometry;
-                        },
-                        [](const mapbox::feature::feature<double>& feature) {
-                            return mbgl::Feature(feature).geometry;
-                        },
-                        [](const mapbox::feature::feature_collection<double>& features) {
-                        return mbgl::Feature(features.front()).geometry;
-                        },
-                        [](const auto&) {
-                            return mapbox::geometry::empty();
-                        });
+                [](const mapbox::geometry::geometry<double>& geometrySet) {
+                    return mbgl::Feature(geometrySet).geometry;
+                },
+                [](const mapbox::feature::feature<double>& feature) {
+                    return mbgl::Feature(feature).geometry;
+                },
+                [](const mapbox::feature::feature_collection<double>& features) {
+                    return mbgl::Feature(features.front()).geometry;
+                },
+                [](const auto&) {
+                    return mapbox::geometry::empty();
+                });
 
-//                const auto &geometry = route.get<mapbox::geometry::geometry<double>>();
-//                const auto &lineString = geometry.get<mapbox::geometry::line_string<double>>();
+            assert(geometry != mapbox::geometry::empty());
+            // Generate route boundary based on the radius (50 meter here) and points per circle(used for configuring line joints/ends and circles)
+            const std::string boundary = mbgl::GeometryBuffer(geometry, 50.0, 10).getGeoJSONBuffer();
 
-            const auto geojson = mbgl::GeometryBuffer(geometry, 100.0, 50).getGeoJSONBuffer();
-            const std::string polygonSource("/Users/miaozhao/Work/MacOs/polygon.geojson");
-            mbgl::GeometryBuffer::writeGeoJSON(polygonSource, geojson);
-
+            // Add a new layer to show the generated boundary
             auto s1 = std::make_unique<GeoJSONSource>("polygon");
-            s1->setGeoJSON(mapbox::geojson::parse(geojson));
+            s1->setGeoJSON(mapbox::geojson::parse(boundary));
             view->map->getStyle().addSource(std::move(s1));
-
-            auto s2 = std::make_unique<GeoJSONSource>("line");
-            s2->setGeoJSON(route);
-            view->map->getStyle().addSource(std::move(s2));
 
             auto fillLayer = std::make_unique<mbgl::style::FillLayer>("fill", "polygon");
             fillLayer->setFillColor(mbgl::Color::black());
             fillLayer->setFillOpacity(0.1);
             view->map->getStyle().addLayer(std::move(fillLayer));
 
+            // Add a new layer to show the route line
+            auto s2 = std::make_unique<GeoJSONSource>("line");
+            s2->setGeoJSON(route);
+            view->map->getStyle().addSource(std::move(s2));
+
             auto lineLayer = std::make_unique<mbgl::style::LineLayer>("line", "line");
             lineLayer->setLineColor(mbgl::Color::red());
+            lineLayer->setLineWidth(2);
             view->map->getStyle().addLayer(std::move(lineLayer));
 
+            // Filter out POIs that are outside the defined route boundary using within expression.
             auto &style = view->map->getStyle();
             auto labelLayer = style.getLayer("poi-label");
             if (labelLayer) {
                 auto symbolLayer = static_cast<mbgl::style::SymbolLayer *>(labelLayer);
                 std::stringstream ss;
-                ss << std::string(R"(["within", )") << geojson << std::string(R"( ])");
+                ss << std::string(R"(["within", )") << boundary << std::string(R"( ])");
                 auto expr = createExpression(ss.str().c_str());
                 if (expr) {
                     symbolLayer->setFilter(Filter(std::move(expr)));
