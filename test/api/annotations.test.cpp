@@ -552,6 +552,10 @@ TEST(Annotations, DebugEmpty) {
 
 
 TEST(Annotations, DebugSparse) {
+    if (gfx::Backend::GetType() != gfx::Backend::Type::OpenGL) {
+        return;
+    }
+
     // This test should only render the top right tile with the associated tile border, but no other
     // tiles because they're all empty.
     AnnotationTest test;
