@@ -2,11 +2,16 @@ if(MBGL_IOS_RENDER_TEST)
     include(${PROJECT_SOURCE_DIR}/vendor/zip-archive.cmake)
     initialize_ios_target(mbgl-vendor-zip-archive)
 
-    set(PREPARE_CMD "${PROJECT_SOURCE_DIR}/render-test/ios/setup_test_data.sh")
-    execute_process(COMMAND ${PREPARE_CMD} RESULT_VARIABLE CMD_ERROR WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+    if(MBGL_WITH_OPENGL)
+        message("-- Setting up test data for iOS render test with OpenGL renderer")
+        set(PREPARE_CMD "${PROJECT_SOURCE_DIR}/render-test/ios/setup_test_data.sh")
+    endif()
+    add_custom_target(RenderTestApp-prepare COMMAND ${PREPARE_CMD} ${CMAKE_CURRENT_BINARY_DIR} WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+
+    execute_process(COMMAND mkdir ${CMAKE_CURRENT_BINARY_DIR}/test-data RESULT_VARIABLE CMD_ERROR WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 
     set(RESOURCES ${PROJECT_SOURCE_DIR}/platform/ios/test/common/Main.storyboard
-                  ${PROJECT_SOURCE_DIR}/platform/ios/test/common/LaunchScreen.storyboard ${PROJECT_SOURCE_DIR}/test-data)
+                  ${PROJECT_SOURCE_DIR}/platform/ios/test/common/LaunchScreen.storyboard ${CMAKE_CURRENT_BINARY_DIR}/test-data)
 
     add_executable(
         RenderTestApp
@@ -20,6 +25,7 @@ if(MBGL_IOS_RENDER_TEST)
         ${RESOURCES}
     )
     initialize_ios_target(RenderTestApp)
+    add_dependencies(RenderTestApp RenderTestApp-prepare)
 
     set_target_properties(
         RenderTestApp
