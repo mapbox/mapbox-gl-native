@@ -6,6 +6,7 @@
 #include "../file_source.hpp"
 #include "../geometry/lat_lng_bounds.hpp"
 #include "../map/camera_position.hpp"
+#include "../style/layers/layer.hpp"
 
 #include <jni/jni.hpp>
 
@@ -13,6 +14,16 @@
 
 namespace mbgl {
 namespace android {
+    class SnapshotObserver final : public mbgl::MapSnapshotterObserver {
+    public:
+        ~SnapshotObserver() = default;
+        void onDidFinishLoadingStyle() override {
+            if (didFinishLoadingStyleCallback) {
+                didFinishLoadingStyleCallback();
+            }
+        }
+        std::function<void()> didFinishLoadingStyleCallback;
+    };
 
 class MapSnapshotter {
 public:
@@ -50,6 +61,8 @@ public:
 
     void cancel(JNIEnv&);
 
+    void addLayer(JNIEnv&, jlong);
+
 private:
     MBGL_STORE_THREAD(tid);
 
@@ -60,7 +73,7 @@ private:
     bool showLogo;
 
     std::unique_ptr<mbgl::MapSnapshotter> snapshotter;
-
+    SnapshotObserver observer;
     FileSource *jFileSource;
     void activateFilesource(JNIEnv&);
     void deactivateFilesource(JNIEnv&);
