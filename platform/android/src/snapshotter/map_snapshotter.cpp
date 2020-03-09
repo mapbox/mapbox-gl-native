@@ -37,13 +37,12 @@ MapSnapshotter::MapSnapshotter(jni::JNIEnv& _env,
     auto size = mbgl::Size { static_cast<uint32_t>(width), static_cast<uint32_t>(height) };
 
     showLogo = _showLogo;
-
     // Create the core snapshotter
     snapshotter = std::make_unique<mbgl::MapSnapshotter>(
         size,
         pixelRatio,
         mbgl::android::FileSource::getSharedResourceOptions(_env, _jFileSource),
-        mbgl::MapSnapshotterObserver::nullObserver(),
+        observer,
         _localIdeographFontFamily ? jni::Make<std::string>(_env, _localIdeographFontFamily) : optional<std::string>{});
 
     if (position) {
@@ -126,6 +125,15 @@ void MapSnapshotter::setRegion(JNIEnv& env, const jni::Object<LatLngBounds>& reg
     snapshotter->setRegion(LatLngBounds::getLatLngBounds(env, region));
 }
 
+void MapSnapshotter::addLayer(JNIEnv &, jlong nativeLayerPtr) {
+    assert(nativeLayerPtr != 0);
+    Layer *layer = reinterpret_cast<Layer *>(nativeLayerPtr);
+    style::Layer &t = layer->get();
+    std::unique_ptr<style::Layer> u (&t);
+    observer.didFinishLoadingStyleCallback= [&] {
+        snapshotter->getStyle().addLayer(std::move(u));
+    };
+}
 
 // Private methods //
 
@@ -157,6 +165,7 @@ void MapSnapshotter::registerNative(jni::JNIEnv& env) {
                                            "nativeInitialize",
                                            "finalize",
                                             METHOD(&MapSnapshotter::setStyleUrl, "setStyleUrl"),
+                                            METHOD(&MapSnapshotter::addLayer, "nativeAddLayer"),
                                             METHOD(&MapSnapshotter::setStyleJson, "setStyleJson"),
                                             METHOD(&MapSnapshotter::setSize, "setSize"),
                                             METHOD(&MapSnapshotter::setCameraPosition, "setCameraPosition"),
