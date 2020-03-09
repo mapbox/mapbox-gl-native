@@ -311,12 +311,12 @@ void Placement::placeSymbolBucket(const BucketPlacementData& params, std::set<ui
                         const auto prevAnchor = prevOffset->second.anchor;
                         auto found = std::find(variableTextAnchors.begin(), variableTextAnchors.end(), prevAnchor);
                         if (found != variableTextAnchors.begin() && found != variableTextAnchors.end()) {
-                            std::vector<style::TextVariableAnchorType> filtered;
-                            filtered.reserve(variableTextAnchors.size());
-                            filtered.push_back(prevAnchor);
-                            for (auto anchor : variableTextAnchors) {
-                                if (anchor != prevAnchor) {
-                                    filtered.push_back(anchor);
+                            std::vector<style::TextVariableAnchorType> filtered{prevAnchor};
+                            if (!isTiltedView()) {
+                                for (auto anchor : variableTextAnchors) {
+                                    if (anchor != prevAnchor) {
+                                        filtered.push_back(anchor);
+                                    }
                                 }
                             }
                             variableTextAnchors = std::move(filtered);
@@ -659,22 +659,24 @@ void Placement::placeSymbolBucket(const BucketPlacementData& params, std::set<ui
 
     } else {
         auto sortedSymbols = bucket.getSymbols(params.sortKeyRange);
-        if (auto* previousPlacement = getPrevPlacement()) {
-            std::stable_sort(
-                sortedSymbols.begin(), sortedSymbols.end(), [&](const SymbolInstance& a, const SymbolInstance& b) {
-                    auto* aPlacement = previousPlacement->getSymbolPlacement(a);
-                    auto* bPlacement = previousPlacement->getSymbolPlacement(b);
-                    if (!aPlacement) {
-                        // a < b, if 'a' is new and if 'b' was previously hidden.
-                        return bPlacement && !bPlacement->placed();
-                    }
-                    if (!bPlacement) {
-                        // a < b, if 'b' is new and 'a' was previously shown.
-                        return aPlacement && aPlacement->placed();
-                    }
-                    // a < b, if 'a' was shown and 'b' was hidden.
-                    return aPlacement->placed() && !bPlacement->placed();
-                });
+        auto* previousPlacement = getPrevPlacement();
+        if (previousPlacement && isTiltedView()) {
+            std::stable_sort(sortedSymbols.begin(),
+                             sortedSymbols.end(),
+                             [&previousPlacement](const SymbolInstance& a, const SymbolInstance& b) {
+                                 auto* aPlacement = previousPlacement->getSymbolPlacement(a);
+                                 auto* bPlacement = previousPlacement->getSymbolPlacement(b);
+                                 if (!aPlacement) {
+                                     // a < b, if 'a' is new and if 'b' was previously hidden.
+                                     return bPlacement && !bPlacement->placed();
+                                 }
+                                 if (!bPlacement) {
+                                     // a < b, if 'b' is new and 'a' was previously shown.
+                                     return aPlacement && aPlacement->placed();
+                                 }
+                                 // a < b, if 'a' was shown and 'b' was hidden.
+                                 return aPlacement->placed() && !bPlacement->placed();
+                             });
         }
         for (const SymbolInstance& symbol : sortedSymbols) {
             placeSymbol(symbol);
@@ -1199,6 +1201,10 @@ void Placement::markUsedOrientation(SymbolBucket& bucket,
     if (symbolInstance.placedVerticalIconIndex) {
         iconBuffer.placedSymbols.at(*symbolInstance.placedVerticalIconIndex).placedOrientation = vertical;
     }
+}
+
+bool Placement::isTiltedView() const {
+    return updateParameters->transformState.getPitch() != 0.0f;
 }
 
 float Placement::symbolFadeChange(TimePoint now) const {
