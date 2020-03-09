@@ -281,6 +281,7 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(
         renderSources.emplace(entry.first, std::move(renderSource));
     }
     transformState = updateParameters->transformState;
+    const bool tiltedView = transformState.getPitch() != 0.0f;
 
     // Create parameters for the render tree.
     auto renderTreeParameters = std::make_unique<RenderTreeParameters>(updateParameters->transformState,
@@ -386,14 +387,20 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(
             symbolBucketsAdded = symbolBucketsAdded || (result & CrossTileSymbolIndex::AddLayerResult::BucketsAdded);
             symbolBucketsChanged = symbolBucketsChanged || (result != CrossTileSymbolIndex::AddLayerResult::NoChanges);
         }
-        // We want new symbols to show up faster, however simple setting `placementChanged` to `true` would
-        // initiate placement too often as new buckets ususally come from several rendered tiles in a row within
-        // a short period of time. Instead, we squeeze placement update period to coalesce buckets updates from several
-        // tiles.
-        optional<Duration> maximumPlacementUpdatePeriod;
-        if (symbolBucketsAdded) maximumPlacementUpdatePeriod = optional<Duration>(Milliseconds(30));
+
+        optional<Duration> placementUpdatePeriodOverride;
+        if (symbolBucketsAdded && !tiltedView) {
+            // If the view is not tilted, we want *the new* symbols to show up faster, however simple setting
+            // `placementChanged` to `true` would initiate placement too often as new buckets usually come from several
+            // rendered tiles in a row within a short period of time. Instead, we squeeze placement update period to
+            // coalesce buckets updates from several tiles. On contrary, with the tilted view it's more important to
+            // make placement rarely for performance reasons and as the new symbols are normally "far away" and the user
+            // is not that interested to see them ASAP.
+            placementUpdatePeriodOverride = optional<Duration>(Milliseconds(30));
+        }
+
         renderTreeParameters->placementChanged = !placementController.placementIsRecent(
-            updateParameters->timePoint, updateParameters->transformState.getZoom(), maximumPlacementUpdatePeriod);
+            updateParameters->timePoint, updateParameters->transformState.getZoom(), placementUpdatePeriodOverride);
         symbolBucketsChanged |= renderTreeParameters->placementChanged;
 
         std::set<std::string> usedSymbolLayers;
