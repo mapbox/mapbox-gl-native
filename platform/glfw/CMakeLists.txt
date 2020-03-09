@@ -7,12 +7,18 @@ add_executable(
     mbgl-glfw
     ${PROJECT_SOURCE_DIR}/platform/glfw/main.cpp
     ${PROJECT_SOURCE_DIR}/platform/glfw/glfw_view.cpp
-    ${PROJECT_SOURCE_DIR}/platform/glfw/glfw_gl_backend.cpp
     ${PROJECT_SOURCE_DIR}/platform/glfw/glfw_renderer_frontend.cpp
     ${PROJECT_SOURCE_DIR}/platform/glfw/settings_json.cpp
     ${PROJECT_SOURCE_DIR}/platform/glfw/test_writer.cpp
     ${PROJECT_SOURCE_DIR}/platform/default/src/mbgl/map/map_snapshotter.cpp
 )
+
+if(MBGL_WITH_OPENGL)
+    target_sources(
+        mbgl-glfw
+        PRIVATE ${PROJECT_SOURCE_DIR}/platform/glfw/glfw_gl_backend.cpp
+    )
+endif()
 
 target_include_directories(
     mbgl-glfw
@@ -38,10 +44,16 @@ target_link_libraries(
         Mapbox::Base::Extras::filesystem
         Mapbox::Base::Extras::rapidjson
         Mapbox::Map
-        OpenGL::GL
         mbgl-compiler-options
         mbgl-vendor-cheap-ruler-cpp
 )
+
+if(MBGL_WITH_OPENGL)
+    target_link_libraries(
+        mbgl-glfw
+        PRIVATE OpenGL::GL
+    )
+endif()
 
 set_property(TARGET mbgl-glfw PROPERTY FOLDER Executables)
 
