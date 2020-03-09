@@ -137,6 +137,7 @@ private:
                                style::TextWritingModeType orientation) const;
     void markUsedOrientation(SymbolBucket&, style::TextWritingModeType, const SymbolInstance&) const;
     const Placement* getPrevPlacement() const { return prevPlacement ? prevPlacement->get() : nullptr; }
+    bool isTiltedView() const;
 
     std::shared_ptr<const UpdateParameters> updateParameters;
     CollisionIndex collisionIndex;
