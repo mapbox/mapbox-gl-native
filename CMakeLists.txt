@@ -177,6 +177,7 @@ add_library(
     ${PROJECT_SOURCE_DIR}/include/mbgl/style/expression/comparison.hpp
     ${PROJECT_SOURCE_DIR}/include/mbgl/style/expression/compound_expression.hpp
     ${PROJECT_SOURCE_DIR}/include/mbgl/style/expression/dsl.hpp
+    ${PROJECT_SOURCE_DIR}/include/mbgl/style/expression/distance.hpp
     ${PROJECT_SOURCE_DIR}/include/mbgl/style/expression/error.hpp
     ${PROJECT_SOURCE_DIR}/include/mbgl/style/expression/expression.hpp
     ${PROJECT_SOURCE_DIR}/include/mbgl/style/expression/find_zoom_curve.hpp
@@ -569,6 +570,7 @@ add_library(
     ${PROJECT_SOURCE_DIR}/src/mbgl/style/expression/collator_expression.cpp
     ${PROJECT_SOURCE_DIR}/src/mbgl/style/expression/comparison.cpp
     ${PROJECT_SOURCE_DIR}/src/mbgl/style/expression/compound_expression.cpp
+    ${PROJECT_SOURCE_DIR}/src/mbgl/style/expression/distance.cpp
     ${PROJECT_SOURCE_DIR}/src/mbgl/style/expression/dsl.cpp
     ${PROJECT_SOURCE_DIR}/src/mbgl/style/expression/dsl_impl.hpp
     ${PROJECT_SOURCE_DIR}/src/mbgl/style/expression/expression.cpp
@@ -758,8 +760,8 @@ add_library(
     ${PROJECT_SOURCE_DIR}/src/mbgl/util/font_stack.cpp
     ${PROJECT_SOURCE_DIR}/src/mbgl/util/geo.cpp
     ${PROJECT_SOURCE_DIR}/src/mbgl/util/geojson_impl.cpp
-    ${PROJECT_SOURCE_DIR}/src/mbgl/util/geometry_within.cpp
-    ${PROJECT_SOURCE_DIR}/src/mbgl/util/geometry_within.hpp
+    ${PROJECT_SOURCE_DIR}/src/mbgl/util/geometry_util.cpp
+    ${PROJECT_SOURCE_DIR}/src/mbgl/util/geometry_util.hpp
     ${PROJECT_SOURCE_DIR}/src/mbgl/util/grid_index.cpp
     ${PROJECT_SOURCE_DIR}/src/mbgl/util/grid_index.hpp
     ${PROJECT_SOURCE_DIR}/src/mbgl/util/hash.hpp
@@ -974,6 +976,7 @@ target_link_libraries(
         Mapbox::Base::supercluster.hpp
         Mapbox::Base::shelf-pack-cpp
         Mapbox::Base::geojson-vt-cpp
+        Mapbox::Base::cheap-ruler-cpp
         mbgl-compiler-options
         mbgl-vendor-boost
         mbgl-vendor-csscolorparser

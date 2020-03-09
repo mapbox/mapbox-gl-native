@@ -12,6 +12,7 @@
 #include <mbgl/style/expression/coercion.hpp>
 #include <mbgl/style/expression/comparison.hpp>
 #include <mbgl/style/expression/compound_expression.hpp>
+#include <mbgl/style/expression/distance.hpp>
 #include <mbgl/style/expression/expression.hpp>
 #include <mbgl/style/expression/format_expression.hpp>
 #include <mbgl/style/expression/image_expression.hpp>
@@ -121,6 +122,7 @@ MAPBOX_ETERNAL_CONSTEXPR const auto expressionRegistry =
         {"case", Case::parse},
         {"coalesce", Coalesce::parse},
         {"collator", CollatorExpression::parse},
+        {"distance", Distance::parse},
         {"format", FormatExpression::parse},
         {"image", ImageExpression::parse},
         {"interpolate", parseInterpolate},

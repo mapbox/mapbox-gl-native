@@ -33,6 +33,10 @@ bool isFeatureConstant(const Expression& expression) {
         return false;
     }
 
+    if (expression.getKind() == Kind::Distance) {
+        return false;
+    }
+
     if (expression.getKind() == Kind::CollatorExpression) {
         // Although the results of a Collator expression with fixed arguments
         // generally shouldn't change between executions, we can't serialize them

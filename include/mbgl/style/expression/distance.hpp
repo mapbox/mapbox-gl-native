@@ -1,18 +1,18 @@
 #pragma once
 
+#include <mapbox/cheap_ruler.hpp>
 #include <mbgl/style/expression/expression.hpp>
 #include <mbgl/util/geojson.hpp>
-#include <mbgl/util/optional.hpp>
 
 namespace mbgl {
 namespace style {
 namespace expression {
 
-class Within final : public Expression {
+class Distance final : public Expression {
 public:
-    explicit Within(GeoJSON geojson, Feature::geometry_type geometries_);
+    Distance(GeoJSON geoJSONSource_, Feature::geometry_type geometries_, mapbox::cheap_ruler::CheapRuler::Unit unit_);
 
-    ~Within() override;
+    ~Distance() override;
 
     EvaluationResult evaluate(const EvaluationContext&) const override;
 
@@ -30,6 +30,7 @@ public:
 private:
     GeoJSON geoJSONSource;
     Feature::geometry_type geometries;
+    mapbox::cheap_ruler::CheapRuler::Unit unit;
 };
 
 } // namespace expression
