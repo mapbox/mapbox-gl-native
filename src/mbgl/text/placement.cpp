@@ -68,14 +68,10 @@ void PlacementController::setPlacement(Immutable<Placement> placement_) {
     stale = false;
 }
 
-bool PlacementController::placementIsRecent(TimePoint now, const float zoom, optional<Duration> maximumDuration) const {
+bool PlacementController::placementIsRecent(TimePoint now, const float zoom, optional<Duration> periodOverride) const {
     if (!placement->transitionsEnabled()) return false;
 
-    auto updatePeriod = placement->getUpdatePeriod(zoom);
-
-    if (maximumDuration) {
-        updatePeriod = std::min(*maximumDuration, updatePeriod);
-    }
+    auto updatePeriod = periodOverride ? *periodOverride : placement->getUpdatePeriod(zoom);
 
     return placement->getCommitTime() + updatePeriod > now;
 }

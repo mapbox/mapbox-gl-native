@@ -96,7 +96,7 @@ public:
     void setPlacement(Immutable<Placement>);
     const Immutable<Placement>& getPlacement() const { return placement; }
     void setPlacementStale() { stale = true; }
-    bool placementIsRecent(TimePoint now, const float zoom, optional<Duration> maximumDuration = nullopt) const;
+    bool placementIsRecent(TimePoint now, const float zoom, optional<Duration> periodOverride = nullopt) const;
     bool hasTransitions(TimePoint now) const;
 
 private:
