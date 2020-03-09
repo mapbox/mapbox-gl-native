@@ -9,12 +9,12 @@
 #include <rapidjson/stringbuffer.h>
 
 #include <mbgl/util/geometry.hpp>
-#include <mbgl/util/variant.hpp>
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/optional.hpp>
+#include <mbgl/util/variant.hpp>
 
-#include <mapbox/geometry/geometry.hpp>
 #include <mapbox/geojson_impl.hpp>
+#include <mapbox/geometry/geometry.hpp>
 
 #include <cstdio>
 #include <fstream>
@@ -138,7 +138,7 @@ std::string getGeoStringBuffer(const mapbox::geometry::geometry<double> geometry
     json.AddMember("type", "Feature", allocator);
     JSValue v;
     v.SetObject();
-    json.AddMember("properties",v, allocator);
+    json.AddMember("properties", v, allocator);
     json.AddMember("geometry", mapbox::geojson::convert(geometry, allocator), allocator);
     json.Accept(writer);
 
@@ -271,7 +271,8 @@ public:
         return {};
     }
 
-    static std::string geoJSONFromGeometryBuffer(const mapbox::geometry::multi_polygon<double>& geometryBuffer, bool singleLine = false) {
+    static std::string geoJSONFromGeometryBuffer(const mapbox::geometry::multi_polygon<double>& geometryBuffer,
+                                                 bool singleLine = false) {
         return getGeoStringBuffer(geometryBuffer, singleLine);
     }
 

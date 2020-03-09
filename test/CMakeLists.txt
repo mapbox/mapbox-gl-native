@@ -83,6 +83,7 @@ add_library(
     ${PROJECT_SOURCE_DIR}/test/util/async_task.test.cpp
     ${PROJECT_SOURCE_DIR}/test/util/dtoa.test.cpp
     ${PROJECT_SOURCE_DIR}/test/util/geo.test.cpp
+    ${PROJECT_SOURCE_DIR}/test/util/geometry_buffer.test.cpp
     ${PROJECT_SOURCE_DIR}/test/util/grid_index.test.cpp
     ${PROJECT_SOURCE_DIR}/test/util/http_timeout.test.cpp
     ${PROJECT_SOURCE_DIR}/test/util/image.test.cpp
@@ -203,6 +204,7 @@ endif()
 
 # Needed for testing private classes
 get_target_property(MBGL_CORE_PRIVATE_LIBRARIES mbgl-core LINK_LIBRARIES)
+include(${PROJECT_SOURCE_DIR}/vendor/cheap-ruler-cpp.cmake)
 
 target_link_libraries(
     mbgl-test
@@ -211,6 +213,7 @@ target_link_libraries(
         Mapbox::Base::Extras::args
         Mapbox::Base::pixelmatch-cpp
         mbgl-compiler-options
+        mbgl-vendor-cheap-ruler-cpp
     PUBLIC mbgl-core
 )
 

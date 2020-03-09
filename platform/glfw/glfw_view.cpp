@@ -1,8 +1,8 @@
 #include "glfw_view.hpp"
 #include "glfw_backend.hpp"
 #include "glfw_renderer_frontend.hpp"
-#include "ny_route.hpp"
 #include "helsinki_route.hpp"
+#include "ny_route.hpp"
 #include "test_writer.hpp"
 
 #include <mbgl/annotation/annotation.hpp>
@@ -22,10 +22,10 @@
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/geo.hpp>
+#include <mbgl/util/geometry_buffer.hpp>
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/platform.hpp>
 #include <mbgl/util/string.hpp>
-#include <mbgl/util/geometry_buffer.hpp>
 
 #include <mapbox/cheap_ruler.hpp>
 #include <mapbox/geometry.hpp>
@@ -469,22 +469,19 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
             using namespace mbgl::style::expression::dsl;
 
             static mapbox::geojson::geojson route{mapbox::geojson::parse(mbgl::platform::glfw::helsinkiRoute)};
-            const auto& geometry = route.match(
-                [](const mapbox::geometry::geometry<double>& geometrySet) {
+            const auto &geometry = route.match(
+                [](const mapbox::geometry::geometry<double> &geometrySet) {
                     return mbgl::Feature(geometrySet).geometry;
                 },
-                [](const mapbox::feature::feature<double>& feature) {
-                    return mbgl::Feature(feature).geometry;
-                },
-                [](const mapbox::feature::feature_collection<double>& features) {
+                [](const mapbox::feature::feature<double> &feature) { return mbgl::Feature(feature).geometry; },
+                [](const mapbox::feature::feature_collection<double> &features) {
                     return mbgl::Feature(features.front()).geometry;
                 },
-                [](const auto&) {
-                    return mapbox::geometry::empty();
-                });
+                [](const auto &) { return mapbox::geometry::empty(); });
 
             assert(geometry != mapbox::geometry::empty());
-            // Generate route boundary based on the radius (50 meter here) and points per circle(used for configuring line joints/ends and circles)
+            // Generate route boundary based on the radius (50 meter here) and points per circle(used for configuring
+            // line joints/ends and circles)
             const std::string boundary = mbgl::GeometryBuffer(geometry, 50.0, 10).getGeoJSONBuffer();
 
             // Add a new layer to show the generated boundary
