@@ -169,7 +169,8 @@ enum class Kind : int32_t {
     NumberFormat,
     ImageExpression,
     In,
-    Within
+    Within,
+    Distance
 };
 
 class Expression {
