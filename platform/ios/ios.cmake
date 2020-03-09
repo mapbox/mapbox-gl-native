@@ -74,7 +74,9 @@ target_include_directories(
 
 include(${PROJECT_SOURCE_DIR}/vendor/icu.cmake)
 # include(${PROJECT_SOURCE_DIR}/platform/ios/ccache.cmake)
-include(${PROJECT_SOURCE_DIR}/platform/ios/ios-test-runners.cmake)
+if(MBGL_WITH_OPENGL)
+    include(${PROJECT_SOURCE_DIR}/platform/ios/ios-test-runners.cmake)
+endif()
 
 initialize_ios_target(mbgl-core)
 initialize_ios_target(mbgl-vendor-csscolorparser)
