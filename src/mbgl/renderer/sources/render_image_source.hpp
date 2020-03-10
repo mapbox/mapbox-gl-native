@@ -26,8 +26,8 @@ private:
     void render(PaintParameters&) const override;
     bool hasRenderPass(RenderPass) const override { return false; }
     const std::string& getName() const override { return name; }
-
     std::string name;
+    mutable optional<gfx::Texture> debugTexture;
 };
 
 class RenderImageSource final : public RenderSource {

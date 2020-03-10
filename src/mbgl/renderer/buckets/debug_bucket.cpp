@@ -76,6 +76,11 @@ void DebugBucket::upload(gfx::UploadPass& uploadPass) {
         vertexBuffer = uploadPass.createVertexBuffer(std::move(vertices));
         indexBuffer = uploadPass.createIndexBuffer(std::move(indices));
     }
+    if (!texture) {
+        std::array<uint8_t, 4> data{{0, 0, 0, 0}};
+        static const PremultipliedImage emptyImage{Size(1, 1), data.data(), data.size()};
+        texture = uploadPass.createTexture(emptyImage);
+    }
 }
 
 } // namespace mbgl

@@ -155,12 +155,13 @@ void RenderTile::finishRender(PaintParameters& parameters) const {
             *debugBucket->indexBuffer,
             debugBucket->segments,
             program.computeAllUniformValues(DebugProgram::LayoutUniformValues{uniforms::matrix::Value(matrix),
-                                                                              uniforms::color::Value(Color::white())},
+                                                                              uniforms::color::Value(Color::white()),
+                                                                              uniforms::overlay_scale::Value(1.0f)},
                                             paintAttributeData,
                                             properties,
                                             parameters.state.getZoom()),
             allAttributeBindings,
-            DebugProgram::TextureBindings{},
+            DebugProgram::TextureBindings{textures::image::Value{debugBucket->texture->getResource()}},
             "text-outline");
 
         program.draw(
@@ -174,12 +175,13 @@ void RenderTile::finishRender(PaintParameters& parameters) const {
             *debugBucket->indexBuffer,
             debugBucket->segments,
             program.computeAllUniformValues(DebugProgram::LayoutUniformValues{uniforms::matrix::Value(matrix),
-                                                                              uniforms::color::Value(Color::black())},
+                                                                              uniforms::color::Value(Color::black()),
+                                                                              uniforms::overlay_scale::Value(1.0f)},
                                             paintAttributeData,
                                             properties,
                                             parameters.state.getZoom()),
             allAttributeBindings,
-            DebugProgram::TextureBindings{},
+            DebugProgram::TextureBindings{textures::image::Value{debugBucket->texture->getResource()}},
             "text");
     }
 
@@ -199,13 +201,14 @@ void RenderTile::finishRender(PaintParameters& parameters) const {
             *parameters.staticData.tileBorderIndexBuffer,
             debugBucket->tileBorderSegments,
             program.computeAllUniformValues(DebugProgram::LayoutUniformValues{uniforms::matrix::Value(matrix),
-                                                                              uniforms::color::Value(Color::red())},
+                                                                              uniforms::color::Value(Color::red()),
+                                                                              uniforms::overlay_scale::Value(1.0f)},
                                             paintAttributeData,
                                             properties,
                                             parameters.state.getZoom()),
             program.computeAllAttributeBindings(
                 *parameters.staticData.tileVertexBuffer, paintAttributeData, properties),
-            DebugProgram::TextureBindings{},
+            DebugProgram::TextureBindings{textures::image::Value{debugBucket->texture->getResource()}},
             "border");
     }
 }

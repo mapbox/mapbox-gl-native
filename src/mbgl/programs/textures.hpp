@@ -11,6 +11,7 @@ MBGL_DEFINE_TEXTURE(image1);
 MBGL_DEFINE_TEXTURE(color_ramp);
 MBGL_DEFINE_TEXTURE(texture);
 MBGL_DEFINE_TEXTURE(texture_icon);
+MBGL_DEFINE_TEXTURE(overlay);
 
 } // namespace textures
 } // namespace mbgl
