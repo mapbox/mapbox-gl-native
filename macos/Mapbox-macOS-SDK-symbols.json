@@ -1,4 +1,5 @@
 {
+    "0.15.0-alpha.1": "https://github.com/mapbox/mapbox-gl-native/releases/download/macos-v0.15.0-alpha.1/mapbox-macos-sdk-0.15.0-alpha.1-symbols.zip",
     "0.14.0": "https://github.com/mapbox/mapbox-gl-native/releases/download/macos-v0.14.0/mapbox-macos-sdk-0.14.0-symbols.zip",
     "0.13.0": "https://github.com/mapbox/mapbox-gl-native/releases/download/macos-v0.13.0/mapbox-macos-sdk-0.13.0-symbols.zip",
     "0.12.0": "https://github.com/mapbox/mapbox-gl-native/releases/download/macos-v0.12.0/mapbox-macos-sdk-0.12.0-symbols.zip",
