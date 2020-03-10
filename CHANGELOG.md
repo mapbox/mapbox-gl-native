@@ -2,6 +2,10 @@
 
 ## master
 
+## maps-v1.3.1+ios (2020.02-release-vanillashake)
+
+This release disables ccache in iOS builds. ([#16289](https://github.com/mapbox/mapbox-gl-native/pull/16289))
+
 ## maps-v1.3.1 (2020.02-release-vanillashake)
 
 ### 🐞 Bug fixes
