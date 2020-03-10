@@ -16,8 +16,8 @@ template <>
 struct ShaderSource<FillExtrusionProgram> {
     static constexpr const char* name = "fill_extrusion";
     static constexpr const uint8_t hash[8] = {0x9d, 0x76, 0x7f, 0xaa, 0x86, 0x57, 0x56, 0x96};
-    static constexpr const auto vertexOffset = 21283;
-    static constexpr const auto fragmentOffset = 23214;
+    static constexpr const auto vertexOffset = 21491;
+    static constexpr const auto fragmentOffset = 23422;
 };
 
 constexpr const char* ShaderSource<FillExtrusionProgram>::name;
