@@ -47,6 +47,7 @@ RUN pip3 install cmake-format==0.5.5
 RUN set -eu && apt-get install -y \
     libcurl4-openssl-dev \
     libgl1-mesa-dev \
+    libgles2-mesa-dev \
     libglfw3-dev \
     libicu-dev \
     libjpeg-turbo8-dev \
