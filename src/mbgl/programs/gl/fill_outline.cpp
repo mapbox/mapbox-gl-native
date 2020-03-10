@@ -16,8 +16,8 @@ template <>
 struct ShaderSource<FillOutlineProgram> {
     static constexpr const char* name = "fill_outline";
     static constexpr const uint8_t hash[8] = {0x51, 0x25, 0x43, 0x9d, 0x41, 0x73, 0xe1, 0xbb};
-    static constexpr const auto vertexOffset = 13722;
-    static constexpr const auto fragmentOffset = 14547;
+    static constexpr const auto vertexOffset = 13930;
+    static constexpr const auto fragmentOffset = 14755;
 };
 
 constexpr const char* ShaderSource<FillOutlineProgram>::name;
