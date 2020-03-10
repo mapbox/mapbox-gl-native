@@ -43,6 +43,7 @@ public:
     SegmentVector<DebugAttributes> tileBorderSegments;
     optional<gfx::VertexBuffer<DebugLayoutVertex>> vertexBuffer;
     optional<gfx::IndexBuffer> indexBuffer;
+    optional<gfx::Texture> texture;
 };
 
 } // namespace mbgl

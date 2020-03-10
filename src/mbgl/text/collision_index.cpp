@@ -284,7 +284,7 @@ void CollisionIndex::insertFeature(const CollisionFeature& feature, const std::v
                 );
             }
         }
-    } else {
+    } else if (!projectedBoxes.empty()) {
         assert(projectedBoxes.size() == 1);
         auto& box = projectedBoxes[0];
         assert(box.isBox());
