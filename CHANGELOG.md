@@ -40,6 +40,10 @@
 
   Resources that belong to an offline region, should not contribute to the amount of space available in the ambient cache.
 
+ - [core][tile mode] Fix assertion at `line-center` placement handling ([#16293](https://github.com/mapbox/mapbox-gl-native/pull/16293))
+
+  The `Symbol Intersects Tile Edges` placement algorithm should not be applied to the symbols with `line-center` placement.
+
 ### 🧩  Architectural changes
 
 - Changes to `MapSnapshotter` threading model ([#16268](https://github.com/mapbox/mapbox-gl-native/pull/16268))
