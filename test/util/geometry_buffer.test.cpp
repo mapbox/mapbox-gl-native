@@ -122,11 +122,12 @@ TEST(GeometryBuffer, BufferForLine) {
     ASSERT_EQ(1, polygon1.size());
     const auto& ring1 = polygon1[0];
     ASSERT_EQ(10, ring1.size());
-    const mapbox::geometry::point<double> a(24.93696391582489, 60.16926456940512),
-        b(24.938240647315975, 60.16974755943638);
-    mapbox::cheap_ruler::CheapRuler ruler2(a.y, mapbox::cheap_ruler::CheapRuler::Unit::Meters);
+    const mapbox::geometry::line_string<double> lineString{{24.93696391582489, 60.16926456940512},
+                                                           {24.938240647315975, 60.16974755943638}};
+    mapbox::cheap_ruler::CheapRuler ruler2(lineString[0].y, mapbox::cheap_ruler::CheapRuler::Unit::Meters);
     for (size_t i = 0; i < ring1.size(); i++) {
-        auto actualDistance = ruler2.distanceToLineSegment(ring1[i], a, b);
+        auto nearestPoint = std::get<0>(ruler2.pointOnLine(lineString, ring1[i]));
+        auto actualDistance = ruler2.distance(nearestPoint, ring1[i]);
         // Allow 0.5 meter's error, which is 5 meters per 1km
         EXPECT_NEAR(100.0, actualDistance, 0.5);
     }
@@ -167,11 +168,12 @@ TEST(GeometryBuffer, BufferForLines) {
     ASSERT_EQ(1, polygon1.size());
     const auto& ring1 = polygon1[0];
     ASSERT_EQ(20, ring1.size());
-    const mapbox::geometry::point<double> a1(24.93696391582489, 60.16926456940512),
-        b1(24.938240647315975, 60.16974755943638);
-    mapbox::cheap_ruler::CheapRuler ruler1(a1.y, mapbox::cheap_ruler::CheapRuler::Unit::Meters);
+    const mapbox::geometry::line_string<double> lineString{{24.93696391582489, 60.16926456940512},
+                                                           {24.938240647315975, 60.16974755943638}};
+    mapbox::cheap_ruler::CheapRuler ruler1(lineString[0].y, mapbox::cheap_ruler::CheapRuler::Unit::Meters);
     for (size_t i = 0; i < ring1.size(); i++) {
-        auto actualDistance = ruler1.distanceToLineSegment(ring1[i], a1, b1);
+        auto nearestPoint = std::get<0>(ruler1.pointOnLine(lineString, ring1[i]));
+        auto actualDistance = ruler1.distance(nearestPoint, ring1[i]);
         // Allow 0.25 meter's error, which is 5 meters per 1km
         EXPECT_NEAR(50.0, actualDistance, 0.25);
     }
@@ -180,11 +182,12 @@ TEST(GeometryBuffer, BufferForLines) {
     ASSERT_EQ(1, polygon2.size());
     const auto& ring2 = polygon2[0];
     ASSERT_EQ(20, ring2.size());
-    const mapbox::geometry::point<double> a2(24.93122935295105, 60.167383242200444),
-        b2(24.931269586086273, 60.16739658532588);
-    mapbox::cheap_ruler::CheapRuler ruler2(a1.y, mapbox::cheap_ruler::CheapRuler::Unit::Meters);
+    const mapbox::geometry::line_string<double> lineString2{{24.93122935295105, 60.167383242200444},
+                                                            {24.931269586086273, 60.16739658532588}};
+    mapbox::cheap_ruler::CheapRuler ruler2(lineString2[0].y, mapbox::cheap_ruler::CheapRuler::Unit::Meters);
     for (size_t i = 0; i < ring2.size(); i++) {
-        auto actualDistance = ruler2.distanceToLineSegment(ring2[i], a2, b2);
+        auto nearestPoint = std::get<0>(ruler2.pointOnLine(lineString, ring1[i]));
+        auto actualDistance = ruler2.distance(nearestPoint, ring1[i]);
         // Allow 0.25 meter's error, which is 5 meters per 1km
         EXPECT_NEAR(50.0, actualDistance, 0.25);
     }
