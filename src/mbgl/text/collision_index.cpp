@@ -16,19 +16,27 @@
 
 namespace mbgl {
 
+namespace {
 // When a symbol crosses the edge that causes it to be included in
 // collision detection, it will cause changes in the symbols around
 // it. This constant specifies how many pixels to pad the edge of
 // the viewport for collision detection so that the bulk of the changes
 // occur offscreen. Making this constant greater increases label
 // stability, but it's expensive.
-static const float viewportPaddingDefault = 100;
+const float viewportPaddingDefault = 100;
 // Viewport padding must be much larger for static tiles to avoid clipped labels.
-static const float viewportPaddingForStaticTiles = 1024;
+const float viewportPaddingForStaticTiles = 1024;
+
+inline float getViewportPadding(const TransformState& transformState, MapMode mapMode) {
+    if (mapMode == MapMode::Tile) return viewportPaddingForStaticTiles;
+    return (transformState.getPitch() != 0.0f) ? viewportPaddingDefault * 2 : viewportPaddingDefault;
+}
+
+} // namespace
 
 CollisionIndex::CollisionIndex(const TransformState& transformState_, MapMode mapMode)
     : transformState(transformState_),
-      viewportPadding(mapMode == MapMode::Tile ? viewportPaddingForStaticTiles : viewportPaddingDefault),
+      viewportPadding(getViewportPadding(transformState_, mapMode)),
       collisionGrid(transformState.getSize().width + 2 * viewportPadding,
                     transformState.getSize().height + 2 * viewportPadding,
                     25),
