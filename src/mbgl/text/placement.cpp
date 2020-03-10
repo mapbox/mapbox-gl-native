@@ -174,11 +174,12 @@ void Placement::placeSymbolBucket(const BucketPlacementData& params, std::set<ui
 
     optional<CollisionBoundaries> tileBorders;
     optional<CollisionBoundaries> avoidEdges;
-    if (mapMode == MapMode::Tile) tileBorders = collisionIndex.projectTileBoundaries(posMatrix);
-
-    if (tileBorders && (layout.get<style::SymbolAvoidEdges>() ||
-                        layout.get<style::SymbolPlacement>() == style::SymbolPlacementType::Line)) {
-        avoidEdges = tileBorders;
+    if (mapMode == MapMode::Tile) {
+        tileBorders = collisionIndex.projectTileBoundaries(posMatrix);
+        if (layout.get<style::SymbolAvoidEdges>() ||
+            layout.get<style::SymbolPlacement>() == style::SymbolPlacementType::Line) {
+            avoidEdges = tileBorders;
+        }
     }
 
     const bool textAllowOverlap = layout.get<style::TextAllowOverlap>();
@@ -559,7 +560,8 @@ void Placement::placeSymbolBucket(const BucketPlacementData& params, std::set<ui
         for (auto it = sortedSymbols.rbegin(); it != sortedSymbols.rend(); ++it) {
             placeSymbol(*it);
         }
-    } else if (mapMode == MapMode::Tile && !avoidEdges) {
+    } else if (mapMode == MapMode::Tile && !avoidEdges &&
+               layout.get<style::SymbolPlacement>() == style::SymbolPlacementType::Point) {
         // In this case we first try to place symbols, which intersects the tile borders, so that
         // those symbols will remain even if each tile is handled independently.
         SymbolInstanceReferences symbolInstances = bucket.getSymbols(params.sortKeyRange);
