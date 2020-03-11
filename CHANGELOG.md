@@ -12,6 +12,10 @@
 
   New feature provides means of modifying style of a MapSnapshotter. The new API enables several use-cases, such as: adding route overlays, removing extra information (layers) from a base style, adding custom images that are missing from a style.
 
+- [core] Improve stability of symbol placement when the map is tilted ([#16287](https://github.com/mapbox/mapbox-gl-native/pull/16287))
+
+  These changes improve performance and bring more stability to the symbol placement for the tilted view, which is mainly used for navigation scenarios.
+
 ### 🐞 Bug fixes
 
 - [core] Fix iterators in addRegularDash() ([#16249](https://github.com/mapbox/mapbox-gl-native/pull/16249))
