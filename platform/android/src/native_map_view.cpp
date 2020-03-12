@@ -909,7 +909,7 @@ jni::Local<jni::Array<jni::Object<Layer>>> NativeMapView::getLayers(JNIEnv& env)
     auto jLayers = jni::Array<jni::Object<Layer>>::New(env, layers.size());
     int index = 0;
     for (auto layer : layers) {
-        jLayers.Set(env, index, LayerManagerAndroid::get()->createJavaLayerPeer(env, *map, *layer));
+        jLayers.Set(env, index, LayerManagerAndroid::get()->createJavaLayerPeer(env, *layer));
         index++;
     }
 
@@ -926,7 +926,7 @@ jni::Local<jni::Object<Layer>> NativeMapView::getLayer(JNIEnv& env, const jni::S
     }
 
     // Create and return the layer's native peer
-    return LayerManagerAndroid::get()->createJavaLayerPeer(env, *map, *coreLayer);
+    return LayerManagerAndroid::get()->createJavaLayerPeer(env, *coreLayer);
 }
 
 void NativeMapView::addLayer(JNIEnv& env, jlong nativeLayerPtr, const jni::String& before) {
@@ -934,7 +934,7 @@ void NativeMapView::addLayer(JNIEnv& env, jlong nativeLayerPtr, const jni::Strin
 
     Layer *layer = reinterpret_cast<Layer *>(nativeLayerPtr);
     try {
-        layer->addToMap(*map, before ? mbgl::optional<std::string>(jni::Make<std::string>(env, before)) : mbgl::optional<std::string>());
+        layer->addToStyle(map->getStyle(), before ? mbgl::optional<std::string>(jni::Make<std::string>(env, before)) : mbgl::optional<std::string>());
     } catch (const std::runtime_error& error) {
         jni::ThrowNew(env, jni::FindClass(env, "com/mapbox/mapboxsdk/style/layers/CannotAddLayerException"), error.what());
     }
@@ -971,7 +971,7 @@ void NativeMapView::addLayerAbove(JNIEnv& env, jlong nativeLayerPtr, const jni::
 
     // Add the layer
     try {
-        layer->addToMap(*map, before);
+        layer->addToStyle(map->getStyle(), before);
     } catch (const std::runtime_error& error) {
         jni::ThrowNew(env, jni::FindClass(env, "com/mapbox/mapboxsdk/style/layers/CannotAddLayerException"), error.what());
     }
@@ -994,7 +994,7 @@ void NativeMapView::addLayerAt(JNIEnv& env, jlong nativeLayerPtr, jni::jint inde
 
     // Insert it below the current at that index
     try {
-        layer->addToMap(*map, layers.at(index)->getID());
+        layer->addToStyle(map->getStyle(), layers.at(index)->getID());
     } catch (const std::runtime_error& error) {
         jni::ThrowNew(env, jni::FindClass(env, "com/mapbox/mapboxsdk/style/layers/CannotAddLayerException"), error.what());
     }
@@ -1017,7 +1017,7 @@ jni::jboolean NativeMapView::removeLayerAt(JNIEnv& env, jni::jint index) {
     std::unique_ptr<mbgl::style::Layer> coreLayer = map->getStyle().removeLayer(layers.at(index)->getID());
     if (coreLayer) {
         jni::Local<jni::Object<Layer>> layerObj =
-                LayerManagerAndroid::get()->createJavaLayerPeer(env, *map, std::move(coreLayer));
+                LayerManagerAndroid::get()->createJavaLayerPeer(env, std::move(coreLayer));
         return jni::jni_true;
     }
     return jni::jni_false;
@@ -1141,6 +1141,11 @@ mbgl::Map& NativeMapView::getMap() {
     return *map;
 }
 
+void NativeMapView::triggerRepaint(JNIEnv&) {
+    assert(map);
+    map->triggerRepaint();
+}
+
 // Static methods //
 
 void NativeMapView::registerNative(jni::JNIEnv& env) {
@@ -1248,7 +1253,8 @@ void NativeMapView::registerNative(jni::JNIEnv& env) {
         METHOD(&NativeMapView::setPrefetchTiles, "nativeSetPrefetchTiles"),
         METHOD(&NativeMapView::getPrefetchTiles, "nativeGetPrefetchTiles"),
         METHOD(&NativeMapView::setPrefetchZoomDelta, "nativeSetPrefetchZoomDelta"),
-        METHOD(&NativeMapView::getPrefetchZoomDelta, "nativeGetPrefetchZoomDelta"));
+        METHOD(&NativeMapView::getPrefetchZoomDelta, "nativeGetPrefetchZoomDelta"),
+        METHOD(&NativeMapView::triggerRepaint, "nativeTriggerRepaint"));
 }
 
 } // namespace android

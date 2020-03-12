@@ -14,24 +14,15 @@ namespace android {
                 ) {
     }
 
-    CustomLayer::CustomLayer(mbgl::Map& map, mbgl::style::CustomLayer& coreLayer)
-        : Layer(map, coreLayer) {
+    CustomLayer::CustomLayer(mbgl::style::CustomLayer& coreLayer)
+        : Layer(coreLayer) {
     }
 
-    CustomLayer::CustomLayer(mbgl::Map& map, std::unique_ptr<mbgl::style::CustomLayer> coreLayer)
-        : Layer(map, std::move(coreLayer)) {
+    CustomLayer::CustomLayer(std::unique_ptr<mbgl::style::CustomLayer> coreLayer)
+        : Layer(std::move(coreLayer)) {
     }
 
     CustomLayer::~CustomLayer() = default;
-
-    void CustomLayer::update(jni::JNIEnv&) {
-        Log::Debug(mbgl::Event::JNI, "Updating map");
-        if (map) {
-            map->triggerRepaint();
-        } else {
-            Log::Error(mbgl::Event::JNI, "No map reference, cannot update");
-        }
-    }
 
     namespace {
         jni::Local<jni::Object<Layer>> createJavaPeer(jni::JNIEnv& env, Layer* layer) {
@@ -43,12 +34,12 @@ namespace android {
 
     CustomJavaLayerPeerFactory::~CustomJavaLayerPeerFactory() = default;
 
-    jni::Local<jni::Object<Layer>> CustomJavaLayerPeerFactory::createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, mbgl::style::Layer& layer) {
-        return createJavaPeer(env, new CustomLayer(map, static_cast<mbgl::style::CustomLayer&>(layer)));
+    jni::Local<jni::Object<Layer>> CustomJavaLayerPeerFactory::createJavaLayerPeer(jni::JNIEnv& env, mbgl::style::Layer& layer) {
+        return createJavaPeer(env, new CustomLayer(static_cast<mbgl::style::CustomLayer&>(layer)));
     }
 
-    jni::Local<jni::Object<Layer>> CustomJavaLayerPeerFactory::createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, std::unique_ptr<mbgl::style::Layer> layer) {
-        return createJavaPeer(env, new CustomLayer(map, std::unique_ptr<mbgl::style::CustomLayer>(static_cast<mbgl::style::CustomLayer*>(layer.release()))));
+    jni::Local<jni::Object<Layer>> CustomJavaLayerPeerFactory::createJavaLayerPeer(jni::JNIEnv& env, std::unique_ptr<mbgl::style::Layer> layer) {
+        return createJavaPeer(env, new CustomLayer(std::unique_ptr<mbgl::style::CustomLayer>(static_cast<mbgl::style::CustomLayer*>(layer.release()))));
     }
 
     void CustomJavaLayerPeerFactory::registerNative(jni::JNIEnv& env) {
@@ -62,8 +53,7 @@ namespace android {
             env, javaClass, "nativePtr",
             jni::MakePeer<CustomLayer, const jni::String&, jni::jlong>,
             "initialize",
-            "finalize",
-            METHOD(&CustomLayer::update, "nativeUpdate"));
+            "finalize");
     }
 
 } // namespace android

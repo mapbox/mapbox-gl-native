@@ -42,7 +42,7 @@ MapSnapshotter::MapSnapshotter(jni::JNIEnv& _env,
         size,
         pixelRatio,
         mbgl::android::FileSource::getSharedResourceOptions(_env, _jFileSource),
-        observer,
+        *this,
         _localIdeographFontFamily ? jni::Make<std::string>(_env, _localIdeographFontFamily) : optional<std::string>{});
 
     if (position) {
@@ -58,6 +58,7 @@ MapSnapshotter::MapSnapshotter(jni::JNIEnv& _env,
     } else {
         snapshotter->setStyleURL(jni::Make<std::string>(_env, styleURL));
     }
+    activateFilesource(_env);
 }
 
 MapSnapshotter::~MapSnapshotter() = default;
@@ -125,16 +126,6 @@ void MapSnapshotter::setRegion(JNIEnv& env, const jni::Object<LatLngBounds>& reg
     snapshotter->setRegion(LatLngBounds::getLatLngBounds(env, region));
 }
 
-void MapSnapshotter::addLayer(JNIEnv &, jlong nativeLayerPtr) {
-    assert(nativeLayerPtr != 0);
-    Layer *layer = reinterpret_cast<Layer *>(nativeLayerPtr);
-    style::Layer &t = layer->get();
-    std::unique_ptr<style::Layer> u (&t);
-    observer.didFinishLoadingStyleCallback= [&] {
-        snapshotter->getStyle().addLayer(std::move(u));
-    };
-}
-
 // Private methods //
 
 void MapSnapshotter::activateFilesource(JNIEnv& env) {
@@ -148,6 +139,51 @@ void MapSnapshotter::deactivateFilesource(JNIEnv& env) {
     if (activatedFilesource) {
         activatedFilesource = false;
         jFileSource->pause(env);
+    }
+}
+
+void MapSnapshotter::onDidFailLoadingStyle(const std::string& error) {
+    MBGL_VERIFY_THREAD(tid);
+    android::UniqueEnv _env = android::AttachEnv();
+    static auto& javaClass = jni::Class<MapSnapshotter>::Singleton(*_env);
+    static auto onDidFailLoadingStyle = javaClass.GetMethod<void (jni::String)>(*_env, "onDidFailLoadingStyle");
+    auto weakReference = javaPeer.get(*_env);
+    if (weakReference) {
+        weakReference.Call(*_env, onDidFailLoadingStyle, jni::Make<jni::String>(*_env, error));
+    }
+}
+
+void MapSnapshotter::onDidFinishLoadingStyle() {
+    MBGL_VERIFY_THREAD(tid);
+    android::UniqueEnv _env = android::AttachEnv();
+
+    static auto& javaClass = jni::Class<MapSnapshotter>::Singleton(*_env);
+    static auto onDidFinishLoadingStyle = javaClass.GetMethod<void ()>(*_env, "onDidFinishLoadingStyle");
+    auto weakReference = javaPeer.get(*_env);
+    if (weakReference) {
+        weakReference.Call(*_env, onDidFinishLoadingStyle);
+    }
+}
+
+void MapSnapshotter::onStyleImageMissing(const std::string& imageName) {
+    MBGL_VERIFY_THREAD(tid);
+    android::UniqueEnv _env = android::AttachEnv();
+    static auto& javaClass = jni::Class<MapSnapshotter>::Singleton(*_env);
+    static auto onStyleImageMissing = javaClass.GetMethod<void (jni::String)>(*_env, "onStyleImageMissing");
+    auto weakReference = javaPeer.get(*_env);
+    if (weakReference) {
+        weakReference.Call(*_env, onStyleImageMissing, jni::Make<jni::String>(*_env, imageName));
+    }
+}
+
+void MapSnapshotter::addLayer(JNIEnv& env, jlong nativeLayerPtr, const jni::String& before) {
+    assert(nativeLayerPtr != 0);
+
+    Layer *layer = reinterpret_cast<Layer *>(nativeLayerPtr);
+    try {
+        layer->addToStyle(snapshotter->getStyle(), before ? mbgl::optional<std::string>(jni::Make<std::string>(env, before)) : mbgl::optional<std::string>());
+    } catch (const std::runtime_error& error) {
+        jni::ThrowNew(env, jni::FindClass(env, "com/mapbox/mapboxsdk/style/layers/CannotAddLayerException"), error.what());
     }
 }
 
