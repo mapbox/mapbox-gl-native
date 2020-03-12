@@ -592,7 +592,8 @@ void Placement::placeSymbolBucket(const BucketPlacementData& params, std::set<ui
             {collisionIndex, UnwrappedTileID(z, x + 1, y), {-util::EXTENT, 0.0f}}  // right
         }};
 
-        auto collisionBoxIntersectsTileEdges = [&](const CollisionBox& collisionBox, Point<float> shift) -> bool {
+        auto collisionBoxIntersectsTileEdges = [&](const CollisionBox& collisionBox,
+                                                   Point<float> shift) noexcept->bool {
             bool intersects =
                 collisionIndex.intersectsTileEdges(collisionBox, shift, renderTile.matrix, pixelRatio, *tileBorders);
             // Check if this symbol intersects the neighbor tile borders. If so, it also shall be placed with priority.
@@ -604,7 +605,14 @@ void Placement::placeSymbolBucket(const BucketPlacementData& params, std::set<ui
             return intersects;
         };
 
-        auto symbolIntersectsTileEdges = [&](const SymbolInstance& symbol) -> bool {
+        auto symbolIntersectsTileEdges = [
+            &locationCache,
+            &collisionBoxIntersectsTileEdges,
+            variableAnchor,
+            pitchTextWithMap,
+            rotateTextWithMap,
+            bearing = state.getBearing()
+        ](const SymbolInstance& symbol) noexcept->bool {
             auto it = locationCache.find(symbol.crossTileID);
             if (it != locationCache.end()) return it->second;
 
@@ -623,7 +631,7 @@ void Placement::placeSymbolBucket(const BucketPlacementData& params, std::set<ui
                                                            symbol.textBoxScale,
                                                            rotateTextWithMap,
                                                            pitchTextWithMap,
-                                                           state.getBearing());
+                                                           bearing);
                 }
                 intersects = collisionBoxIntersectsTileEdges(textCollisionBox, offset);
             }
@@ -637,46 +645,47 @@ void Placement::placeSymbolBucket(const BucketPlacementData& params, std::set<ui
             return intersects;
         };
 
-        std::stable_sort(symbolInstances.begin(),
-                         symbolInstances.end(),
-                         [&symbolIntersectsTileEdges](const SymbolInstance& a, const SymbolInstance& b) {
-                             assert(!a.textCollisionFeature.alongLine);
-                             assert(!b.textCollisionFeature.alongLine);
-                             auto intersectsA = symbolIntersectsTileEdges(a);
-                             auto intersectsB = symbolIntersectsTileEdges(b);
-                             if (intersectsA) {
-                                 if (!intersectsB) return true;
-                                 // Both symbols are inrecepting the tile borders, we need a universal cross-tile rule
-                                 // to define which of them shall be placed first - use anchor `y` point.
-                                 return a.anchor.point.y < b.anchor.point.y;
-                             }
-                             return false;
-                         });
+        std::stable_sort(
+            symbolInstances.begin(),
+            symbolInstances.end(),
+            [&symbolIntersectsTileEdges](const SymbolInstance& a, const SymbolInstance& b) noexcept {
+                assert(!a.textCollisionFeature.alongLine);
+                assert(!b.textCollisionFeature.alongLine);
+                auto intersectsA = symbolIntersectsTileEdges(a);
+                auto intersectsB = symbolIntersectsTileEdges(b);
+                if (intersectsA) {
+                    if (!intersectsB) return true;
+                    // Both symbols are inrecepting the tile borders, we need a universal cross-tile rule
+                    // to define which of them shall be placed first - use anchor `y` point.
+                    return a.anchor.point.y < b.anchor.point.y;
+                }
+                return false;
+            });
 
         for (const SymbolInstance& symbol : symbolInstances) {
             placeSymbol(symbol);
         }
-
     } else {
-        auto sortedSymbols = bucket.getSymbols(params.sortKeyRange);
+        SymbolInstanceReferences sortedSymbols = bucket.getSymbols(params.sortKeyRange);
         auto* previousPlacement = getPrevPlacement();
         if (previousPlacement && isTiltedView()) {
-            std::stable_sort(sortedSymbols.begin(),
-                             sortedSymbols.end(),
-                             [&previousPlacement](const SymbolInstance& a, const SymbolInstance& b) {
-                                 auto* aPlacement = previousPlacement->getSymbolPlacement(a);
-                                 auto* bPlacement = previousPlacement->getSymbolPlacement(b);
-                                 if (!aPlacement) {
-                                     // a < b, if 'a' is new and if 'b' was previously hidden.
-                                     return bPlacement && !bPlacement->placed();
-                                 }
-                                 if (!bPlacement) {
-                                     // a < b, if 'b' is new and 'a' was previously shown.
-                                     return aPlacement && aPlacement->placed();
-                                 }
-                                 // a < b, if 'a' was shown and 'b' was hidden.
-                                 return aPlacement->placed() && !bPlacement->placed();
-                             });
+            std::stable_sort(
+                sortedSymbols.begin(),
+                sortedSymbols.end(),
+                [previousPlacement](const SymbolInstance& a, const SymbolInstance& b) noexcept {
+                    auto* aPlacement = previousPlacement->getSymbolPlacement(a);
+                    auto* bPlacement = previousPlacement->getSymbolPlacement(b);
+                    if (!aPlacement) {
+                        // a < b, if 'a' is new and if 'b' was previously hidden.
+                        return bPlacement && !bPlacement->placed();
+                    }
+                    if (!bPlacement) {
+                        // a < b, if 'b' is new and 'a' was previously shown.
+                        return aPlacement && aPlacement->placed();
+                    }
+                    // a < b, if 'a' was shown and 'b' was hidden.
+                    return aPlacement->placed() && !bPlacement->placed();
+                });
         }
         for (const SymbolInstance& symbol : sortedSymbols) {
             placeSymbol(symbol);
@@ -1226,8 +1235,7 @@ float Placement::zoomAdjustment(const float zoom) const {
 const JointPlacement* Placement::getSymbolPlacement(const SymbolInstance& symbol) const {
     assert(symbol.crossTileID != 0);
     auto found = placements.find(symbol.crossTileID);
-    if (found == placements.end()) return nullptr;
-    return &found->second;
+    return (found == placements.end()) ? &found->second : nullptr;
 }
 
 Duration Placement::getUpdatePeriod(const float zoom) const {
