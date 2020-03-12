@@ -641,7 +641,7 @@ void Placement::placeSymbolBucket(const BucketPlacementData& params, std::set<ui
             return intersects;
         };
 
-        std::stable_sort(symbolInstances.begin(),
+        std::sort(symbolInstances.begin(),
                          symbolInstances.end(),
                          [&symbolIntersectsTileEdges](const SymbolInstance& a, const SymbolInstance& b) {
                              assert(!a.textCollisionFeature.alongLine);
