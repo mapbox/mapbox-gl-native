@@ -14,18 +14,8 @@
 
 namespace mbgl {
 namespace android {
-    class SnapshotObserver final : public mbgl::MapSnapshotterObserver {
-    public:
-        ~SnapshotObserver() = default;
-        void onDidFinishLoadingStyle() override {
-            if (didFinishLoadingStyleCallback) {
-                didFinishLoadingStyleCallback();
-            }
-        }
-        std::function<void()> didFinishLoadingStyleCallback;
-    };
 
-class MapSnapshotter {
+class MapSnapshotter final : public mbgl::MapSnapshotterObserver {
 public:
 
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/snapshotter/MapSnapshotter"; };
@@ -61,7 +51,12 @@ public:
 
     void cancel(JNIEnv&);
 
-    void addLayer(JNIEnv&, jlong);
+    void addLayer(JNIEnv&, jlong, const jni::String&);
+
+    // MapSnapshotterObserver overrides
+    void onDidFailLoadingStyle(const std::string&) override;
+    void onDidFinishLoadingStyle() override;
+    void onStyleImageMissing(const std::string&) override;
 
 private:
     MBGL_STORE_THREAD(tid);
@@ -73,7 +68,6 @@ private:
     bool showLogo;
 
     std::unique_ptr<mbgl::MapSnapshotter> snapshotter;
-    SnapshotObserver observer;
     FileSource *jFileSource;
     void activateFilesource(JNIEnv&);
     void deactivateFilesource(JNIEnv&);

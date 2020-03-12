@@ -1,7 +1,7 @@
 #pragma once
 
 #include <mbgl/layermanager/layer_factory.hpp>
-#include <mbgl/map/map.hpp>
+#include <mbgl/style/style.hpp>
 #include <mbgl/style/layer.hpp>
 #include "../../gson/json_array.hpp"
 #include "../value.hpp"
@@ -27,7 +27,7 @@ public:
      */
     void setLayer(std::unique_ptr<mbgl::style::Layer>);
 
-    void addToMap(mbgl::Map&, mbgl::optional<std::string>);
+    void addToStyle(mbgl::style::Style&, mbgl::optional<std::string>);
 
     // Release the owned view and return it
     std::unique_ptr<mbgl::style::Layer> releaseCoreLayer();
@@ -68,26 +68,19 @@ protected:
     /*
      * Called when a non-owning peer object is created on the c++ side
      */
-    Layer(mbgl::Map&, mbgl::style::Layer&);
+    Layer(mbgl::style::Layer&);
 
     /*
      * Called when a owning peer object is created on the c++ side
      */
-    Layer(mbgl::Map&, std::unique_ptr<mbgl::style::Layer>);
-
-    /*
-     * Called when a Java object was created from the jvm side
-     */
     Layer(std::unique_ptr<mbgl::style::Layer>);
+
 
     // Owned layer is set when creating a new layer, before adding it to the map
     std::unique_ptr<mbgl::style::Layer> ownedLayer;
 
     // Raw reference to the layer
     mbgl::style::Layer& layer;
-
-    // Map is set when the layer is retrieved or after adding to the map
-    mbgl::Map* map;
 };
 
 /**
@@ -99,12 +92,12 @@ public:
     /**
      * @brief Create a non-owning peer.
      */
-    virtual jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv&, mbgl::Map&, mbgl::style::Layer&) = 0;
+    virtual jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv&, mbgl::style::Layer&) = 0;
 
     /**
      * @brief Create an owning peer.
      */
-    virtual jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, std::unique_ptr<mbgl::style::Layer>) = 0;
+    virtual jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv& env, std::unique_ptr<mbgl::style::Layer>) = 0;
 
     /**
      * @brief Register peer methods.

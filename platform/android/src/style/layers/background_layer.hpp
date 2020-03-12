@@ -18,9 +18,9 @@ public:
 
     BackgroundLayer(jni::JNIEnv&, jni::String&);
 
-    BackgroundLayer(mbgl::Map&, mbgl::style::BackgroundLayer&);
+    BackgroundLayer(mbgl::style::BackgroundLayer&);
 
-    BackgroundLayer(mbgl::Map&, std::unique_ptr<mbgl::style::BackgroundLayer>);
+    BackgroundLayer(std::unique_ptr<mbgl::style::BackgroundLayer>);
 
     ~BackgroundLayer();
 
@@ -45,8 +45,8 @@ public:
     ~BackgroundJavaLayerPeerFactory() override;
 
     // JavaLayerPeerFactory overrides.
-    jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv&, mbgl::Map&, mbgl::style::Layer&) final;
-    jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, std::unique_ptr<mbgl::style::Layer>) final;
+    jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv&, mbgl::style::Layer&) final;
+    jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv& env, std::unique_ptr<mbgl::style::Layer>) final;
 
     void registerNative(jni::JNIEnv&) final;
 

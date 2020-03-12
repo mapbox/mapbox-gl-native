@@ -18,9 +18,9 @@ public:
 
     CircleLayer(jni::JNIEnv&, jni::String&, jni::String&);
 
-    CircleLayer(mbgl::Map&, mbgl::style::CircleLayer&);
+    CircleLayer(mbgl::style::CircleLayer&);
 
-    CircleLayer(mbgl::Map&, std::unique_ptr<mbgl::style::CircleLayer>);
+    CircleLayer(std::unique_ptr<mbgl::style::CircleLayer>);
 
     ~CircleLayer();
 
@@ -71,8 +71,8 @@ public:
     ~CircleJavaLayerPeerFactory() override;
 
     // JavaLayerPeerFactory overrides.
-    jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv&, mbgl::Map&, mbgl::style::Layer&) final;
-    jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, std::unique_ptr<mbgl::style::Layer>) final;
+    jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv&, mbgl::style::Layer&) final;
+    jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv& env, std::unique_ptr<mbgl::style::Layer>) final;
 
     void registerNative(jni::JNIEnv&) final;
 

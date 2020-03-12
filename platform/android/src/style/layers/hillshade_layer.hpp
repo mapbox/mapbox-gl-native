@@ -18,9 +18,9 @@ public:
 
     HillshadeLayer(jni::JNIEnv&, jni::String&, jni::String&);
 
-    HillshadeLayer(mbgl::Map&, mbgl::style::HillshadeLayer&);
+    HillshadeLayer(mbgl::style::HillshadeLayer&);
 
-    HillshadeLayer(mbgl::Map&, std::unique_ptr<mbgl::style::HillshadeLayer>);
+    HillshadeLayer(std::unique_ptr<mbgl::style::HillshadeLayer>);
 
     ~HillshadeLayer();
 
@@ -53,8 +53,8 @@ public:
     ~HillshadeJavaLayerPeerFactory() override;
 
     // JavaLayerPeerFactory overrides.
-    jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv&, mbgl::Map&, mbgl::style::Layer&) final;
-    jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, std::unique_ptr<mbgl::style::Layer>) final;
+    jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv&, mbgl::style::Layer&) final;
+    jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv& env, std::unique_ptr<mbgl::style::Layer>) final;
 
     void registerNative(jni::JNIEnv&) final;
 

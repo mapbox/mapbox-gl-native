@@ -253,6 +253,8 @@ public:
 
     mbgl::Map& getMap();
 
+    void triggerRepaint(JNIEnv&);
+
 private:
     std::unique_ptr<AndroidRendererFrontend> rendererFrontend;
 

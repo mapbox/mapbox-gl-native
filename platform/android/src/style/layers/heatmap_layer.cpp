@@ -26,15 +26,15 @@ namespace android {
     /**
      * Creates a non-owning peer object (for layers currently attached to the map)
      */
-    HeatmapLayer::HeatmapLayer(mbgl::Map& map, mbgl::style::HeatmapLayer& coreLayer)
-        : Layer(map, coreLayer) {
+    HeatmapLayer::HeatmapLayer(mbgl::style::HeatmapLayer& coreLayer)
+        : Layer(coreLayer) {
     }
 
     /**
      * Creates an owning peer object (for layers not attached to the map)
      */
-    HeatmapLayer::HeatmapLayer(mbgl::Map& map, std::unique_ptr<mbgl::style::HeatmapLayer> coreLayer)
-        : Layer(map, std::move(coreLayer)) {
+    HeatmapLayer::HeatmapLayer(std::unique_ptr<mbgl::style::HeatmapLayer> coreLayer)
+        : Layer(std::move(coreLayer)) {
     }
 
     HeatmapLayer::~HeatmapLayer() = default;
@@ -122,14 +122,14 @@ namespace android {
         }
     }  // namespace
 
-    jni::Local<jni::Object<Layer>> HeatmapJavaLayerPeerFactory::createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, mbgl::style::Layer& layer) {
+    jni::Local<jni::Object<Layer>> HeatmapJavaLayerPeerFactory::createJavaLayerPeer(jni::JNIEnv& env, mbgl::style::Layer& layer) {
         assert(layer.baseImpl->getTypeInfo() == getTypeInfo());
-        return createJavaPeer(env, new HeatmapLayer(map, toHeatmapLayer(layer)));
+        return createJavaPeer(env, new HeatmapLayer(toHeatmapLayer(layer)));
     }
 
-    jni::Local<jni::Object<Layer>> HeatmapJavaLayerPeerFactory::createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, std::unique_ptr<mbgl::style::Layer> layer) {
+    jni::Local<jni::Object<Layer>> HeatmapJavaLayerPeerFactory::createJavaLayerPeer(jni::JNIEnv& env, std::unique_ptr<mbgl::style::Layer> layer) {
         assert(layer->baseImpl->getTypeInfo() == getTypeInfo());
-        return createJavaPeer(env, new HeatmapLayer(map, std::unique_ptr<mbgl::style::HeatmapLayer>(static_cast<mbgl::style::HeatmapLayer*>(layer.release()))));
+        return createJavaPeer(env, new HeatmapLayer(std::unique_ptr<mbgl::style::HeatmapLayer>(static_cast<mbgl::style::HeatmapLayer*>(layer.release()))));
     }
 
     void HeatmapJavaLayerPeerFactory::registerNative(jni::JNIEnv& env) {
@@ -140,7 +140,9 @@ namespace android {
 
         // Register the peer
         jni::RegisterNativePeer<HeatmapLayer>(
-            env, javaClass, "nativePtr",
+            env,
+            javaClass,
+            "nativePtr",
             jni::MakePeer<HeatmapLayer, jni::String&, jni::String&>,
             "initialize",
             "finalize",
