@@ -664,7 +664,7 @@ void Placement::placeSymbolBucket(const BucketPlacementData& params, std::set<ui
     } else {
         auto sortedSymbols = bucket.getSymbols(params.sortKeyRange);
         if (auto* previousPlacement = getPrevPlacement()) {
-            std::stable_sort(
+            std::sort(
                 sortedSymbols.begin(), sortedSymbols.end(), [&](const SymbolInstance& a, const SymbolInstance& b) {
                     auto* aPlacement = previousPlacement->getSymbolPlacement(a);
                     auto* bPlacement = previousPlacement->getSymbolPlacement(b);
