@@ -1,6 +1,6 @@
 # Changelog
 
-## master
+## maps-v1.4.0
 
 ### ✨ New features
 
@@ -24,17 +24,17 @@
 
 - [default] Fix possible crash at RunLoop::wake() ([#16255](https://github.com/mapbox/mapbox-gl-native/pull/16255))
 
-- [android] Update toGeoJSON in android_conversion.hpp [#16243](https://github.com/mapbox/mapbox-gl-native/pull/16243)
+- [android] Update toGeoJSON in android_conversion.hpp ([#16243](https://github.com/mapbox/mapbox-gl-native/pull/16243))
   
-  Before this chage, `toGeoJSON` method in `android_conversion.hpp` can't convert Object(Map in android) to GeoJSON object. 
+  Before this chage, `toGeoJSON` method in `android_conversion.hpp` could not convert an Object (Map in android) to GeoJSON object. 
   
-  But `within` expression need to accept an Object and then convert to GeoJSON object, now `toGeoJSON` method can convert both string and Object to GeoJSON.
+  But `within` expression needs to accept an Object and then convert it to the GeoJSON object, now `toGeoJSON` method can convert both string and Object to GeoJSON.
 
 - [core] Fix `within` expression algorithm so that `false` value will be returned when point is on the boundary.  Allow using different GeoJSON formats as arguments of `within` expression.([#16232](https://github.com/mapbox/mapbox-gl-native/pull/16232))
 
   A valid GeoJSON argument should contain one of the following types:  `"Feature"`, `"FeatureCollection"`,`"Polygon"` or `"MultiPolygon"`.
 
-- [core] [tile mode] placement algorithm must consider icons bounding boxes [#16277](https://github.com/mapbox/mapbox-gl-native/pull/16277)
+- [core] [tile mode] placement algorithm must consider icons bounding boxes ([#16277](https://github.com/mapbox/mapbox-gl-native/pull/16277))
 
   Tile mode placement algorithm now checks if bounding boxes for both label text and icon are intersecting the edges of the tiles.
 
@@ -47,6 +47,10 @@
  - [core][tile mode] Fix assertion at `line-center` placement handling ([#16293](https://github.com/mapbox/mapbox-gl-native/pull/16293))
 
   The `Symbol Intersects Tile Edges` placement algorithm should not be applied to the symbols with `line-center` placement.
+
+ - Fixed using of the `in` expression as a layer filter ([#16272](https://github.com/mapbox/mapbox-gl-native/pull/16272))
+
+  The bug was caused by `mbgl::style::conversion::isExpression()` always returning `false` for the `in` expression.
 
 ### 🧩  Architectural changes
 
