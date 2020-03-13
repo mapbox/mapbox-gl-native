@@ -59,6 +59,11 @@
 - Signature of a `MapSnapshotter`'s constructor has been changed
 - Signature for a `MapSnapshotter::snapshot` method has been changed
 - Size of an offline regions do not affect ambient cache size ([#15622](https://github.com/mapbox/mapbox-gl-native/pull/15622))
+  
+##### 📌 Known issues
+
+- When feature is exactly on the geometry boundary, `within` expression returns inconsistent values for different zoom levels  ([#16301](https://github.com/mapbox/mapbox-gl-native/issues/16301))
+
 
 ## maps-v1.3.0 (2020.02-relvanillashake)
 
