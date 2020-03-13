@@ -1235,7 +1235,7 @@ float Placement::zoomAdjustment(const float zoom) const {
 const JointPlacement* Placement::getSymbolPlacement(const SymbolInstance& symbol) const {
     assert(symbol.crossTileID != 0);
     auto found = placements.find(symbol.crossTileID);
-    return (found == placements.end()) ? &found->second : nullptr;
+    return (found != placements.end()) ? &found->second : nullptr;
 }
 
 Duration Placement::getUpdatePeriod(const float zoom) const {
