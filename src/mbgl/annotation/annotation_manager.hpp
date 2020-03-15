@@ -1,7 +1,6 @@
 #pragma once
 
 #include <mbgl/annotation/annotation.hpp>
-#include <mbgl/annotation/symbol_annotation_impl.hpp>
 #include <mbgl/style/image.hpp>
 #include <mbgl/util/noncopyable.hpp>
 
@@ -18,8 +17,6 @@ namespace mbgl {
 class LatLngBounds;
 class AnnotationTile;
 class AnnotationTileData;
-class SymbolAnnotationImpl;
-class ShapeAnnotationImpl;
 
 namespace style {
 class Style;
@@ -75,19 +72,8 @@ private:
     
     AnnotationID nextID = 0;
 
-    using SymbolAnnotationTree = boost::geometry::index::rtree<std::shared_ptr<const SymbolAnnotationImpl>, boost::geometry::index::rstar<16, 4>>;
-    // Unlike std::unordered_map, std::map is guaranteed to sort by AnnotationID, ensuring that older annotations are below newer annotations.
-    // <https://github.com/mapbox/mapbox-gl-native/issues/5691>
-    using SymbolAnnotationMap = std::map<AnnotationID, std::shared_ptr<SymbolAnnotationImpl>>;
-    using ShapeAnnotationMap = std::map<AnnotationID, std::unique_ptr<ShapeAnnotationImpl>>;
-    using ImageMap = std::unordered_map<std::string, style::Image>;
-
-    SymbolAnnotationTree symbolTree;
-    SymbolAnnotationMap symbolAnnotations;
-    ShapeAnnotationMap shapeAnnotations;
-    ImageMap images;
-
-    std::unordered_set<AnnotationTile*> tiles;
+    class Impl;
+    const std::unique_ptr<Impl> impl;
     mapbox::base::WeakPtrFactory<AnnotationManager> weakFactory{this};
 };
 

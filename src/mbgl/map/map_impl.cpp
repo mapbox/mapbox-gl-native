@@ -30,7 +30,15 @@ Map::Impl::~Impl() {
     // Explicitly reset the RendererFrontend first to ensure it releases
     // All shared resources (AnnotationManager)
     rendererFrontend.reset();
-};
+}
+
+Map::Impl *Map::Impl::get(Map& map) {
+    return map.impl.get();
+}
+
+const Map::Impl *Map::Impl::get(const Map& map) {
+    return map.impl.get();
+}
 
 #pragma mark - Map::Impl StyleObserver
 

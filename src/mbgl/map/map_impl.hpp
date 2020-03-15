@@ -31,6 +31,9 @@ public:
     Impl(RendererFrontend&, MapObserver&, std::shared_ptr<FileSource>, const MapOptions&);
     ~Impl() final;
 
+    static Map::Impl *get(Map&);
+    static const Map::Impl *get(const Map&);
+
     // StyleObserver
     void onSourceChanged(style::Source&) final;
     void onUpdate() final;

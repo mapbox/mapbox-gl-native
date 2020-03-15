@@ -31,6 +31,7 @@ class Style;
 
 class Map : private util::noncopyable {
 public:
+    class Impl;
     explicit Map(RendererFrontend&,
                  MapObserver&,
                  const MapOptions&,
@@ -127,11 +128,11 @@ public:
     void dumpDebugLogs() const;
 
 protected:
-    class Impl;
     const std::unique_ptr<Impl> impl;
 
     // For testing only.
     Map(std::unique_ptr<Impl>);
+    friend class Impl;
 };
 
 } // namespace mbgl
