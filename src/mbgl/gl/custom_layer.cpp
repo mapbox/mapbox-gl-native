@@ -55,5 +55,13 @@ const LayerTypeInfo* CustomLayer::Impl::staticTypeInfo() noexcept {
     return &typeInfoCustom;
 }
 
+bool CustomLayerRenderParameters::operator==(const CustomLayerRenderParameters& o) const {
+    return projectionMatrix == o.projectionMatrix;
+}
+
+bool CustomLayerRenderParameters::operator!=(const CustomLayerRenderParameters& o) const {
+    return !(*this == o);
+}
+
 } // namespace style
 } // namespace mbgl

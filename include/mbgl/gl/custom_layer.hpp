@@ -20,6 +20,9 @@ struct CustomLayerRenderParameters {
     double pitch;
     double fieldOfView;
     std::array<double, 16> projectionMatrix;
+
+    bool operator==(const CustomLayerRenderParameters&) const;
+    bool operator!=(const CustomLayerRenderParameters&) const;
 };
 
 class CustomLayerHost {
