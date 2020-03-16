@@ -2,6 +2,8 @@
 
 ## master
 
+## maps-v1.4.1
+
 ### 🐞 Bug fixes
 
 - [android] Fix wrong method call in map_snapshotter ([#16308](https://github.com/mapbox/mapbox-gl-native/pull/16308))
