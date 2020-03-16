@@ -51,7 +51,9 @@ public:
 
     void cancel(JNIEnv&);
 
-    void addLayer(JNIEnv&, jlong, const jni::String&);
+    void addLayerAt(JNIEnv&, jlong,  jni::jint);
+    void addLayerBelow(JNIEnv&, jlong, const jni::String&);
+    void addLayerAbove(JNIEnv&, jlong, const jni::String&);
 
     // MapSnapshotterObserver overrides
     void onDidFailLoadingStyle(const std::string&) override;

@@ -176,17 +176,71 @@ void MapSnapshotter::onStyleImageMissing(const std::string& imageName) {
     }
 }
 
-void MapSnapshotter::addLayer(JNIEnv& env, jlong nativeLayerPtr, const jni::String& before) {
+void MapSnapshotter::addLayerAt(JNIEnv& env, jlong nativeLayerPtr, jni::jint index) {
     assert(nativeLayerPtr != 0);
-
+    auto layers = snapshotter->getStyle().getLayers();
     Layer *layer = reinterpret_cast<Layer *>(nativeLayerPtr);
+    // Check index
+    int numLayers = layers.size() - 1;
+    if (index > numLayers || index < 0) {
+        Log::Error(Event::JNI, "Index out of range: %i", index);
+        jni::ThrowNew(env, jni::FindClass(env, "com/mapbox/mapboxsdk/style/layers/CannotAddLayerException"),
+                      std::string("Invalid index").c_str());
+    }
+    // Insert it below the current at that index
     try {
-        layer->addToStyle(snapshotter->getStyle(), before ? mbgl::optional<std::string>(jni::Make<std::string>(env, before)) : mbgl::optional<std::string>());
+        layer->addToStyle(snapshotter->getStyle(),  layers.at(index)->getID());
     } catch (const std::runtime_error& error) {
         jni::ThrowNew(env, jni::FindClass(env, "com/mapbox/mapboxsdk/style/layers/CannotAddLayerException"), error.what());
     }
 }
 
+void MapSnapshotter::addLayerBelow(JNIEnv& env, jlong nativeLayerPtr, const jni::String& below){
+    assert(nativeLayerPtr != 0);
+
+    Layer *layer = reinterpret_cast<Layer *>(nativeLayerPtr);
+    try {
+        layer->addToStyle(snapshotter->getStyle(), below ? mbgl::optional<std::string>(jni::Make<std::string>(env, below)) : mbgl::optional<std::string>());
+    } catch (const std::runtime_error& error) {
+        jni::ThrowNew(env, jni::FindClass(env, "com/mapbox/mapboxsdk/style/layers/CannotAddLayerException"), error.what());
+    }
+}
+
+void MapSnapshotter::addLayerAbove(JNIEnv& env, jlong nativeLayerPtr, const jni::String& above) {
+    assert(nativeLayerPtr != 0);
+    Layer *layer = reinterpret_cast<Layer *>(nativeLayerPtr);
+
+    // Find the sibling
+    auto layers = snapshotter->getStyle().getLayers();
+    auto siblingId = jni::Make<std::string>(env, above);
+
+    size_t index = 0;
+    for (auto l : layers) {
+        if (l->getID() == siblingId) {
+            break;
+        }
+        index++;
+    }
+
+    // Check if we found a sibling to place before
+    mbgl::optional<std::string> before;
+    if (index + 1 > layers.size()) {
+        // Not found
+        jni::ThrowNew(env, jni::FindClass(env, "com/mapbox/mapboxsdk/style/layers/CannotAddLayerException"),
+                      std::string("Could not find layer: ").append(siblingId).c_str());
+        return;
+    } else if (index + 1 < layers.size()) {
+        // Place before the sibling
+        before = { layers.at(index + 1)->getID() };
+    }
+
+    // Add the layer
+    try {
+        layer->addToStyle(snapshotter->getStyle(), before);
+    } catch (const std::runtime_error& error) {
+        jni::ThrowNew(env, jni::FindClass(env, "com/mapbox/mapboxsdk/style/layers/CannotAddLayerException"), error.what());
+    }
+}
 // Static methods //
 
 void MapSnapshotter::registerNative(jni::JNIEnv& env) {
@@ -201,7 +255,9 @@ void MapSnapshotter::registerNative(jni::JNIEnv& env) {
                                            "nativeInitialize",
                                            "finalize",
                                             METHOD(&MapSnapshotter::setStyleUrl, "setStyleUrl"),
-                                            METHOD(&MapSnapshotter::addLayer, "nativeAddLayer"),
+                                            METHOD(&MapSnapshotter::addLayerAt, "nativeAddLayerAt"),
+                                            METHOD(&MapSnapshotter::addLayerBelow, "nativeAddLayerBelow"),
+                                            METHOD(&MapSnapshotter::addLayerAbove, "nativeAddLayerAbove"),
                                             METHOD(&MapSnapshotter::setStyleJson, "setStyleJson"),
                                             METHOD(&MapSnapshotter::setSize, "setSize"),
                                             METHOD(&MapSnapshotter::setCameraPosition, "setCameraPosition"),
