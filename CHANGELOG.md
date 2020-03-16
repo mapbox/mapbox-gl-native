@@ -1,5 +1,15 @@
 # Changelog
 
+## master
+
+## maps-v1.4.1
+
+### 🐞 Bug fixes
+
+- [android] Fix wrong method call in map_snapshotter ([#16308](https://github.com/mapbox/mapbox-gl-native/pull/16308))
+
+  In map_snapshotter, a wrong method call will cause Sanpshotter not works with a style url in Android. This change makes it call the right method to let Snapshotter works.
+
 ## maps-v1.4.0
 
 ### ✨ New features
