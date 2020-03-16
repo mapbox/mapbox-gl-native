@@ -57,7 +57,7 @@ MapSnapshotter::MapSnapshotter(jni::JNIEnv& _env,
     if (styleJSON) {
         snapshotter->setStyleJSON(jni::Make<std::string>(_env, styleJSON));
     } else {
-        snapshotter->setStyleJSON(jni::Make<std::string>(_env, styleURL));
+        snapshotter->setStyleURL(jni::Make<std::string>(_env, styleURL));
     }
 }
 
