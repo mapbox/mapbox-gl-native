@@ -109,6 +109,21 @@ namespace android {
         return jni::Local<jni::Integer>(env, nullptr);
     }
 
+    void Source::addToStyle(JNIEnv &env, const jni::Object<Source> &obj, mbgl::style::Style& style) {
+        if (!ownedSource) {
+            throw std::runtime_error("Cannot add source twice");
+        }
+
+        // Add source to style and release ownership
+        style.addSource(std::move(ownedSource));
+
+        // Add peer to core source
+        source.peer = std::unique_ptr<Source>(this);
+
+        // Add strong reference to java source
+        javaPeer = jni::NewGlobal(env, obj);
+    }
+
     void Source::addToMap(JNIEnv& env, const jni::Object<Source>& obj, mbgl::Map& map, AndroidRendererFrontend& frontend) {
         // Check to see if we own the source first
         if (!ownedSource) {

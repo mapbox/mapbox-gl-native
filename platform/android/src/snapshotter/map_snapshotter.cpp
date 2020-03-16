@@ -241,6 +241,17 @@ void MapSnapshotter::addLayerAbove(JNIEnv& env, jlong nativeLayerPtr, const jni:
         jni::ThrowNew(env, jni::FindClass(env, "com/mapbox/mapboxsdk/style/layers/CannotAddLayerException"), error.what());
     }
 }
+
+void MapSnapshotter::addSource(JNIEnv& env, const jni::Object<Source>& obj, jlong sourcePtr) {
+    assert(sourcePtr != 0);
+
+    Source *source = reinterpret_cast<Source *>(sourcePtr);
+    try {
+        source->addToStyle(env, obj, snapshotter->getStyle());
+    } catch (const std::runtime_error& error) {
+        jni::ThrowNew(env, jni::FindClass(env, "com/mapbox/mapboxsdk/style/sources/CannotAddSourceException"), error.what());
+    }
+}
 // Static methods //
 
 void MapSnapshotter::registerNative(jni::JNIEnv& env) {
@@ -258,6 +269,7 @@ void MapSnapshotter::registerNative(jni::JNIEnv& env) {
                                             METHOD(&MapSnapshotter::addLayerAt, "nativeAddLayerAt"),
                                             METHOD(&MapSnapshotter::addLayerBelow, "nativeAddLayerBelow"),
                                             METHOD(&MapSnapshotter::addLayerAbove, "nativeAddLayerAbove"),
+                                            METHOD(&MapSnapshotter::addSource, "nativeAddSource"),
                                             METHOD(&MapSnapshotter::setStyleJson, "setStyleJson"),
                                             METHOD(&MapSnapshotter::setSize, "setSize"),
                                             METHOD(&MapSnapshotter::setCameraPosition, "setCameraPosition"),

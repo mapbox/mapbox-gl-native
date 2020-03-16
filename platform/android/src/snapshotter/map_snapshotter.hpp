@@ -7,6 +7,7 @@
 #include "../geometry/lat_lng_bounds.hpp"
 #include "../map/camera_position.hpp"
 #include "../style/layers/layer.hpp"
+#include "../style/sources/source.hpp"
 
 #include <jni/jni.hpp>
 
@@ -54,6 +55,7 @@ public:
     void addLayerAt(JNIEnv&, jlong,  jni::jint);
     void addLayerBelow(JNIEnv&, jlong, const jni::String&);
     void addLayerAbove(JNIEnv&, jlong, const jni::String&);
+    void addSource(JNIEnv&, const jni::Object<Source>&, jlong nativePtr);
 
     // MapSnapshotterObserver overrides
     void onDidFailLoadingStyle(const std::string&) override;
