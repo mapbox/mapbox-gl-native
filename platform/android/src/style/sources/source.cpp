@@ -109,7 +109,7 @@ namespace android {
         return jni::Local<jni::Integer>(env, nullptr);
     }
 
-    void Source::addToStyle(JNIEnv &env, const jni::Object<Source> &obj, mbgl::style::Style& style) {
+    void Source::addToStyle(JNIEnv& env, const jni::Object<Source>& obj, mbgl::style::Style& style) {
         if (!ownedSource) {
             throw std::runtime_error("Cannot add source twice");
         }

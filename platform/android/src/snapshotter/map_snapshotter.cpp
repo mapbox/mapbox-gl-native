@@ -146,7 +146,7 @@ void MapSnapshotter::onDidFailLoadingStyle(const std::string& error) {
     MBGL_VERIFY_THREAD(tid);
     android::UniqueEnv _env = android::AttachEnv();
     static auto& javaClass = jni::Class<MapSnapshotter>::Singleton(*_env);
-    static auto onDidFailLoadingStyle = javaClass.GetMethod<void (jni::String)>(*_env, "onDidFailLoadingStyle");
+    static auto onDidFailLoadingStyle = javaClass.GetMethod<void(jni::String)>(*_env, "onDidFailLoadingStyle");
     auto weakReference = javaPeer.get(*_env);
     if (weakReference) {
         weakReference.Call(*_env, onDidFailLoadingStyle, jni::Make<jni::String>(*_env, error));
@@ -158,7 +158,7 @@ void MapSnapshotter::onDidFinishLoadingStyle() {
     android::UniqueEnv _env = android::AttachEnv();
 
     static auto& javaClass = jni::Class<MapSnapshotter>::Singleton(*_env);
-    static auto onDidFinishLoadingStyle = javaClass.GetMethod<void ()>(*_env, "onDidFinishLoadingStyle");
+    static auto onDidFinishLoadingStyle = javaClass.GetMethod<void()>(*_env, "onDidFinishLoadingStyle");
     auto weakReference = javaPeer.get(*_env);
     if (weakReference) {
         weakReference.Call(*_env, onDidFinishLoadingStyle);
@@ -169,7 +169,7 @@ void MapSnapshotter::onStyleImageMissing(const std::string& imageName) {
     MBGL_VERIFY_THREAD(tid);
     android::UniqueEnv _env = android::AttachEnv();
     static auto& javaClass = jni::Class<MapSnapshotter>::Singleton(*_env);
-    static auto onStyleImageMissing = javaClass.GetMethod<void (jni::String)>(*_env, "onStyleImageMissing");
+    static auto onStyleImageMissing = javaClass.GetMethod<void(jni::String)>(*_env, "onStyleImageMissing");
     auto weakReference = javaPeer.get(*_env);
     if (weakReference) {
         weakReference.Call(*_env, onStyleImageMissing, jni::Make<jni::String>(*_env, imageName));
@@ -179,36 +179,41 @@ void MapSnapshotter::onStyleImageMissing(const std::string& imageName) {
 void MapSnapshotter::addLayerAt(JNIEnv& env, jlong nativeLayerPtr, jni::jint index) {
     assert(nativeLayerPtr != 0);
     auto layers = snapshotter->getStyle().getLayers();
-    Layer *layer = reinterpret_cast<Layer *>(nativeLayerPtr);
+    Layer* layer = reinterpret_cast<Layer*>(nativeLayerPtr);
     // Check index
     int numLayers = layers.size() - 1;
     if (index > numLayers || index < 0) {
         Log::Error(Event::JNI, "Index out of range: %i", index);
-        jni::ThrowNew(env, jni::FindClass(env, "com/mapbox/mapboxsdk/style/layers/CannotAddLayerException"),
+        jni::ThrowNew(env,
+                      jni::FindClass(env, "com/mapbox/mapboxsdk/style/layers/CannotAddLayerException"),
                       std::string("Invalid index").c_str());
     }
     // Insert it below the current at that index
     try {
-        layer->addToStyle(snapshotter->getStyle(),  layers.at(index)->getID());
+        layer->addToStyle(snapshotter->getStyle(), layers.at(index)->getID());
     } catch (const std::runtime_error& error) {
-        jni::ThrowNew(env, jni::FindClass(env, "com/mapbox/mapboxsdk/style/layers/CannotAddLayerException"), error.what());
+        jni::ThrowNew(
+            env, jni::FindClass(env, "com/mapbox/mapboxsdk/style/layers/CannotAddLayerException"), error.what());
     }
 }
 
-void MapSnapshotter::addLayerBelow(JNIEnv& env, jlong nativeLayerPtr, const jni::String& below){
+void MapSnapshotter::addLayerBelow(JNIEnv& env, jlong nativeLayerPtr, const jni::String& below) {
     assert(nativeLayerPtr != 0);
 
-    Layer *layer = reinterpret_cast<Layer *>(nativeLayerPtr);
+    Layer* layer = reinterpret_cast<Layer*>(nativeLayerPtr);
     try {
-        layer->addToStyle(snapshotter->getStyle(), below ? mbgl::optional<std::string>(jni::Make<std::string>(env, below)) : mbgl::optional<std::string>());
+        layer->addToStyle(
+            snapshotter->getStyle(),
+            below ? mbgl::optional<std::string>(jni::Make<std::string>(env, below)) : mbgl::optional<std::string>());
     } catch (const std::runtime_error& error) {
-        jni::ThrowNew(env, jni::FindClass(env, "com/mapbox/mapboxsdk/style/layers/CannotAddLayerException"), error.what());
+        jni::ThrowNew(
+            env, jni::FindClass(env, "com/mapbox/mapboxsdk/style/layers/CannotAddLayerException"), error.what());
     }
 }
 
 void MapSnapshotter::addLayerAbove(JNIEnv& env, jlong nativeLayerPtr, const jni::String& above) {
     assert(nativeLayerPtr != 0);
-    Layer *layer = reinterpret_cast<Layer *>(nativeLayerPtr);
+    Layer* layer = reinterpret_cast<Layer*>(nativeLayerPtr);
 
     // Find the sibling
     auto layers = snapshotter->getStyle().getLayers();
@@ -226,30 +231,33 @@ void MapSnapshotter::addLayerAbove(JNIEnv& env, jlong nativeLayerPtr, const jni:
     mbgl::optional<std::string> before;
     if (index + 1 > layers.size()) {
         // Not found
-        jni::ThrowNew(env, jni::FindClass(env, "com/mapbox/mapboxsdk/style/layers/CannotAddLayerException"),
+        jni::ThrowNew(env,
+                      jni::FindClass(env, "com/mapbox/mapboxsdk/style/layers/CannotAddLayerException"),
                       std::string("Could not find layer: ").append(siblingId).c_str());
         return;
     } else if (index + 1 < layers.size()) {
         // Place before the sibling
-        before = { layers.at(index + 1)->getID() };
+        before = {layers.at(index + 1)->getID()};
     }
 
     // Add the layer
     try {
         layer->addToStyle(snapshotter->getStyle(), before);
     } catch (const std::runtime_error& error) {
-        jni::ThrowNew(env, jni::FindClass(env, "com/mapbox/mapboxsdk/style/layers/CannotAddLayerException"), error.what());
+        jni::ThrowNew(
+            env, jni::FindClass(env, "com/mapbox/mapboxsdk/style/layers/CannotAddLayerException"), error.what());
     }
 }
 
 void MapSnapshotter::addSource(JNIEnv& env, const jni::Object<Source>& obj, jlong sourcePtr) {
     assert(sourcePtr != 0);
 
-    Source *source = reinterpret_cast<Source *>(sourcePtr);
+    Source* source = reinterpret_cast<Source*>(sourcePtr);
     try {
         source->addToStyle(env, obj, snapshotter->getStyle());
     } catch (const std::runtime_error& error) {
-        jni::ThrowNew(env, jni::FindClass(env, "com/mapbox/mapboxsdk/style/sources/CannotAddSourceException"), error.what());
+        jni::ThrowNew(
+            env, jni::FindClass(env, "com/mapbox/mapboxsdk/style/sources/CannotAddSourceException"), error.what());
     }
 }
 

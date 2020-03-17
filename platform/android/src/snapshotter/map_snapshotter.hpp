@@ -51,7 +51,7 @@ public:
 
     void cancel(JNIEnv&);
 
-    void addLayerAt(JNIEnv&, jlong,  jni::jint);
+    void addLayerAt(JNIEnv&, jlong, jni::jint);
     void addLayerBelow(JNIEnv&, jlong, const jni::String&);
     void addLayerAbove(JNIEnv&, jlong, const jni::String&);
     void addSource(JNIEnv&, const jni::Object<Source>&, jlong nativePtr);

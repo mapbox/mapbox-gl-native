@@ -45,9 +45,7 @@ namespace android {
     /**
      * Takes a non-owning reference. For lookup methods
      */
-    Layer::Layer(mbgl::style::Layer& coreLayer) : layer(coreLayer) {
-    }
-
+    Layer::Layer(mbgl::style::Layer& coreLayer) : layer(coreLayer) {}
 
     Layer::~Layer() {
     }

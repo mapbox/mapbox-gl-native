@@ -934,7 +934,9 @@ void NativeMapView::addLayer(JNIEnv& env, jlong nativeLayerPtr, const jni::Strin
 
     Layer *layer = reinterpret_cast<Layer *>(nativeLayerPtr);
     try {
-        layer->addToStyle(map->getStyle(), before ? mbgl::optional<std::string>(jni::Make<std::string>(env, before)) : mbgl::optional<std::string>());
+        layer->addToStyle(
+            map->getStyle(),
+            before ? mbgl::optional<std::string>(jni::Make<std::string>(env, before)) : mbgl::optional<std::string>());
     } catch (const std::runtime_error& error) {
         jni::ThrowNew(env, jni::FindClass(env, "com/mapbox/mapboxsdk/style/layers/CannotAddLayerException"), error.what());
     }
@@ -1017,7 +1019,7 @@ jni::jboolean NativeMapView::removeLayerAt(JNIEnv& env, jni::jint index) {
     std::unique_ptr<mbgl::style::Layer> coreLayer = map->getStyle().removeLayer(layers.at(index)->getID());
     if (coreLayer) {
         jni::Local<jni::Object<Layer>> layerObj =
-                LayerManagerAndroid::get()->createJavaLayerPeer(env, std::move(coreLayer));
+            LayerManagerAndroid::get()->createJavaLayerPeer(env, std::move(coreLayer));
         return jni::jni_true;
     }
     return jni::jni_false;

@@ -26,16 +26,12 @@ namespace android {
     /**
      * Creates a non-owning peer object (for layers currently attached to the map)
      */
-    RasterLayer::RasterLayer(mbgl::style::RasterLayer& coreLayer)
-        : Layer(coreLayer) {
-    }
+    RasterLayer::RasterLayer(mbgl::style::RasterLayer& coreLayer) : Layer(coreLayer) {}
 
     /**
      * Creates an owning peer object (for layers not attached to the map)
      */
-    RasterLayer::RasterLayer(std::unique_ptr<mbgl::style::RasterLayer> coreLayer)
-        : Layer(std::move(coreLayer)) {
-    }
+    RasterLayer::RasterLayer(std::unique_ptr<mbgl::style::RasterLayer> coreLayer) : Layer(std::move(coreLayer)) {}
 
     RasterLayer::~RasterLayer() = default;
 
@@ -172,14 +168,18 @@ namespace android {
         }
     }  // namespace
 
-    jni::Local<jni::Object<Layer>> RasterJavaLayerPeerFactory::createJavaLayerPeer(jni::JNIEnv& env, mbgl::style::Layer& layer) {
+    jni::Local<jni::Object<Layer>> RasterJavaLayerPeerFactory::createJavaLayerPeer(jni::JNIEnv& env,
+                                                                                   mbgl::style::Layer& layer) {
         assert(layer.baseImpl->getTypeInfo() == getTypeInfo());
         return createJavaPeer(env, new RasterLayer(toRasterLayer(layer)));
     }
 
-    jni::Local<jni::Object<Layer>> RasterJavaLayerPeerFactory::createJavaLayerPeer(jni::JNIEnv& env, std::unique_ptr<mbgl::style::Layer> layer) {
+    jni::Local<jni::Object<Layer>> RasterJavaLayerPeerFactory::createJavaLayerPeer(
+        jni::JNIEnv& env, std::unique_ptr<mbgl::style::Layer> layer) {
         assert(layer->baseImpl->getTypeInfo() == getTypeInfo());
-        return createJavaPeer(env, new RasterLayer(std::unique_ptr<mbgl::style::RasterLayer>(static_cast<mbgl::style::RasterLayer*>(layer.release()))));
+        return createJavaPeer(env,
+                              new RasterLayer(std::unique_ptr<mbgl::style::RasterLayer>(
+                                  static_cast<mbgl::style::RasterLayer*>(layer.release()))));
     }
 
     void RasterJavaLayerPeerFactory::registerNative(jni::JNIEnv& env) {

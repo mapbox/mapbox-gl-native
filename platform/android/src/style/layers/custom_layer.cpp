@@ -14,13 +14,9 @@ namespace android {
                 ) {
     }
 
-    CustomLayer::CustomLayer(mbgl::style::CustomLayer& coreLayer)
-        : Layer(coreLayer) {
-    }
+    CustomLayer::CustomLayer(mbgl::style::CustomLayer& coreLayer) : Layer(coreLayer) {}
 
-    CustomLayer::CustomLayer(std::unique_ptr<mbgl::style::CustomLayer> coreLayer)
-        : Layer(std::move(coreLayer)) {
-    }
+    CustomLayer::CustomLayer(std::unique_ptr<mbgl::style::CustomLayer> coreLayer) : Layer(std::move(coreLayer)) {}
 
     CustomLayer::~CustomLayer() = default;
 
@@ -34,12 +30,16 @@ namespace android {
 
     CustomJavaLayerPeerFactory::~CustomJavaLayerPeerFactory() = default;
 
-    jni::Local<jni::Object<Layer>> CustomJavaLayerPeerFactory::createJavaLayerPeer(jni::JNIEnv& env, mbgl::style::Layer& layer) {
+    jni::Local<jni::Object<Layer>> CustomJavaLayerPeerFactory::createJavaLayerPeer(jni::JNIEnv& env,
+                                                                                   mbgl::style::Layer& layer) {
         return createJavaPeer(env, new CustomLayer(static_cast<mbgl::style::CustomLayer&>(layer)));
     }
 
-    jni::Local<jni::Object<Layer>> CustomJavaLayerPeerFactory::createJavaLayerPeer(jni::JNIEnv& env, std::unique_ptr<mbgl::style::Layer> layer) {
-        return createJavaPeer(env, new CustomLayer(std::unique_ptr<mbgl::style::CustomLayer>(static_cast<mbgl::style::CustomLayer*>(layer.release()))));
+    jni::Local<jni::Object<Layer>> CustomJavaLayerPeerFactory::createJavaLayerPeer(
+        jni::JNIEnv& env, std::unique_ptr<mbgl::style::Layer> layer) {
+        return createJavaPeer(env,
+                              new CustomLayer(std::unique_ptr<mbgl::style::CustomLayer>(
+                                  static_cast<mbgl::style::CustomLayer*>(layer.release()))));
     }
 
     void CustomJavaLayerPeerFactory::registerNative(jni::JNIEnv& env) {
@@ -49,11 +49,12 @@ namespace android {
         #define METHOD(MethodPtr, name) jni::MakeNativePeerMethod<decltype(MethodPtr), (MethodPtr)>(name)
 
         // Register the peer
-        jni::RegisterNativePeer<CustomLayer>(
-            env, javaClass, "nativePtr",
-            jni::MakePeer<CustomLayer, const jni::String&, jni::jlong>,
-            "initialize",
-            "finalize");
+        jni::RegisterNativePeer<CustomLayer>(env,
+                                             javaClass,
+                                             "nativePtr",
+                                             jni::MakePeer<CustomLayer, const jni::String&, jni::jlong>,
+                                             "initialize",
+                                             "finalize");
     }
 
 } // namespace android

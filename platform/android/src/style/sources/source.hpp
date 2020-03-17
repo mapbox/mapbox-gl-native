@@ -47,7 +47,7 @@ public:
 
     jni::Local<jni::Integer> getPrefetchZoomDelta(jni::JNIEnv&);
 
-    void addToStyle(JNIEnv &env, const jni::Object<Source> &obj, mbgl::style::Style& style);
+    void addToStyle(JNIEnv& env, const jni::Object<Source>& obj, mbgl::style::Style& style);
 
 protected:
     // Set on newly created sources until added to the map.

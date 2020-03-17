@@ -1,11 +1,11 @@
 #pragma once
 
 #include <mbgl/layermanager/layer_factory.hpp>
-#include <mbgl/style/style.hpp>
 #include <mbgl/style/layer.hpp>
+#include <mbgl/style/style.hpp>
 #include "../../gson/json_array.hpp"
-#include "../value.hpp"
 #include "../../gson/json_element.hpp"
+#include "../value.hpp"
 
 #include <jni/jni.hpp>
 
@@ -75,7 +75,6 @@ protected:
      */
     Layer(std::unique_ptr<mbgl::style::Layer>);
 
-
     // Owned layer is set when creating a new layer, before adding it to the map
     std::unique_ptr<mbgl::style::Layer> ownedLayer;
 
@@ -97,7 +96,8 @@ public:
     /**
      * @brief Create an owning peer.
      */
-    virtual jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv& env, std::unique_ptr<mbgl::style::Layer>) = 0;
+    virtual jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv& env,
+                                                               std::unique_ptr<mbgl::style::Layer>) = 0;
 
     /**
      * @brief Register peer methods.

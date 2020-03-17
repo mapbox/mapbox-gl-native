@@ -26,16 +26,12 @@ namespace android {
     /**
      * Creates a non-owning peer object (for layers currently attached to the map)
      */
-    FillLayer::FillLayer(mbgl::style::FillLayer& coreLayer)
-        : Layer(coreLayer) {
-    }
+    FillLayer::FillLayer(mbgl::style::FillLayer& coreLayer) : Layer(coreLayer) {}
 
     /**
      * Creates an owning peer object (for layers not attached to the map)
      */
-    FillLayer::FillLayer(std::unique_ptr<mbgl::style::FillLayer> coreLayer)
-        : Layer(std::move(coreLayer)) {
-    }
+    FillLayer::FillLayer(std::unique_ptr<mbgl::style::FillLayer> coreLayer) : Layer(std::move(coreLayer)) {}
 
     FillLayer::~FillLayer() = default;
 
@@ -159,14 +155,18 @@ namespace android {
         }
     }  // namespace
 
-    jni::Local<jni::Object<Layer>> FillJavaLayerPeerFactory::createJavaLayerPeer(jni::JNIEnv& env, mbgl::style::Layer& layer) {
+    jni::Local<jni::Object<Layer>> FillJavaLayerPeerFactory::createJavaLayerPeer(jni::JNIEnv& env,
+                                                                                 mbgl::style::Layer& layer) {
         assert(layer.baseImpl->getTypeInfo() == getTypeInfo());
         return createJavaPeer(env, new FillLayer(toFillLayer(layer)));
     }
 
-    jni::Local<jni::Object<Layer>> FillJavaLayerPeerFactory::createJavaLayerPeer(jni::JNIEnv& env, std::unique_ptr<mbgl::style::Layer> layer) {
+    jni::Local<jni::Object<Layer>> FillJavaLayerPeerFactory::createJavaLayerPeer(
+        jni::JNIEnv& env, std::unique_ptr<mbgl::style::Layer> layer) {
         assert(layer->baseImpl->getTypeInfo() == getTypeInfo());
-        return createJavaPeer(env, new FillLayer(std::unique_ptr<mbgl::style::FillLayer>(static_cast<mbgl::style::FillLayer*>(layer.release()))));
+        return createJavaPeer(env,
+                              new FillLayer(std::unique_ptr<mbgl::style::FillLayer>(
+                                  static_cast<mbgl::style::FillLayer*>(layer.release()))));
     }
 
     void FillJavaLayerPeerFactory::registerNative(jni::JNIEnv& env) {
