@@ -1,17 +1,16 @@
 #pragma once
 
+#include <jni/jni.hpp>
 #include <mbgl/map/map_snapshotter.hpp>
 #include <mbgl/util/util.hpp>
+#include <memory>
 
 #include "../file_source.hpp"
 #include "../geometry/lat_lng_bounds.hpp"
 #include "../map/camera_position.hpp"
+#include "../map/image.hpp"
 #include "../style/layers/layer.hpp"
 #include "../style/sources/source.hpp"
-
-#include <jni/jni.hpp>
-
-#include <memory>
 
 namespace mbgl {
 namespace android {
@@ -56,6 +55,7 @@ public:
     void addLayerBelow(JNIEnv&, jlong, const jni::String&);
     void addLayerAbove(JNIEnv&, jlong, const jni::String&);
     void addSource(JNIEnv&, const jni::Object<Source>&, jlong nativePtr);
+    void addImages(JNIEnv&, const jni::Array<jni::Object<mbgl::android::Image>>&);
 
     // MapSnapshotterObserver overrides
     void onDidFailLoadingStyle(const std::string&) override;

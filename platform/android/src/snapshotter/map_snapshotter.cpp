@@ -252,6 +252,17 @@ void MapSnapshotter::addSource(JNIEnv& env, const jni::Object<Source>& obj, jlon
         jni::ThrowNew(env, jni::FindClass(env, "com/mapbox/mapboxsdk/style/sources/CannotAddSourceException"), error.what());
     }
 }
+
+void MapSnapshotter::addImages(JNIEnv& env, const jni::Array<jni::Object<mbgl::android::Image>>& jimages) {
+    jni::NullCheck(env, &jimages);
+    std::size_t len = jimages.Length(env);
+
+    for (std::size_t i = 0; i < len; i++) {
+        auto image = mbgl::android::Image::getImage(env, jimages.Get(env, i));
+        snapshotter->getStyle().addImage(std::make_unique<mbgl::style::Image>(image));
+    }
+}
+
 // Static methods //
 
 void MapSnapshotter::registerNative(jni::JNIEnv& env) {
@@ -261,22 +272,35 @@ void MapSnapshotter::registerNative(jni::JNIEnv& env) {
 #define METHOD(MethodPtr, name) jni::MakeNativePeerMethod<decltype(MethodPtr), (MethodPtr)>(name)
 
     // Register the peer
-    jni::RegisterNativePeer<MapSnapshotter>(env, javaClass, "nativePtr",
-                                            jni::MakePeer<MapSnapshotter, const jni::Object<MapSnapshotter>&, const jni::Object<FileSource>&, jni::jfloat, jni::jint, jni::jint, const jni::String&, const jni::String&, const jni::Object<LatLngBounds>&, const jni::Object<CameraPosition>&, jni::jboolean, const jni::String&>,
-                                           "nativeInitialize",
-                                           "finalize",
+    jni::RegisterNativePeer<MapSnapshotter>(env,
+                                            javaClass,
+                                            "nativePtr",
+                                            jni::MakePeer<MapSnapshotter,
+                                                          const jni::Object<MapSnapshotter>&,
+                                                          const jni::Object<FileSource>&,
+                                                          jni::jfloat,
+                                                          jni::jint,
+                                                          jni::jint,
+                                                          const jni::String&,
+                                                          const jni::String&,
+                                                          const jni::Object<LatLngBounds>&,
+                                                          const jni::Object<CameraPosition>&,
+                                                          jni::jboolean,
+                                                          const jni::String&>,
+                                            "nativeInitialize",
+                                            "finalize",
                                             METHOD(&MapSnapshotter::setStyleUrl, "setStyleUrl"),
                                             METHOD(&MapSnapshotter::addLayerAt, "nativeAddLayerAt"),
                                             METHOD(&MapSnapshotter::addLayerBelow, "nativeAddLayerBelow"),
                                             METHOD(&MapSnapshotter::addLayerAbove, "nativeAddLayerAbove"),
                                             METHOD(&MapSnapshotter::addSource, "nativeAddSource"),
+                                            METHOD(&MapSnapshotter::addImages, "nativeAddImages"),
                                             METHOD(&MapSnapshotter::setStyleJson, "setStyleJson"),
                                             METHOD(&MapSnapshotter::setSize, "setSize"),
                                             METHOD(&MapSnapshotter::setCameraPosition, "setCameraPosition"),
                                             METHOD(&MapSnapshotter::setRegion, "setRegion"),
                                             METHOD(&MapSnapshotter::start, "nativeStart"),
-                                            METHOD(&MapSnapshotter::cancel, "nativeCancel")
-    );
+                                            METHOD(&MapSnapshotter::cancel, "nativeCancel"));
 }
 
 } // namespace android
