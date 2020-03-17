@@ -339,5 +339,53 @@ TEST(PropertyExpression, WithinExpression) {
         pointFeature = getPointFeature(Point<double>(3.076171875, -7.01366792756663));
         evaluatedResult = propExpr.evaluate(EvaluationContext(&pointFeature).withCanonicalTileID(&canonicalTileID));
         EXPECT_FALSE(evaluatedResult);
+
+        pointFeature = getPointFeature(Point<double>(-11.689453125, -9.79567758282973));
+        evaluatedResult = propExpr.evaluate(EvaluationContext(&pointFeature).withCanonicalTileID(&canonicalTileID));
+        EXPECT_FALSE(evaluatedResult);
+
+        pointFeature = getPointFeature(Point<double>(2.021484375, -10.012129557908128));
+        evaluatedResult = propExpr.evaluate(EvaluationContext(&pointFeature).withCanonicalTileID(&canonicalTileID));
+        EXPECT_FALSE(evaluatedResult);
+
+        pointFeature = getPointFeature(Point<double>(-15.99609375, -17.392579271057766));
+        evaluatedResult = propExpr.evaluate(EvaluationContext(&pointFeature).withCanonicalTileID(&canonicalTileID));
+        EXPECT_FALSE(evaluatedResult);
+
+        pointFeature = getPointFeature(Point<double>(-5.9765625, -5.659718554577273));
+        evaluatedResult = propExpr.evaluate(EvaluationContext(&pointFeature).withCanonicalTileID(&canonicalTileID));
+        EXPECT_FALSE(evaluatedResult);
+
+        pointFeature = getPointFeature(Point<double>(-16.259765625, -3.7327083213358336));
+        evaluatedResult = propExpr.evaluate(EvaluationContext(&pointFeature).withCanonicalTileID(&canonicalTileID));
+        EXPECT_FALSE(evaluatedResult);
+
+        pointFeature = getPointFeature(Point<double>(-17.75390625, -12.897489183755892));
+        evaluatedResult = propExpr.evaluate(EvaluationContext(&pointFeature).withCanonicalTileID(&canonicalTileID));
+        EXPECT_FALSE(evaluatedResult);
+
+        pointFeature = getPointFeature(Point<double>(-17.138671875, -21.002471054356715));
+        evaluatedResult = propExpr.evaluate(EvaluationContext(&pointFeature).withCanonicalTileID(&canonicalTileID));
+        EXPECT_FALSE(evaluatedResult);
+
+        pointFeature = getPointFeature(Point<double>(4.482421875, -16.8886597873816));
+        evaluatedResult = propExpr.evaluate(EvaluationContext(&pointFeature).withCanonicalTileID(&canonicalTileID));
+        EXPECT_FALSE(evaluatedResult);
+
+        pointFeature = getPointFeature(Point<double>(3.076171875, -7.01366792756663));
+        evaluatedResult = propExpr.evaluate(EvaluationContext(&pointFeature).withCanonicalTileID(&canonicalTileID));
+        EXPECT_FALSE(evaluatedResult);
+
+        pointFeature = getPointFeature(Point<double>(-5.9326171875, 0.6591651462894632));
+        evaluatedResult = propExpr.evaluate(EvaluationContext(&pointFeature).withCanonicalTileID(&canonicalTileID));
+        EXPECT_FALSE(evaluatedResult);
+
+        pointFeature = getPointFeature(Point<double>(-16.1279296875, 1.4939713066293239));
+        evaluatedResult = propExpr.evaluate(EvaluationContext(&pointFeature).withCanonicalTileID(&canonicalTileID));
+        EXPECT_FALSE(evaluatedResult);
+
+        pointFeature = getPointFeature(Point<double>(-11.689453125, -9.79567758282973));
+        evaluatedResult = propExpr.evaluate(EvaluationContext(&pointFeature).withCanonicalTileID(&canonicalTileID));
+        EXPECT_FALSE(evaluatedResult);
     }
 }
