@@ -79,6 +79,7 @@ public:
 private:
     bool isLoaded() const;
     bool hasTransitions(TimePoint) const;
+    void clearData();
 
     RenderSource* getRenderSource(const std::string& id) const;
 

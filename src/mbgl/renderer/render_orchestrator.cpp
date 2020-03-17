@@ -142,10 +142,7 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(
         // Reset zoom history state.
         zoomHistory.first = true;
         if (!updateParameters->keepRenderData && stillImageRequest != updateParameters->stillImageRequest) {
-            sourceImpls = makeMutable<std::vector<Immutable<style::Source::Impl>>>();
-            layerImpls = makeMutable<std::vector<Immutable<style::Layer::Impl>>>();
-            renderSources.clear();
-            renderLayers.clear();
+            clearData();
             stillImageRequest = updateParameters->stillImageRequest;
         }
     }
@@ -433,7 +430,6 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(
             placementController.getPlacement()->symbolFadeChange(updateParameters->timePoint);
         renderTreeParameters->needsRepaint = hasTransitions(updateParameters->timePoint);
     } else {
-        crossTileSymbolIndex.reset();
         renderTreeParameters->placementChanged = symbolBucketsChanged = !layersNeedPlacement.empty();
         if (renderTreeParameters->placementChanged) {
             Mutable<Placement> placement = makeMutable<Placement>(updateParameters);
@@ -701,6 +697,19 @@ bool RenderOrchestrator::isLoaded() const {
     }
 
     return true;
+}
+
+void RenderOrchestrator::clearData() {
+    if (!sourceImpls->empty()) sourceImpls = makeMutable<std::vector<Immutable<style::Source::Impl>>>();
+    if (!layerImpls->empty()) layerImpls = makeMutable<std::vector<Immutable<style::Layer::Impl>>>();
+
+    renderSources.clear();
+    renderLayers.clear();
+
+    crossTileSymbolIndex.reset();
+
+    if (!lineAtlas->isEmpty()) lineAtlas = std::make_unique<LineAtlas>();
+    if (!patternAtlas->isEmpty()) patternAtlas = std::make_unique<PatternAtlas>();
 }
 
 void RenderOrchestrator::onGlyphsError(const FontStack& fontStack, const GlyphRange& glyphRange, std::exception_ptr error) {
