@@ -702,6 +702,7 @@ bool RenderOrchestrator::isLoaded() const {
 void RenderOrchestrator::clearData() {
     if (!sourceImpls->empty()) sourceImpls = makeMutable<std::vector<Immutable<style::Source::Impl>>>();
     if (!layerImpls->empty()) layerImpls = makeMutable<std::vector<Immutable<style::Layer::Impl>>>();
+    if (!imageImpls->empty()) imageImpls = makeMutable<std::vector<Immutable<style::Image::Impl>>>();
 
     renderSources.clear();
     renderLayers.clear();
@@ -710,6 +711,8 @@ void RenderOrchestrator::clearData() {
 
     if (!lineAtlas->isEmpty()) lineAtlas = std::make_unique<LineAtlas>();
     if (!patternAtlas->isEmpty()) patternAtlas = std::make_unique<PatternAtlas>();
+
+    imageManager->clear();
 }
 
 void RenderOrchestrator::onGlyphsError(const FontStack& fontStack, const GlyphRange& glyphRange, std::exception_ptr error) {

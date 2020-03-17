@@ -51,6 +51,8 @@ public:
 
     ImageVersionMap updatedImageVersions;
 
+    void clear();
+
 private:
     void checkMissingAndNotify(ImageRequestor&, const ImageRequestPair&);
     void notify(ImageRequestor&, const ImageRequestPair&) const;
