@@ -175,6 +175,17 @@ const std::set<std::string>& ImageManager::getAvailableImages() const {
     return availableImages;
 }
 
+void ImageManager::clear() {
+    assert(requestors.empty());
+    assert(missingImageRequestors.empty());
+
+    images.clear();
+    availableImages.clear();
+    updatedImageVersions.clear();
+    requestedImages.clear();
+    loaded = false;
+}
+
 void ImageManager::checkMissingAndNotify(ImageRequestor& requestor, const ImageRequestPair& pair) {
     ImageDependencies missingDependencies;
 
