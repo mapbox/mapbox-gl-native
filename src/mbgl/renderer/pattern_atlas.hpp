@@ -38,6 +38,8 @@ public:
         return atlasImage;
     }
 
+    bool isEmpty() const { return patterns.empty(); }
+
 private:
     struct Pattern {
         mapbox::Bin* bin;
