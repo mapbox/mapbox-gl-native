@@ -144,10 +144,27 @@ void Layer::setObserver(LayerObserver* observer_) {
 }
 
 optional<conversion::Error> Layer::setProperty(const std::string& name, const conversion::Convertible& value) {
-    optional<conversion::Error> error = setPropertyInternal(name, value);
+    using namespace conversion;
+    optional<Error> error = setPropertyInternal(name, value);
     if (!error) return error; // Successfully set by the derived class implementation.
     if (name == "visibility") return setVisibility(value);
-    return error; // Must be Error{"layer doesn't support this property"}.
+    if (name == "minzoom") {
+        if (auto zoom = convert<float>(value, *error)) {
+            setMinZoom(*zoom);
+            return nullopt;
+        }
+    } else if (name == "maxzoom") {
+        if (auto zoom = convert<float>(value, *error)) {
+            setMaxZoom(*zoom);
+            return nullopt;
+        }
+    } else if (name == "filter") {
+        if (auto filter = convert<Filter>(value, *error)) {
+            setFilter(*filter);
+            return nullopt;
+        }
+    }
+    return error;
 }
 
 optional<conversion::Error> Layer::setVisibility(const conversion::Convertible& value) {

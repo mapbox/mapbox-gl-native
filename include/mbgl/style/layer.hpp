@@ -148,6 +148,8 @@ protected:
 
 private:
     optional<conversion::Error> setVisibility(const conversion::Convertible& value);
+    optional<conversion::Error> setMinZoom(const conversion::Convertible& value);
+    optional<conversion::Error> setMaxZoom(const conversion::Convertible& value);
 };
 
 } // namespace style
