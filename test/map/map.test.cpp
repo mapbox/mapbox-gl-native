@@ -53,6 +53,11 @@ public:
         , map(frontend, observer, fileSource,
               MapOptions().withMapMode(mode).withSize(frontend.getSize()).withPixelRatio(pixelRatio)) {}
 
+    explicit MapTest(MapOptions options)
+        : fileSource(std::make_shared<FileSource>()),
+          frontend(options.pixelRatio()),
+          map(frontend, observer, fileSource, options.withSize(frontend.getSize())) {}
+
     template <typename T = FileSource>
     MapTest(const std::string& cachePath,
             const std::string& assetPath,
@@ -1340,4 +1345,56 @@ TEST(Map, TEST_REQUIRES_SERVER(ExpiredSpriteSheet)) {
                   [&] { test.map.getStyle().loadURL(prefix + "style.json"); });
 
     test.runLoop.run();
+}
+
+namespace {
+constexpr auto styleJSON = R"STYLE({
+  "sources": {
+    "a": { "type": "vector", "tiles": [ "a/{z}/{x}/{y}" ] }
+  },
+  "layers": [{
+    "id": "a",
+    "type": "fill",
+    "source": "a",
+    "source-layer": "a"
+  }]
+})STYLE";
+}
+
+TEST(Map, KeepRenderData) {
+    MapTest<> test{std::move(MapOptions().withMapMode(MapMode::Static).withKeepRenderData(true))};
+    int requestsCount = 0;
+    test.fileSource->tileResponse = [&](const Resource&) {
+        ++requestsCount;
+        Response res;
+        res.noContent = true;
+        return res;
+    };
+    test.map.jumpTo(CameraOptions().withZoom(10));
+    test.map.getStyle().loadJSON(styleJSON);
+    test.frontend.render(test.map);
+    EXPECT_EQ(4, requestsCount);
+
+    test.map.getStyle().loadJSON(styleJSON);
+    test.frontend.render(test.map);
+    EXPECT_EQ(4, requestsCount);
+}
+
+TEST(Map, DontKeepRenderData) {
+    MapTest<> test{std::move(MapOptions().withMapMode(MapMode::Static).withKeepRenderData(false))};
+    int requestsCount = 0;
+    test.fileSource->tileResponse = [&](const Resource&) {
+        ++requestsCount;
+        Response res;
+        res.noContent = true;
+        return res;
+    };
+    test.map.jumpTo(CameraOptions().withZoom(10));
+    test.map.getStyle().loadJSON(styleJSON);
+    test.frontend.render(test.map);
+    EXPECT_EQ(4, requestsCount);
+
+    test.map.getStyle().loadJSON(styleJSON);
+    test.frontend.render(test.map);
+    EXPECT_EQ(8, requestsCount);
 }
