@@ -683,7 +683,8 @@ TestRunner::Impl::Impl(const TestMetadata& metadata, const mbgl::ResourceOptions
               .withMapMode(metadata.mapMode)
               .withSize(metadata.size)
               .withPixelRatio(metadata.pixelRatio)
-              .withCrossSourceCollisions(metadata.crossSourceCollisions),
+              .withCrossSourceCollisions(metadata.crossSourceCollisions)
+              .withKeepRenderData(metadata.mapMode != MapMode::Tile),
           resourceOptions) {}
 
 TestRunner::Impl::~Impl() {}
