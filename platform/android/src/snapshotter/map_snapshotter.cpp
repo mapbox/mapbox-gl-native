@@ -60,7 +60,6 @@ MapSnapshotter::MapSnapshotter(jni::JNIEnv& _env,
     } else {
         snapshotter->setStyleURL(jni::Make<std::string>(_env, styleURL));
     }
-    activateFilesource(_env);
 }
 
 MapSnapshotter::~MapSnapshotter() {
