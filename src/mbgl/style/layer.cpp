@@ -143,6 +143,13 @@ void Layer::setObserver(LayerObserver* observer_) {
     observer = observer_ ? observer_ : &nullObserver;
 }
 
+optional<conversion::Error> Layer::setProperty(const std::string& name, const conversion::Convertible& value) {
+    optional<conversion::Error> error = setPropertyInternal(name, value);
+    if (!error) return error; // Successfully set by the derived class implementation.
+    if (name == "visibility") return setVisibility(value);
+    return error; // Must be Error{"layer doesn't support this property"}.
+}
+
 optional<conversion::Error> Layer::setVisibility(const conversion::Convertible& value) {
     using namespace conversion;
 

@@ -23,12 +23,6 @@ public:
     LineLayer(const std::string& layerID, const std::string& sourceID);
     ~LineLayer() final;
 
-    // Dynamic properties
-    optional<conversion::Error> setProperty(const std::string& name, const conversion::Convertible& value) final;
-
-    StyleProperty getProperty(const std::string& name) const final;
-    Value serialize() const final;
-
     // Layout properties
 
     static PropertyValue<LineCapType> getDefaultLineCap();
@@ -129,6 +123,12 @@ public:
     std::unique_ptr<Layer> cloneRef(const std::string& id) const final;
 
 protected:
+    // Dynamic properties
+    optional<conversion::Error> setPropertyInternal(const std::string& name, const conversion::Convertible& value) final;
+
+    StyleProperty getProperty(const std::string& name) const final;
+    Value serialize() const final;
+
     Mutable<Layer::Impl> mutableBaseImpl() const final;
 };
 

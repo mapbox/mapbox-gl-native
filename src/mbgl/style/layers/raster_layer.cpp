@@ -386,12 +386,9 @@ Value RasterLayer::serialize() const {
     return result;
 }
 
-optional<Error> RasterLayer::setProperty(const std::string& name, const Convertible& value) {
+optional<Error> RasterLayer::setPropertyInternal(const std::string& name, const Convertible& value) {
     const auto it = layerProperties.find(name.c_str());
-    if (it == layerProperties.end()) {
-        if (name == "visibility") return setVisibility(value);
-        return Error{"layer doesn't support this property"};
-    }
+    if (it == layerProperties.end()) return Error{"layer doesn't support this property"};
 
     auto property = static_cast<Property>(it->second);
 

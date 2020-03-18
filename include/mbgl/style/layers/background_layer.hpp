@@ -20,12 +20,6 @@ public:
     BackgroundLayer(const std::string& layerID);
     ~BackgroundLayer() final;
 
-    // Dynamic properties
-    optional<conversion::Error> setProperty(const std::string& name, const conversion::Convertible& value) final;
-
-    StyleProperty getProperty(const std::string& name) const final;
-    Value serialize() const final;
-
     // Paint properties
 
     static PropertyValue<Color> getDefaultBackgroundColor();
@@ -56,6 +50,12 @@ public:
     std::unique_ptr<Layer> cloneRef(const std::string& id) const final;
 
 protected:
+    // Dynamic properties
+    optional<conversion::Error> setPropertyInternal(const std::string& name, const conversion::Convertible& value) final;
+
+    StyleProperty getProperty(const std::string& name) const final;
+    Value serialize() const final;
+
     Mutable<Layer::Impl> mutableBaseImpl() const final;
 };
 
