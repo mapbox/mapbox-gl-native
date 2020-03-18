@@ -17,6 +17,7 @@ Map::Impl::Impl(RendererFrontend& frontend_,
       mode(mapOptions.mapMode()),
       pixelRatio(mapOptions.pixelRatio()),
       crossSourceCollisions(mapOptions.crossSourceCollisions()),
+      keepRenderData(mapOptions.keepRenderData()),
       fileSource(std::move(fileSource_)),
       style(std::make_unique<style::Style>(fileSource, pixelRatio)),
       annotationManager(*style) {
@@ -64,8 +65,9 @@ void Map::Impl::onUpdate() {
                                annotationManager.makeWeakPtr(),
                                fileSource,
                                prefetchZoomDelta,
-                               bool(stillImageRequest),
-                               crossSourceCollisions};
+                               stillImageRequest.get(),
+                               crossSourceCollisions,
+                               keepRenderData};
 
     rendererFrontend.update(std::make_shared<UpdateParameters>(std::move(params)));
 }

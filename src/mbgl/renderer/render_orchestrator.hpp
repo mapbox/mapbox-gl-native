@@ -126,6 +126,7 @@ private:
 
     const bool backgroundLayerAsColor;
     bool contextLost = false;
+    const void* stillImageRequest = nullptr;
 
     // Vectors with reserved capacity of layerImpls->size() to avoid reallocation
     // on each frame.

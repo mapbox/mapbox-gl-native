@@ -141,6 +141,13 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(
     if (!isMapModeContinuous) {
         // Reset zoom history state.
         zoomHistory.first = true;
+        if (!updateParameters->keepRenderData && stillImageRequest != updateParameters->stillImageRequest) {
+            sourceImpls = makeMutable<std::vector<Immutable<style::Source::Impl>>>();
+            layerImpls = makeMutable<std::vector<Immutable<style::Layer::Impl>>>();
+            renderSources.clear();
+            renderLayers.clear();
+            stillImageRequest = updateParameters->stillImageRequest;
+        }
     }
 
     if (LayerManager::annotationsEnabled) {
