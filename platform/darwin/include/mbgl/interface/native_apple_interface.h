@@ -10,7 +10,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @required
 
-- (NSURLSessionConfiguration *)sessionConfiguration;
+- (NSURLSession *)session;
 
 - (void)startDownloadEvent:(NSString *)event type:(NSString *)type;
 
@@ -34,7 +34,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, readonly) NSString *skuToken;
 
-@property (nonatomic, readonly) NSURLSessionConfiguration *sessionConfiguration;
+@property (nonatomic, readonly) NSURLSession *session;
 
 - (void)startDownloadEvent:(NSString *)event type:(NSString *)type;
 

@@ -1,6 +1,21 @@
 #import <Foundation/Foundation.h>
 #import <mbgl/interface/native_apple_interface.h>
 
+static NSURLSessionConfiguration *testSessionConfiguration() {
+    NSURLSessionConfiguration* sessionConfiguration = [NSURLSessionConfiguration defaultSessionConfiguration];
+
+    sessionConfiguration.timeoutIntervalForResource = 30;
+    sessionConfiguration.HTTPMaximumConnectionsPerHost = 8;
+    sessionConfiguration.requestCachePolicy = NSURLRequestReloadIgnoringLocalCacheData;
+    sessionConfiguration.URLCache = nil;
+
+    return sessionConfiguration;
+}
+
+@interface MGLNativeNetworkManager ()
+@property (nonatomic) NSURLSession *testSession;
+@end
+
 @implementation MGLNativeNetworkManager
 
 static MGLNativeNetworkManager *instance = nil;
@@ -13,24 +28,22 @@ static MGLNativeNetworkManager *instance = nil;
     return instance;
 }
 
-- (NSURLSessionConfiguration *)sessionConfiguration {
-    if (_delegate && [_delegate respondsToSelector:@selector(sessionConfiguration)]) {
-        return [_delegate sessionConfiguration];
+- (instancetype)init {
+    if ((self = [super init])) {
+        _testSession = [NSURLSession sessionWithConfiguration:testSessionConfiguration()];
     }
-    // For testing. Since we get a `nil` return when SDK is modualar, we use this for testing requests.
-    // Same as `[MGLNetworkConfiguration defaultSessionConfiguration]` in `MGLNetworkConfiguration.m`.
-    return [self testSessionConfiguration];
+    return self;
 }
 
-- (NSURLSessionConfiguration *)testSessionConfiguration {
-    NSURLSessionConfiguration* sessionConfiguration = [NSURLSessionConfiguration defaultSessionConfiguration];
-    
-    sessionConfiguration.timeoutIntervalForResource = 30;
-    sessionConfiguration.HTTPMaximumConnectionsPerHost = 8;
-    sessionConfiguration.requestCachePolicy = NSURLRequestReloadIgnoringLocalCacheData;
-    sessionConfiguration.URLCache = nil;
-    
-    return sessionConfiguration;
+- (NSURLSession *)session {
+    NSURLSession *session;
+    if (_delegate && [_delegate respondsToSelector:@selector(session)]) {
+        session = [_delegate session];
+    }
+
+    // For testing. Since we get a `nil` return when SDK is modualar, we use this for testing requests.
+    // Same as `[MGLNetworkConfiguration defaultSessionConfiguration]` in `MGLNetworkConfiguration.m`.
+    return session ?: self.testSession;
 }
 
 - (NSString *)skuToken {

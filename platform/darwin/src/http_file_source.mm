@@ -84,14 +84,10 @@ class HTTPFileSource::Impl {
 public:
     Impl() {
         @autoreleasepool {
-            NSURLSessionConfiguration *sessionConfig = MGLNativeNetworkManager.sharedManager.sessionConfiguration;
-            session = [NSURLSession sessionWithConfiguration:sessionConfig];
-
             userAgent = getUserAgent();
         }
     }
 
-    NSURLSession* session = nil;
     NSString* userAgent = nil;
     NSInteger accountType = 0;
 
@@ -249,8 +245,10 @@ std::unique_ptr<AsyncRequest> HTTPFileSource::request(const Resource& resource, 
         if (isTile) {
             [MGLNativeNetworkManager.sharedManager startDownloadEvent:url.relativePath type:@"tile"];
         }
-        
-        request->task = [impl->session
+
+        NSURLSession *session = [MGLNativeNetworkManager.sharedManager.session copy];
+
+        request->task = [session
             dataTaskWithRequest:req
               completionHandler:^(NSData* data, NSURLResponse* res, NSError* error) {
                 if (error && [error code] == NSURLErrorCancelled) {
