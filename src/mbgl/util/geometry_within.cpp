@@ -5,13 +5,11 @@
 namespace mbgl {
 
 namespace {
-
 bool rayIntersect(const Point<int64_t>& p, const Point<int64_t>& p1, const Point<int64_t>& p2) {
     return ((p1.y > p.y) != (p2.y > p.y)) && (p.x < (p2.x - p1.x) * (p.y - p1.y) / (p2.y - p1.y) + p1.x);
 }
 
 // check if point p in on line segment with end points p1 and p2
-
 bool onBoundary(const Point<int64_t>& p, const Point<int64_t>& p1, const Point<int64_t>& p2) {
     // requirements of point p on line segment:
     // 1. colinear: cross product of vector p->p1(x1, y1) and vector p->p2(x2, y2) equals to 0
@@ -24,7 +22,6 @@ bool onBoundary(const Point<int64_t>& p, const Point<int64_t>& p1, const Point<i
 }
 
 // a, b are end points for line segment1, c and d are end points for line segment2
-
 bool lineIntersectLine(const Point<int64_t>& a,
                        const Point<int64_t>& b,
                        const Point<int64_t>& c,

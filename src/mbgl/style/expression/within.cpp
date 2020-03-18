@@ -14,15 +14,16 @@
 namespace mbgl {
 namespace {
 
-Point<int64_t> latLonToTileCoodinates(const Point<double>& c, const mbgl::CanonicalTileID& canonical) {
-    Point<int64_t> p;
-
+Point<int64_t> latLonToTileCoodinates(const Point<double>& point, const mbgl::CanonicalTileID& canonical) {
     const double size = util::EXTENT * std::pow(2, canonical.z);
 
-    auto x = (c.x + 180.0) * size / 360.0;
-    p.x = (util::clamp<int64_t>(x, std::numeric_limits<int64_t>::min(), std::numeric_limits<int64_t>::max()));
+    auto x = (point.x + util::LONGITUDE_MAX) * size / util::DEGREES_MAX;
+    auto y =
+        (util::LONGITUDE_MAX - (std::log(std::tan(point.y * M_PI / util::DEGREES_MAX + M_PI / 4.0)) * util::RAD2DEG)) *
+        size / util::DEGREES_MAX;
 
-    auto y = (180 - (std::log(std::tan((c.y + 90) * M_PI / 360.0)) * 180 / M_PI)) * size / 360;
+    Point<int64_t> p;
+    p.x = (util::clamp<int64_t>(x, std::numeric_limits<int64_t>::min(), std::numeric_limits<int64_t>::max()));
     p.y = (util::clamp<int64_t>(y, std::numeric_limits<int64_t>::min(), std::numeric_limits<int64_t>::max()));
 
     return p;
@@ -46,26 +47,35 @@ Polygon<int64_t> getTilePolygon(const Polygon<double>& polygon,
     return result;
 }
 
-MultiPolygon<int64_t> getTilePolygons(const MultiPolygon<double>& polygons,
+MultiPolygon<int64_t> getTilePolygons(const Feature::geometry_type& polygonGeoSet,
                                       const mbgl::CanonicalTileID& canonical,
                                       WithinBBox& bbox) {
-    MultiPolygon<int64_t> result;
-    result.reserve(polygons.size());
-    for (const auto& pg : polygons) {
-        result.push_back(getTilePolygon(pg, canonical, bbox));
-    }
-    return result;
+    return polygonGeoSet.match(
+        [&canonical, &bbox](const mapbox::geometry::multi_polygon<double>& polygons) {
+            MultiPolygon<int64_t> result;
+            result.reserve(polygons.size());
+            for (const auto& pg : polygons) {
+                result.push_back(getTilePolygon(pg, canonical, bbox));
+            }
+            return result;
+        },
+        [&canonical, &bbox](const mapbox::geometry::polygon<double>& polygon) {
+            MultiPolygon<int64_t> result;
+            result.push_back(getTilePolygon(polygon, canonical, bbox));
+            return result;
+        },
+        [](const auto&) { return MultiPolygon<int64_t>(); });
 }
 
 MultiPoint<int64_t> getTilePoints(const GeometryCoordinates& points,
                                   const mbgl::CanonicalTileID& canonical,
                                   WithinBBox& bbox) {
-    const int64_t x0 = util::EXTENT * canonical.x;
-    const int64_t y0 = util::EXTENT * canonical.y;
+    const int64_t xShift = util::EXTENT * canonical.x;
+    const int64_t yShift = util::EXTENT * canonical.y;
     MultiPoint<int64_t> results;
     results.reserve(points.size());
     for (const auto& p : points) {
-        auto point = Point<int64_t>(p.x + x0, p.y + y0);
+        const auto point = Point<int64_t>(p.x + xShift, p.y + yShift);
         updateBBox(bbox, point);
         results.push_back(point);
     }
@@ -75,15 +85,15 @@ MultiPoint<int64_t> getTilePoints(const GeometryCoordinates& points,
 MultiLineString<int64_t> getTileLines(const GeometryCollection& lines,
                                       const mbgl::CanonicalTileID& canonical,
                                       WithinBBox& bbox) {
-    const int64_t x0 = util::EXTENT * canonical.x;
-    const int64_t y0 = util::EXTENT * canonical.y;
+    const int64_t xShift = util::EXTENT * canonical.x;
+    const int64_t yShift = util::EXTENT * canonical.y;
     MultiLineString<int64_t> results;
     results.reserve(bbox.size());
     for (const auto& line : lines) {
         LineString<int64_t> lineString;
         lineString.reserve(line.size());
         for (const auto& p : line) {
-            auto point = Point<int64_t>(p.x + x0, p.y + y0);
+            auto point = Point<int64_t>(p.x + xShift, p.y + yShift);
             updateBBox(bbox, point);
             lineString.push_back(point);
         }
@@ -95,65 +105,32 @@ MultiLineString<int64_t> getTileLines(const GeometryCollection& lines,
 bool featureWithinPolygons(const GeometryTileFeature& feature,
                            const CanonicalTileID& canonical,
                            const Feature::geometry_type& polygonGeoSet) {
-    return polygonGeoSet.match(
-        [&feature, &canonical](const mapbox::geometry::multi_polygon<double>& polys) -> bool {
-            WithinBBox polyBBox = DefaultBBox;
-            auto polygons = getTilePolygons(polys, canonical, polyBBox);
+    WithinBBox polyBBox = DefaultBBox;
+    const auto polygons = getTilePolygons(polygonGeoSet, canonical, polyBBox);
+    assert(!polygons.empty());
+    const GeometryCollection& geometries = feature.getGeometries();
+    switch (feature.getType()) {
+        case FeatureType::Point: {
+            assert(!geometries.empty());
+            WithinBBox pointBBox = DefaultBBox;
+            MultiPoint<int64_t> points = getTilePoints(geometries.at(0), canonical, pointBBox);
+            if (!boxWithinBox(pointBBox, polyBBox)) return false;
 
-            const GeometryCollection& geometries = feature.getGeometries();
-            switch (feature.getType()) {
-                case FeatureType::Point: {
-                    WithinBBox pointBBox = DefaultBBox;
-                    MultiPoint<int64_t> points = getTilePoints(geometries.at(0), canonical, pointBBox);
-                    if (!boxWithinBox(pointBBox, polyBBox)) return false;
+            return std::all_of(
+                points.begin(), points.end(), [&polygons](const auto& p) { return pointWithinPolygons(p, polygons); });
+        }
+        case FeatureType::LineString: {
+            WithinBBox lineBBox = DefaultBBox;
+            MultiLineString<int64_t> multiLineString = getTileLines(geometries, canonical, lineBBox);
+            if (!boxWithinBox(lineBBox, polyBBox)) return false;
 
-                    return std::all_of(points.begin(), points.end(), [&polygons](const auto& p) {
-                        return pointWithinPolygons(p, polygons);
-                    });
-                }
-                case FeatureType::LineString: {
-                    WithinBBox lineBBox = DefaultBBox;
-                    MultiLineString<int64_t> multiLineString = getTileLines(geometries, canonical, lineBBox);
-
-                    if (!boxWithinBox(lineBBox, polyBBox)) return false;
-
-                    return std::all_of(multiLineString.begin(), multiLineString.end(), [&polygons](const auto& line) {
-                        return lineStringWithinPolygons(line, polygons);
-                    });
-                }
-                default:
-                    return false;
-            };
-        },
-        [&feature, &canonical](const mapbox::geometry::polygon<double>& poly) -> bool {
-            WithinBBox polyBBox = DefaultBBox;
-            const auto polygon = getTilePolygon(poly, canonical, polyBBox);
-
-            const GeometryCollection& geometries = feature.getGeometries();
-            switch (feature.getType()) {
-                case FeatureType::Point: {
-                    WithinBBox pointBBox = DefaultBBox;
-                    MultiPoint<int64_t> points = getTilePoints(geometries.at(0), canonical, pointBBox);
-                    if (!boxWithinBox(pointBBox, polyBBox)) return false;
-
-                    return std::all_of(points.begin(), points.end(), [&polygon](const auto& p) {
-                        return pointWithinPolygon(p, polygon);
-                    });
-                }
-                case FeatureType::LineString: {
-                    WithinBBox lineBBox = DefaultBBox;
-                    MultiLineString<int64_t> multiLineString = getTileLines(geometries, canonical, lineBBox);
-                    if (!boxWithinBox(lineBBox, polyBBox)) return false;
-
-                    return std::all_of(multiLineString.begin(), multiLineString.end(), [&polygon](const auto& line) {
-                        return lineStringWithinPolygon(line, polygon);
-                    });
-                }
-                default:
-                    return false;
-            };
-        },
-        [](const auto&) -> bool { return false; });
+            return std::all_of(multiLineString.begin(), multiLineString.end(), [&polygons](const auto& line) {
+                return lineStringWithinPolygons(line, polygons);
+            });
+        }
+        default:
+            return false;
+    };
 }
 
 mbgl::optional<mbgl::GeoJSON> parseValue(const mbgl::style::conversion::Convertible& value_,
