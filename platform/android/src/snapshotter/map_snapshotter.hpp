@@ -3,7 +3,9 @@
 #include <jni/jni.hpp>
 #include <mbgl/map/map_snapshotter.hpp>
 #include <mbgl/util/util.hpp>
+
 #include <memory>
+#include <mapbox/weak.hpp>
 
 #include "../file_source.hpp"
 #include "../geometry/lat_lng_bounds.hpp"
@@ -35,7 +37,7 @@ public:
                    jni::jboolean showLogo,
                    const jni::String& localIdeographFontFamily);
 
-    ~MapSnapshotter();
+    virtual ~MapSnapshotter();
 
     void setStyleUrl(JNIEnv&, const jni::String& styleURL);
 
@@ -71,11 +73,12 @@ private:
     float pixelRatio;
     bool showLogo;
 
-    std::unique_ptr<mbgl::MapSnapshotter> snapshotter;
     FileSource *jFileSource;
     void activateFilesource(JNIEnv&);
     void deactivateFilesource(JNIEnv&);
     bool activatedFilesource = false;
+    std::unique_ptr<mbgl::MapSnapshotter> snapshotter;
+    mapbox::base::WeakPtr<mbgl::Scheduler> weakScheduler;
 };
 
 } // namespace android

@@ -33,6 +33,8 @@ MapSnapshotter::MapSnapshotter(jni::JNIEnv& _env,
         return;
     }
 
+    weakScheduler = mbgl::Scheduler::GetCurrent()->makeWeakPtr();
+
     jFileSource = FileSource::getNativePeer(_env, _jFileSource);
     auto size = mbgl::Size { static_cast<uint32_t>(width), static_cast<uint32_t>(height) };
 
@@ -61,7 +63,19 @@ MapSnapshotter::MapSnapshotter(jni::JNIEnv& _env,
     activateFilesource(_env);
 }
 
-MapSnapshotter::~MapSnapshotter() = default;
+MapSnapshotter::~MapSnapshotter() {
+    auto guard = weakScheduler.lock();
+    if (weakScheduler && weakScheduler.get() != mbgl::Scheduler::GetCurrent()) {
+        snapshotter->cancel();
+        std::shared_ptr<mbgl::MapSnapshotter> shared = std::move(snapshotter);
+        weakScheduler->schedule([s = std::move(shared)] {
+            (void)s;
+        });
+    } else {
+        snapshotter.reset();
+    }
+    vm = nullptr;
+}
 
 void MapSnapshotter::start(JNIEnv& env) {
     MBGL_VERIFY_THREAD(tid);
