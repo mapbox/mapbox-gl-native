@@ -367,7 +367,6 @@ commands:
             fastlane run create_keychain name:fastlane_keychain password:$FASTLANE_PASSWORD timeout:false unlock:true
             fastlane match
             security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k $FASTLANE_PASSWORD fastlane_keychain
-            /usr/bin/env xcrun security find-identity -v -p codesigning
   codesign-ios-test-runner:
     parameters:
       directory:
