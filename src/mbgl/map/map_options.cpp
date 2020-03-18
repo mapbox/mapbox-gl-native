@@ -9,6 +9,7 @@ public:
     ViewportMode viewportMode = ViewportMode::Default;
     NorthOrientation orientation = NorthOrientation::Upwards;
     bool crossSourceCollisions = true;
+    bool keepRenderData = true;
     Size size = { 64, 64 };
     float pixelRatio = 1.0;
 };
@@ -52,6 +53,15 @@ MapOptions& MapOptions::withCrossSourceCollisions(bool enableCollisions) {
 
 bool MapOptions::crossSourceCollisions() const {
     return impl_->crossSourceCollisions;
+}
+
+MapOptions& MapOptions::withKeepRenderData(bool keepRenderData_) {
+    impl_->keepRenderData = keepRenderData_;
+    return *this;
+}
+
+bool MapOptions::keepRenderData() const {
+    return impl_->keepRenderData;
 }
 
 MapOptions& MapOptions::withNorthOrientation(NorthOrientation orientation) {

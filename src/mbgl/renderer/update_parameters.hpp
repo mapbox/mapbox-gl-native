@@ -41,9 +41,12 @@ public:
     const uint8_t prefetchZoomDelta;
     
     // For still image requests, render requested
-    const bool stillImageRequest;
-    
+    const void* stillImageRequest;
+
     const bool crossSourceCollisions;
+
+    // If set, the render data from the previous render calls is kept.
+    const bool keepRenderData;
 };
 
 } // namespace mbgl
