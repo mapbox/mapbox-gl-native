@@ -66,21 +66,17 @@ public:
     CustomLayer(const std::string& id,
                 std::unique_ptr<CustomLayerHost> host);
 
+    CustomLayer(const CustomLayer&) = delete;
     ~CustomLayer() final;
-
-    // Dynamic properties
-    optional<conversion::Error> setProperty(const std::string& name, const conversion::Convertible& value) final;
-    StyleProperty getProperty(const std::string&) const final;
-    // Private implementation
-
     class Impl;
     const Impl& impl() const;
-
     Mutable<Impl> mutableImpl() const;
+
+private:
+    optional<conversion::Error> setPropertyInternal(const std::string& name,
+                                                    const conversion::Convertible& value) final;
+    StyleProperty getProperty(const std::string&) const final;
     std::unique_ptr<Layer> cloneRef(const std::string& id) const final;
-
-    CustomLayer(const CustomLayer&) = delete;
-
     Mutable<Layer::Impl> mutableBaseImpl() const final;
 };
 

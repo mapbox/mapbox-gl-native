@@ -110,8 +110,7 @@ public:
     void setMaxZoom(float);
 
     // Dynamic properties
-    virtual optional<conversion::Error> setProperty(const std::string& name, const conversion::Convertible& value) = 0;
-    optional<conversion::Error> setVisibility(const conversion::Convertible& value);
+    optional<conversion::Error> setProperty(const std::string& name, const conversion::Convertible& value);
 
     virtual StyleProperty getProperty(const std::string&) const = 0;
     virtual Value serialize() const;
@@ -142,9 +141,13 @@ public:
 protected:
     virtual Mutable<Impl> mutableBaseImpl() const = 0;
     void serializeProperty(Value&, const StyleProperty&, const char* propertyName, bool isPaint) const;
-
+    virtual optional<conversion::Error> setPropertyInternal(const std::string& name,
+                                                            const conversion::Convertible& value) = 0;
     LayerObserver* observer;
     mapbox::base::WeakPtrFactory<Layer> weakFactory {this};
+
+private:
+    optional<conversion::Error> setVisibility(const conversion::Convertible& value);
 };
 
 } // namespace style

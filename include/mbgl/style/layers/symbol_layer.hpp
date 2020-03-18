@@ -22,12 +22,6 @@ public:
     SymbolLayer(const std::string& layerID, const std::string& sourceID);
     ~SymbolLayer() final;
 
-    // Dynamic properties
-    optional<conversion::Error> setProperty(const std::string& name, const conversion::Convertible& value) final;
-
-    StyleProperty getProperty(const std::string& name) const final;
-    Value serialize() const final;
-
     // Layout properties
 
     static PropertyValue<bool> getDefaultIconAllowOverlap();
@@ -290,6 +284,12 @@ public:
     std::unique_ptr<Layer> cloneRef(const std::string& id) const final;
 
 protected:
+    // Dynamic properties
+    optional<conversion::Error> setPropertyInternal(const std::string& name, const conversion::Convertible& value) final;
+
+    StyleProperty getProperty(const std::string& name) const final;
+    Value serialize() const final;
+
     Mutable<Layer::Impl> mutableBaseImpl() const final;
 };
 

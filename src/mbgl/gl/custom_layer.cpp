@@ -38,7 +38,7 @@ std::unique_ptr<Layer> CustomLayer::cloneRef(const std::string&) const {
 
 using namespace conversion;
 
-optional<Error> CustomLayer::setProperty(const std::string&, const Convertible&) {
+optional<Error> CustomLayer::setPropertyInternal(const std::string&, const Convertible&) {
     return Error { "layer doesn't support this property" };
 }
 
