@@ -65,12 +65,15 @@ public:
     }
 
     CTFontRef getFont() {
-        if (!fontFamily) {
-            return NULL;
-        }
-        
         if (!fontHandle) {
-            NSArray<NSString *> *fontFamilyNames = [@(fontFamily->c_str()) componentsSeparatedByString:@"\n"];
+            NSArray<NSString *> *fontFamilyNames = [[NSUserDefaults standardUserDefaults] stringArrayForKey:@"MGLIdeographicFontFamilyName"] ?: @[];
+            if (fontFamily) {
+                fontFamilyNames = [fontFamilyNames arrayByAddingObjectsFromArray:[@(fontFamily->c_str()) componentsSeparatedByString:@"\n"]];
+            }
+            if (!fontFamilyNames.count) {
+                return NULL;
+            }
+            
             CFMutableArrayRefHandle fontDescriptors(CFArrayCreateMutable(kCFAllocatorDefault, fontFamilyNames.count, &kCFTypeArrayCallBacks));
             for (NSString *name in fontFamilyNames) {
                 NSDictionary *fontAttributes = @{
