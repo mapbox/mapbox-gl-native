@@ -709,6 +709,7 @@ void RenderOrchestrator::clearData() {
     if (!patternAtlas->isEmpty()) patternAtlas = std::make_unique<PatternAtlas>();
 
     imageManager->clear();
+    glyphManager->evict(fontStacks(*layerImpls));
 }
 
 void RenderOrchestrator::onGlyphsError(const FontStack& fontStack, const GlyphRange& glyphRange, std::exception_ptr error) {
