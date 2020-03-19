@@ -8,6 +8,12 @@
 
   The newly added `Renderer::clearData()` method allows to clear render data and thus save memory and make sure outdated tiles are not shown. It clears data more agressively than `Renderer::reduceMemoryUse()` does, as it clears not only the cache but all orchestration data, including the data used by the currently rendered frame.
 
+### 🐞 Bug fixes
+
+- [core] Use `TileCoordinates` instead of `LngLat` for `within` expression calculation ([#16319](https://github.com/mapbox/mapbox-gl-native/pull/16319))
+
+  Fix the issue that `within` expression evaluates point features inconsistently across zoom levels if the point lies near the boundary of a GeoJSON object ([#16301](https://github.com/mapbox/mapbox-gl-native/issues/16301))
+
 ## maps-v1.4.1
 
 ### 🐞 Bug fixes
