@@ -6,7 +6,7 @@
 
 - [core] Add Renderer::clearData() ([#16323](https://github.com/mapbox/mapbox-gl-native/pull/16323))
 
-  The newly added `Renderer::clearData()` method allows to clear render data and thus save memory and make sure outdated tiles are not shown.
+  The newly added `Renderer::clearData()` method allows to clear render data and thus save memory and make sure outdated tiles are not shown. It clears data more agressively than `Renderer::reduceMemoryUse()` does, as it clears not only the cache but all orchestration data, including the data used by the currently rendered frame.
 
 ## maps-v1.4.1
 

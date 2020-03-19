@@ -1349,42 +1349,44 @@ TEST(Map, TEST_REQUIRES_SERVER(ExpiredSpriteSheet)) {
 }
 
 namespace {
-constexpr auto styleJSON = R"STYLE({
-  "sources": {
-    "a": { "type": "vector", "tiles": [ "a/{z}/{x}/{y}" ] }
-  },
-  "layers": [{
-    "id": "a",
-    "type": "fill",
-    "source": "a",
-    "source-layer": "a"
-  }]
-})STYLE";
+
+int requestsCount = 0;
+auto makeResponse(const std::string& file, bool incrementCounter = false) {
+    return [file, incrementCounter](const Resource&) {
+        if (incrementCounter) ++requestsCount;
+        Response result;
+        result.data = std::make_shared<std::string>(util::read_file("test/fixtures/resources/" + file));
+        return result;
+    };
 }
+
+} // namespace
 
 TEST(Map, KeepRenderData) {
     MapTest<> test;
-    int requestsCount = 0;
-    test.fileSource->tileResponse = [&](const Resource&) {
-        ++requestsCount;
-        Response res;
-        res.noContent = true;
-        return res;
-    };
+
+    test.fileSource->tileResponse = makeResponse("vector.tile", true);
+    test.fileSource->glyphsResponse = makeResponse("glyphs.pbf", true);
+    // The resources below belong to style and requested on style re-load.
+    test.fileSource->styleResponse = makeResponse("style_vector.json");
+    test.fileSource->sourceResponse = makeResponse("source_vector.json");
+    test.fileSource->spriteJSONResponse = makeResponse("sprite.json");
+    test.fileSource->spriteImageResponse = makeResponse("sprite.png");
+
     test.map.jumpTo(CameraOptions().withZoom(10));
+    test.map.getStyle().loadURL("mapbox://streets");
     const int iterations = 3;
+    const int resourcesCount = 4 /*tiles*/ + 3 /*fonts*/;
     // Keep render data.
     for (int i = 1; i <= iterations; ++i) {
-        test.map.getStyle().loadJSON(styleJSON);
         test.frontend.render(test.map);
-        EXPECT_EQ(4, requestsCount);
+        EXPECT_EQ(resourcesCount, requestsCount);
     }
     requestsCount = 0;
     // Clear render data.
     for (int i = 1; i <= iterations; ++i) {
         test.frontend.getRenderer()->clearData();
-        test.map.getStyle().loadJSON(styleJSON);
         test.frontend.render(test.map);
-        EXPECT_EQ(4 * i, requestsCount);
+        EXPECT_EQ(resourcesCount * i, requestsCount);
     }
 }
