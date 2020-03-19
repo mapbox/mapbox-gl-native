@@ -4,21 +4,9 @@
 
 ### ✨ New features
 
-- [tile mode][static mode] Clear render data for the new still image request ([#16318](https://github.com/mapbox/mapbox-gl-native/pull/16318))
+- [core] Add Renderer::clearData() ([#16323](https://github.com/mapbox/mapbox-gl-native/pull/16323))
 
-  The new `keepRenderData` map options flag is added to control whether render data shall be kept between `renderStill()` calls.
-
-### 🐞 Bug fixes
-
-- [tile mode][static mode] Clear render data for the new still image request ([#16318](https://github.com/mapbox/mapbox-gl-native/pull/16318))
-
-  If the `keepRenderData` map options flag is unset all render data is cleared between `renderStill()` calls, thus stale tiles from the previous `renderStill()` call are never shown.
-
-### 🏁 Performance improvements
-
-- [tile mode][static mode] Clear render data for the new still image request ([#16318](https://github.com/mapbox/mapbox-gl-native/pull/16318))
-
-  If the `keepRenderData` map options flag is unset all render data is cleared between `renderStill()` calls, thus saving memory being used.
+  The newly added `Renderer::clearData()` method allows to clear render data and thus save memory and make sure outdated tiles are not shown.
 
 ## maps-v1.4.1
 
