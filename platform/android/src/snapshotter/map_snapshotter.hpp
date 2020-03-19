@@ -3,9 +3,7 @@
 #include <jni/jni.hpp>
 #include <mbgl/map/map_snapshotter.hpp>
 #include <mbgl/util/util.hpp>
-
 #include <memory>
-#include <mapbox/weak.hpp>
 
 #include "../file_source.hpp"
 #include "../geometry/lat_lng_bounds.hpp"
@@ -65,6 +63,15 @@ public:
     void onStyleImageMissing(const std::string&) override;
 
 private:
+    struct DeleteOnThread {
+        DeleteOnThread();
+        explicit DeleteOnThread(mapbox::base::WeakPtr<mbgl::Scheduler>);
+        void operator()(mbgl::MapSnapshotter* p) const;
+    private:
+        mapbox::base::WeakPtr<mbgl::Scheduler> weakScheduler;
+    };
+
+private:
     MBGL_STORE_THREAD(tid);
 
     JavaVM *vm = nullptr;
@@ -77,8 +84,7 @@ private:
     void activateFilesource(JNIEnv&);
     void deactivateFilesource(JNIEnv&);
     bool activatedFilesource = false;
-    std::unique_ptr<mbgl::MapSnapshotter> snapshotter;
-    mapbox::base::WeakPtr<mbgl::Scheduler> weakScheduler;
+    std::unique_ptr<mbgl::MapSnapshotter, DeleteOnThread> snapshotter;
 };
 
 } // namespace android
