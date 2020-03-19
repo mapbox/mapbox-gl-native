@@ -59,7 +59,6 @@ public:
     const MapMode mode;
     const float pixelRatio;
     const bool crossSourceCollisions;
-    const bool keepRenderData;
 
     MapDebugOptions debugOptions { MapDebugOptions::NoDebug };
 

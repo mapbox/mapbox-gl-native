@@ -89,28 +89,6 @@ public:
     bool crossSourceCollisions() const;
 
     /**
-     * @brief Specify whether render data for layers, sources and images should be kept between renderStill() calls.
-     *
-     * This flag is ignored in Continuous mode. In Static mode and Tile mode, if this flag is set to false, all the data
-     * are created from scratch for every renderStill() call, which guaranties that no extra memory is used, however it
-     * might cause higher CPU load and network traffic.
-     *
-     * By default, it is set to true.
-     *
-     * @param keepRenderData true to enable, false to disable
-     * @return MapOptions for chaining options together.
-     */
-    MapOptions& withKeepRenderData(bool keepRenderData);
-
-    /**
-     * @brief Gets the previously set (or default) keepRenderData value.
-     *
-     * @return true if render data is kept between renderStill() calls,
-     * false otherwise.
-     */
-    bool keepRenderData() const;
-
-    /**
      * @brief Sets the orientation of the Map. By default, it is set to
      * Upwards.
      *
