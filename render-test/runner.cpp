@@ -641,6 +641,7 @@ TestOperations getAfterOperations(const Manifest& manifest) {
 }
 
 void resetContext(const TestMetadata& metadata, TestContext& ctx) {
+    ctx.getFrontend().getRenderer()->clearData();
     ctx.getFrontend().setSize(metadata.size);
     auto& map = ctx.getMap();
     map.setSize(metadata.size);
@@ -683,8 +684,7 @@ TestRunner::Impl::Impl(const TestMetadata& metadata, const mbgl::ResourceOptions
               .withMapMode(metadata.mapMode)
               .withSize(metadata.size)
               .withPixelRatio(metadata.pixelRatio)
-              .withCrossSourceCollisions(metadata.crossSourceCollisions)
-              .withKeepRenderData(metadata.mapMode != MapMode::Tile),
+              .withCrossSourceCollisions(metadata.crossSourceCollisions),
           resourceOptions) {}
 
 TestRunner::Impl::~Impl() {}

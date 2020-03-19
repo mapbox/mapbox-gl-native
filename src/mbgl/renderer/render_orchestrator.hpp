@@ -75,11 +75,11 @@ public:
 
     void reduceMemoryUse();
     void dumpDebugLogs();
+    void clearData();
 
 private:
     bool isLoaded() const;
     bool hasTransitions(TimePoint) const;
-    void clearData();
 
     RenderSource* getRenderSource(const std::string& id) const;
 
@@ -127,7 +127,6 @@ private:
 
     const bool backgroundLayerAsColor;
     bool contextLost = false;
-    const void* stillImageRequest = nullptr;
 
     // Vectors with reserved capacity of layerImpls->size() to avoid reallocation
     // on each frame.

@@ -10,6 +10,7 @@
 #include <mbgl/gl/context.hpp>
 #include <mbgl/map/map_options.hpp>
 #include <mbgl/math/log2.hpp>
+#include <mbgl/renderer/renderer.hpp>
 #include <mbgl/renderer/update_parameters.hpp>
 #include <mbgl/storage/file_source_manager.hpp>
 #include <mbgl/storage/main_resource_loader.hpp>
@@ -1362,7 +1363,7 @@ constexpr auto styleJSON = R"STYLE({
 }
 
 TEST(Map, KeepRenderData) {
-    MapTest<> test{std::move(MapOptions().withMapMode(MapMode::Static).withKeepRenderData(true))};
+    MapTest<> test;
     int requestsCount = 0;
     test.fileSource->tileResponse = [&](const Resource&) {
         ++requestsCount;
@@ -1371,30 +1372,19 @@ TEST(Map, KeepRenderData) {
         return res;
     };
     test.map.jumpTo(CameraOptions().withZoom(10));
-    test.map.getStyle().loadJSON(styleJSON);
-    test.frontend.render(test.map);
-    EXPECT_EQ(4, requestsCount);
-
-    test.map.getStyle().loadJSON(styleJSON);
-    test.frontend.render(test.map);
-    EXPECT_EQ(4, requestsCount);
-}
-
-TEST(Map, DontKeepRenderData) {
-    MapTest<> test{std::move(MapOptions().withMapMode(MapMode::Static).withKeepRenderData(false))};
-    int requestsCount = 0;
-    test.fileSource->tileResponse = [&](const Resource&) {
-        ++requestsCount;
-        Response res;
-        res.noContent = true;
-        return res;
-    };
-    test.map.jumpTo(CameraOptions().withZoom(10));
-    test.map.getStyle().loadJSON(styleJSON);
-    test.frontend.render(test.map);
-    EXPECT_EQ(4, requestsCount);
-
-    test.map.getStyle().loadJSON(styleJSON);
-    test.frontend.render(test.map);
-    EXPECT_EQ(8, requestsCount);
+    const int iterations = 3;
+    // Keep render data.
+    for (int i = 1; i <= iterations; ++i) {
+        test.map.getStyle().loadJSON(styleJSON);
+        test.frontend.render(test.map);
+        EXPECT_EQ(4, requestsCount);
+    }
+    requestsCount = 0;
+    // Clear render data.
+    for (int i = 1; i <= iterations; ++i) {
+        test.frontend.getRenderer()->clearData();
+        test.map.getStyle().loadJSON(styleJSON);
+        test.frontend.render(test.map);
+        EXPECT_EQ(4 * i, requestsCount);
+    }
 }

@@ -131,4 +131,8 @@ void Renderer::reduceMemoryUse() {
     impl->orchestrator.reduceMemoryUse();
 }
 
+void Renderer::clearData() {
+    impl->orchestrator.clearData();
+}
+
 } // namespace mbgl

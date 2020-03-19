@@ -63,6 +63,7 @@ public:
 
     // Memory
     void reduceMemoryUse();
+    void clearData();
 
 private:
     class Impl;
