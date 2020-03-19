@@ -130,6 +130,16 @@ TEST(Transform, PerspectiveProjection) {
     point = transform.getState().latLngToScreenCoordinate({37.692872969426375, -76.75823239205641});
     ASSERT_NEAR(point.x, 1000.0, 1e-5);
     ASSERT_NEAR(point.y, 0.0, 1e-4);
+
+    mbgl::vec4 p;
+    point = transform.getState().latLngToScreenCoordinate({37.692872969426375, -76.75823239205641}, p);
+    ASSERT_NEAR(point.x, 1000.0, 1e-5);
+    ASSERT_NEAR(point.y, 0.0, 1e-4);
+    ASSERT_GT(p[3], 0.0);
+
+    transform.jumpTo(CameraOptions().withCenter(LatLng{38.0, -77.0}).withZoom(18.0).withPitch(51.56620156));
+    point = transform.getState().latLngToScreenCoordinate({7.692872969426375, -76.75823239205641}, p);
+    ASSERT_LT(p[3], 0.0);
 }
 
 TEST(Transform, UnwrappedLatLng) {
