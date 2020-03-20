@@ -79,9 +79,9 @@ public:
     static mapbox::util::variant<Database, Exception> tryOpen(const std::string &filename, int flags = 0);
     static Database open(const std::string &filename, int flags = 0);
 
-    Database(Database &&);
+    Database(Database&&) noexcept;
     ~Database();
-    Database &operator=(Database &&);
+    Database& operator=(Database&&) noexcept;
 
     void setBusyTimeout(std::chrono::milliseconds);
     void exec(const std::string &sql);

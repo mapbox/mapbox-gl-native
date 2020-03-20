@@ -144,10 +144,9 @@ Database::Database(std::unique_ptr<DatabaseImpl> impl_)
     : impl(std::move(impl_))
 {}
 
-Database::Database(Database &&other)
-    : impl(std::move(other.impl)) {}
+Database::Database(Database&& other) noexcept : impl(std::move(other.impl)) {}
 
-Database &Database::operator=(Database &&other) {
+Database& Database::operator=(Database&& other) noexcept {
     std::swap(impl, other.impl);
     return *this;
 }
