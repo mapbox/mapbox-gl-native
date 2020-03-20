@@ -21,7 +21,7 @@ SymbolBucket::SymbolBucket(Immutable<style::SymbolLayoutProperties::PossiblyEval
                            float zoom,
                            bool iconsNeedLinear_,
                            bool sortFeaturesByY_,
-                           const std::string bucketName_,
+                           const std::string& bucketName_,
                            const std::vector<SymbolInstance>&& symbolInstances_,
                            const std::vector<SortKeyRange>&& sortKeyRanges_,
                            float tilePixelRatio_,

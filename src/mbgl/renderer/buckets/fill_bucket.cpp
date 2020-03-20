@@ -27,11 +27,10 @@ using namespace style;
 
 struct GeometryTooLongException : std::exception {};
 
-FillBucket::FillBucket(const FillBucket::PossiblyEvaluatedLayoutProperties,
+FillBucket::FillBucket(const FillBucket::PossiblyEvaluatedLayoutProperties&,
                        const std::map<std::string, Immutable<style::LayerProperties>>& layerPaintProperties,
                        const float zoom,
                        const uint32_t) {
-
     for (const auto& pair : layerPaintProperties) {
         paintPropertyBinders.emplace(
             std::piecewise_construct,

@@ -24,15 +24,11 @@ static RendererObserver& nullObserver() {
     return observer;
 }
 
-Renderer::Impl::Impl(gfx::RendererBackend& backend_,
-                     float pixelRatio_,
-                     optional<std::string> localFontFamily_)
-    : orchestrator(!backend_.contextIsShared(), std::move(localFontFamily_))
-    , backend(backend_)
-    , observer(&nullObserver())
-    , pixelRatio(pixelRatio_) {
-
-}
+Renderer::Impl::Impl(gfx::RendererBackend& backend_, float pixelRatio_, const optional<std::string>& localFontFamily_)
+    : orchestrator(!backend_.contextIsShared(), localFontFamily_),
+      backend(backend_),
+      observer(&nullObserver()),
+      pixelRatio(pixelRatio_) {}
 
 Renderer::Impl::~Impl() {
     assert(gfx::BackendScope::exists());

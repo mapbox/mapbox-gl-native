@@ -224,7 +224,7 @@ GeometryCollection convertGeometry(const Feature::geometry_type& geometryTileFea
             }
             return result;
         },
-        [&](const Polygon<double> polygon) -> GeometryCollection {
+        [&](const Polygon<double>& polygon) -> GeometryCollection {
             GeometryCollection result;
             result.reserve(polygon.size());
             for (const auto& ring : polygon) {
@@ -237,7 +237,7 @@ GeometryCollection convertGeometry(const Feature::geometry_type& geometryTileFea
             }
             return result;
         },
-        [&](const MultiPolygon<double> polygons) -> GeometryCollection {
+        [&](const MultiPolygon<double>& polygons) -> GeometryCollection {
             GeometryCollection result;
             result.reserve(polygons.size());
             for (const auto& pg : polygons) {

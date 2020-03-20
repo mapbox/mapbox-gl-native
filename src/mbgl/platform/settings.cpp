@@ -33,7 +33,7 @@ void Settings::set(const std::string& key, mapbox::base::Value value) noexcept {
     impl->settings[key] = std::move(value);
 }
 
-void Settings::set(mapbox::base::ValueObject values) noexcept {
+void Settings::set(const mapbox::base::ValueObject& values) noexcept {
     std::lock_guard<std::mutex> lock(impl->mutex);
     for (const auto& pair : values) {
         impl->settings[pair.first] = pair.second;

@@ -3,13 +3,14 @@
 #include <mbgl/style/sources/geojson_source.hpp>
 #include <mbgl/tile/geojson_tile.hpp>
 #include <mbgl/tile/geojson_tile_data.hpp>
+#include <utility>
 namespace mbgl {
 
 GeoJSONTile::GeoJSONTile(const OverscaledTileID& overscaledTileID,
                          std::string sourceID_,
                          const TileParameters& parameters,
                          std::shared_ptr<style::GeoJSONData> data_)
-    : GeometryTile(overscaledTileID, sourceID_, parameters) {
+    : GeometryTile(overscaledTileID, std::move(sourceID_), parameters) {
     updateData(std::move(data_), false /*needsRelayout*/);
 }
 

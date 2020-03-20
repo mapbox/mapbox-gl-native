@@ -84,13 +84,11 @@ struct Signature;
 // Simple evaluate function (const T0&, const T1&, ...) -> Result<U>
 template <class R, class... Params>
 struct Signature<R (Params...)> : SignatureBase {
-    Signature(R (*evaluate_)(Params...), std::string name_) :
-        SignatureBase(
-            valueTypeToExpressionType<std::decay_t<typename R::Value>>(),
-            std::vector<type::Type> {valueTypeToExpressionType<std::decay_t<Params>>()...},
-            std::move(name_)
-        ),
-        evaluate(evaluate_)    {}
+    Signature(R (*evaluate_)(Params...), const std::string& name_)
+        : SignatureBase(valueTypeToExpressionType<std::decay_t<typename R::Value>>(),
+                        std::vector<type::Type>{valueTypeToExpressionType<std::decay_t<Params>>()...},
+                        name_),
+          evaluate(evaluate_) {}
 
     EvaluationResult apply(const EvaluationContext& evaluationParameters, const Args& args) const override {
         return applyImpl(evaluationParameters, args, std::index_sequence_for<Params...>{});
@@ -116,14 +114,11 @@ private:
 // Varargs evaluate function (const Varargs<T>&) -> Result<U>
 template <class R, typename T>
 struct Signature<R (const Varargs<T>&)> : SignatureBase {
-    Signature(R (*evaluate_)(const Varargs<T>&), std::string name_) :
-        SignatureBase(
-            valueTypeToExpressionType<std::decay_t<typename R::Value>>(),
-            VarargsType { valueTypeToExpressionType<T>() },
-            std::move(name_)
-        ),
-        evaluate(evaluate_)
-    {}
+    Signature(R (*evaluate_)(const Varargs<T>&), const std::string& name_)
+        : SignatureBase(valueTypeToExpressionType<std::decay_t<typename R::Value>>(),
+                        VarargsType{valueTypeToExpressionType<T>()},
+                        name_),
+          evaluate(evaluate_) {}
 
     EvaluationResult apply(const EvaluationContext& evaluationParameters, const Args& args) const override {
         Varargs<T> evaluated;
@@ -145,14 +140,11 @@ struct Signature<R (const Varargs<T>&)> : SignatureBase {
 // (const EvaluationParams&, const T0&, const T1&, ...) -> Result<U>
 template <class R, class... Params>
 struct Signature<R (const EvaluationContext&, Params...)> : SignatureBase {
-    Signature(R (*evaluate_)(const EvaluationContext&, Params...), std::string name_) :
-        SignatureBase(
-            valueTypeToExpressionType<std::decay_t<typename R::Value>>(),
-            std::vector<type::Type> {valueTypeToExpressionType<std::decay_t<Params>>()...},
-            std::move(name_)
-        ),
-        evaluate(evaluate_)
-    {}
+    Signature(R (*evaluate_)(const EvaluationContext&, Params...), const std::string& name_)
+        : SignatureBase(valueTypeToExpressionType<std::decay_t<typename R::Value>>(),
+                        std::vector<type::Type>{valueTypeToExpressionType<std::decay_t<Params>>()...},
+                        name_),
+          evaluate(evaluate_) {}
 
     EvaluationResult apply(const EvaluationContext& evaluationParameters, const Args& args) const override {
         return applyImpl(evaluationParameters, args, std::index_sequence_for<Params...>{});
@@ -179,14 +171,11 @@ private:
 // (const EvaluationContext&, const Varargs<T>&) -> Result<U>
 template <class R, typename T>
 struct Signature<R (const EvaluationContext&, const Varargs<T>&)> : SignatureBase {
-    Signature(R (*evaluate_)(const EvaluationContext&, const Varargs<T>&), std::string name_) :
-    SignatureBase(
-                  valueTypeToExpressionType<std::decay_t<typename R::Value>>(),
-                  VarargsType { valueTypeToExpressionType<T>() },
-                  std::move(name_)
-                  ),
-    evaluate(evaluate_)
-    {}
+    Signature(R (*evaluate_)(const EvaluationContext&, const Varargs<T>&), const std::string& name_)
+        : SignatureBase(valueTypeToExpressionType<std::decay_t<typename R::Value>>(),
+                        VarargsType{valueTypeToExpressionType<T>()},
+                        name_),
+          evaluate(evaluate_) {}
 
     EvaluationResult apply(const EvaluationContext& evaluationParameters, const Args& args) const override {
         Varargs<T> evaluated;
@@ -223,7 +212,7 @@ static std::unique_ptr<detail::SignatureBase> makeSignature(std::string name, Fn
 
 } // namespace detail
 
-Value featureIdAsExpressionValue(EvaluationContext params) {
+Value featureIdAsExpressionValue(const EvaluationContext& params) {
     assert(params.feature);
     auto id = params.feature->getID();
     if (id.is<NullValue>()) return Null;
@@ -232,7 +221,7 @@ Value featureIdAsExpressionValue(EvaluationContext params) {
     });
 };
 
-optional<Value> featurePropertyAsExpressionValue(EvaluationContext params, const std::string& key) {
+optional<Value> featurePropertyAsExpressionValue(const EvaluationContext& params, const std::string& key) {
     assert(params.feature);
     auto property = params.feature->getValue(key);
     return property ? toExpressionValue(*property) : optional<Value>();
@@ -253,7 +242,7 @@ optional<std::string> featureTypeAsString(FeatureType type) {
     }
 };
 
-optional<double> featurePropertyAsDouble(EvaluationContext params, const std::string& key) {
+optional<double> featurePropertyAsDouble(const EvaluationContext& params, const std::string& key) {
     assert(params.feature);
     auto property = params.feature->getValue(key);
     if (!property) return {};
@@ -265,7 +254,7 @@ optional<double> featurePropertyAsDouble(EvaluationContext params, const std::st
     );
 };
 
-optional<std::string> featurePropertyAsString(EvaluationContext params, const std::string& key) {
+optional<std::string> featurePropertyAsString(const EvaluationContext& params, const std::string& key) {
     assert(params.feature);
     auto property = params.feature->getValue(key);
     if (!property) return {};
@@ -275,7 +264,7 @@ optional<std::string> featurePropertyAsString(EvaluationContext params, const st
     );
 };
 
-optional<double> featureIdAsDouble(EvaluationContext params) {
+optional<double> featureIdAsDouble(const EvaluationContext& params) {
     assert(params.feature);
     auto id = params.feature->getID();
     return id.match(
@@ -286,7 +275,7 @@ optional<double> featureIdAsDouble(EvaluationContext params) {
     );
 };
 
-optional<std::string> featureIdAsString(EvaluationContext params) {
+optional<std::string> featureIdAsString(const EvaluationContext& params) {
     assert(params.feature);
     auto id = params.feature->getID();
     return id.match(
@@ -723,10 +712,12 @@ const auto& filterLessThanNumberCompoundExpression() {
 }
 
 const auto& filterLessThanStringCompoundExpression() {
-    static auto signature = detail::makeSignature("filter-<", [](const EvaluationContext& params, const std::string& key, std::string lhs) -> Result<bool> {
-        auto rhs = featurePropertyAsString(params, key);
-        return rhs ? rhs < lhs : false;
-    });
+    static auto signature = detail::makeSignature(
+        "filter-<",
+        [](const EvaluationContext& params, const std::string& key, const std::string& lhs) -> Result<bool> {
+            auto rhs = featurePropertyAsString(params, key);
+            return rhs ? rhs < lhs : false;
+        });
     return signature;
 }
 
@@ -739,10 +730,11 @@ const auto& filterIdLessThanNumberCompoundExpression() {
 }
 
 const auto& filterIdLessThanStringCompoundExpression() {
-    static auto signature = detail::makeSignature("filter-id-<", [](const EvaluationContext& params, std::string lhs) -> Result<bool> {
-        auto rhs = featureIdAsString(params);
-        return rhs ? rhs < lhs : false;
-    });
+    static auto signature = detail::makeSignature(
+        "filter-id-<", [](const EvaluationContext& params, const std::string& lhs) -> Result<bool> {
+            auto rhs = featureIdAsString(params);
+            return rhs ? rhs < lhs : false;
+        });
     return signature;
 }
 
@@ -755,10 +747,12 @@ const auto& filterMoreThanNumberCompoundExpression() {
 }
 
 const auto& filterMoreThanStringCompoundExpression() {
-    static auto signature = detail::makeSignature("filter->", [](const EvaluationContext& params, const std::string& key, std::string lhs) -> Result<bool> {
-        auto rhs = featurePropertyAsString(params, key);
-        return rhs ? rhs > lhs : false;
-    });
+    static auto signature = detail::makeSignature(
+        "filter->",
+        [](const EvaluationContext& params, const std::string& key, const std::string& lhs) -> Result<bool> {
+            auto rhs = featurePropertyAsString(params, key);
+            return rhs ? rhs > lhs : false;
+        });
     return signature;
 }
 
@@ -771,10 +765,11 @@ const auto& filterIdMoreThanNumberCompoundExpression() {
 }
 
 const auto& filterIdMoreThanStringCompoundExpression() {
-    static auto signature = detail::makeSignature("filter-id->", [](const EvaluationContext& params, std::string lhs) -> Result<bool> {
-        auto rhs = featureIdAsString(params);
-        return rhs ? rhs > lhs : false;
-    });
+    static auto signature = detail::makeSignature(
+        "filter-id->", [](const EvaluationContext& params, const std::string& lhs) -> Result<bool> {
+            auto rhs = featureIdAsString(params);
+            return rhs ? rhs > lhs : false;
+        });
     return signature;
 }
 
@@ -787,10 +782,12 @@ const auto& filterLessOrEqualThanNumberCompoundExpression() {
 }
 
 const auto& filterLessOrEqualThanStringCompoundExpression() {
-    static auto signature = detail::makeSignature("filter-<=", [](const EvaluationContext& params, const std::string& key, std::string lhs) -> Result<bool> {
-        auto rhs = featurePropertyAsString(params, key);
-        return rhs ? rhs <= lhs : false;
-    });
+    static auto signature = detail::makeSignature(
+        "filter-<=",
+        [](const EvaluationContext& params, const std::string& key, const std::string& lhs) -> Result<bool> {
+            auto rhs = featurePropertyAsString(params, key);
+            return rhs ? rhs <= lhs : false;
+        });
     return signature;
 }
 
@@ -803,10 +800,11 @@ const auto& filterIdLessOrEqualThanNumberCompoundExpression() {
 }
 
 const auto& filterIdLessOrEqualThanStringCompoundExpression() {
-    static auto signature = detail::makeSignature("filter-id-<=", [](const EvaluationContext& params, std::string lhs) -> Result<bool> {
-        auto rhs = featureIdAsString(params);
-        return rhs ? rhs <= lhs : false;
-    });
+    static auto signature = detail::makeSignature(
+        "filter-id-<=", [](const EvaluationContext& params, const std::string& lhs) -> Result<bool> {
+            auto rhs = featureIdAsString(params);
+            return rhs ? rhs <= lhs : false;
+        });
     return signature;
 }
 
@@ -819,10 +817,12 @@ const auto& filterGreaterOrEqualThanNumberCompoundExpression() {
 }
 
 const auto& filterGreaterOrEqualThanStringCompoundExpression() {
-    static auto signature = detail::makeSignature("filter->=", [](const EvaluationContext& params, const std::string& key, std::string lhs) -> Result<bool> {
-        auto rhs = featurePropertyAsString(params, key);
-        return rhs ? rhs >= lhs : false;
-    });
+    static auto signature = detail::makeSignature(
+        "filter->=",
+        [](const EvaluationContext& params, const std::string& key, const std::string& lhs) -> Result<bool> {
+            auto rhs = featurePropertyAsString(params, key);
+            return rhs ? rhs >= lhs : false;
+        });
     return signature;
 }
 
@@ -835,10 +835,11 @@ const auto& filterIdGreaterOrEqualThanNumberCompoundExpression() {
 }
 
 const auto& filterIdGreaterOrEqualThanStringCompoundExpression() {
-    static auto signature = detail::makeSignature("filter-id->=", [](const EvaluationContext& params, std::string lhs) -> Result<bool> {
-        auto rhs = featureIdAsString(params);
-        return rhs ? rhs >= lhs : false;
-    });
+    static auto signature = detail::makeSignature(
+        "filter-id->=", [](const EvaluationContext& params, const std::string& lhs) -> Result<bool> {
+            auto rhs = featureIdAsString(params);
+            return rhs ? rhs >= lhs : false;
+        });
     return signature;
 }
 
@@ -1065,7 +1066,7 @@ static ParseResult createCompoundExpression(const Definitions& definitions,
     return ParseResult();
 }
 
-ParseResult parseCompoundExpression(const std::string name, const Convertible& value, ParsingContext& ctx) {
+ParseResult parseCompoundExpression(const std::string& name, const Convertible& value, ParsingContext& ctx) {
     assert(isArray(value) && arrayLength(value) > 0);
 
     const auto definitions = compoundExpressionRegistry.equal_range(name.c_str());

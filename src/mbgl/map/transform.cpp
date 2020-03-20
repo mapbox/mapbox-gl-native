@@ -11,8 +11,9 @@
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/platform.hpp>
 
-#include <cstdio>
 #include <cmath>
+#include <cstdio>
+#include <utility>
 
 namespace mbgl {
 
@@ -66,7 +67,7 @@ void Transform::resize(const Size size) {
 
 #pragma mark - Camera
 
-CameraOptions Transform::getCameraOptions(optional<EdgeInsets> padding) const {
+CameraOptions Transform::getCameraOptions(const optional<EdgeInsets>& padding) const {
     return state.getCameraOptions(padding);
 }
 
@@ -491,7 +492,7 @@ ProjectionMode Transform::getProjectionMode() const {
 
 void Transform::startTransition(const CameraOptions& camera,
                                 const AnimationOptions& animation,
-                                std::function<void(double)> frame,
+                                const std::function<void(double)>& frame,
                                 const Duration& duration) {
     if (transitionFinishFn) {
         transitionFinishFn();

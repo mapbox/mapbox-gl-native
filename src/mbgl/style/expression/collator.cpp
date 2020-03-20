@@ -4,8 +4,8 @@ namespace mbgl {
 namespace style {
 namespace expression {
 
-Collator::Collator(bool caseSensitive, bool diacriticSensitive, optional<std::string> locale)
-    : collator(platform::Collator(caseSensitive, diacriticSensitive, std::move(locale))) {}
+Collator::Collator(bool caseSensitive, bool diacriticSensitive, const optional<std::string>& locale)
+    : collator(platform::Collator(caseSensitive, diacriticSensitive, locale)) {}
 
 bool Collator::operator==(const Collator& other) const {
     return collator == other.collator;

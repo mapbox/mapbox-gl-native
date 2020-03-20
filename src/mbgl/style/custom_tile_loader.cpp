@@ -10,7 +10,7 @@ CustomTileLoader::CustomTileLoader(const TileFunction& fetchTileFn, const TileFu
     cancelTileFunction = cancelTileFn;
 }
 
-void CustomTileLoader::fetchTile(const OverscaledTileID& tileID, ActorRef<CustomGeometryTile> tileRef) {
+void CustomTileLoader::fetchTile(const OverscaledTileID& tileID, const ActorRef<CustomGeometryTile>& tileRef) {
     std::lock_guard<std::mutex> guard(dataMutex);
     auto cachedTileData = dataCache.find(tileID.canonical);
     if (cachedTileData != dataCache.end()) {

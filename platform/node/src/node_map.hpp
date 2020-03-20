@@ -70,7 +70,7 @@ public:
 
     static v8::Local<v8::Value> ParseError(const char* msg);
 
-    void startRender(RenderOptions options);
+    void startRender(const RenderOptions& options);
     void renderFinished();
 
     void release();

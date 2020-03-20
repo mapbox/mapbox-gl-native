@@ -25,7 +25,7 @@ std::unique_ptr<style::Image> createStyleImage(const std::string& id,
                                                const bool sdf,
                                                style::ImageStretches&& stretchX,
                                                style::ImageStretches&& stretchY,
-                                               optional<style::ImageContent> content) {
+                                               const optional<style::ImageContent>& content) {
     // Disallow invalid parameter configurations.
     if (width <= 0 || height <= 0 || width > 1024 || height > 1024 || ratio <= 0 || ratio > 10 ||
         srcX >= image.size.width || srcY >= image.size.height || srcX + width > image.size.width ||
@@ -49,7 +49,7 @@ std::unique_ptr<style::Image> createStyleImage(const std::string& id,
 
     try {
         return std::make_unique<style::Image>(
-            id, std::move(dstImage), ratio, sdf, std::move(stretchX), std::move(stretchY), std::move(content));
+            id, std::move(dstImage), ratio, sdf, std::move(stretchX), std::move(stretchY), content);
     } catch (const util::StyleImageException& ex) {
         Log::Error(Event::Sprite, "Can't create image with invalid metadata: %s", ex.what());
         return nullptr;
@@ -181,17 +181,8 @@ std::vector<Immutable<style::Image::Impl>> parseSprite(const std::string& encode
             style::ImageStretches stretchY = getStretches(value, "stretchY", name.c_str());
             optional<style::ImageContent> content = getContent(value, "content", name.c_str());
 
-            auto image = createStyleImage(name,
-                                          raster,
-                                          x,
-                                          y,
-                                          width,
-                                          height,
-                                          pixelRatio,
-                                          sdf,
-                                          std::move(stretchX),
-                                          std::move(stretchY),
-                                          std::move(content));
+            auto image = createStyleImage(
+                name, raster, x, y, width, height, pixelRatio, sdf, std::move(stretchX), std::move(stretchY), content);
             if (image) {
                 images.push_back(std::move(image->baseImpl));
             }

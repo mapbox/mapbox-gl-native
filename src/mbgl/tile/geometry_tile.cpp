@@ -22,6 +22,7 @@
 #include <mbgl/util/logging.hpp>
 
 #include <mbgl/gfx/upload_pass.hpp>
+#include <utility>
 
 namespace mbgl {
 
@@ -176,7 +177,7 @@ void GeometryTile::markObsolete() {
 
 void GeometryTile::setError(std::exception_ptr err) {
     loaded = true;
-    observer->onTileError(*this, err);
+    observer->onTileError(*this, std::move(err));
 }
 
 void GeometryTile::setData(std::unique_ptr<const GeometryTileData> data_) {
@@ -257,7 +258,7 @@ void GeometryTile::onError(std::exception_ptr err, const uint64_t resultCorrelat
     if (resultCorrelationID == correlationID) {
         pending = false;
     }
-    observer->onTileError(*this, err);
+    observer->onTileError(*this, std::move(err));
 }
     
 void GeometryTile::onGlyphsAvailable(GlyphMap glyphs) {

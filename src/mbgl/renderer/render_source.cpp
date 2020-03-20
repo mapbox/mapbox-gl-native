@@ -18,7 +18,7 @@ namespace mbgl {
 
 using namespace style;
 
-std::unique_ptr<RenderSource> RenderSource::create(Immutable<Source::Impl> impl) {
+std::unique_ptr<RenderSource> RenderSource::create(const Immutable<Source::Impl>& impl) {
     switch (impl->type) {
     case SourceType::Vector:
         return std::make_unique<RenderVectorSource>(staticImmutableCast<VectorSource::Impl>(impl));

@@ -25,12 +25,14 @@ using FeatureExtensionGetterPtr = FeatureExtensionValue (*)(std::shared_ptr<styl
                                                             std::uint32_t,
                                                             const optional<std::map<std::string, Value>>&);
 
+// NOLINTNEXTLINE(performance-unnecessary-value-param)
 FeatureExtensionValue getChildren(std::shared_ptr<style::GeoJSONData> clusterData,
                                   std::uint32_t clusterID,
                                   const optional<std::map<std::string, Value>>&) {
     return clusterData->getChildren(clusterID);
 }
 
+// NOLINTNEXTLINE(performance-unnecessary-value-param)
 FeatureExtensionValue getLeaves(std::shared_ptr<style::GeoJSONData> clusterData,
                                 std::uint32_t clusterID,
                                 const optional<std::map<std::string, Value>>& args) {
@@ -51,6 +53,7 @@ FeatureExtensionValue getLeaves(std::shared_ptr<style::GeoJSONData> clusterData,
     return clusterData->getLeaves(clusterID);
 }
 
+// NOLINTNEXTLINE(performance-unnecessary-value-param)
 FeatureExtensionValue getClusterExpansionZoom(std::shared_ptr<style::GeoJSONData> clusterData,
                                               std::uint32_t clusterID,
                                               const optional<std::map<std::string, Value>>&) {

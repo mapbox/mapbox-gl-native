@@ -19,11 +19,9 @@ namespace mbgl {
 
 class AssetFileSource::Impl {
 public:
-    Impl(ActorRef<Impl>, std::string root_)
-        : root(std::move(root_)) {
-    }
+    Impl(const ActorRef<Impl>&, std::string root_) : root(std::move(root_)) {}
 
-    void request(const std::string& url, ActorRef<FileSourceRequest> req) {
+    void request(const std::string& url, const ActorRef<FileSourceRequest>& req) {
         if (!acceptsURL(url)) {
             Response response;
             response.error = std::make_unique<Response::Error>(Response::Error::Reason::Other,
@@ -35,7 +33,7 @@ public:
         // Cut off the protocol and prefix with path.
         const auto path =
             root + "/" + mbgl::util::percentDecode(url.substr(std::char_traits<char>::length(util::ASSET_PROTOCOL)));
-        requestLocalFile(path, std::move(req));
+        requestLocalFile(path, req);
     }
 
 private:

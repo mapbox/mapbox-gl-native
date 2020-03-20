@@ -183,7 +183,7 @@ int main(int argc, char *argv[]) {
     auto databaseFileSource = std::static_pointer_cast<mbgl::DatabaseFileSource>(std::shared_ptr<mbgl::FileSource>(
         mbgl::FileSourceManager::get()->getFileSource(mbgl::FileSourceType::Database, resourceOptions)));
     view->setResetCacheCallback([databaseFileSource]() {
-        databaseFileSource->resetDatabase([](std::exception_ptr ex) {
+        databaseFileSource->resetDatabase([](const std::exception_ptr& ex) {
             if (ex) {
                 mbgl::Log::Error(mbgl::Event::Database, "Failed to reset cache:: %s", mbgl::util::toString(ex).c_str());
             }

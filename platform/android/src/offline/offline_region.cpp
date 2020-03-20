@@ -111,7 +111,7 @@ void OfflineRegion::getOfflineRegionStatus(jni::JNIEnv& env_, const jni::Object<
 void OfflineRegion::deleteOfflineRegion(jni::JNIEnv& env_, const jni::Object<OfflineRegionDeleteCallback>& callback_) {
     auto globalCallback = jni::NewGlobal<jni::EnvAttachingDeleter>(env_, callback_);
 
-    fileSource->deleteOfflineRegion(std::move(*region),
+    fileSource->deleteOfflineRegion(*region,
                                     [
                                         // Ensure the object is not gc'd in the meanwhile
                                         callback = std::make_shared<decltype(globalCallback)>(

@@ -6,11 +6,10 @@
 
 namespace mbgl {
 
-RasterTileWorker::RasterTileWorker(ActorRef<RasterTileWorker>, ActorRef<RasterTile> parent_)
-    : parent(std::move(parent_)) {
-}
+RasterTileWorker::RasterTileWorker(const ActorRef<RasterTileWorker>&, ActorRef<RasterTile> parent_)
+    : parent(std::move(parent_)) {}
 
-void RasterTileWorker::parse(std::shared_ptr<const std::string> data, uint64_t correlationID) {
+void RasterTileWorker::parse(const std::shared_ptr<const std::string>& data, uint64_t correlationID) {
     if (!data) {
         parent.invoke(&RasterTile::onParsed, nullptr, correlationID); // No data; empty tile.
         return;

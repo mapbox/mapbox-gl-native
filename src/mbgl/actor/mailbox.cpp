@@ -91,7 +91,7 @@ void Mailbox::receive() {
 }
 
 // static
-void Mailbox::maybeReceive(std::weak_ptr<Mailbox> mailbox) {
+void Mailbox::maybeReceive(const std::weak_ptr<Mailbox>& mailbox) {
     if (auto locked = mailbox.lock()) {
         locked->receive();
     }
@@ -99,7 +99,7 @@ void Mailbox::maybeReceive(std::weak_ptr<Mailbox> mailbox) {
 
 // static
 std::function<void()> Mailbox::makeClosure(std::weak_ptr<Mailbox> mailbox) {
-    return [mailbox]() { maybeReceive(mailbox); };
+    return [mailbox = std::move(mailbox)]() { maybeReceive(mailbox); };
 }
 
 } // namespace mbgl

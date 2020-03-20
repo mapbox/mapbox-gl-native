@@ -5,6 +5,7 @@
 #include <unicode/ushape.h>
 
 #include <memory>
+#include <utility>
 
 namespace mbgl {
 
@@ -98,7 +99,7 @@ std::vector<std::u16string> BiDi::processText(const std::u16string& input,
         throw std::runtime_error(std::string("BiDi::processText: ") + u_errorName(errorCode));
     }
 
-    return applyLineBreaking(lineBreakPoints);
+    return applyLineBreaking(std::move(lineBreakPoints));
 }
     
 std::vector<StyledText> BiDi::processStyledText(const StyledText& input, std::set<std::size_t> lineBreakPoints) {

@@ -37,7 +37,7 @@ public:
         TileOptions tileOptions;
     };
 public:
-    CustomGeometrySource(std::string id, CustomGeometrySource::Options options);
+    CustomGeometrySource(std::string id, const CustomGeometrySource::Options& options);
     ~CustomGeometrySource() final;
     void loadDescription(FileSource&) final;
     void setTileData(const CanonicalTileID&, const GeoJSON&);

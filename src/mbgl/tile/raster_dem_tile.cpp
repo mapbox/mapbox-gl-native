@@ -1,15 +1,16 @@
 #include <mbgl/tile/raster_dem_tile.hpp>
 
-#include <mbgl/tile/raster_dem_tile_worker.hpp>
-#include <mbgl/tile/tile_observer.hpp>
-#include <mbgl/tile/tile_loader_impl.hpp>
-#include <mbgl/style/source.hpp>
-#include <mbgl/storage/resource.hpp>
-#include <mbgl/storage/response.hpp>
+#include <mbgl/actor/scheduler.hpp>
+#include <mbgl/renderer/buckets/hillshade_bucket.hpp>
 #include <mbgl/renderer/tile_parameters.hpp>
 #include <mbgl/renderer/tile_render_data.hpp>
-#include <mbgl/renderer/buckets/hillshade_bucket.hpp>
-#include <mbgl/actor/scheduler.hpp>
+#include <mbgl/storage/resource.hpp>
+#include <mbgl/storage/response.hpp>
+#include <mbgl/style/source.hpp>
+#include <mbgl/tile/raster_dem_tile_worker.hpp>
+#include <mbgl/tile/tile_loader_impl.hpp>
+#include <mbgl/tile/tile_observer.hpp>
+#include <utility>
 
 namespace mbgl {
 
@@ -42,15 +43,15 @@ std::unique_ptr<TileRenderData> RasterDEMTile::createRenderData() {
 
 void RasterDEMTile::setError(std::exception_ptr err) {
     loaded = true;
-    observer->onTileError(*this, err);
+    observer->onTileError(*this, std::move(err));
 }
 
 void RasterDEMTile::setMetadata(optional<Timestamp> modified_, optional<Timestamp> expires_) {
-    modified = modified_;
-    expires = expires_;
+    modified = std::move(modified_);
+    expires = std::move(expires_);
 }
 
-void RasterDEMTile::setData(std::shared_ptr<const std::string> data) {
+void RasterDEMTile::setData(const std::shared_ptr<const std::string>& data) {
     pending = true;
     ++correlationID;
     worker.self().invoke(&RasterDEMTileWorker::parse, data, correlationID, encoding);
@@ -71,7 +72,7 @@ void RasterDEMTile::onError(std::exception_ptr err, const uint64_t resultCorrela
     if (resultCorrelationID == correlationID) {
         pending = false;
     }
-    observer->onTileError(*this, err);
+    observer->onTileError(*this, std::move(err));
 }
 
 bool RasterDEMTile::layerPropertiesUpdated(const Immutable<style::LayerProperties>&) {

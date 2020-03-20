@@ -17,7 +17,7 @@ std::unique_ptr<style::Image> createStyleImage(const std::string& id,
                                                bool sdf,
                                                style::ImageStretches&& stretchX = {},
                                                style::ImageStretches&& stretchY = {},
-                                               optional<style::ImageContent> content = nullopt);
+                                               const optional<style::ImageContent>& content = nullopt);
 
 // Parses an image and an associated JSON file and returns the sprite objects.
 std::vector<Immutable<style::Image::Impl>> parseSprite(const std::string& image, const std::string& json);

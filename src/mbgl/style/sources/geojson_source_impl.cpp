@@ -80,7 +80,7 @@ T evaluateFeature(const mapbox::feature::feature<double>& f,
 
 // static
 std::shared_ptr<GeoJSONData> GeoJSONData::create(const GeoJSON& geoJSON,
-                                                 Immutable<GeoJSONOptions> options,
+                                                 const Immutable<GeoJSONOptions>& options,
                                                  std::shared_ptr<Scheduler> scheduler) {
     constexpr double scale = util::EXTENT / util::tileSize;
     if (options->cluster && geoJSON.is<Features>() && !geoJSON.get<Features>().empty()) {

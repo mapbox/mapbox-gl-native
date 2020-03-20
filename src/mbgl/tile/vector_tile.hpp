@@ -17,7 +17,7 @@ public:
 
     void setNecessity(TileNecessity) final;
     void setMetadata(optional<Timestamp> modified, optional<Timestamp> expires);
-    void setData(std::shared_ptr<const std::string> data);
+    void setData(const std::shared_ptr<const std::string>& data);
 
 private:
     TileLoader<VectorTile> loader;

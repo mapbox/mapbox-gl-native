@@ -9,20 +9,20 @@ namespace style {
 namespace expression {
 
 namespace {
-bool isComparableType(type::Type type) {
+bool isComparableType(const type::Type& type) {
     return type == type::Boolean || type == type::String || type == type::Number || type == type::Null ||
            type == type::Value;
 }
 
-bool isComparableRuntimeType(type::Type type) {
+bool isComparableRuntimeType(const type::Type& type) {
     return type == type::Boolean || type == type::String || type == type::Number || type == type::Null;
 }
 
-bool isSearchableType(type::Type type) {
+bool isSearchableType(const type::Type& type) {
     return type == type::String || type.is<type::Array>() || type == type::Null || type == type::Value;
 }
 
-bool isSearchableRuntimeType(type::Type type) {
+bool isSearchableRuntimeType(const type::Type& type) {
     return type == type::String || type.is<type::Array>() || type == type::Null;
 }
 } // namespace

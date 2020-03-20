@@ -82,7 +82,7 @@ struct TaggedString {
 
     void addTextSection(const std::u16string& text,
                         double scale,
-                        FontStack fontStack,
+                        const FontStack& fontStack,
                         optional<Color> textColor_ = nullopt);
 
     void addImageSection(const std::string& imageID);

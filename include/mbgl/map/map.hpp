@@ -60,17 +60,26 @@ public:
     bool isPanning() const;
 
     // Camera
-    CameraOptions getCameraOptions(optional<EdgeInsets> = {}) const;
+    CameraOptions getCameraOptions(const optional<EdgeInsets>& = {}) const;
     void jumpTo(const CameraOptions&);
     void easeTo(const CameraOptions&, const AnimationOptions&);
     void flyTo(const CameraOptions&, const AnimationOptions&);
     void moveBy(const ScreenCoordinate&, const AnimationOptions& = {});
-    void scaleBy(double scale, optional<ScreenCoordinate> anchor, const AnimationOptions& animation = {});
+    void scaleBy(double scale, const optional<ScreenCoordinate>& anchor, const AnimationOptions& animation = {});
     void pitchBy(double pitch, const AnimationOptions& animation = {});
     void rotateBy(const ScreenCoordinate& first, const ScreenCoordinate& second, const AnimationOptions& = {});
-    CameraOptions cameraForLatLngBounds(const LatLngBounds&, const EdgeInsets&, optional<double> bearing = {}, optional<double> pitch = {}) const;
-    CameraOptions cameraForLatLngs(const std::vector<LatLng>&, const EdgeInsets&, optional<double> bearing = {}, optional<double> pitch = {}) const;
-    CameraOptions cameraForGeometry(const Geometry<double>&, const EdgeInsets&, optional<double> bearing = {}, optional<double> pitch = {}) const;
+    CameraOptions cameraForLatLngBounds(const LatLngBounds&,
+                                        const EdgeInsets&,
+                                        const optional<double>& bearing = {},
+                                        const optional<double>& pitch = {}) const;
+    CameraOptions cameraForLatLngs(const std::vector<LatLng>&,
+                                   const EdgeInsets&,
+                                   const optional<double>& bearing = {},
+                                   const optional<double>& pitch = {}) const;
+    CameraOptions cameraForGeometry(const Geometry<double>&,
+                                    const EdgeInsets&,
+                                    const optional<double>& bearing = {},
+                                    const optional<double>& pitch = {}) const;
     LatLngBounds latLngBoundsForCamera(const CameraOptions&) const;
     LatLngBounds latLngBoundsForCameraUnwrapped(const CameraOptions&) const;
 

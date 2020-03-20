@@ -103,9 +103,9 @@ public:
 
 }  // namespace
 
-RenderOrchestrator::RenderOrchestrator(bool backgroundLayerAsColor_, optional<std::string> localFontFamily_)
+RenderOrchestrator::RenderOrchestrator(bool backgroundLayerAsColor_, const optional<std::string>& localFontFamily_)
     : observer(&nullObserver()),
-      glyphManager(std::make_unique<GlyphManager>(std::make_unique<LocalGlyphRasterizer>(std::move(localFontFamily_)))),
+      glyphManager(std::make_unique<GlyphManager>(std::make_unique<LocalGlyphRasterizer>(localFontFamily_))),
       imageManager(std::make_unique<ImageManager>()),
       lineAtlas(std::make_unique<LineAtlas>()),
       patternAtlas(std::make_unique<PatternAtlas>()),

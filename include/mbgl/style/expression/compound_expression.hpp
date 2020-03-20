@@ -46,7 +46,7 @@ protected:
     std::vector<std::unique_ptr<Expression>> args;
 };
 
-ParseResult parseCompoundExpression(const std::string name,
+ParseResult parseCompoundExpression(const std::string& name,
                                     const mbgl::style::conversion::Convertible& value,
                                     ParsingContext& ctx);
 

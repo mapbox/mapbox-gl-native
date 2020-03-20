@@ -36,7 +36,7 @@ public:
     void push(std::unique_ptr<Message>);
     void receive();
 
-    static void maybeReceive(std::weak_ptr<Mailbox>);
+    static void maybeReceive(const std::weak_ptr<Mailbox>&);
     static std::function<void()> makeClosure(std::weak_ptr<Mailbox>);
 
 private:

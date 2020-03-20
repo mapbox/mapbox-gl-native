@@ -48,7 +48,7 @@ std::string toString(double t, bool decimal) {
     return data;
 }
 
-std::string toString(std::exception_ptr error) {
+std::string toString(const std::exception_ptr& error) {
     assert(error);
 
     if (!error) {

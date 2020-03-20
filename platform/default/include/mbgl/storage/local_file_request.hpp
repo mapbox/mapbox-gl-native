@@ -8,6 +8,6 @@ template <typename>
 class ActorRef;
 class FileSourceRequest;
 
-void requestLocalFile(const std::string&, ActorRef<FileSourceRequest>);
+void requestLocalFile(const std::string&, const ActorRef<FileSourceRequest>&);
 
 } // namespace mbgl

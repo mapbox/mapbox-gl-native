@@ -216,7 +216,7 @@ public:
      * executed on the database thread; it is the responsibility of the SDK bindings
      * to re-execute a user-provided callback on the main thread.
      */
-    virtual void deleteOfflineRegion(OfflineRegion, std::function<void(std::exception_ptr)>);
+    virtual void deleteOfflineRegion(OfflineRegion&, std::function<void(std::exception_ptr)>);
 
     /*
      * Invalidate all the tiles from an offline region forcing Mapbox GL to revalidate
