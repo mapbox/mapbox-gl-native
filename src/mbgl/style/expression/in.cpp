@@ -1,8 +1,9 @@
-#include <string.h>
 #include <mbgl/style/conversion_impl.hpp>
 #include <mbgl/style/expression/in.hpp>
 #include <mbgl/style/expression/type.hpp>
 #include <mbgl/util/string.hpp>
+
+#include <cstring>
 
 namespace mbgl {
 namespace style {
