@@ -140,7 +140,7 @@ LinePatternPos addDashPattern(AlphaImage& image,
 
     if (dasharray.size() < 2) {
         Log::Warning(Event::ParseStyle, "line dasharray requires at least two elements");
-        return LinePatternPos();
+        return {};
     }
 
     float length = 0;

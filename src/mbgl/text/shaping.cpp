@@ -285,8 +285,8 @@ PotentialBreak evaluateBreak(const std::size_t breakIndex, const float breakX, c
             bestBreakBadness = breakBadness;
         }
     }
-    
-    return PotentialBreak(breakIndex, breakX, bestPriorBreak, bestBreakBadness);
+
+    return {breakIndex, breakX, bestPriorBreak, bestBreakBadness};
 }
 
 std::set<std::size_t> leastBadBreaks(const PotentialBreak& lastLineBreak) {

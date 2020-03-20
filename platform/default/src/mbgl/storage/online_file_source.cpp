@@ -245,7 +245,7 @@ private:
 
         optional<OnlineFileRequest*> pop() {
             if (queue.empty()) {
-                return optional<OnlineFileRequest*>();
+                return {};
             }
 
             if (queue.begin() == firstLowPriorityRequest) {
@@ -254,7 +254,7 @@ private:
 
             OnlineFileRequest* next = queue.front();
             queue.pop_front();
-            return optional<OnlineFileRequest*>(next);
+            return {next};
         }
 
         bool contains(OnlineFileRequest* request) const {
