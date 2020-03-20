@@ -1,9 +1,9 @@
 #pragma once
 
 #include <jni/jni.hpp>
+#include <mapbox/weak.hpp>
 #include <mbgl/map/map_snapshotter.hpp>
 #include <mbgl/util/util.hpp>
-#include <mapbox/weak.hpp>
 
 #include <memory>
 

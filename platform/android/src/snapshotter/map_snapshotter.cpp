@@ -41,12 +41,12 @@ MapSnapshotter::MapSnapshotter(jni::JNIEnv& _env,
     showLogo = _showLogo;
 
     // Create the core snapshotter
-    snapshotter = std::make_unique<mbgl::MapSnapshotter>(size,
-                                 pixelRatio,
-                                 mbgl::android::FileSource::getSharedResourceOptions(_env, _jFileSource),
-                                 *this,
-                                 _localIdeographFontFamily ? jni::Make<std::string>(_env, _localIdeographFontFamily)
-                                                           : optional<std::string>{});
+    snapshotter = std::make_unique<mbgl::MapSnapshotter>(
+        size,
+        pixelRatio,
+        mbgl::android::FileSource::getSharedResourceOptions(_env, _jFileSource),
+        *this,
+        _localIdeographFontFamily ? jni::Make<std::string>(_env, _localIdeographFontFamily) : optional<std::string>{});
 
     if (position) {
         snapshotter->setCameraOptions(CameraPosition::getCameraOptions(_env, position, pixelRatio));
