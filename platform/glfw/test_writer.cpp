@@ -7,6 +7,7 @@
 
 #include <cmath>
 #include <fstream>
+#include <utility>
 
 using Writer = rapidjson::PrettyWriter<rapidjson::StringBuffer>;
 
@@ -19,7 +20,7 @@ public:
 
 class SetCamera final : public TestOperationSerializer {
 public:
-    SetCamera(const mbgl::CameraOptions& camera_) : camera(camera_) {}
+    SetCamera(mbgl::CameraOptions camera_) : camera(std::move(camera_)) {}
 
     void serialize(Writer& writer) const override {
         if (camera.zoom) {

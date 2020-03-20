@@ -19,7 +19,7 @@ class LineBucket final : public Bucket {
 public:
     using PossiblyEvaluatedLayoutProperties = style::LineLayoutProperties::PossiblyEvaluated;
 
-    LineBucket(const PossiblyEvaluatedLayoutProperties& layout,
+    LineBucket(PossiblyEvaluatedLayoutProperties layout,
                const std::map<std::string, Immutable<style::LayerProperties>>& layerPaintProperties,
                const float zoom,
                const uint32_t overscaling);

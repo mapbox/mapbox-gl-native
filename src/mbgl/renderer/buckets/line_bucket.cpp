@@ -5,16 +5,17 @@
 #include <mbgl/util/constants.hpp>
 
 #include <cassert>
+#include <utility>
 
 namespace mbgl {
 
 using namespace style;
 
-LineBucket::LineBucket(const LineBucket::PossiblyEvaluatedLayoutProperties& layout_,
+LineBucket::LineBucket(LineBucket::PossiblyEvaluatedLayoutProperties layout_,
                        const std::map<std::string, Immutable<LayerProperties>>& layerPaintProperties,
                        const float zoom_,
                        const uint32_t overscaling_)
-    : layout(layout_), zoom(zoom_), overscaling(overscaling_) {
+    : layout(std::move(layout_)), zoom(zoom_), overscaling(overscaling_) {
     for (const auto& pair : layerPaintProperties) {
         paintPropertyBinders.emplace(
             std::piecewise_construct,
