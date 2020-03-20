@@ -501,7 +501,7 @@ void RenderOrchestrator::queryRenderedSymbols(std::unordered_map<std::string, st
     const Placement& placement = *placementController.getPlacement();
     auto renderedSymbols = placement.getCollisionIndex().queryRenderedSymbols(geometry);
     std::vector<std::reference_wrapper<const RetainedQueryData>> bucketQueryData;
-    for (auto entry : renderedSymbols) {
+    for (const auto& entry : renderedSymbols) {
         bucketQueryData.emplace_back(placement.getQueryData(entry.first));
     }
     // Although symbol query is global, symbol results are only sortable within a bucket

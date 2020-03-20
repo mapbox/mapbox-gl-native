@@ -69,7 +69,7 @@ ParseResult Let::parse(const Convertible& value, ParsingContext& ctx) {
 mbgl::Value Let::serialize() const {
     std::vector<mbgl::Value> serialized;
     serialized.emplace_back(getOperator());
-    for (auto entry : bindings) {
+    for (const auto& entry : bindings) {
         serialized.emplace_back(entry.first);
         serialized.emplace_back(entry.second->serialize());
     }

@@ -185,7 +185,7 @@ bool CrossTileSymbolLayerIndex::addBucket(const OverscaledTileID& tileID,
 }
 
 void CrossTileSymbolLayerIndex::removeBucketCrossTileIDs(uint8_t zoom, const TileLayerIndex& removedBucket) {
-    for (auto key : removedBucket.indexedSymbolInstances) {
+    for (const auto& key : removedBucket.indexedSymbolInstances) {
         for (auto indexedSymbolInstance : key.second) {
             usedCrossTileIDs[zoom].erase(indexedSymbolInstance.crossTileID);
         }
