@@ -335,7 +335,7 @@ public:
     void setMaximumConcurrentRequests(const mapbox::base::Value& value) {
         if (auto* maximumConcurrentRequests = value.getUint()) {
             assert(*maximumConcurrentRequests < std::numeric_limits<uint32_t>::max());
-            const uint32_t maxConcurretnRequests = static_cast<uint32_t>(*maximumConcurrentRequests);
+            const auto maxConcurretnRequests = static_cast<uint32_t>(*maximumConcurrentRequests);
             thread->actor().invoke(&OnlineFileSourceThread::setMaximumConcurrentRequests, maxConcurretnRequests);
             {
                 std::lock_guard<std::mutex> lock(maximumConcurrentRequestsMutex);
