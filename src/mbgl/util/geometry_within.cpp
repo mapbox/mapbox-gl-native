@@ -47,7 +47,11 @@ bool lineIntersectLine(const Point<int64_t>& a,
             y2 = p2.y - q1.y;
             x3 = q2.x - q1.x;
             y3 = q2.y - q1.y;
-            if ((x1 * y3 - x3 * y1) * (x2 * y3 - x3 * y2) < 0) return true;
+            auto ret1 = (x1 * y3 - x3 * y1);
+            auto ret2 = (x2 * y3 - x3 * y2);
+            if ((ret1 > 0 && ret2 < 0) || (ret1 < 0 && ret2 > 0)) {
+                return true;
+            }
             return false;
         };
 
