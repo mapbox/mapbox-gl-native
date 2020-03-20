@@ -1,6 +1,7 @@
 #include <mbgl/text/local_glyph_rasterizer.hpp>
 #include <mbgl/util/i18n.hpp>
 #include <mbgl/util/platform.hpp>
+#include <mbgl/util/constants.hpp>
 
 #include <unordered_map>
 
@@ -54,60 +55,63 @@ using CTLineRefHandle = CFHandle<CTLineRef, CFTypeRef, CFRelease>;
 class LocalGlyphRasterizer::Impl {
 public:
     Impl(const optional<std::string> fontFamily_)
-        : fontFamily(fontFamily_)
-        , fontHandle(NULL)
-    {}
+    {
+        fallbackFontNames = [[NSUserDefaults standardUserDefaults] stringArrayForKey:@"MGLIdeographicFontFamilyName"];
+        if (fontFamily_) {
+            fallbackFontNames = [fallbackFontNames ?: @[] arrayByAddingObjectsFromArray:[@(fontFamily_->c_str()) componentsSeparatedByString:@"\n"]];
+        }
+    }
     
     ~Impl() {
-        if (fontHandle) {
-            CFRelease(fontHandle);
+    }
+    
+    bool isEnabled() { return fallbackFontNames; }
+    
+    CTFontDescriptorRef createFontDescriptor(const FontStack& fontStack) {
+        NSMutableArray *fontNames = [NSMutableArray arrayWithCapacity:fontStack.size() + fallbackFontNames.count];
+        for (auto& fontName : fontStack) {
+            if (fontName != util::LAST_RESORT_ALPHABETIC_FONT && fontName != util::LAST_RESORT_PAN_UNICODE_FONT) {
+                [fontNames addObject:@(fontName.c_str())];
+            }
+        }
+        [fontNames addObjectsFromArray:fallbackFontNames];
+        
+        CFMutableArrayRefHandle fontDescriptors(CFArrayCreateMutable(kCFAllocatorDefault, fontNames.count, &kCFTypeArrayCallBacks));
+        for (NSString *name in fontNames) {
+            NSDictionary *fontAttributes = @{
+                (NSString *)kCTFontSizeAttribute: @(util::ONE_EM),
+                (NSString *)kCTFontNameAttribute: name,
+                (NSString *)kCTFontDisplayNameAttribute: name,
+                (NSString *)kCTFontFamilyNameAttribute: name,
+            };
+            
+            CTFontDescriptorRefHandle descriptor(CTFontDescriptorCreateWithAttributes((CFDictionaryRef)fontAttributes));
+            CFArrayAppendValue(*fontDescriptors, *descriptor);
+        }
+
+        CFStringRef keys[] = { kCTFontSizeAttribute,                  kCTFontCascadeListAttribute };
+        CFTypeRef values[] = { (__bridge CFNumberRef)@(util::ONE_EM), *fontDescriptors };
+
+        CFDictionaryRefHandle attributes(
+            CFDictionaryCreate(kCFAllocatorDefault, (const void**)&keys,
+                (const void**)&values, sizeof(keys) / sizeof(keys[0]),
+                &kCFTypeDictionaryKeyCallBacks,
+                &kCFTypeDictionaryValueCallBacks));
+        if (CFArrayGetCount(*fontDescriptors)) {
+            CTFontDescriptorRef firstDescriptor = (CTFontDescriptorRef)CFArrayGetValueAtIndex(*fontDescriptors, 0);
+            return CTFontDescriptorCreateCopyWithAttributes(firstDescriptor, *attributes);
+        } else {
+            return CTFontDescriptorCreateWithAttributes(*attributes);
         }
     }
 
-    CTFontRef getFont() {
-        if (!fontHandle) {
-            NSArray<NSString *> *fontFamilyNames = [[NSUserDefaults standardUserDefaults] stringArrayForKey:@"MGLIdeographicFontFamilyName"] ?: @[];
-            if (fontFamily) {
-                fontFamilyNames = [fontFamilyNames arrayByAddingObjectsFromArray:[@(fontFamily->c_str()) componentsSeparatedByString:@"\n"]];
-            }
-            if (!fontFamilyNames.count) {
-                return NULL;
-            }
-            
-            CFMutableArrayRefHandle fontDescriptors(CFArrayCreateMutable(kCFAllocatorDefault, fontFamilyNames.count, &kCFTypeArrayCallBacks));
-            for (NSString *name in fontFamilyNames) {
-                NSDictionary *fontAttributes = @{
-                    (NSString *)kCTFontSizeAttribute: @(24.0),
-                    (NSString *)kCTFontNameAttribute: name,
-                    (NSString *)kCTFontDisplayNameAttribute: name,
-                    (NSString *)kCTFontFamilyNameAttribute: name,
-                };
-                
-                CTFontDescriptorRefHandle descriptor(CTFontDescriptorCreateWithAttributes((CFDictionaryRef)fontAttributes));
-                CFArrayAppendValue(*fontDescriptors, *descriptor);
-            }
-
-            CFStringRef keys[] = { kCTFontSizeAttribute,          kCTFontCascadeListAttribute };
-            CFTypeRef values[] = { (__bridge CFNumberRef)@(24.0), *fontDescriptors };
-
-            CFDictionaryRefHandle attributes(
-                CFDictionaryCreate(kCFAllocatorDefault, (const void**)&keys,
-                    (const void**)&values, sizeof(keys) / sizeof(keys[0]),
-                    &kCFTypeDictionaryKeyCallBacks,
-                    &kCFTypeDictionaryValueCallBacks));
-            
-            CTFontDescriptorRefHandle descriptor(CTFontDescriptorCreateWithAttributes(*attributes));
-            fontHandle = CTFontCreateWithFontDescriptor(*descriptor, 0.0, NULL);
-            if (!fontHandle) {
-                throw std::runtime_error("CTFontCreateWithFontDescriptor failed");
-            }
-        }
-        return fontHandle;
+    CTFontRef createFont(const FontStack& fontStack) {
+        CTFontDescriptorRefHandle descriptor(createFontDescriptor(fontStack));
+        return CTFontCreateWithFontDescriptor(*descriptor, 0.0, NULL);
     }
     
 private:
-    optional<std::string> fontFamily;
-    CTFontRef fontHandle;
+    NSArray<NSString *> *fallbackFontNames;
 };
 
 LocalGlyphRasterizer::LocalGlyphRasterizer(const optional<std::string>& fontFamily)
@@ -118,7 +122,7 @@ LocalGlyphRasterizer::~LocalGlyphRasterizer()
 {}
 
 bool LocalGlyphRasterizer::canRasterizeGlyph(const FontStack&, GlyphID glyphID) {
-    return util::i18n::allowsFixedWidthGlyphGeneration(glyphID) && impl->getFont();
+    return util::i18n::allowsFixedWidthGlyphGeneration(glyphID) && impl->isEnabled();
 }
 
 PremultipliedImage drawGlyphBitmap(GlyphID glyphID, CTFontRef font, Size size) {
@@ -166,9 +170,9 @@ PremultipliedImage drawGlyphBitmap(GlyphID glyphID, CTFontRef font, Size size) {
     return rgbaBitmap;
 }
 
-Glyph LocalGlyphRasterizer::rasterizeGlyph(const FontStack&, GlyphID glyphID) {
+Glyph LocalGlyphRasterizer::rasterizeGlyph(const FontStack& fontStack, GlyphID glyphID) {
     Glyph fixedMetrics;
-    CTFontRef font = impl->getFont();
+    CTFontRef font = impl->createFont(fontStack);
     if (!font) {
         return fixedMetrics;
     }
