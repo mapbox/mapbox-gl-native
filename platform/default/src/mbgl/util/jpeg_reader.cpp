@@ -56,8 +56,8 @@ static void term(j_decompress_ptr) {}
 
 static void attach_stream(j_decompress_ptr cinfo, std::istream* in) {
     if (cinfo->src == nullptr) {
-        cinfo->src = (struct jpeg_source_mgr *)
-            (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_PERMANENT, sizeof(jpeg_stream_wrapper));
+        cinfo->src = static_cast<struct jpeg_source_mgr*>((*cinfo->mem->alloc_small)(
+            reinterpret_cast<j_common_ptr>(cinfo), JPOOL_PERMANENT, sizeof(jpeg_stream_wrapper)));
     }
     auto * src = reinterpret_cast<jpeg_stream_wrapper*> (cinfo->src);
     src->manager.init_source = init_source;
@@ -122,7 +122,7 @@ PremultipliedImage decodeJPEG(const uint8_t* data, size_t size) {
     PremultipliedImage image({ static_cast<uint32_t>(width), static_cast<uint32_t>(height) });
     uint8_t* dst = image.data.get();
 
-    JSAMPARRAY buffer = (*cinfo.mem->alloc_sarray)((j_common_ptr) &cinfo, JPOOL_IMAGE, rowStride, 1);
+    JSAMPARRAY buffer = (*cinfo.mem->alloc_sarray)(reinterpret_cast<j_common_ptr>(&cinfo), JPOOL_IMAGE, rowStride, 1);
 
     while (cinfo.output_scanline < cinfo.output_height) {
         jpeg_read_scanlines(&cinfo, buffer, 1);

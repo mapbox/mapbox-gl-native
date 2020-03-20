@@ -254,7 +254,7 @@ optional<mbgl::Value> serializeLegacyFilter(const Convertible& values) {
                 result.emplace_back(NullValue());
             }
         }
-        return (mbgl::Value)result;
+        return mbgl::Value(result);
     }
     return toValue(values);
 }

@@ -145,7 +145,8 @@ void TilePyramid::update(const std::vector<Immutable<style::LayerProperties>>& l
     // tiles are used from the cache, but not created.
     optional<util::TileRange> tileRange = {};
     if (bounds) {
-        tileRange = util::TileRange::fromLatLngBounds(*bounds, zoomRange.min, std::min(tileZoom, (int32_t)zoomRange.max));
+        tileRange = util::TileRange::fromLatLngBounds(
+            *bounds, zoomRange.min, std::min(tileZoom, static_cast<int32_t>(zoomRange.max)));
     }
     auto createTileFn = [&](const OverscaledTileID& tileID) -> Tile* {
         if (tileRange && !tileRange->contains(tileID.canonical)) {
@@ -196,10 +197,9 @@ void TilePyramid::update(const std::vector<Immutable<style::LayerProperties>>& l
 
     if (type != SourceType::Annotations) {
         size_t conservativeCacheSize =
-            std::max((float)parameters.transformState.getSize().width / tileSize, 1.0f) *
-            std::max((float)parameters.transformState.getSize().height / tileSize, 1.0f) *
-            (parameters.transformState.getMaxZoom() - parameters.transformState.getMinZoom() + 1) *
-            0.5;
+            std::max(static_cast<float>(parameters.transformState.getSize().width) / tileSize, 1.0f) *
+            std::max(static_cast<float>(parameters.transformState.getSize().height) / tileSize, 1.0f) *
+            (parameters.transformState.getMaxZoom() - parameters.transformState.getMinZoom() + 1) * 0.5;
         cache.setSize(conservativeCacheSize);
     }
 

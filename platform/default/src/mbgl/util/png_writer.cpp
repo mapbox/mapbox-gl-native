@@ -59,7 +59,7 @@ std::string encodePNG(const PremultipliedImage& pre) {
     for (uint32_t y = 0; y < src.size.height; y++) {
         // Every scanline needs to be prefixed with one byte that indicates the filter type.
         idat.append(1, 0); // filter type 0
-        idat.append((const char*)(src.data.get() + y * stride), stride);
+        idat.append(reinterpret_cast<const char*>(src.data.get() + y * stride), stride);
     }
     idat = util::compress(idat);
 
