@@ -1,6 +1,7 @@
-#include <assert.h>
-#include <chrono>
 #include <mbgl/util/monotonic_timer.hpp>
+
+#include <cassert>
+#include <chrono>
 
 namespace mbgl {
 namespace util {
