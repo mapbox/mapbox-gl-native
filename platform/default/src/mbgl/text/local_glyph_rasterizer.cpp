@@ -7,8 +7,7 @@ class LocalGlyphRasterizer::Impl {
 
 LocalGlyphRasterizer::LocalGlyphRasterizer(const optional<std::string>&) {}
 
-LocalGlyphRasterizer::~LocalGlyphRasterizer()
-{}
+LocalGlyphRasterizer::~LocalGlyphRasterizer() = default;
 
 bool LocalGlyphRasterizer::canRasterizeGlyph(const FontStack&, GlyphID) {
     return false;

@@ -187,6 +187,7 @@ Statement::Statement(Database& db, const char* sql)
     : impl(std::make_unique<StatementImpl>(db.impl->db, sql)) {
 }
 
+// NOLINTNEXTLINE(modernize-use-equals-default)
 Statement::~Statement() {
 #ifndef NDEBUG
     // Crash if we're destructing this object while we know a Query object references this.
