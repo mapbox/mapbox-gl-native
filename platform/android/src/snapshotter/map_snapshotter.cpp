@@ -1,12 +1,11 @@
 #include "map_snapshotter.hpp"
 
+#include <mapbox/weak.hpp>
+#include <mbgl/actor/scheduler.hpp>
 #include <mbgl/renderer/renderer.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/string.hpp>
-#include <mbgl/actor/scheduler.hpp>
-
-#include <mapbox/weak.hpp>
 
 #include "../attach_env.hpp"
 #include "map_snapshot.hpp"
@@ -15,14 +14,14 @@ namespace mbgl {
 namespace android {
 
 MapSnapshotter::DeleteOnThread::DeleteOnThread() = default;
-MapSnapshotter::DeleteOnThread::DeleteOnThread(mapbox::base::WeakPtr<mbgl::Scheduler> weakScheduler_) : weakScheduler(weakScheduler_) {}
+MapSnapshotter::DeleteOnThread::DeleteOnThread(mapbox::base::WeakPtr<mbgl::Scheduler> weakScheduler_)
+    : weakScheduler(weakScheduler_) {}
 
 void MapSnapshotter::DeleteOnThread::operator()(mbgl::MapSnapshotter* p) const {
     auto guard = weakScheduler.lock();
     if (weakScheduler && weakScheduler.get() != mbgl::Scheduler::GetCurrent()) {
-        weakScheduler->schedule([ptr = std::shared_ptr<mbgl::MapSnapshotter>(p, DeleteOnThread(weakScheduler))] {
-            (void)ptr;
-        });
+        weakScheduler->schedule(
+            [ptr = std::shared_ptr<mbgl::MapSnapshotter>(p, DeleteOnThread(weakScheduler))] { (void)ptr; });
     } else {
         delete p;
     }
@@ -55,13 +54,14 @@ MapSnapshotter::MapSnapshotter(jni::JNIEnv& _env,
     showLogo = _showLogo;
 
     // Create the core snapshotter
-    snapshotter = std::unique_ptr<mbgl::MapSnapshotter, DeleteOnThread>(new mbgl::MapSnapshotter(
-            size,
-            pixelRatio,
-            mbgl::android::FileSource::getSharedResourceOptions(_env, _jFileSource),
-            *this,
-            _localIdeographFontFamily ? jni::Make<std::string>(_env, _localIdeographFontFamily) : optional<std::string>{}),
-                    DeleteOnThread(mbgl::Scheduler::GetCurrent()->makeWeakPtr()));
+    snapshotter = std::unique_ptr<mbgl::MapSnapshotter, DeleteOnThread>(
+        new mbgl::MapSnapshotter(size,
+                                 pixelRatio,
+                                 mbgl::android::FileSource::getSharedResourceOptions(_env, _jFileSource),
+                                 *this,
+                                 _localIdeographFontFamily ? jni::Make<std::string>(_env, _localIdeographFontFamily)
+                                                           : optional<std::string>{}),
+        DeleteOnThread(mbgl::Scheduler::GetCurrent()->makeWeakPtr()));
 
     if (position) {
         snapshotter->setCameraOptions(CameraPosition::getCameraOptions(_env, position, pixelRatio));
@@ -196,7 +196,7 @@ void MapSnapshotter::onStyleImageMissing(const std::string& imageName) {
 void MapSnapshotter::addLayerAt(JNIEnv& env, jlong nativeLayerPtr, jni::jint index) {
     assert(nativeLayerPtr != 0);
     auto layers = snapshotter->getStyle().getLayers();
-    Layer* layer = reinterpret_cast<Layer*>(nativeLayerPtr);
+    auto* layer = reinterpret_cast<Layer*>(nativeLayerPtr);
     // Check index
     int numLayers = layers.size() - 1;
     if (index > numLayers || index < 0) {
@@ -217,7 +217,7 @@ void MapSnapshotter::addLayerAt(JNIEnv& env, jlong nativeLayerPtr, jni::jint ind
 void MapSnapshotter::addLayerBelow(JNIEnv& env, jlong nativeLayerPtr, const jni::String& below) {
     assert(nativeLayerPtr != 0);
 
-    Layer* layer = reinterpret_cast<Layer*>(nativeLayerPtr);
+    auto* layer = reinterpret_cast<Layer*>(nativeLayerPtr);
     try {
         layer->addToStyle(
             snapshotter->getStyle(),
@@ -230,7 +230,7 @@ void MapSnapshotter::addLayerBelow(JNIEnv& env, jlong nativeLayerPtr, const jni:
 
 void MapSnapshotter::addLayerAbove(JNIEnv& env, jlong nativeLayerPtr, const jni::String& above) {
     assert(nativeLayerPtr != 0);
-    Layer* layer = reinterpret_cast<Layer*>(nativeLayerPtr);
+    auto* layer = reinterpret_cast<Layer*>(nativeLayerPtr);
 
     // Find the sibling
     auto layers = snapshotter->getStyle().getLayers();
@@ -251,7 +251,6 @@ void MapSnapshotter::addLayerAbove(JNIEnv& env, jlong nativeLayerPtr, const jni:
         jni::ThrowNew(env,
                       jni::FindClass(env, "com/mapbox/mapboxsdk/style/layers/CannotAddLayerException"),
                       std::string("Could not find layer: ").append(siblingId).c_str());
-        return;
     } else if (index + 1 < layers.size()) {
         // Place before the sibling
         before = {layers.at(index + 1)->getID()};
@@ -269,7 +268,7 @@ void MapSnapshotter::addLayerAbove(JNIEnv& env, jlong nativeLayerPtr, const jni:
 void MapSnapshotter::addSource(JNIEnv& env, const jni::Object<Source>& obj, jlong sourcePtr) {
     assert(sourcePtr != 0);
 
-    Source* source = reinterpret_cast<Source*>(sourcePtr);
+    auto* source = reinterpret_cast<Source*>(sourcePtr);
     try {
         source->addToStyle(env, obj, snapshotter->getStyle());
     } catch (const std::runtime_error& error) {

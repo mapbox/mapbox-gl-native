@@ -67,6 +67,7 @@ private:
         DeleteOnThread();
         explicit DeleteOnThread(mapbox::base::WeakPtr<mbgl::Scheduler>);
         void operator()(mbgl::MapSnapshotter* p) const;
+
     private:
         mapbox::base::WeakPtr<mbgl::Scheduler> weakScheduler;
     };
