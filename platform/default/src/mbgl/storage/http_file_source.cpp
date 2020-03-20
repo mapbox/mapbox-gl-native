@@ -286,7 +286,7 @@ size_t HTTPRequest::writeCallback(void *const contents, const size_t size, const
         impl->data = std::make_shared<std::string>();
     }
 
-    impl->data->append((char *)contents, size * nmemb);
+    impl->data->append(static_cast<char *>(contents), size * nmemb);
     return size * nmemb;
 }
 

@@ -36,7 +36,7 @@ RenderHillshadeLayer::~RenderHillshadeLayer() = default;
 const std::array<float, 2> RenderHillshadeLayer::getLatRange(const UnwrappedTileID& id) {
    const LatLng latlng0 = LatLng(id);
    const LatLng latlng1 = LatLng(UnwrappedTileID(id.canonical.z, id.canonical.x, id.canonical.y + 1));
-   return {{ (float)latlng0.latitude(), (float)latlng1.latitude() }};
+   return {{static_cast<float>(latlng0.latitude()), static_cast<float>(latlng1.latitude())}};
 }
 
 const std::array<float, 2> RenderHillshadeLayer::getLight(const PaintParameters& parameters) {

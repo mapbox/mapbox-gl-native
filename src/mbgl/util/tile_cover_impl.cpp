@@ -113,11 +113,13 @@ void build_bounds_map(PointList& points, uint32_t maxTile, BoundsMap& et, bool c
 
         if (to_max.points.size() >= 2) {
             // Projections may result in values beyond the bounds, clamp to max tile coordinates
-            const auto y = static_cast<uint32_t>(std::floor(clamp(to_max.points.front().y, 0.0, (double)maxTile)));
+            const auto y =
+                static_cast<uint32_t>(std::floor(clamp(to_max.points.front().y, 0.0, static_cast<double>(maxTile))));
             et[y].push_back(to_max);
         }
         if (to_min.points.size() >= 2) {
-            const auto y = static_cast<uint32_t>(std::floor(clamp(to_min.points.front().y, 0.0, (double)maxTile)));
+            const auto y =
+                static_cast<uint32_t>(std::floor(clamp(to_min.points.front().y, 0.0, static_cast<double>(maxTile))));
             et[y].push_back(to_min);
         }
     }
@@ -218,7 +220,7 @@ struct BuildBoundsMap {
         bnd.points.insert(bnd.points.end(), 2, point);
         bnd.winding = false;
         BoundsMap et;
-        const auto y = static_cast<uint32_t>(std::floor(clamp(point.y, 0.0, (double)(1 << zoom))));
+        const auto y = static_cast<uint32_t>(std::floor(clamp(point.y, 0.0, static_cast<double>(1 << zoom))));
         et[y].push_back(bnd);
         return et;
     }
@@ -233,7 +235,7 @@ struct BuildBoundsMap {
             }
             bnd.points.insert(bnd.points.end(), 2, point);
             bnd.winding = false;
-            const auto y = static_cast<uint32_t>(std::floor(clamp(point.y, 0.0, (double)(1 << zoom))));
+            const auto y = static_cast<uint32_t>(std::floor(clamp(point.y, 0.0, static_cast<double>(1 << zoom))));
             et[y].push_back(bnd);
         }
         return et;
