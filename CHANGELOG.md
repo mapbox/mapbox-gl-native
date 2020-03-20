@@ -30,6 +30,8 @@
 
   By default, CJK characters are now set in the font specified by the `text-font` layout property. If the named font is not installed on the device or bundled with the application, the characters are set in one of the fallback fonts passed into the `localFontFamily` parameter of `mbgl::Renderer::Renderer()` and `mbgl::MapSnapshotter::MapSnapshotter()`. This parameter can now contain a list of font family names, font display names, and font PostScript names, each name separated by a newline.
 
+  CJK characters are now laid out according to the font, so fonts with nonsquare glyphs have the correct kerning. This also fixes an issue where the baseline for CJK characters was too low compared to non-CJK characters.
+
 ## maps-v1.6.0-rc.1
 
 ### ✨ New features
