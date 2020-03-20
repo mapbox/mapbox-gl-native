@@ -214,7 +214,7 @@ GeometryCollection convertGeometry(const Feature::geometry_type& geometryTileFea
         [&](const MultiLineString<double>& lineStrings) -> GeometryCollection {
             GeometryCollection result;
             result.reserve(lineStrings.size());
-            for (const auto line : lineStrings) {
+            for (const auto& line : lineStrings) {
                 LineString<int16_t> temp;
                 temp.reserve(line.size());
                 for (const auto p : line) {
@@ -227,7 +227,7 @@ GeometryCollection convertGeometry(const Feature::geometry_type& geometryTileFea
         [&](const Polygon<double> polygon) -> GeometryCollection {
             GeometryCollection result;
             result.reserve(polygon.size());
-            for (const auto ring : polygon) {
+            for (const auto& ring : polygon) {
                 LinearRing<int16_t> temp;
                 temp.reserve(ring.size());
                 for (const auto p : ring) {
@@ -240,8 +240,8 @@ GeometryCollection convertGeometry(const Feature::geometry_type& geometryTileFea
         [&](const MultiPolygon<double> polygons) -> GeometryCollection {
             GeometryCollection result;
             result.reserve(polygons.size());
-            for (const auto pg : polygons) {
-                for (const auto r : pg) {
+            for (const auto& pg : polygons) {
+                for (const auto& r : pg) {
                     LinearRing<int16_t> ring;
                     ring.reserve(r.size());
                     for (const auto p : r) {
