@@ -65,7 +65,7 @@ inline std::string toString(long double t, bool decimal = false) {
     return toString(static_cast<double>(t), decimal);
 }
 
-std::string toString(std::exception_ptr);
+std::string toString(const std::exception_ptr &);
 
 template <class T>
 std::string toString(T) = delete;

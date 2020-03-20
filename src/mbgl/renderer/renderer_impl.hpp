@@ -17,9 +17,7 @@ class RendererBackend;
 
 class Renderer::Impl {
 public:
-    Impl(gfx::RendererBackend&,
-         float pixelRatio_,
-         optional<std::string> localFontFamily_);
+    Impl(gfx::RendererBackend&, float pixelRatio_, const optional<std::string>& localFontFamily_);
     ~Impl();
 
 private:

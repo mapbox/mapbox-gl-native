@@ -11,7 +11,7 @@
 
 namespace mbgl {
 
-void requestLocalFile(const std::string& path, ActorRef<FileSourceRequest> req) {
+void requestLocalFile(const std::string& path, const ActorRef<FileSourceRequest>& req) {
     Response response;
     struct stat buf;
     int result = stat(path.c_str(), &buf);

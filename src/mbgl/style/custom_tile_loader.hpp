@@ -21,7 +21,7 @@ public:
 
     CustomTileLoader(const TileFunction& fetchTileFn, const TileFunction& cancelTileFn);
 
-    void fetchTile(const OverscaledTileID& tileID, ActorRef<CustomGeometryTile> tileRef);
+    void fetchTile(const OverscaledTileID& tileID, const ActorRef<CustomGeometryTile>& tileRef);
     void cancelTile(const OverscaledTileID& tileID);
 
     void removeTile(const OverscaledTileID& tileID);

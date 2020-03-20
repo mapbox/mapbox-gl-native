@@ -10,8 +10,8 @@ namespace style {
 
 class CustomGeometrySource::Impl : public Source::Impl {
 public:
-    Impl(std::string id, CustomGeometrySource::Options options);
-    Impl(const Impl&, ActorRef<CustomTileLoader>);
+    Impl(std::string id, const CustomGeometrySource::Options& options);
+    Impl(const Impl&, const ActorRef<CustomTileLoader>&);
 
     optional<std::string> getAttribution() const final;
 

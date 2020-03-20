@@ -17,7 +17,7 @@ CustomGeometryTile::CustomGeometryTile(const OverscaledTileID& overscaledTileID,
                                        const TileParameters& parameters,
                                        Immutable<style::CustomGeometrySource::TileOptions> options_,
                                        ActorRef<style::CustomTileLoader> loader_)
-    : GeometryTile(overscaledTileID, sourceID_, parameters),
+    : GeometryTile(overscaledTileID, std::move(sourceID_), parameters),
       necessity(TileNecessity::Optional),
       options(std::move(options_)),
       loader(std::move(loader_)),

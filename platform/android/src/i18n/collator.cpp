@@ -173,10 +173,8 @@ private:
     jni::Global<jni::Object<android::Locale>> locale;
 };
 
-
-Collator::Collator(bool caseSensitive, bool diacriticSensitive, optional<std::string> locale_)
-    : impl(std::make_shared<Impl>(caseSensitive, diacriticSensitive, std::move(locale_)))
-{}
+Collator::Collator(bool caseSensitive, bool diacriticSensitive, const optional<std::string>& locale_)
+    : impl(std::make_shared<Impl>(caseSensitive, diacriticSensitive, locale_)) {}
 
 bool Collator::operator==(const Collator& other) const {
     return *impl == *(other.impl);

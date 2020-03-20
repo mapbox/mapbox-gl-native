@@ -130,7 +130,7 @@ public:
     ViewportMode getViewportMode() const;
     void setViewportMode(ViewportMode val);
 
-    CameraOptions getCameraOptions(optional<EdgeInsets>) const;
+    CameraOptions getCameraOptions(const optional<EdgeInsets>&) const;
 
     // EdgeInsects
     EdgeInsets getEdgeInsets() const { return edgeInsets; }

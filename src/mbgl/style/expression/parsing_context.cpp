@@ -34,6 +34,7 @@
 #include <mbgl/util/string.hpp>
 
 #include <mapbox/eternal.hpp>
+#include <utility>
 
 namespace mbgl {
 namespace style {
@@ -85,7 +86,7 @@ using namespace mbgl::style::conversion;
 ParseResult ParsingContext::parse(const Convertible& value,
                                   std::size_t index_,
                                   optional<type::Type> expected_,
-                                  optional<TypeAnnotationOption> typeAnnotationOption) {
+                                  const optional<TypeAnnotationOption>& typeAnnotationOption) {
     ParsingContext child(key + "[" + util::toString(index_) + "]",
                          errors,
                          std::move(expected_),
@@ -144,7 +145,8 @@ bool isExpression(const std::string& name) {
     return expressionRegistry.contains(name.c_str());
 }
 
-ParseResult ParsingContext::parse(const Convertible& value, optional<TypeAnnotationOption> typeAnnotationOption) {
+ParseResult ParsingContext::parse(const Convertible& value,
+                                  const optional<TypeAnnotationOption>& typeAnnotationOption) {
     ParseResult parsed;
     
     if (isArray(value)) {
@@ -179,14 +181,16 @@ ParseResult ParsingContext::parse(const Convertible& value, optional<TypeAnnotat
         return parsed;
     }
 
-    auto annotate = [] (std::unique_ptr<Expression> expression, type::Type type, TypeAnnotationOption typeAnnotation) -> std::unique_ptr<Expression> {
+    auto annotate = [](std::unique_ptr<Expression> expression,
+                       const type::Type& type,
+                       TypeAnnotationOption typeAnnotation) -> std::unique_ptr<Expression> {
         switch (typeAnnotation) {
-        case TypeAnnotationOption::assert:
-            return std::make_unique<Assertion>(type, dsl::vec(std::move(expression)));
-        case TypeAnnotationOption::coerce:
-            return std::make_unique<Coercion>(type, dsl::vec(std::move(expression)));
-        case TypeAnnotationOption::omit:
-            return expression;
+            case TypeAnnotationOption::assert:
+                return std::make_unique<Assertion>(type, dsl::vec(std::move(expression)));
+            case TypeAnnotationOption::coerce:
+                return std::make_unique<Coercion>(type, dsl::vec(std::move(expression)));
+            case TypeAnnotationOption::omit:
+                return expression;
         }
 
         // Not reachable, but placate GCC.
@@ -237,7 +241,8 @@ ParseResult ParsingContext::parse(const Convertible& value, optional<TypeAnnotat
     return parsed;
 }
 
-ParseResult ParsingContext::parseExpression(const Convertible& value, optional<TypeAnnotationOption> typeAnnotationOption) {
+ParseResult ParsingContext::parseExpression(const Convertible& value,
+                                            const optional<TypeAnnotationOption>& typeAnnotationOption) {
     return parse(value, typeAnnotationOption);
 }
 

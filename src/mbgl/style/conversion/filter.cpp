@@ -1,11 +1,12 @@
 #include <mbgl/style/conversion/filter.hpp>
 #include <mbgl/style/conversion_impl.hpp>
-#include <mbgl/style/expression/literal.hpp>
-#include <mbgl/style/expression/expression.hpp>
-#include <mbgl/style/expression/type.hpp>
-#include <mbgl/style/expression/compound_expression.hpp>
 #include <mbgl/style/expression/boolean_operator.hpp>
+#include <mbgl/style/expression/compound_expression.hpp>
+#include <mbgl/style/expression/expression.hpp>
+#include <mbgl/style/expression/literal.hpp>
+#include <mbgl/style/expression/type.hpp>
 #include <mbgl/util/geometry.hpp>
+#include <utility>
 
 namespace mbgl {
 namespace style {
@@ -78,7 +79,9 @@ bool isExpression(const Convertible& filter) {
     }
 }
 
-ParseResult createExpression(std::string op, optional<std::vector<std::unique_ptr<Expression>>> args, Error& error) {
+ParseResult createExpression(const std::string& op,
+                             optional<std::vector<std::unique_ptr<Expression>>> args,
+                             Error& error) {
     if (!args) return {};
     assert(std::all_of(args->begin(), args->end(), [](const std::unique_ptr<Expression> &e) {
         return bool(e.get());
@@ -100,7 +103,7 @@ ParseResult createExpression(std::string op, optional<std::vector<std::unique_pt
     }
 }
 
-ParseResult createExpression(std::string op, ParseResult arg, Error& error) {
+ParseResult createExpression(const std::string& op, ParseResult arg, Error& error) {
     if (!arg) {
         return {};
     }
@@ -134,7 +137,9 @@ optional<std::vector<std::unique_ptr<Expression>>> convertLiteralArray(const Con
     return {std::move(output)};
 }
 
-ParseResult convertLegacyComparisonFilter(const Convertible& values, Error& error, optional<std::string> opOverride = {}) {
+ParseResult convertLegacyComparisonFilter(const Convertible& values,
+                                          Error& error,
+                                          const optional<std::string>& opOverride = {}) {
     optional<std::string> op = opOverride ? opOverride : toString(arrayMember(values, 0));
     optional<std::string> property = toString(arrayMember(values, 1));
 

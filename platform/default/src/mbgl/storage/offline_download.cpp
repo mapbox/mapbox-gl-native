@@ -236,7 +236,7 @@ void OfflineDownload::activateDownload() {
     styleResource.setPriority(Resource::Priority::Low);
     styleResource.setUsage(Resource::Usage::Offline);
 
-    ensureResource(std::move(styleResource), [&](Response styleResponse) {
+    ensureResource(std::move(styleResource), [&](const Response& styleResponse) {
         status.requiredResourceCountIsPrecise = true;
 
         style::Parser parser;
@@ -258,7 +258,7 @@ void OfflineDownload::activateDownload() {
                     sourceResource.setPriority(Resource::Priority::Low);
                     sourceResource.setUsage(Resource::Usage::Offline);
 
-                    ensureResource(std::move(sourceResource), [=](Response sourceResponse) {
+                    ensureResource(std::move(sourceResource), [=](const Response& sourceResponse) {
                         style::conversion::Error error;
                         optional<Tileset> tileset = style::conversion::convertJSON<Tileset>(*sourceResponse.data, error);
                         if (tileset) {
@@ -275,45 +275,45 @@ void OfflineDownload::activateDownload() {
             };
 
             switch (type) {
-            case SourceType::Vector: {
-                const auto& vectorSource = *source->as<VectorSource>();
-                handleTiledSource(vectorSource.getURLOrTileset(), util::tileSize);
-                break;
-            }
-
-            case SourceType::Raster: {
-                const auto& rasterSource = *source->as<RasterSource>();
-                handleTiledSource(rasterSource.getURLOrTileset(), rasterSource.getTileSize());
-                break;
-            }
-
-            case SourceType::RasterDEM: {
-                const auto& rasterDEMSource = *source->as<RasterDEMSource>();
-                handleTiledSource(rasterDEMSource.getURLOrTileset(), rasterDEMSource.getTileSize());
-                break;
-            }
-
-            case SourceType::GeoJSON: {
-                const auto& geojsonSource = *source->as<GeoJSONSource>();
-                if (geojsonSource.getURL()) {
-                    queueResource(Resource::source(*geojsonSource.getURL()));
+                case SourceType::Vector: {
+                    const auto& vectorSource = *source->as<VectorSource>();
+                    handleTiledSource(vectorSource.getURLOrTileset(), util::tileSize);
+                    break;
                 }
-                break;
-            }
 
-            case SourceType::Image: {
-                const auto& imageSource = *source->as<ImageSource>();
-                auto imageUrl = imageSource.getURL();
-                if (imageUrl && !imageUrl->empty()) {
-                    queueResource(Resource::image(*imageUrl));
+                case SourceType::Raster: {
+                    const auto& rasterSource = *source->as<RasterSource>();
+                    handleTiledSource(rasterSource.getURLOrTileset(), rasterSource.getTileSize());
+                    break;
                 }
-                break;
-            }
 
-            case SourceType::Video:
-            case SourceType::Annotations:
-            case SourceType::CustomVector:
-                break;
+                case SourceType::RasterDEM: {
+                    const auto& rasterDEMSource = *source->as<RasterDEMSource>();
+                    handleTiledSource(rasterDEMSource.getURLOrTileset(), rasterDEMSource.getTileSize());
+                    break;
+                }
+
+                case SourceType::GeoJSON: {
+                    const auto& geojsonSource = *source->as<GeoJSONSource>();
+                    if (geojsonSource.getURL()) {
+                        queueResource(Resource::source(*geojsonSource.getURL()));
+                    }
+                    break;
+                }
+
+                case SourceType::Image: {
+                    const auto& imageSource = *source->as<ImageSource>();
+                    auto imageUrl = imageSource.getURL();
+                    if (imageUrl && !imageUrl->empty()) {
+                        queueResource(Resource::image(*imageUrl));
+                    }
+                    break;
+                }
+
+                case SourceType::Video:
+                case SourceType::Annotations:
+                case SourceType::CustomVector:
+                    break;
             }
         }
 
@@ -481,7 +481,7 @@ void OfflineDownload::ensureResource(Resource&& resource,
         }
 
         auto fileRequestsIt = requests.insert(requests.begin(), nullptr);
-        *fileRequestsIt = onlineFileSource.request(resource, [=](Response onlineResponse) {
+        *fileRequestsIt = onlineFileSource.request(resource, [=](const Response& onlineResponse) {
             if (onlineResponse.error) {
                 observer->responseError(*onlineResponse.error);
                 if (onlineResponse.error->reason == Response::Error::Reason::NotFound) {

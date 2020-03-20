@@ -443,7 +443,7 @@ void NodeMap::Render(const Nan::FunctionCallbackInfo<v8::Value>& info) {
         assert(!nodeMap->image.data);
         nodeMap->req = std::make_unique<RenderRequest>(Nan::To<v8::Function>(info[1]).ToLocalChecked());
 
-        nodeMap->startRender(std::move(options));
+        nodeMap->startRender(options);
     } catch (const mbgl::style::conversion::Error& err) {
         return Nan::ThrowTypeError(err.message.c_str());
     } catch (const mbgl::util::StyleParseException& ex) {
@@ -455,7 +455,7 @@ void NodeMap::Render(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     info.GetReturnValue().SetUndefined();
 }
 
-void NodeMap::startRender(NodeMap::RenderOptions options) {
+void NodeMap::startRender(const NodeMap::RenderOptions& options) {
     frontend->setSize(options.size);
     map->setSize(options.size);
 
@@ -472,7 +472,7 @@ void NodeMap::startRender(NodeMap::RenderOptions options) {
 
     map->setProjectionMode(projectionOptions);
 
-    map->renderStill(camera, options.debugOptions, [this](const std::exception_ptr eptr) {
+    map->renderStill(camera, options.debugOptions, [this](const std::exception_ptr& eptr) {
         if (eptr) {
             error = eptr;
             uv_async_send(async);

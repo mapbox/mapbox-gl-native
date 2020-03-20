@@ -1,6 +1,7 @@
+#include <mbgl/style/conversion_impl.hpp>
 #include <mbgl/style/expression/assertion.hpp>
 #include <mbgl/style/expression/check_subtype.hpp>
-#include <mbgl/style/conversion_impl.hpp>
+#include <utility>
 
 namespace mbgl {
 namespace style {
@@ -8,10 +9,8 @@ namespace expression {
 
 using namespace mbgl::style::conversion;
 
-Assertion::Assertion(type::Type type_, std::vector<std::unique_ptr<Expression>> inputs_) :
-    Expression(Kind::Assertion, type_),
-    inputs(std::move(inputs_))
-{
+Assertion::Assertion(type::Type type_, std::vector<std::unique_ptr<Expression>> inputs_)
+    : Expression(Kind::Assertion, std::move(type_)), inputs(std::move(inputs_)) {
     assert(!inputs.empty());
 }
 

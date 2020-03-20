@@ -11,7 +11,7 @@ Image::Image(std::string id,
              bool sdf,
              ImageStretches stretchX,
              ImageStretches stretchY,
-             optional<ImageContent> content)
+             const optional<ImageContent>& content)
     : baseImpl(makeMutable<Impl>(
           std::move(id), std::move(image), pixelRatio, sdf, std::move(stretchX), std::move(stretchY), content)) {}
 

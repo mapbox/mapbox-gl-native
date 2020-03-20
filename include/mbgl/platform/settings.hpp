@@ -26,7 +26,7 @@ public:
 
     // Sets multiple setting values by merging current Settings object
     // with provided `values` object.
-    void set(mapbox::base::ValueObject values) noexcept;
+    void set(const mapbox::base::ValueObject& values) noexcept;
 
     // Returns setting value for a specified key or NullValue if element
     // for specified key is missing.

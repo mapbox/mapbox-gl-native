@@ -53,7 +53,7 @@ void RasterSource::loadDescription(FileSource& fileSource) {
     }
 
     const auto& url = urlOrTileset.get<std::string>();
-    req = fileSource.request(Resource::source(url), [this, url](Response res) {
+    req = fileSource.request(Resource::source(url), [this, url](const Response& res) {
         if (res.error) {
             observer->onSourceError(*this, std::make_exception_ptr(std::runtime_error(res.error->message)));
         } else if (res.notModified) {

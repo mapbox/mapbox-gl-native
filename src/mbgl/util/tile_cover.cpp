@@ -34,7 +34,7 @@ struct edge {
 };
 
 // scan-line conversion
-static void scanSpans(edge e0, edge e1, int32_t ymin, int32_t ymax, ScanLine scanLine) {
+static void scanSpans(edge e0, edge e1, int32_t ymin, int32_t ymax, ScanLine& scanLine) {
     double y0 = ::fmax(ymin, std::floor(e1.y0));
     double y1 = ::fmin(ymax, std::ceil(e1.y1));
 

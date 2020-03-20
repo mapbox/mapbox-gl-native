@@ -42,7 +42,7 @@ public:
     using TileFeatures = mapbox::feature::feature_collection<int16_t>;
     using Features = mapbox::feature::feature_collection<double>;
     static std::shared_ptr<GeoJSONData> create(const GeoJSON&,
-                                               Immutable<GeoJSONOptions> = GeoJSONOptions::defaultOptions(),
+                                               const Immutable<GeoJSONOptions>& = GeoJSONOptions::defaultOptions(),
                                                std::shared_ptr<Scheduler> scheduler = nullptr);
 
     virtual ~GeoJSONData() = default;

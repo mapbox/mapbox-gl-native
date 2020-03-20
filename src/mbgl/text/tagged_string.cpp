@@ -12,7 +12,7 @@ namespace mbgl {
 
 void TaggedString::addTextSection(const std::u16string& sectionText,
                                   double scale,
-                                  FontStack fontStack,
+                                  const FontStack& fontStack,
                                   optional<Color> textColor) {
     styledText.first += sectionText;
     sections.emplace_back(scale, fontStack, std::move(textColor));

@@ -64,7 +64,7 @@ void ImageSource::loadDescription(FileSource& fileSource) {
     }
     const Resource imageResource { Resource::Image, *url, {} };
 
-    req = fileSource.request(imageResource, [this](Response res) {
+    req = fileSource.request(imageResource, [this](const Response& res) {
         if (res.error) {
             observer->onSourceError(*this, std::make_exception_ptr(std::runtime_error(res.error->message)));
         } else if (res.notModified) {

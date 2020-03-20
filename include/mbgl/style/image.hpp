@@ -34,7 +34,7 @@ public:
           bool sdf,
           ImageStretches stretchX = {},
           ImageStretches stretchY = {},
-          optional<ImageContent> content = nullopt);
+          const optional<ImageContent>& content = nullopt);
     Image(std::string id,
           PremultipliedImage&& image,
           float pixelRatio,

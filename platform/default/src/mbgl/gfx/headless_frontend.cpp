@@ -14,14 +14,14 @@ namespace mbgl {
 HeadlessFrontend::HeadlessFrontend(float pixelRatio_,
                                    gfx::HeadlessBackend::SwapBehaviour swapBehavior,
                                    const gfx::ContextMode contextMode,
-                                   const optional<std::string> localFontFamily)
+                                   const optional<std::string>& localFontFamily)
     : HeadlessFrontend({256, 256}, pixelRatio_, swapBehavior, contextMode, localFontFamily) {}
 
 HeadlessFrontend::HeadlessFrontend(Size size_,
                                    float pixelRatio_,
                                    gfx::HeadlessBackend::SwapBehaviour swapBehavior,
                                    const gfx::ContextMode contextMode,
-                                   const optional<std::string> localFontFamily)
+                                   const optional<std::string>& localFontFamily)
     : size(size_),
       pixelRatio(pixelRatio_),
       frameTime(0),
@@ -144,7 +144,7 @@ HeadlessFrontend::RenderResult HeadlessFrontend::render(Map& map) {
     HeadlessFrontend::RenderResult result;
     std::exception_ptr error;
 
-    map.renderStill([&](std::exception_ptr e) {
+    map.renderStill([&](const std::exception_ptr& e) {
         if (e) {
             error = e;
         } else {

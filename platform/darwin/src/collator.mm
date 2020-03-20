@@ -9,7 +9,7 @@ namespace platform {
 
 class Collator::Impl {
 public:
-    Impl(bool caseSensitive, bool diacriticSensitive, optional<std::string> locale_)
+    Impl(bool caseSensitive, bool diacriticSensitive, const optional<std::string>& locale_)
         : options((caseSensitive ? 0 : NSCaseInsensitiveSearch) |
                   (diacriticSensitive ? 0 : NSDiacriticInsensitiveSearch))
         , locale(locale_ ?
@@ -47,8 +47,8 @@ private:
     NSLocale* locale;
 };
 
-Collator::Collator(bool caseSensitive, bool diacriticSensitive, optional<std::string> locale_)
-    : impl(std::make_shared<Impl>(caseSensitive, diacriticSensitive, std::move(locale_)))
+Collator::Collator(bool caseSensitive, bool diacriticSensitive, const optional<std::string>& locale_)
+    : impl(std::make_shared<Impl>(caseSensitive, diacriticSensitive, locale_))
 {}
 
 bool Collator::operator==(const Collator& other) const {

@@ -39,7 +39,7 @@ public:
         const bool pitchWithMap,
         const bool collisionDebug,
         const optional<CollisionBoundaries>& avoidEdges,
-        const optional<std::function<bool(const IndexedSubfeature&)>> collisionGroupPredicate,
+        const optional<std::function<bool(const IndexedSubfeature&)>>& collisionGroupPredicate,
         std::vector<ProjectedCollisionBox>& /*out*/);
 
     void insertFeature(const CollisionFeature& feature, const std::vector<ProjectedCollisionBox>&, bool ignorePlacement, uint32_t bucketInstanceId, uint16_t collisionGroupId);
@@ -68,7 +68,7 @@ private:
         const bool pitchWithMap,
         const bool collisionDebug,
         const optional<CollisionBoundaries>& avoidEdges,
-        const optional<std::function<bool(const IndexedSubfeature&)>> collisionGroupPredicate,
+        const optional<std::function<bool(const IndexedSubfeature&)>>& collisionGroupPredicate,
         std::vector<ProjectedCollisionBox>& /*out*/);
 
     float approximateTileDistance(const TileDistance& tileDistance, const float lastSegmentAngle, const float pixelsToTileUnits, const float cameraToAnchorDistance, const bool pitchWithMap);

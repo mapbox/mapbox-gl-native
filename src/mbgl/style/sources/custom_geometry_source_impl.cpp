@@ -4,13 +4,13 @@
 namespace mbgl {
 namespace style {
 
-CustomGeometrySource::Impl::Impl(std::string id_, CustomGeometrySource::Options options)
+CustomGeometrySource::Impl::Impl(std::string id_, const CustomGeometrySource::Options& options)
     : Source::Impl(SourceType::CustomVector, std::move(id_)),
       tileOptions(makeMutable<CustomGeometrySource::TileOptions>(options.tileOptions)),
       zoomRange(options.zoomRange),
       loaderRef({}) {}
 
-CustomGeometrySource::Impl::Impl(const Impl& impl, ActorRef<CustomTileLoader> loaderRef_)
+CustomGeometrySource::Impl::Impl(const Impl& impl, const ActorRef<CustomTileLoader>& loaderRef_)
     : Source::Impl(impl), tileOptions(impl.tileOptions), zoomRange(impl.zoomRange), loaderRef(loaderRef_) {}
 
 bool CustomGeometrySource::Impl::operator!=(const Impl& other) const noexcept {

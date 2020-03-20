@@ -79,7 +79,7 @@ void GeoJSONSource::loadDescription(FileSource& fileSource) {
         return;
     }
 
-    req = fileSource.request(Resource::source(*url), [this](Response res) {
+    req = fileSource.request(Resource::source(*url), [this](const Response& res) {
         if (res.error) {
             observer->onSourceError(
                 *this, std::make_exception_ptr(std::runtime_error(res.error->message)));

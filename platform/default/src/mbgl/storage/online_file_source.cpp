@@ -24,6 +24,7 @@
 #include <cassert>
 #include <list>
 #include <map>
+#include <utility>
 
 namespace mbgl {
 
@@ -77,7 +78,7 @@ public:
 
     ~OnlineFileSourceThread() { NetworkStatus::Unsubscribe(&reachability); }
 
-    void request(AsyncRequest* req, Resource resource, ActorRef<FileSourceRequest> ref) {
+    void request(AsyncRequest* req, Resource resource, const ActorRef<FileSourceRequest>& ref) {
         auto callback = [ref](const Response& res) { ref.invoke(&FileSourceRequest::setResponse, res); };
         tasks[req] = std::make_unique<OnlineFileRequest>(std::move(resource), std::move(callback), *this);
     }
@@ -127,7 +128,7 @@ public:
     void queueRequest(OnlineFileRequest* req) { pendingRequests.insert(req); }
 
     void activateRequest(OnlineFileRequest* req) {
-        auto callback = [=](Response response) {
+        auto callback = [=](const Response& response) {
             activeRequests.erase(req);
             req->request.reset();
             req->completed(response);
@@ -439,7 +440,7 @@ void OnlineFileRequest::schedule(optional<Timestamp> expires) {
     // If we're not being asked for a forced refresh, calculate a timeout that depends on how many
     // consecutive errors we've encountered, and on the expiration time, if present.
     Duration timeout = std::min(http::errorRetryTimeout(failedRequestReason, failedRequests, retryAfter),
-                                http::expirationTimeout(expires, expiredRequests));
+                                http::expirationTimeout(std::move(expires), expiredRequests));
 
     if (timeout == Duration::max()) {
         return;

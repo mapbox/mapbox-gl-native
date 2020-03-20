@@ -255,7 +255,7 @@ void TransformState::setViewportMode(ViewportMode val) {
 
 #pragma mark - Camera options
 
-CameraOptions TransformState::getCameraOptions(optional<EdgeInsets> padding) const {
+CameraOptions TransformState::getCameraOptions(const optional<EdgeInsets>& padding) const {
     return CameraOptions()
         .withCenter(getLatLng())
         .withPadding(padding ? padding : edgeInsets)

@@ -39,6 +39,7 @@
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
+#include <utility>
 
 class SnapshotObserver final : public mbgl::MapSnapshotterObserver {
 public:
@@ -640,11 +641,11 @@ void GLFWView::makeSnapshot(bool withOverlay) {
 
     auto snapshot = [&] {
         snapshotter->setCameraOptions(map->getCameraOptions());
-        snapshotter->snapshot([](std::exception_ptr ptr,
+        snapshotter->snapshot([](const std::exception_ptr &ptr,
                                  mbgl::PremultipliedImage image,
-                                 mbgl::MapSnapshotter::Attributions,
-                                 mbgl::MapSnapshotter::PointForFn,
-                                 mbgl::MapSnapshotter::LatLngForFn) {
+                                 const mbgl::MapSnapshotter::Attributions &,
+                                 const mbgl::MapSnapshotter::PointForFn &,
+                                 const mbgl::MapSnapshotter::LatLngForFn &) {
             if (!ptr) {
                 mbgl::Log::Info(mbgl::Event::General,
                                 "Made snapshot './snapshot.png' with size w:%dpx h:%dpx",
@@ -865,7 +866,7 @@ void GLFWView::report(float duration) {
 }
 
 void GLFWView::setChangeStyleCallback(std::function<void()> callback) {
-    changeStyleCallback = callback;
+    changeStyleCallback = std::move(callback);
 }
 
 void GLFWView::setShouldClose() {
