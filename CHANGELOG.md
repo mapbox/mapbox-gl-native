@@ -28,7 +28,7 @@
 
 - [ios, macos] Allow specifying multiple fonts or font families for local font rendering ([#16253](https://github.com/mapbox/mapbox-gl-native/pull/16253))
 
-  The `localFontFamily` parameter of `mbgl::Renderer::Renderer()` and `mbgl::MapSnapshotter::MapSnapshotter()` can now contain a list of font family names, font display names, and font PostScript names, each name separated by a newline.
+  By default, CJK characters are now set in the font specified by the `text-font` layout property. If the named font is not installed on the device or bundled with the application, the characters are set in one of the fallback fonts passed into the `localFontFamily` parameter of `mbgl::Renderer::Renderer()` and `mbgl::MapSnapshotter::MapSnapshotter()`. This parameter can now contain a list of font family names, font display names, and font PostScript names, each name separated by a newline.
 
 ### 🐞 Bug fixes
 
