@@ -264,7 +264,7 @@ void TilePyramid::handleWrapJump(float lng) {
 
     const float lngDifference = lng - prevLng;
     const float worldDifference = lngDifference / 360;
-    const int wrapDelta = ::round(worldDifference);
+    const int wrapDelta = std::round(worldDifference);
     prevLng = lng;
 
     if (wrapDelta) {
