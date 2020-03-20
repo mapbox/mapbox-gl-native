@@ -7,6 +7,8 @@
 #include <mbgl/text/glyph_atlas.hpp>
 #include <mbgl/text/placement.hpp>
 
+#include <utility>
+
 namespace mbgl {
 
 using namespace style;
@@ -21,7 +23,7 @@ SymbolBucket::SymbolBucket(Immutable<style::SymbolLayoutProperties::PossiblyEval
                            float zoom,
                            bool iconsNeedLinear_,
                            bool sortFeaturesByY_,
-                           const std::string& bucketName_,
+                           std::string bucketName_,
                            const std::vector<SymbolInstance>&& symbolInstances_,
                            const std::vector<SortKeyRange>&& sortKeyRanges_,
                            float tilePixelRatio_,
@@ -29,7 +31,7 @@ SymbolBucket::SymbolBucket(Immutable<style::SymbolLayoutProperties::PossiblyEval
                            std::vector<style::TextWritingModeType> placementModes_,
                            bool iconsInText_)
     : layout(std::move(layout_)),
-      bucketLeaderID(bucketName_),
+      bucketLeaderID(std::move(bucketName_)),
       iconsNeedLinear(iconsNeedLinear_ || iconSize.isDataDriven() || !iconSize.isZoomConstant()),
       sortFeaturesByY(sortFeaturesByY_),
       staticUploaded(false),
