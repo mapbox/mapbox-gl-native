@@ -187,7 +187,7 @@ CameraOptions Map::cameraForLatLngBounds(const LatLngBounds& bounds,
 
 CameraOptions cameraForLatLngs(const std::vector<LatLng>& latLngs, const Transform& transform, const EdgeInsets& padding) {
     if (latLngs.empty()) {
-        return CameraOptions();
+        return {};
     }
     Size size = transform.getState().getSize();
     // Calculate the bounds of the possibly rotated shape with respect to the viewport.

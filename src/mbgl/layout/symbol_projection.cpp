@@ -242,19 +242,17 @@ namespace mbgl {
                                                             const bool returnTileDistance) {
         if (symbol.glyphOffsets.empty()) {
             assert(false);
-            return optional<std::pair<PlacedGlyph, PlacedGlyph>>();
+            return {};
         }
         
         const float firstGlyphOffset = symbol.glyphOffsets.front();
         const float lastGlyphOffset = symbol.glyphOffsets.back();;
 
         optional<PlacedGlyph> firstPlacedGlyph = placeGlyphAlongLine(fontScale * firstGlyphOffset, lineOffsetX, lineOffsetY, flip, anchorPoint, tileAnchorPoint, symbol.segment, symbol.line, symbol.tileDistances, labelPlaneMatrix,  returnTileDistance);
-        if (!firstPlacedGlyph)
-            return optional<std::pair<PlacedGlyph, PlacedGlyph>>();
+        if (!firstPlacedGlyph) return {};
 
         optional<PlacedGlyph> lastPlacedGlyph = placeGlyphAlongLine(fontScale * lastGlyphOffset, lineOffsetX, lineOffsetY, flip, anchorPoint, tileAnchorPoint, symbol.segment, symbol.line, symbol.tileDistances, labelPlaneMatrix, returnTileDistance);
-        if (!lastPlacedGlyph)
-            return optional<std::pair<PlacedGlyph, PlacedGlyph>>();
+        if (!lastPlacedGlyph) return {};
 
         return std::make_pair(*firstPlacedGlyph, *lastPlacedGlyph);
     }

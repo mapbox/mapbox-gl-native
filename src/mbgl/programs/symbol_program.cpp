@@ -168,19 +168,18 @@ SymbolTextAndIconProgram::LayoutUniformValues SymbolTextAndIconProgram::layoutUn
     const TransformState& state,
     const float symbolFadeChange,
     const SymbolSDFPart part) {
-    return SymbolTextAndIconProgram::LayoutUniformValues(
-        SymbolSDFProgram<SymbolSDFTextProgram, style::TextPaintProperties>::layoutUniformValues(true,
-                                                                                                hasVariablePacement,
-                                                                                                values,
-                                                                                                texsize,
-                                                                                                pixelsToGLUnits,
-                                                                                                pixelRatio,
-                                                                                                alongLine,
-                                                                                                tile,
-                                                                                                state,
-                                                                                                symbolFadeChange,
-                                                                                                part)
-            .concat(gfx::UniformValues<SymbolTextAndIconProgramUniforms>(uniforms::texsize::Value(texsize_icon))));
+    return {SymbolSDFProgram<SymbolSDFTextProgram, style::TextPaintProperties>::layoutUniformValues(true,
+                                                                                                    hasVariablePacement,
+                                                                                                    values,
+                                                                                                    texsize,
+                                                                                                    pixelsToGLUnits,
+                                                                                                    pixelRatio,
+                                                                                                    alongLine,
+                                                                                                    tile,
+                                                                                                    state,
+                                                                                                    symbolFadeChange,
+                                                                                                    part)
+                .concat(gfx::UniformValues<SymbolTextAndIconProgramUniforms>(uniforms::texsize::Value(texsize_icon)))};
 }
 
 template class SymbolSDFProgram<SymbolSDFIconProgram, style::IconPaintProperties>;

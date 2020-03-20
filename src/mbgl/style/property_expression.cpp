@@ -40,14 +40,11 @@ float PropertyExpressionBase::interpolationFactor(const Range<float>& inputLevel
 
 Range<float> PropertyExpressionBase::getCoveringStops(const float lower, const float upper) const noexcept {
     return zoomCurve.match(
-        [](std::nullptr_t) {
+        [](std::nullptr_t) -> Range<float> {
             assert(false);
-            return Range<float>(0.0f, 0.0f);
+            return {0.0f, 0.0f};
         },
-        [&](auto z) {
-            return z->getCoveringStops(lower, upper);
-        }
-    );
+        [&](auto z) { return z->getCoveringStops(lower, upper); });
 }
 
 const expression::Expression& PropertyExpressionBase::getExpression() const noexcept {

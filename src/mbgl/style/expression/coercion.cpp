@@ -25,7 +25,7 @@ EvaluationResult toNumber(const Value& v) {
             try {
                 return util::stof(s);
             } catch (...) {
-                return optional<double>();
+                return {};
             }
         },
         [](const auto&) { return optional<double>(); }
