@@ -571,7 +571,7 @@ void SymbolLayout::addFeature(const std::size_t layoutFeatureIndex,
             verticallyShapedIcon->fitIconToText(
                 shapedTextOrientations.vertical, iconTextFit, layout->get<IconTextFitPadding>(), iconOffset, fontScale);
         }
-        const auto shapedText = getDefaultHorizontalShaping(shapedTextOrientations);
+        const auto& shapedText = getDefaultHorizontalShaping(shapedTextOrientations);
         if (shapedText) {
             shapedIcon->fitIconToText(
                 shapedText, iconTextFit, layout->get<IconTextFitPadding>(), iconOffset, fontScale);
