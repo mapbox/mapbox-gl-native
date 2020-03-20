@@ -43,7 +43,7 @@
 
 class SnapshotObserver final : public mbgl::MapSnapshotterObserver {
 public:
-    ~SnapshotObserver() = default;
+    ~SnapshotObserver() override = default;
     void onDidFinishLoadingStyle() override {
         if (didFinishLoadingStyleCallback) {
             didFinishLoadingStyleCallback();

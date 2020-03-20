@@ -108,7 +108,7 @@ public:
         : renderer(std::make_unique<util::Thread<SnapshotterRenderer>>(
               "Snapshotter", size, pixelRatio, std::move(localFontFamily))) {}
 
-    ~SnapshotterRendererFrontend() = default;
+    ~SnapshotterRendererFrontend() override = default;
 
     void reset() override { renderer->actor().invoke(&SnapshotterRenderer::reset); }
 
