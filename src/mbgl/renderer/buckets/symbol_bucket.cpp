@@ -281,8 +281,8 @@ SymbolInstanceReferences SymbolBucket::getSortedSymbols(const float angle) const
     const float cos = std::cos(angle);
 
     std::sort(result.begin(), result.end(), [sin, cos](const SymbolInstance& a, const SymbolInstance& b) {
-        const auto aRotated = ::lround(sin * a.anchor.point.x + cos * a.anchor.point.y);
-        const auto bRotated = ::lround(sin * b.anchor.point.x + cos * b.anchor.point.y);
+        const auto aRotated = std::lround(sin * a.anchor.point.x + cos * a.anchor.point.y);
+        const auto bRotated = std::lround(sin * b.anchor.point.x + cos * b.anchor.point.y);
         if (aRotated != bRotated) {
             return aRotated < bRotated;
         }
