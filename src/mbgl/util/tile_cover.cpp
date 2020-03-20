@@ -122,6 +122,7 @@ std::vector<UnwrappedTileID> tileCover(const Point<double>& tl,
             }), t.end());
 
     std::vector<UnwrappedTileID> result;
+    result.reserve(t.size());
     for (const auto& id : t) {
         result.emplace_back(z, id.x, id.y);
     }
