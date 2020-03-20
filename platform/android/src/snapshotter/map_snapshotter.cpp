@@ -1,6 +1,5 @@
 #include "map_snapshotter.hpp"
 
-#include <mapbox/weak.hpp>
 #include <mbgl/actor/scheduler.hpp>
 #include <mbgl/renderer/renderer.hpp>
 #include <mbgl/style/style.hpp>
@@ -12,20 +11,6 @@
 
 namespace mbgl {
 namespace android {
-
-MapSnapshotter::DeleteOnThread::DeleteOnThread() = default;
-MapSnapshotter::DeleteOnThread::DeleteOnThread(mapbox::base::WeakPtr<mbgl::Scheduler> weakScheduler_)
-    : weakScheduler(weakScheduler_) {}
-
-void MapSnapshotter::DeleteOnThread::operator()(mbgl::MapSnapshotter* p) const {
-    auto guard = weakScheduler.lock();
-    if (weakScheduler && weakScheduler.get() != mbgl::Scheduler::GetCurrent()) {
-        weakScheduler->schedule(
-            [ptr = std::shared_ptr<mbgl::MapSnapshotter>(p, DeleteOnThread(weakScheduler))] { (void)ptr; });
-    } else {
-        delete p;
-    }
-}
 
 MapSnapshotter::MapSnapshotter(jni::JNIEnv& _env,
                                const jni::Object<MapSnapshotter>& _obj,
@@ -48,20 +33,20 @@ MapSnapshotter::MapSnapshotter(jni::JNIEnv& _env,
         return;
     }
 
+    weakScheduler = mbgl::Scheduler::GetCurrent()->makeWeakPtr();
+
     jFileSource = FileSource::getNativePeer(_env, _jFileSource);
     auto size = mbgl::Size { static_cast<uint32_t>(width), static_cast<uint32_t>(height) };
 
     showLogo = _showLogo;
 
     // Create the core snapshotter
-    snapshotter = std::unique_ptr<mbgl::MapSnapshotter, DeleteOnThread>(
-        new mbgl::MapSnapshotter(size,
+    snapshotter = std::make_unique<mbgl::MapSnapshotter>(size,
                                  pixelRatio,
                                  mbgl::android::FileSource::getSharedResourceOptions(_env, _jFileSource),
                                  *this,
                                  _localIdeographFontFamily ? jni::Make<std::string>(_env, _localIdeographFontFamily)
-                                                           : optional<std::string>{}),
-        DeleteOnThread(mbgl::Scheduler::GetCurrent()->makeWeakPtr()));
+                                                           : optional<std::string>{});
 
     if (position) {
         snapshotter->setCameraOptions(CameraPosition::getCameraOptions(_env, position, pixelRatio));
@@ -78,7 +63,18 @@ MapSnapshotter::MapSnapshotter(jni::JNIEnv& _env,
     }
 }
 
-MapSnapshotter::~MapSnapshotter() = default;
+MapSnapshotter::~MapSnapshotter() {
+    auto guard = weakScheduler.lock();
+    if (weakScheduler && weakScheduler.get() != mbgl::Scheduler::GetCurrent()) {
+        snapshotter->cancel();
+        weakScheduler->schedule([ptr = snapshotter.release()]() mutable {
+            if (ptr) {
+                delete ptr;
+                ptr = nullptr;
+            }
+        });
+    }
+}
 
 void MapSnapshotter::start(JNIEnv& env) {
     MBGL_VERIFY_THREAD(tid);
