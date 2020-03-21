@@ -35,7 +35,8 @@ void RenderRasterSource::updateInternal(const Tileset& tileset,
         tileset.zoomRange,
         tileset.bounds,
         [&](const OverscaledTileID& tileID) { return std::make_unique<RasterTile>(tileID, parameters, tileset); },
-        baseImpl->getPrefetchZoomDelta());
+        baseImpl->getPrefetchZoomDelta(),
+        baseImpl->getMaxOverscaleFactorForParentTiles());
     algorithm::updateTileMasks(tilePyramid.getRenderedTiles());
 }
 

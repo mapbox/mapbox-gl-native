@@ -53,7 +53,8 @@ void RenderCustomGeometrySource::update(Immutable<style::Source::Impl> baseImpl_
             return std::make_unique<CustomGeometryTile>(
                 tileID, impl().id, parameters, impl().getTileOptions(), *tileLoader);
         },
-        baseImpl->getPrefetchZoomDelta());
+        baseImpl->getPrefetchZoomDelta(),
+        baseImpl->getMaxOverscaleFactorForParentTiles());
 }
 
 } // namespace mbgl
