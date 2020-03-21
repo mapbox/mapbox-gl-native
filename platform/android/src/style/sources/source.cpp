@@ -118,6 +118,22 @@ static std::unique_ptr<Source> createSourcePeer(jni::JNIEnv& env,
         return jni::Local<jni::Integer>(env, nullptr);
     }
 
+    void Source::setMaxOverscaleFactorForParentTiles(jni::JNIEnv& env, jni::Integer& maxOverscaleFactor) {
+        if (!maxOverscaleFactor) {
+            source.setMaxOverscaleFactorForParentTiles(nullopt);
+        } else {
+            source.setMaxOverscaleFactorForParentTiles(jni::Unbox(env, maxOverscaleFactor));
+        }
+    }
+
+    jni::Local<jni::Integer> Source::getMaxOverscaleFactorForParentTiles(jni::JNIEnv& env) {
+        auto maxOverscaleFactor = source.getMaxOverscaleFactorForParentTiles();
+        if (maxOverscaleFactor) {
+            return jni::Box(env, jni::jint(*maxOverscaleFactor));
+        }
+        return jni::Local<jni::Integer>(env, nullptr);
+    }
+
     void Source::addToStyle(JNIEnv& env, const jni::Object<Source>& obj, mbgl::style::Style& style) {
         if (!ownedSource) {
             throw std::runtime_error("Cannot add source twice");
@@ -189,13 +205,16 @@ static std::unique_ptr<Source> createSourcePeer(jni::JNIEnv& env,
         #define METHOD(MethodPtr, name) jni::MakeNativePeerMethod<decltype(MethodPtr), (MethodPtr)>(name)
 
         // Register the peer
-        jni::RegisterNativePeer<Source>(env,
-                                        javaClass,
-                                        "nativePtr",
-                                        METHOD(&Source::getId, "nativeGetId"),
-                                        METHOD(&Source::getAttribution, "nativeGetAttribution"),
-                                        METHOD(&Source::setPrefetchZoomDelta, "nativeSetPrefetchZoomDelta"),
-                                        METHOD(&Source::getPrefetchZoomDelta, "nativeGetPrefetchZoomDelta"));
+        jni::RegisterNativePeer<Source>(
+            env,
+            javaClass,
+            "nativePtr",
+            METHOD(&Source::getId, "nativeGetId"),
+            METHOD(&Source::getAttribution, "nativeGetAttribution"),
+            METHOD(&Source::setPrefetchZoomDelta, "nativeSetPrefetchZoomDelta"),
+            METHOD(&Source::getPrefetchZoomDelta, "nativeGetPrefetchZoomDelta"),
+            METHOD(&Source::setMaxOverscaleFactorForParentTiles, "nativeSetMaxOverscaleFactorForParentTiles"),
+            METHOD(&Source::getMaxOverscaleFactorForParentTiles, "nativeGetMaxOverscaleFactorForParentTiles"));
 
         // Register subclasses
         GeoJSONSource::registerNative(env);
