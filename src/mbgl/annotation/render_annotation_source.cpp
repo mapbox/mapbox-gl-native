@@ -40,7 +40,8 @@ void RenderAnnotationSource::update(Immutable<style::Source::Impl> baseImpl_,
         {0, 16},
         optional<LatLngBounds>{},
         [&](const OverscaledTileID& tileID) { return std::make_unique<AnnotationTile>(tileID, parameters); },
-        baseImpl->getPrefetchZoomDelta());
+        baseImpl->getPrefetchZoomDelta(),
+        baseImpl->getMaxOverscaleFactorForParentTiles());
 }
 
 std::unordered_map<std::string, std::vector<Feature>>

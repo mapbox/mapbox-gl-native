@@ -33,7 +33,8 @@ void RenderVectorSource::updateInternal(const Tileset& tileset,
         [&](const OverscaledTileID& tileID) {
             return std::make_unique<VectorTile>(tileID, baseImpl->id, parameters, tileset);
         },
-        baseImpl->getPrefetchZoomDelta());
+        baseImpl->getPrefetchZoomDelta(),
+        baseImpl->getMaxOverscaleFactorForParentTiles());
 }
 
 } // namespace mbgl

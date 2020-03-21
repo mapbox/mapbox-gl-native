@@ -42,7 +42,8 @@ public:
                 Range<uint8_t> zoomRange,
                 optional<LatLngBounds> bounds,
                 std::function<std::unique_ptr<Tile>(const OverscaledTileID&)> createTile,
-                optional<uint8_t> sourcePrefetchZoomDelta);
+                const optional<uint8_t>& sourcePrefetchZoomDelta,
+                const optional<uint8_t>& maxParentTileOverscaleFactor);
 
     const std::map<UnwrappedTileID, std::reference_wrapper<Tile>>& getRenderedTiles() const { return renderedTiles; }
     Tile* getTile(const OverscaledTileID&);

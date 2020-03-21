@@ -22,10 +22,13 @@ public:
     virtual optional<std::string> getAttribution() const = 0;
     void setPrefetchZoomDelta(optional<uint8_t> delta) noexcept;
     optional<uint8_t> getPrefetchZoomDelta() const noexcept;
+    void setMaxOverscaleFactorForParentTiles(optional<uint8_t> overscaleFactor) noexcept;
+    optional<uint8_t> getMaxOverscaleFactorForParentTiles() const noexcept;
 
     const SourceType type;
     const std::string id;
     optional<uint8_t> prefetchZoomDelta;
+    optional<uint8_t> maxOverscaleFactor;
 
 protected:
     Impl(SourceType, std::string);
