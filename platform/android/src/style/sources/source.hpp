@@ -48,6 +48,10 @@ public:
 
     jni::Local<jni::Integer> getPrefetchZoomDelta(jni::JNIEnv&);
 
+    void setMaxOverscaleFactorForParentTiles(jni::JNIEnv& env, jni::Integer& delta);
+
+    jni::Local<jni::Integer> getMaxOverscaleFactorForParentTiles(jni::JNIEnv&);
+
     void addToStyle(JNIEnv& env, const jni::Object<Source>& obj, mbgl::style::Style& style);
 
 protected:
