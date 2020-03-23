@@ -78,12 +78,12 @@ workflows:
           metrics: true
           style_tests: true
       - build-template:
-          name: linux-gcc4.9-release
+          name: linux-gcc5-release
           executor_name: ubuntu-disco
           target_is_linux: true
           requires:
             - linux-gcc8-release
-          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=gcc-4.9 -DCMAKE_CXX_COMPILER=g++-4.9'
+          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=gcc-5 -DCMAKE_CXX_COMPILER=g++-5'
           build_params: '--target mbgl-glfw'
           test_params: '-N -Q'
       - build-template:
