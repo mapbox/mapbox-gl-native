@@ -28,6 +28,7 @@ namespace mbgl {
 
 using vec3 = std::array<double, 3>;
 using vec3f = std::array<float, 3>;
+using vec3i = std::array<int, 3>;
 using mat3 = std::array<double, 9>;
 
 namespace matrix {

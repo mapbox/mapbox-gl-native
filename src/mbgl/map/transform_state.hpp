@@ -216,6 +216,7 @@ public:
 
     void constrain(double& scale, double& x, double& y) const;
     const mat4& getProjectionMatrix() const;
+    const mat4& getInvProjectionMatrix() const;
 
 private:
     bool rotatedNorth() const;
@@ -282,6 +283,7 @@ private:
 
     mutable bool requestMatricesUpdate{true};
     mutable mat4 projectionMatrix;
+    mutable mat4 invProjectionMatrix;
     mutable mat4 coordMatrix;
     mutable mat4 invertedMatrix;
 };

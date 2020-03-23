@@ -171,15 +171,23 @@ void TransformState::updateMatricesIfNeeded() const {
     getProjMatrix(projectionMatrix);
     coordMatrix = coordinatePointMatrix(projectionMatrix);
 
-    bool err = matrix::invert(invertedMatrix, coordMatrix);
+    bool err = matrix::invert(invProjectionMatrix, projectionMatrix);
+    if (err) throw std::runtime_error("failed to invert projectionMatrix");
 
+    err = matrix::invert(invertedMatrix, coordMatrix);
     if (err) throw std::runtime_error("failed to invert coordinatePointMatrix");
+
     requestMatricesUpdate = false;
 }
 
 const mat4& TransformState::getProjectionMatrix() const {
     updateMatricesIfNeeded();
     return projectionMatrix;
+}
+
+const mat4& TransformState::getInvProjectionMatrix() const {
+    updateMatricesIfNeeded();
+    return invProjectionMatrix;
 }
 
 const mat4& TransformState::getCoordMatrix() const {
