@@ -407,9 +407,8 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(
         renderTreeParameters->placementChanged = !placementController.placementIsRecent(
             updateParameters->timePoint, updateParameters->transformState.getZoom(), placementUpdatePeriodOverride);
         symbolBucketsChanged |= renderTreeParameters->placementChanged;
-
         if (renderTreeParameters->placementChanged) {
-            Mutable<Placement> placement = makeMutable<Placement>(updateParameters, placementController.getPlacement());
+            Mutable<Placement> placement = Placement::create(updateParameters, placementController.getPlacement());
             placement->placeLayers(layersNeedPlacement);
             placementController.setPlacement(std::move(placement));
             crossTileSymbolIndex.pruneUnusedLayers(usedSymbolLayers);
@@ -425,7 +424,7 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(
     } else {
         renderTreeParameters->placementChanged = symbolBucketsChanged = !layersNeedPlacement.empty();
         if (renderTreeParameters->placementChanged) {
-            Mutable<Placement> placement = makeMutable<Placement>(updateParameters);
+            Mutable<Placement> placement = Placement::create(updateParameters);
             placement->placeLayers(layersNeedPlacement);
             placementController.setPlacement(std::move(placement));
         }
