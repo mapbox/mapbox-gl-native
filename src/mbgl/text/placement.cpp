@@ -105,6 +105,13 @@ Placement::Placement(std::shared_ptr<const UpdateParameters> updateParameters_,
 
 Placement::Placement() : collisionIndex({}, MapMode::Static), collisionGroups(true) {}
 
+void Placement::placeLayers(const RenderLayerReferences& layers) {
+    for (auto it = layers.crbegin(); it != layers.crend(); ++it) {
+        placeLayer(*it);
+    }
+    commit();
+}
+
 void Placement::placeLayer(const RenderLayer& layer) {
     std::set<uint32_t> seenCrossTileIDs;
     for (const BucketPlacementData& data : layer.getPlacementData()) {
