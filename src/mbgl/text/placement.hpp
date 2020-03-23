@@ -117,7 +117,7 @@ public:
                                      optional<Immutable<Placement>> prevPlacement = nullopt);
 
     virtual ~Placement();
-    void placeLayers(const RenderLayerReferences&);
+    virtual void placeLayers(const RenderLayerReferences&);
     void updateLayerBuckets(const RenderLayer&, const TransformState&, bool updateOpacities) const;
     virtual float symbolFadeChange(TimePoint now) const;
     virtual bool hasTransitions(TimePoint now) const;

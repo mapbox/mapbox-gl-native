@@ -557,10 +557,10 @@ void Placement::placeSymbolBucket(const BucketPlacementData& params, std::set<ui
 namespace {
 
 SymbolInstanceReferences getBucketSymbols(const SymbolBucket& bucket,
-                                          optional<SortKeyRange> sortKeyRange,
-                                          float bearing) {
+                                          const optional<SortKeyRange>& sortKeyRange,
+                                          double bearing) {
     if (bucket.layout->get<style::SymbolZOrder>() == style::SymbolZOrderType::ViewportY) {
-        auto sortedSymbols = bucket.getSortedSymbols(bearing);
+        auto sortedSymbols = bucket.getSortedSymbols(float(bearing));
         // Place in the reverse order than draw i.e., starting from the foreground elements.
         std::reverse(std::begin(sortedSymbols), std::end(sortedSymbols));
         return sortedSymbols;
@@ -1156,7 +1156,7 @@ const RetainedQueryData& Placement::getQueryData(uint32_t bucketInstanceId) cons
 
 class StaticPlacement : public Placement {
 public:
-    StaticPlacement(std::shared_ptr<const UpdateParameters> updateParameters_)
+    explicit StaticPlacement(std::shared_ptr<const UpdateParameters> updateParameters_)
         : Placement(std::move(updateParameters_), nullopt) {}
 
 private:
@@ -1174,13 +1174,13 @@ void StaticPlacement::commit() {
             JointOpacityState(jointPlacement.second.text, jointPlacement.second.icon, jointPlacement.second.skipFade));
     }
 }
-
 class TilePlacement : public StaticPlacement {
 public:
-    TilePlacement(std::shared_ptr<const UpdateParameters> updateParameters_)
+    explicit TilePlacement(std::shared_ptr<const UpdateParameters> updateParameters_)
         : StaticPlacement(std::move(updateParameters_)) {}
 
 private:
+    void placeLayers(const RenderLayerReferences&) override;
     optional<CollisionBoundaries> getAvoidEdges(const SymbolBucket&, const mat4&) override;
     SymbolInstanceReferences getSortedSymbols(const BucketPlacementData&, float pixelRatio) override;
     bool stickToFirstVariableAnchor(const CollisionBox& box,
@@ -1190,7 +1190,18 @@ private:
 
     std::unordered_map<uint32_t, bool> locationCache;
     optional<CollisionBoundaries> tileBorders;
+    bool onlyLabelsIntersectingTileBorders;
 };
+
+void TilePlacement::placeLayers(const RenderLayerReferences& layers) {
+    // In order to avoid label cut-offs, at first, place the labels,
+    // which cross tile boundaries.
+    onlyLabelsIntersectingTileBorders = true;
+    StaticPlacement::placeLayers(layers);
+    // Place the rest labels.
+    onlyLabelsIntersectingTileBorders = false;
+    StaticPlacement::placeLayers(layers);
+}
 
 optional<CollisionBoundaries> TilePlacement::getAvoidEdges(const SymbolBucket& bucket, const mat4& posMatrix) {
     tileBorders = collisionIndex.projectTileBoundaries(posMatrix);
@@ -1209,7 +1220,8 @@ SymbolInstanceReferences TilePlacement::getSortedSymbols(const BucketPlacementDa
     const auto& state = collisionIndex.getTransformState();
     if (layout.get<style::SymbolPlacement>() != style::SymbolPlacementType::Point ||
         layout.get<style::SymbolAvoidEdges>()) {
-        return StaticPlacement::getSortedSymbols(params, pixelRatio);
+        return onlyLabelsIntersectingTileBorders ? SymbolInstanceReferences()
+                                                 : StaticPlacement::getSortedSymbols(params, pixelRatio);
     }
     const bool rotateTextWithMap = layout.get<style::TextRotationAlignment>() == style::AlignmentType::Map;
     const bool pitchTextWithMap = layout.get<style::TextPitchAlignment>() == style::AlignmentType::Map;
@@ -1221,7 +1233,6 @@ SymbolInstanceReferences TilePlacement::getSortedSymbols(const BucketPlacementDa
         getBucketSymbols(bucket, params.sortKeyRange, collisionIndex.getTransformState().getBearing());
     optional<style::TextVariableAnchorType> variableAnchor;
     if (!variableTextAnchors.empty()) variableAnchor = variableTextAnchors.front();
-    locationCache.clear();
 
     // Keeps the data necessary to find a feature location according to a tile.
     struct NeighborTileData {
@@ -1241,7 +1252,7 @@ SymbolInstanceReferences TilePlacement::getSortedSymbols(const BucketPlacementDa
     uint8_t z = renderTile.id.canonical.z;
     uint32_t x = renderTile.id.canonical.x;
     uint32_t y = renderTile.id.canonical.y;
-    const std::array<NeighborTileData, 4> neightbors{{
+    const std::array<NeighborTileData, 4> neighbours{{
         {collisionIndex, UnwrappedTileID(z, x, y - 1), {0.0f, util::EXTENT}},  // top
         {collisionIndex, UnwrappedTileID(z, x, y + 1), {0.0f, -util::EXTENT}}, // bottom
         {collisionIndex, UnwrappedTileID(z, x - 1, y), {util::EXTENT, 0.0f}},  // left
@@ -1252,7 +1263,7 @@ SymbolInstanceReferences TilePlacement::getSortedSymbols(const BucketPlacementDa
         bool intersects =
             collisionIndex.intersectsTileEdges(collisionBox, shift, renderTile.matrix, pixelRatio, *tileBorders);
         // Check if this symbol intersects the neighbor tile borders. If so, it also shall be placed with priority.
-        for (const auto& neighbor : neightbors) {
+        for (const auto& neighbor : neighbours) {
             if (intersects) break;
             intersects = collisionIndex.intersectsTileEdges(
                 collisionBox, shift + neighbor.shift, neighbor.matrix, pixelRatio, neighbor.borders);
@@ -1261,16 +1272,12 @@ SymbolInstanceReferences TilePlacement::getSortedSymbols(const BucketPlacementDa
     };
 
     auto symbolIntersectsTileEdges = [
-        this,
         &collisionBoxIntersectsTileEdges,
         variableAnchor,
         pitchTextWithMap,
         rotateTextWithMap,
         bearing = state.getBearing()
     ](const SymbolInstance& symbol) noexcept->bool {
-        auto it = locationCache.find(symbol.crossTileID);
-        if (it != locationCache.end()) return it->second;
-
         bool intersects = false;
         if (!symbol.textCollisionFeature.boxes.empty()) {
             const auto& textCollisionBox = symbol.textCollisionFeature.boxes.front();
@@ -1296,26 +1303,22 @@ SymbolInstanceReferences TilePlacement::getSortedSymbols(const BucketPlacementDa
             intersects = collisionBoxIntersectsTileEdges(iconCollisionBox, {});
         }
 
-        locationCache.insert(std::make_pair(symbol.crossTileID, intersects));
         return intersects;
     };
 
-    std::stable_sort(
-        symbolInstances.begin(),
-        symbolInstances.end(),
-        [&symbolIntersectsTileEdges](const SymbolInstance& a, const SymbolInstance& b) noexcept {
-            assert(!a.textCollisionFeature.alongLine);
-            assert(!b.textCollisionFeature.alongLine);
-            auto intersectsA = symbolIntersectsTileEdges(a);
-            auto intersectsB = symbolIntersectsTileEdges(b);
-            if (intersectsA) {
-                if (!intersectsB) return true;
-                // Both symbols are inrecepting the tile borders, we need a universal cross-tile rule
-                // to define which of them shall be placed first - use anchor `y` point.
-                return a.anchor.point.y < b.anchor.point.y;
-            }
-            return false;
+    if (onlyLabelsIntersectingTileBorders) {
+        SymbolInstanceReferences filtered;
+        filtered.reserve(symbolInstances.size());
+        for (const SymbolInstance& symbol : symbolInstances) {
+            if (symbolIntersectsTileEdges(symbol)) filtered.push_back(symbol);
+        }
+        // Add more stability, sorting tile border labels by their Y position.
+        std::stable_sort(filtered.begin(), filtered.end(), [](const SymbolInstance& a, const SymbolInstance& b) {
+            return a.anchor.point.y < b.anchor.point.y;
         });
+        return filtered;
+    }
+
     return symbolInstances;
 }
 
