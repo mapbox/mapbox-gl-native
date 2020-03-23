@@ -309,10 +309,8 @@ target_link_libraries(
     example-custom-layer
     PRIVATE
         GLESv2
+        Mapbox::Base
         Mapbox::Base::optional
-        Mapbox::Base::typewrapper
-        Mapbox::Base::value
-        Mapbox::Base::weak
         log
         mbgl-compiler-options
 )

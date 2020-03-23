@@ -3,7 +3,7 @@
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/optional.hpp>
 
-#include <mapbox/value.hpp>
+#include <mapbox/compatibility/value.hpp>
 
 namespace mbgl {
 namespace style {

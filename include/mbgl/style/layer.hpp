@@ -6,8 +6,8 @@
 #include <mbgl/util/immutable.hpp>
 #include <mbgl/util/optional.hpp>
 
-#include <mapbox/weak.hpp>
-#include <mapbox/type_wrapper.hpp>
+#include <mapbox/std/weak.hpp>
+#include <mapbox/util/type_wrapper.hpp>
 
 #include <cassert>
 #include <memory>

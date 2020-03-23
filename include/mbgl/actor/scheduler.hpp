@@ -2,7 +2,7 @@
 
 #include <mbgl/util/pass_types.hpp>
 
-#include <mapbox/weak.hpp>
+#include <mapbox/std/weak.hpp>
 
 #include <functional>
 #include <memory>

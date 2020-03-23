@@ -4,7 +4,7 @@
 
 #include <memory>
 
-#include <mapbox/weak.hpp>
+#include <mapbox/std/weak.hpp>
 
 namespace mbgl {
 

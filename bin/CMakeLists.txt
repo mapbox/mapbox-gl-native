@@ -6,8 +6,8 @@ add_executable(
 target_link_libraries(
     mbgl-cache
     PRIVATE
+        Mapbox::Base
         Mapbox::Base::Extras::args
-        Mapbox::Base::io
         mbgl-compiler-options
         mbgl-core
 )

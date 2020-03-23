@@ -3,7 +3,7 @@
 #include <mbgl/storage/resource_transform.hpp>
 #include <mbgl/storage/response.hpp>
 
-#include <mapbox/value.hpp>
+#include <mapbox/compatibility/value.hpp>
 
 #include <functional>
 #include <memory>
