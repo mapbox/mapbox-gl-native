@@ -1,4 +1,4 @@
-Checks: '-*,bugprone-*,clang-analyzer-*,google-*,modernize-*,performance-*,-clang-analyzer-osx.*,-google-readability-braces-around-statements,-google-readability-todo,-google-runtime-int,-google-runtime-references'
-WarningsAsErrors: 'bugprone-use-after-move,performance-*'
+Checks: '-*,bugprone-*,clang-analyzer-*,google-*,modernize-*,performance-*,-clang-analyzer-osx.*,-google-readability-braces-around-statements,-google-readability-todo,-google-runtime-int,-google-runtime-references,-modernize-avoid-c-arrays'
+WarningsAsErrors: 'bugprone-use-after-move,modernize-*,performance-*'
 HeaderFilterRegex: '.*'
 FormatStyle: file
