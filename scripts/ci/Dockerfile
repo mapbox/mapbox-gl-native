@@ -72,9 +72,7 @@ RUN set -eu \
     && apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 1E9377A2BA9EF27F \
     && add-apt-repository "deb http://ppa.launchpad.net/ubuntu-toolchain-r/test/ubuntu xenial main" \
     && add-apt-repository "deb http://us.archive.ubuntu.com/ubuntu/ xenial main universe" \
-    && apt-get install -y \
-        g++-4.9 \
-        g++-5
+    && apt-get install -y g++-5
 
 # Install Android NDK
 RUN set -eu \
