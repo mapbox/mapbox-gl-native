@@ -11,7 +11,7 @@
 #include <unordered_set>
 #include <unordered_map>
 
-#include <mapbox/weak.hpp>
+#include <mapbox/std/weak.hpp>
 
 namespace mbgl {
 

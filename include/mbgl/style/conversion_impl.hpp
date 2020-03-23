@@ -11,7 +11,7 @@
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/traits.hpp>
 
-#include <mapbox/value.hpp>
+#include <mapbox/compatibility/value.hpp>
 
 #include <array>
 #include <chrono>

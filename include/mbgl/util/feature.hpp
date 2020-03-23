@@ -3,7 +3,7 @@
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/string.hpp>
 
-#include <mapbox/value.hpp>
+#include <mapbox/compatibility/value.hpp>
 
 namespace mbgl {
 

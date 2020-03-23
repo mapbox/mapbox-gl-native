@@ -25,9 +25,9 @@ target_include_directories(
 target_link_libraries(
     mbgl-expression-test
     PRIVATE
+        Mapbox::Base
         Mapbox::Base::Extras::args
         Mapbox::Base::Extras::filesystem
-        Mapbox::Base::io
         mbgl-core
 )
 

@@ -5,7 +5,7 @@
 #include <mbgl/util/run_loop.hpp>
 
 #include <args.hxx>
-#include <mapbox/io.hpp>
+#include <mapbox/io/io.hpp>
 
 #include <fstream>
 #include <iostream>

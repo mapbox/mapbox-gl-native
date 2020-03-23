@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mapbox/value.hpp>
+#include <mapbox/compatibility/value.hpp>
 
 #include <memory>
 

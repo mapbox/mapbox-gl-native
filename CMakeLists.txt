@@ -960,15 +960,13 @@ target_link_libraries(
         mbgl-vendor-vector-tile
         mbgl-vendor-wagyu
     PUBLIC
+        Mapbox::Base
         Mapbox::Base::Extras::expected-lite
         Mapbox::Base::Extras::rapidjson
         Mapbox::Base::geojson.hpp
         Mapbox::Base::geometry.hpp
         Mapbox::Base::optional
-        Mapbox::Base::typewrapper
-        Mapbox::Base::value
         Mapbox::Base::variant
-        Mapbox::Base::weak
 )
 
 set_target_properties(
