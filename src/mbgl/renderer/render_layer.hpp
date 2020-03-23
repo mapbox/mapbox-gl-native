@@ -146,4 +146,6 @@ private:
     bool hasRenderFailures = false;
 };
 
+using RenderLayerReferences = std::vector<std::reference_wrapper<RenderLayer>>;
+
 } // namespace mbgl

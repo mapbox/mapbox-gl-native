@@ -21,7 +21,6 @@ namespace mbgl {
 
 class RendererObserver;
 class RenderSource;
-class RenderLayer;
 class UpdateParameters;
 class RenderStaticData;
 class RenderedQueryOptions;
@@ -129,8 +128,8 @@ private:
     // Vectors with reserved capacity of layerImpls->size() to avoid reallocation
     // on each frame.
     std::vector<Immutable<style::LayerProperties>> filteredLayersForSource;
-    std::vector<std::reference_wrapper<RenderLayer>> orderedLayers;
-    std::vector<std::reference_wrapper<RenderLayer>> layersNeedPlacement;
+    RenderLayerReferences orderedLayers;
+    RenderLayerReferences layersNeedPlacement;
 };
 
 } // namespace mbgl

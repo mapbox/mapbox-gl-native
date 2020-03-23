@@ -108,9 +108,7 @@ class Placement {
 public:
     Placement(std::shared_ptr<const UpdateParameters>, optional<Immutable<Placement>> prevPlacement = nullopt);
     Placement();
-
-    void placeLayer(const RenderLayer&);
-    void commit();
+    void placeLayers(const RenderLayerReferences&);
     void updateLayerBuckets(const RenderLayer&, const TransformState&, bool updateOpacities) const;
     float symbolFadeChange(TimePoint now) const;
     bool hasTransitions(TimePoint now) const;
@@ -128,6 +126,8 @@ public:
 private:
     friend SymbolBucket;
     void placeSymbolBucket(const BucketPlacementData&, std::set<uint32_t>& seenCrossTileIDs);
+    void placeLayer(const RenderLayer&);
+    void commit();
     // Returns `true` if bucket vertices were updated; returns `false` otherwise.
     bool updateBucketDynamicVertices(SymbolBucket&, const TransformState&, const RenderTile& tile) const;
     void updateBucketOpacities(SymbolBucket&, const TransformState&, std::set<uint32_t>&) const;

@@ -62,7 +62,7 @@ public:
                    std::vector<std::unique_ptr<RenderItem>> sourceRenderItems_,
                    LineAtlas& lineAtlas_,
                    PatternAtlas& patternAtlas_,
-                   std::vector<std::reference_wrapper<RenderLayer>> layersNeedPlacement_,
+                   RenderLayerReferences layersNeedPlacement_,
                    Immutable<Placement> placement_,
                    bool updateSymbolOpacities_)
         : RenderTree(std::move(parameters_)),
@@ -96,7 +96,7 @@ public:
     std::vector<std::unique_ptr<RenderItem>> sourceRenderItems;
     std::reference_wrapper<LineAtlas> lineAtlas;
     std::reference_wrapper<PatternAtlas> patternAtlas;
-    std::vector<std::reference_wrapper<RenderLayer>> layersNeedPlacement;
+    RenderLayerReferences layersNeedPlacement;
     Immutable<Placement> placement;
     bool updateSymbolOpacities;
 };
@@ -379,15 +379,20 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(
     }
     // Symbol placement.
     bool symbolBucketsChanged = false;
+    bool symbolBucketsAdded = false;
+    std::set<std::string> usedSymbolLayers;
     auto longitude = updateParameters->transformState.getLatLng().longitude();
-    if (isMapModeContinuous) {
-        bool symbolBucketsAdded = false;
-        for (auto it = layersNeedPlacement.crbegin(); it != layersNeedPlacement.crend(); ++it) {
-            auto result = crossTileSymbolIndex.addLayer(*it, longitude);
+    for (auto it = layersNeedPlacement.crbegin(); it != layersNeedPlacement.crend(); ++it) {
+        RenderLayer& layer = *it;
+        auto result = crossTileSymbolIndex.addLayer(layer, longitude);
+        if (isMapModeContinuous) {
+            usedSymbolLayers.insert(layer.getID());
             symbolBucketsAdded = symbolBucketsAdded || (result & CrossTileSymbolIndex::AddLayerResult::BucketsAdded);
             symbolBucketsChanged = symbolBucketsChanged || (result != CrossTileSymbolIndex::AddLayerResult::NoChanges);
         }
+    }
 
+    if (isMapModeContinuous) {
         optional<Duration> placementUpdatePeriodOverride;
         if (symbolBucketsAdded && !tiltedView) {
             // If the view is not tilted, we want *the new* symbols to show up faster, however simple setting
@@ -403,22 +408,14 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(
             updateParameters->timePoint, updateParameters->transformState.getZoom(), placementUpdatePeriodOverride);
         symbolBucketsChanged |= renderTreeParameters->placementChanged;
 
-        std::set<std::string> usedSymbolLayers;
         if (renderTreeParameters->placementChanged) {
             Mutable<Placement> placement = makeMutable<Placement>(updateParameters, placementController.getPlacement());
-
-            for (auto it = layersNeedPlacement.crbegin(); it != layersNeedPlacement.crend(); ++it) {
-                const RenderLayer& layer = *it;
-                usedSymbolLayers.insert(layer.getID());
-                placement->placeLayer(layer);
-            }
-
-            placement->commit();
+            placement->placeLayers(layersNeedPlacement);
+            placementController.setPlacement(std::move(placement));
             crossTileSymbolIndex.pruneUnusedLayers(usedSymbolLayers);
             for (const auto& entry : renderSources) {
                 entry.second->updateFadingTiles();
             }
-            placementController.setPlacement(std::move(placement));
         } else {
             placementController.setPlacementStale();
         }
@@ -429,14 +426,10 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(
         renderTreeParameters->placementChanged = symbolBucketsChanged = !layersNeedPlacement.empty();
         if (renderTreeParameters->placementChanged) {
             Mutable<Placement> placement = makeMutable<Placement>(updateParameters);
-            for (auto it = layersNeedPlacement.crbegin(); it != layersNeedPlacement.crend(); ++it) {
-                const RenderLayer& layer = *it;
-                crossTileSymbolIndex.addLayer(layer, longitude);
-                placement->placeLayer(layer);
-            }
-            placement->commit();
+            placement->placeLayers(layersNeedPlacement);
             placementController.setPlacement(std::move(placement));
         }
+        crossTileSymbolIndex.reset();
         renderTreeParameters->symbolFadeChange = 1.0f;
         renderTreeParameters->needsRepaint = false;
     }
