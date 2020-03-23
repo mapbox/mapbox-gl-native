@@ -12,6 +12,7 @@ namespace mbgl {
 
 class SymbolBucket;
 class SymbolInstance;
+using SymbolInstanceReferences = std::vector<std::reference_wrapper<const SymbolInstance>>;
 class UpdateParameters;
 enum class PlacedSymbolOrientation : bool;
 
@@ -106,13 +107,21 @@ private:
 
 class Placement {
 public:
-    Placement(std::shared_ptr<const UpdateParameters>, optional<Immutable<Placement>> prevPlacement = nullopt);
-    Placement();
+    /**
+     * @brief creates a new placement instance, from the given update parameters and the previous placement instance.
+     *
+     * Different placement implementations are created based on `updateParameters->mapMode`.
+     * In Continuous map mode, `prevPlacement` must be provided.
+     */
+    static Mutable<Placement> create(std::shared_ptr<const UpdateParameters> updateParameters,
+                                     optional<Immutable<Placement>> prevPlacement = nullopt);
+
+    virtual ~Placement();
     void placeLayers(const RenderLayerReferences&);
     void updateLayerBuckets(const RenderLayer&, const TransformState&, bool updateOpacities) const;
-    float symbolFadeChange(TimePoint now) const;
-    bool hasTransitions(TimePoint now) const;
-    bool transitionsEnabled() const;
+    virtual float symbolFadeChange(TimePoint now) const;
+    virtual bool hasTransitions(TimePoint now) const;
+    virtual bool transitionsEnabled() const;
 
     const CollisionIndex& getCollisionIndex() const;
     TimePoint getCommitTime() const { return commitTime; }
@@ -123,11 +132,27 @@ public:
 
     const RetainedQueryData& getQueryData(uint32_t bucketInstanceId) const;
 
-private:
+    // Public constructors are required for makeMutable(), shall not be called directly.
+    Placement();
+    Placement(std::shared_ptr<const UpdateParameters>, optional<Immutable<Placement>> prevPlacement);
+
+protected:
     friend SymbolBucket;
     void placeSymbolBucket(const BucketPlacementData&, std::set<uint32_t>& seenCrossTileIDs);
     void placeLayer(const RenderLayer&);
-    void commit();
+    virtual void commit();
+    // Implentation specific hooks, which get called during a symbol bucket placement.
+    virtual optional<CollisionBoundaries> getAvoidEdges(const SymbolBucket&, const mat4& /*posMatrix*/) {
+        return nullopt;
+    }
+    virtual SymbolInstanceReferences getSortedSymbols(const BucketPlacementData&, float pixelRatio);
+    virtual bool stickToFirstVariableAnchor(const CollisionBox&,
+                                            Point<float> /*shift*/,
+                                            const mat4& /*posMatrix*/,
+                                            float /*textPixelRatio*/) {
+        return false;
+    }
+
     // Returns `true` if bucket vertices were updated; returns `false` otherwise.
     bool updateBucketDynamicVertices(SymbolBucket&, const TransformState&, const RenderTile& tile) const;
     void updateBucketOpacities(SymbolBucket&, const TransformState&, std::set<uint32_t>&) const;
@@ -142,7 +167,6 @@ private:
     std::shared_ptr<const UpdateParameters> updateParameters;
     CollisionIndex collisionIndex;
 
-    MapMode mapMode = MapMode::Static;
     style::TransitionOptions transitionOptions;
 
     TimePoint fadeStartTime;
@@ -159,7 +183,6 @@ private:
     CollisionGroups collisionGroups;
     mutable optional<Immutable<Placement>> prevPlacement;
     bool showCollisionBoxes = false;
-
     // Used for debug purposes.
     std::unordered_map<const CollisionFeature*, std::vector<ProjectedCollisionBox>> collisionCircles;
 };
