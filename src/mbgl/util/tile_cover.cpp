@@ -1,10 +1,11 @@
-#include <mbgl/util/tile_cover.hpp>
+#include <mbgl/map/transform_state.hpp>
+#include <mbgl/math/log2.hpp>
+#include <mbgl/util/bounding_volumes.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/interpolate.hpp>
-#include <mbgl/map/transform_state.hpp>
-#include <mbgl/util/tile_cover_impl.hpp>
 #include <mbgl/util/tile_coordinate.hpp>
-#include <mbgl/math/log2.hpp>
+#include <mbgl/util/tile_cover.hpp>
+#include <mbgl/util/tile_cover_impl.hpp>
 
 #include <functional>
 #include <list>
@@ -146,6 +147,128 @@ int32_t coveringZoomLevel(double zoom, style::SourceType type, uint16_t size) {
     }
 }
 
+std::vector<OverscaledTileID> tileCover(const TransformState& state, uint8_t z, const optional<uint8_t>& overscaledZ) {
+    struct Node {
+        AABB aabb;
+        uint8_t zoom;
+        uint32_t x, y;
+        int16_t wrap;
+        bool fullyVisible;
+    };
+
+    struct ResultTile {
+        OverscaledTileID id;
+        double sqrDist;
+    };
+
+    const double numTiles = std::pow(2.0, z);
+    const double worldSize = Projection::worldSize(state.getScale());
+    const uint8_t minZoom = state.getPitch() <= (60.0 / 180.0) * M_PI ? z : 0;
+    const uint8_t maxZoom = z;
+    const uint8_t overscaledZoom = overscaledZ.value_or(z);
+    const bool flippedY = state.getViewportMode() == ViewportMode::FlippedY;
+
+    auto centerPoint =
+        TileCoordinate::fromScreenCoordinate(state, z, {state.getSize().width / 2.0, state.getSize().height / 2.0}).p;
+
+    vec3 centerCoord = {centerPoint.x, centerPoint.y, 0.0};
+
+    const Frustum frustum = Frustum::fromInvProjMatrix(state.getInvProjectionMatrix(), worldSize, z, flippedY);
+
+    // There should always be a certain number of maximum zoom level tiles surrounding the center location
+    const double radiusOfMaxLvlLodInTiles = 3;
+
+    const auto newRootTile = [&](int16_t wrap) -> Node {
+        return {AABB({wrap * numTiles, 0.0, 0.0}, {(wrap + 1) * numTiles, numTiles, 0.0}),
+                uint8_t(0),
+                uint16_t(0),
+                uint16_t(0),
+                wrap,
+                false};
+    };
+
+    // Perform depth-first traversal on tile tree to find visible tiles
+    std::vector<Node> stack;
+    std::vector<ResultTile> result;
+    stack.reserve(128);
+
+    // World copies shall be rendered three times on both sides from closest to farthest
+    for (int i = 1; i <= 3; i++) {
+        stack.push_back(newRootTile(-i));
+        stack.push_back(newRootTile(i));
+    }
+
+    stack.push_back(newRootTile(0));
+
+    while (!stack.empty()) {
+        Node node = stack.back();
+        stack.pop_back();
+
+        // Use cached visibility information of ancestor nodes
+        if (!node.fullyVisible) {
+            const IntersectionResult intersection = frustum.intersects(node.aabb);
+
+            if (intersection == IntersectionResult::Separate) continue;
+
+            node.fullyVisible = intersection == IntersectionResult::Contains;
+        }
+
+        const vec3 distanceXyz = node.aabb.distanceXYZ(centerCoord);
+        const double* longestDim = std::max_element(distanceXyz.data(), distanceXyz.data() + distanceXyz.size());
+        assert(longestDim);
+
+        // We're using distance based heuristics to determine if a tile should be split into quadrants or not.
+        // radiusOfMaxLvlLodInTiles defines that there's always a certain number of maxLevel tiles next to the map
+        // center. Using the fact that a parent node in quadtree is twice the size of its children (per dimension) we
+        // can define distance thresholds for each relative level: f(k) = offset + 2 + 4 + 8 + 16 + ... + 2^k. This is
+        // the same as "offset+2^(k+1)-2"
+        const double distToSplit = radiusOfMaxLvlLodInTiles + (1 << (maxZoom - node.zoom)) - 2;
+
+        // Have we reached the target depth or is the tile too far away to be any split further?
+        if (node.zoom == maxZoom || (*longestDim > distToSplit && node.zoom >= minZoom)) {
+            // Perform precise intersection test between the frustum and aabb. This will cull < 1% false positives
+            // missed by the original test
+            if (node.fullyVisible || frustum.intersectsPrecise(node.aabb, true) != IntersectionResult::Separate) {
+                const OverscaledTileID id = {
+                    node.zoom == maxZoom ? overscaledZoom : node.zoom, node.wrap, node.zoom, node.x, node.y};
+                const double dx = node.wrap * numTiles + node.x + 0.5 - centerCoord[0];
+                const double dy = node.y + 0.5 - centerCoord[1];
+
+                result.push_back({id, dx * dx + dy * dy});
+            }
+            continue;
+        }
+
+        for (int i = 0; i < 4; i++) {
+            const uint32_t childX = (node.x << 1) + (i % 2);
+            const uint32_t childY = (node.y << 1) + (i >> 1);
+
+            // Create child node and push to the stack for traversal
+            Node child = node;
+
+            child.aabb = node.aabb.quadrant(i);
+            child.zoom = node.zoom + 1;
+            child.x = childX;
+            child.y = childY;
+
+            stack.push_back(child);
+        }
+    }
+
+    // Sort results by distance
+    std::sort(
+        result.begin(), result.end(), [](const ResultTile& a, const ResultTile& b) { return a.sqrDist < b.sqrDist; });
+
+    std::vector<OverscaledTileID> ids;
+    ids.reserve(result.size());
+
+    for (const auto& tile : result) {
+        ids.push_back(tile.id);
+    }
+
+    return ids;
+}
+
 std::vector<UnwrappedTileID> tileCover(const LatLngBounds& bounds_, uint8_t z) {
     if (bounds_.isEmpty() ||
         bounds_.south() >  util::LATITUDE_MAX ||
@@ -163,20 +286,6 @@ std::vector<UnwrappedTileID> tileCover(const LatLngBounds& bounds_, uint8_t z) {
         Projection::project(bounds.southeast(), z),
         Projection::project(bounds.southwest(), z),
         Projection::project(bounds.center(), z),
-        z);
-}
-
-std::vector<UnwrappedTileID> tileCover(const TransformState& state, uint8_t z) {
-    assert(state.valid());
-
-    const double w = state.getSize().width;
-    const double h = state.getSize().height;
-    return tileCover(
-        TileCoordinate::fromScreenCoordinate(state, z, { 0,   0   }).p,
-        TileCoordinate::fromScreenCoordinate(state, z, { w,   0   }).p,
-        TileCoordinate::fromScreenCoordinate(state, z, { w,   h   }).p,
-        TileCoordinate::fromScreenCoordinate(state, z, { 0,   h   }).p,
-        TileCoordinate::fromScreenCoordinate(state, z, { w/2, h/2 }).p,
         z);
 }
 

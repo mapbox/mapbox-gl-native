@@ -116,14 +116,15 @@ void RenderBackgroundLayer::render(PaintParameters& parameters) {
 
         uint32_t i = 0;
         for (const auto& tileID : util::tileCover(parameters.state, parameters.state.getIntegerZoom())) {
+            const UnwrappedTileID unwrappedTileID = tileID.toUnwrapped();
             draw(parameters.programs.getBackgroundLayerPrograms().backgroundPattern,
-                 BackgroundPatternProgram::layoutUniformValues(parameters.matrixForTile(tileID),
+                 BackgroundPatternProgram::layoutUniformValues(parameters.matrixForTile(unwrappedTileID),
                                                                evaluated.get<BackgroundOpacity>(),
                                                                parameters.patternAtlas.getPixelSize(),
                                                                *imagePosA,
                                                                *imagePosB,
                                                                crossfade,
-                                                               tileID,
+                                                               unwrappedTileID,
                                                                parameters.state),
                  BackgroundPatternProgram::TextureBindings{
                      textures::image::Value{parameters.patternAtlas.textureBinding()},
@@ -141,7 +142,7 @@ void RenderBackgroundLayer::render(PaintParameters& parameters) {
         for (const auto& tileID : util::tileCover(parameters.state, parameters.state.getIntegerZoom())) {
             draw(parameters.programs.getBackgroundLayerPrograms().background,
                  BackgroundProgram::LayoutUniformValues{
-                     uniforms::matrix::Value(parameters.matrixForTile(tileID)),
+                     uniforms::matrix::Value(parameters.matrixForTile(tileID.toUnwrapped())),
                      uniforms::color::Value(evaluated.get<BackgroundColor>()),
                      uniforms::opacity::Value(evaluated.get<BackgroundOpacity>()),
                  },
