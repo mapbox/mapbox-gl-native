@@ -70,7 +70,6 @@ MapSnapshotter::~MapSnapshotter() {
         weakScheduler->schedule([ptr = snapshotter.release()]() mutable {
             if (ptr) {
                 delete ptr;
-                ptr = nullptr;
             }
         });
     }
@@ -191,10 +190,10 @@ void MapSnapshotter::onStyleImageMissing(const std::string& imageName) {
 
 void MapSnapshotter::addLayerAt(JNIEnv& env, jlong nativeLayerPtr, jni::jint index) {
     assert(nativeLayerPtr != 0);
-    auto layers = snapshotter->getStyle().getLayers();
+    const auto layers = snapshotter->getStyle().getLayers();
     auto* layer = reinterpret_cast<Layer*>(nativeLayerPtr);
     // Check index
-    int numLayers = layers.size() - 1;
+    const int numLayers = layers.size() - 1;
     if (index > numLayers || index < 0) {
         Log::Error(Event::JNI, "Index out of range: %i", index);
         jni::ThrowNew(env,
@@ -229,27 +228,27 @@ void MapSnapshotter::addLayerAbove(JNIEnv& env, jlong nativeLayerPtr, const jni:
     auto* layer = reinterpret_cast<Layer*>(nativeLayerPtr);
 
     // Find the sibling
-    auto layers = snapshotter->getStyle().getLayers();
+    const auto layers = snapshotter->getStyle().getLayers();
     auto siblingId = jni::Make<std::string>(env, above);
 
     size_t index = 0;
-    for (auto l : layers) {
+    for (auto* l : layers) {
+        ++index;
         if (l->getID() == siblingId) {
             break;
         }
-        index++;
     }
 
     // Check if we found a sibling to place before
     mbgl::optional<std::string> before;
-    if (index + 1 > layers.size()) {
+    if (index > layers.size()) {
         // Not found
         jni::ThrowNew(env,
                       jni::FindClass(env, "com/mapbox/mapboxsdk/style/layers/CannotAddLayerException"),
                       std::string("Could not find layer: ").append(siblingId).c_str());
-    } else if (index + 1 < layers.size()) {
+    } else if (index < layers.size()) {
         // Place before the sibling
-        before = {layers.at(index + 1)->getID()};
+        before = {layers.at(index)->getID()};
     }
 
     // Add the layer
@@ -309,13 +308,13 @@ void MapSnapshotter::registerNative(jni::JNIEnv& env) {
                                                           const jni::String&>,
                                             "nativeInitialize",
                                             "finalize",
-                                            METHOD(&MapSnapshotter::setStyleUrl, "nativeSetStyleUrl"),
+                                            METHOD(&MapSnapshotter::setStyleUrl, "setStyleUrl"),
                                             METHOD(&MapSnapshotter::addLayerAt, "nativeAddLayerAt"),
                                             METHOD(&MapSnapshotter::addLayerBelow, "nativeAddLayerBelow"),
                                             METHOD(&MapSnapshotter::addLayerAbove, "nativeAddLayerAbove"),
                                             METHOD(&MapSnapshotter::addSource, "nativeAddSource"),
                                             METHOD(&MapSnapshotter::addImages, "nativeAddImages"),
-                                            METHOD(&MapSnapshotter::setStyleJson, "nativeSetStyleJson"),
+                                            METHOD(&MapSnapshotter::setStyleJson, "setStyleJson"),
                                             METHOD(&MapSnapshotter::setSize, "setSize"),
                                             METHOD(&MapSnapshotter::setCameraPosition, "setCameraPosition"),
                                             METHOD(&MapSnapshotter::setRegion, "setRegion"),

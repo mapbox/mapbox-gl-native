@@ -37,7 +37,7 @@ public:
                    jni::jboolean showLogo,
                    const jni::String& localIdeographFontFamily);
 
-    virtual ~MapSnapshotter();
+    virtual ~MapSnapshotter() override;
 
     void setStyleUrl(JNIEnv&, const jni::String& styleURL);
 
