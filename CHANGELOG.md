@@ -10,6 +10,15 @@
 
 - [android] Add jni binding for styleable snapshotter ([#16286](https://github.com/mapbox/mapbox-gl-native/pull/16286))
 
+- [core] Ability to set generic layer properties using setProperty method ([#16324](https://github.com/mapbox/mapbox-gl-native/pull/16324))
+  This change enables the following new keys for the `mbgl::Layer::setProperty()` API:
+  - "filter" invokes `setFilter()`
+  - "minzoom" invokes `setMinZoom()`
+  - "maxzoom" invokes `setMaxZoom()`
+  - "source-layer" invokes `setSourceLayer()`
+
+  The newly-added API is used in the style-conversion code, which made this code much simpler.
+
 ### 🐞 Bug fixes
 
 - [core] Use `TileCoordinates` instead of `LngLat` for `within` expression calculation ([#16319](https://github.com/mapbox/mapbox-gl-native/pull/16319))
