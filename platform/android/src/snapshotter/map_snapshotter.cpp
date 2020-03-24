@@ -225,35 +225,35 @@ void MapSnapshotter::addLayerBelow(JNIEnv& env, jlong nativeLayerPtr, const jni:
 
 void MapSnapshotter::addLayerAbove(JNIEnv& env, jlong nativeLayerPtr, const jni::String& above) {
     assert(nativeLayerPtr != 0);
-    auto* layer = reinterpret_cast<Layer*>(nativeLayerPtr);
+    auto* newLayer = reinterpret_cast<Layer*>(nativeLayerPtr);
 
     // Find the sibling
-    const auto layers = snapshotter->getStyle().getLayers();
+    const auto snapshotterLayers = snapshotter->getStyle().getLayers();
     auto siblingId = jni::Make<std::string>(env, above);
 
     size_t index = 0;
-    for (auto* l : layers) {
+    for (auto* snapshotterLayer : snapshotterLayers) {
         ++index;
-        if (l->getID() == siblingId) {
+        if (snapshotterLayer->getID() == siblingId) {
             break;
         }
     }
 
     // Check if we found a sibling to place before
     mbgl::optional<std::string> before;
-    if (index > layers.size()) {
+    if (index > snapshotterLayers.size()) {
         // Not found
         jni::ThrowNew(env,
                       jni::FindClass(env, "com/mapbox/mapboxsdk/style/layers/CannotAddLayerException"),
                       std::string("Could not find layer: ").append(siblingId).c_str());
-    } else if (index < layers.size()) {
+    } else if (index < snapshotterLayers.size()) {
         // Place before the sibling
-        before = {layers.at(index)->getID()};
+        before = {snapshotterLayers.at(index)->getID()};
     }
 
     // Add the layer
     try {
-        layer->addToStyle(snapshotter->getStyle(), before);
+        newLayer->addToStyle(snapshotter->getStyle(), before);
     } catch (const std::runtime_error& error) {
         jni::ThrowNew(
             env, jni::FindClass(env, "com/mapbox/mapboxsdk/style/layers/CannotAddLayerException"), error.what());
@@ -276,7 +276,7 @@ void MapSnapshotter::addImages(JNIEnv& env, const jni::Array<jni::Object<mbgl::a
     jni::NullCheck(env, &jimages);
     std::size_t len = jimages.Length(env);
 
-    for (std::size_t i = 0; i < len; i++) {
+    for (std::size_t i = 0; i < len; ++i) {
         auto image = mbgl::android::Image::getImage(env, jimages.Get(env, i));
         snapshotter->getStyle().addImage(std::make_unique<mbgl::style::Image>(image));
     }
