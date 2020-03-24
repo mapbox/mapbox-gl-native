@@ -1,5 +1,6 @@
 #include <mbgl/test/util.hpp>
 
+#include <mbgl/style/conversion/filter.hpp>
 #include <mbgl/style/conversion/json.hpp>
 #include <mbgl/style/conversion/layer.hpp>
 #include <mbgl/style/layers/background_layer_impl.hpp>
@@ -16,6 +17,11 @@ std::unique_ptr<Layer> parseLayer(const std::string& src) {
     auto layer = convertJSON<std::unique_ptr<Layer>>(src, error);
     if (layer) return std::move(*layer);
     return nullptr;
+}
+
+Filter parseFilter(const std::string& expression) {
+    Error error;
+    return *convertJSON<Filter>(expression, error);
 }
 
 std::string stringifyLayer(const Value& value) {
@@ -124,4 +130,22 @@ TEST(StyleConversion, OverrideDefaults) {
     EXPECT_EQ(9u, roundTrippedObject.size());
     EXPECT_EQ(4u, roundTrippedObject.at("layout").getObject()->size());
     EXPECT_EQ(2u, roundTrippedObject.at("paint").getObject()->size());
+}
+
+TEST(StyleConversion, SetGenericProperties) {
+    auto layer = parseLayer(R"JSON({
+        "type": "symbol",
+        "id": "symbol",
+        "source": "composite",
+        "source-layer": "landmarks",
+        "filter": ["has", "monuments"],
+        "minzoom": 12,
+        "maxzoom": 18
+    })JSON");
+
+    ASSERT_NE(nullptr, layer);
+    EXPECT_EQ(parseFilter(R"FILTER(["has", "monuments"])FILTER").serialize(), layer->getFilter().serialize());
+    EXPECT_EQ(12.0f, layer->getMinZoom());
+    EXPECT_EQ(18.0f, layer->getMaxZoom());
+    EXPECT_EQ("landmarks", layer->getSourceLayer());
 }
