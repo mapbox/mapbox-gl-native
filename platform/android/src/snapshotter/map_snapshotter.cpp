@@ -1,10 +1,10 @@
 #include "map_snapshotter.hpp"
 
+#include <mbgl/actor/scheduler.hpp>
 #include <mbgl/renderer/renderer.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/string.hpp>
-#include <mbgl/actor/scheduler.hpp>
 
 #include "../attach_env.hpp"
 #include "map_snapshot.hpp"
@@ -33,6 +33,8 @@ MapSnapshotter::MapSnapshotter(jni::JNIEnv& _env,
         return;
     }
 
+    weakScheduler = mbgl::Scheduler::GetCurrent()->makeWeakPtr();
+
     jFileSource = FileSource::getNativePeer(_env, _jFileSource);
     auto size = mbgl::Size { static_cast<uint32_t>(width), static_cast<uint32_t>(height) };
 
@@ -43,7 +45,7 @@ MapSnapshotter::MapSnapshotter(jni::JNIEnv& _env,
         size,
         pixelRatio,
         mbgl::android::FileSource::getSharedResourceOptions(_env, _jFileSource),
-        mbgl::MapSnapshotterObserver::nullObserver(),
+        *this,
         _localIdeographFontFamily ? jni::Make<std::string>(_env, _localIdeographFontFamily) : optional<std::string>{});
 
     if (position) {
@@ -61,7 +63,17 @@ MapSnapshotter::MapSnapshotter(jni::JNIEnv& _env,
     }
 }
 
-MapSnapshotter::~MapSnapshotter() = default;
+MapSnapshotter::~MapSnapshotter() {
+    auto guard = weakScheduler.lock();
+    if (weakScheduler && weakScheduler.get() != mbgl::Scheduler::GetCurrent()) {
+        snapshotter->cancel();
+        weakScheduler->schedule([ptr = snapshotter.release()]() mutable {
+            if (ptr) {
+                delete ptr;
+            }
+        });
+    }
+}
 
 void MapSnapshotter::start(JNIEnv& env) {
     MBGL_VERIFY_THREAD(tid);
@@ -126,7 +138,6 @@ void MapSnapshotter::setRegion(JNIEnv& env, const jni::Object<LatLngBounds>& reg
     snapshotter->setRegion(LatLngBounds::getLatLngBounds(env, region));
 }
 
-
 // Private methods //
 
 void MapSnapshotter::activateFilesource(JNIEnv& env) {
@@ -143,6 +154,134 @@ void MapSnapshotter::deactivateFilesource(JNIEnv& env) {
     }
 }
 
+void MapSnapshotter::onDidFailLoadingStyle(const std::string& error) {
+    MBGL_VERIFY_THREAD(tid);
+    android::UniqueEnv _env = android::AttachEnv();
+    static auto& javaClass = jni::Class<MapSnapshotter>::Singleton(*_env);
+    static auto onDidFailLoadingStyle = javaClass.GetMethod<void(jni::String)>(*_env, "onDidFailLoadingStyle");
+    auto weakReference = javaPeer.get(*_env);
+    if (weakReference) {
+        weakReference.Call(*_env, onDidFailLoadingStyle, jni::Make<jni::String>(*_env, error));
+    }
+}
+
+void MapSnapshotter::onDidFinishLoadingStyle() {
+    MBGL_VERIFY_THREAD(tid);
+    android::UniqueEnv _env = android::AttachEnv();
+
+    static auto& javaClass = jni::Class<MapSnapshotter>::Singleton(*_env);
+    static auto onDidFinishLoadingStyle = javaClass.GetMethod<void()>(*_env, "onDidFinishLoadingStyle");
+    auto weakReference = javaPeer.get(*_env);
+    if (weakReference) {
+        weakReference.Call(*_env, onDidFinishLoadingStyle);
+    }
+}
+
+void MapSnapshotter::onStyleImageMissing(const std::string& imageName) {
+    MBGL_VERIFY_THREAD(tid);
+    android::UniqueEnv _env = android::AttachEnv();
+    static auto& javaClass = jni::Class<MapSnapshotter>::Singleton(*_env);
+    static auto onStyleImageMissing = javaClass.GetMethod<void(jni::String)>(*_env, "onStyleImageMissing");
+    auto weakReference = javaPeer.get(*_env);
+    if (weakReference) {
+        weakReference.Call(*_env, onStyleImageMissing, jni::Make<jni::String>(*_env, imageName));
+    }
+}
+
+void MapSnapshotter::addLayerAt(JNIEnv& env, jlong nativeLayerPtr, jni::jint index) {
+    assert(nativeLayerPtr != 0);
+    const auto layers = snapshotter->getStyle().getLayers();
+    auto* layer = reinterpret_cast<Layer*>(nativeLayerPtr);
+    // Check index
+    const int numLayers = layers.size() - 1;
+    if (index > numLayers || index < 0) {
+        Log::Error(Event::JNI, "Index out of range: %i", index);
+        jni::ThrowNew(env,
+                      jni::FindClass(env, "com/mapbox/mapboxsdk/style/layers/CannotAddLayerException"),
+                      std::string("Invalid index").c_str());
+    }
+    // Insert it below the current at that index
+    try {
+        layer->addToStyle(snapshotter->getStyle(), layers.at(index)->getID());
+    } catch (const std::runtime_error& error) {
+        jni::ThrowNew(
+            env, jni::FindClass(env, "com/mapbox/mapboxsdk/style/layers/CannotAddLayerException"), error.what());
+    }
+}
+
+void MapSnapshotter::addLayerBelow(JNIEnv& env, jlong nativeLayerPtr, const jni::String& below) {
+    assert(nativeLayerPtr != 0);
+
+    auto* layer = reinterpret_cast<Layer*>(nativeLayerPtr);
+    try {
+        layer->addToStyle(
+            snapshotter->getStyle(),
+            below ? mbgl::optional<std::string>(jni::Make<std::string>(env, below)) : mbgl::optional<std::string>());
+    } catch (const std::runtime_error& error) {
+        jni::ThrowNew(
+            env, jni::FindClass(env, "com/mapbox/mapboxsdk/style/layers/CannotAddLayerException"), error.what());
+    }
+}
+
+void MapSnapshotter::addLayerAbove(JNIEnv& env, jlong nativeLayerPtr, const jni::String& above) {
+    assert(nativeLayerPtr != 0);
+    auto* newLayer = reinterpret_cast<Layer*>(nativeLayerPtr);
+
+    // Find the sibling
+    const auto snapshotterLayers = snapshotter->getStyle().getLayers();
+    auto siblingId = jni::Make<std::string>(env, above);
+
+    size_t index = 0;
+    for (auto* snapshotterLayer : snapshotterLayers) {
+        ++index;
+        if (snapshotterLayer->getID() == siblingId) {
+            break;
+        }
+    }
+
+    // Check if we found a sibling to place before
+    mbgl::optional<std::string> before;
+    if (index > snapshotterLayers.size()) {
+        // Not found
+        jni::ThrowNew(env,
+                      jni::FindClass(env, "com/mapbox/mapboxsdk/style/layers/CannotAddLayerException"),
+                      std::string("Could not find layer: ").append(siblingId).c_str());
+    } else if (index < snapshotterLayers.size()) {
+        // Place before the sibling
+        before = {snapshotterLayers.at(index)->getID()};
+    }
+
+    // Add the layer
+    try {
+        newLayer->addToStyle(snapshotter->getStyle(), before);
+    } catch (const std::runtime_error& error) {
+        jni::ThrowNew(
+            env, jni::FindClass(env, "com/mapbox/mapboxsdk/style/layers/CannotAddLayerException"), error.what());
+    }
+}
+
+void MapSnapshotter::addSource(JNIEnv& env, const jni::Object<Source>& obj, jlong sourcePtr) {
+    assert(sourcePtr != 0);
+
+    auto* source = reinterpret_cast<Source*>(sourcePtr);
+    try {
+        source->addToStyle(env, obj, snapshotter->getStyle());
+    } catch (const std::runtime_error& error) {
+        jni::ThrowNew(
+            env, jni::FindClass(env, "com/mapbox/mapboxsdk/style/sources/CannotAddSourceException"), error.what());
+    }
+}
+
+void MapSnapshotter::addImages(JNIEnv& env, const jni::Array<jni::Object<mbgl::android::Image>>& jimages) {
+    jni::NullCheck(env, &jimages);
+    std::size_t len = jimages.Length(env);
+
+    for (std::size_t i = 0; i < len; ++i) {
+        auto image = mbgl::android::Image::getImage(env, jimages.Get(env, i));
+        snapshotter->getStyle().addImage(std::make_unique<mbgl::style::Image>(image));
+    }
+}
+
 // Static methods //
 
 void MapSnapshotter::registerNative(jni::JNIEnv& env) {
@@ -152,18 +291,35 @@ void MapSnapshotter::registerNative(jni::JNIEnv& env) {
 #define METHOD(MethodPtr, name) jni::MakeNativePeerMethod<decltype(MethodPtr), (MethodPtr)>(name)
 
     // Register the peer
-    jni::RegisterNativePeer<MapSnapshotter>(env, javaClass, "nativePtr",
-                                            jni::MakePeer<MapSnapshotter, const jni::Object<MapSnapshotter>&, const jni::Object<FileSource>&, jni::jfloat, jni::jint, jni::jint, const jni::String&, const jni::String&, const jni::Object<LatLngBounds>&, const jni::Object<CameraPosition>&, jni::jboolean, const jni::String&>,
-                                           "nativeInitialize",
-                                           "finalize",
+    jni::RegisterNativePeer<MapSnapshotter>(env,
+                                            javaClass,
+                                            "nativePtr",
+                                            jni::MakePeer<MapSnapshotter,
+                                                          const jni::Object<MapSnapshotter>&,
+                                                          const jni::Object<FileSource>&,
+                                                          jni::jfloat,
+                                                          jni::jint,
+                                                          jni::jint,
+                                                          const jni::String&,
+                                                          const jni::String&,
+                                                          const jni::Object<LatLngBounds>&,
+                                                          const jni::Object<CameraPosition>&,
+                                                          jni::jboolean,
+                                                          const jni::String&>,
+                                            "nativeInitialize",
+                                            "finalize",
                                             METHOD(&MapSnapshotter::setStyleUrl, "setStyleUrl"),
+                                            METHOD(&MapSnapshotter::addLayerAt, "nativeAddLayerAt"),
+                                            METHOD(&MapSnapshotter::addLayerBelow, "nativeAddLayerBelow"),
+                                            METHOD(&MapSnapshotter::addLayerAbove, "nativeAddLayerAbove"),
+                                            METHOD(&MapSnapshotter::addSource, "nativeAddSource"),
+                                            METHOD(&MapSnapshotter::addImages, "nativeAddImages"),
                                             METHOD(&MapSnapshotter::setStyleJson, "setStyleJson"),
                                             METHOD(&MapSnapshotter::setSize, "setSize"),
                                             METHOD(&MapSnapshotter::setCameraPosition, "setCameraPosition"),
                                             METHOD(&MapSnapshotter::setRegion, "setRegion"),
                                             METHOD(&MapSnapshotter::start, "nativeStart"),
-                                            METHOD(&MapSnapshotter::cancel, "nativeCancel")
-    );
+                                            METHOD(&MapSnapshotter::cancel, "nativeCancel"));
 }
 
 } // namespace android

@@ -26,9 +26,9 @@ public:
     <%- camelize(type) %>Layer(jni::JNIEnv&, jni::String&, jni::String&);
 <% } -%>
 
-    <%- camelize(type) %>Layer(mbgl::Map&, mbgl::style::<%- camelize(type) %>Layer&);
+    <%- camelize(type) %>Layer(mbgl::style::<%- camelize(type) %>Layer&);
 
-    <%- camelize(type) %>Layer(mbgl::Map&, std::unique_ptr<mbgl::style::<%- camelize(type) %>Layer>);
+    <%- camelize(type) %>Layer(std::unique_ptr<mbgl::style::<%- camelize(type) %>Layer>);
 
     ~<%- camelize(type) %>Layer();
 
@@ -49,8 +49,8 @@ public:
     ~<%- camelize(type) %>JavaLayerPeerFactory() override;
 
     // JavaLayerPeerFactory overrides.
-    jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv&, mbgl::Map&, mbgl::style::Layer&) final;
-    jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, std::unique_ptr<mbgl::style::Layer>) final;
+    jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv&, mbgl::style::Layer&) final;
+    jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv& env, std::unique_ptr<mbgl::style::Layer>) final;
 
     void registerNative(jni::JNIEnv&) final;
 

@@ -26,16 +26,12 @@ namespace android {
     /**
      * Creates a non-owning peer object (for layers currently attached to the map)
      */
-    CircleLayer::CircleLayer(mbgl::Map& map, mbgl::style::CircleLayer& coreLayer)
-        : Layer(map, coreLayer) {
-    }
+    CircleLayer::CircleLayer(mbgl::style::CircleLayer& coreLayer) : Layer(coreLayer) {}
 
     /**
      * Creates an owning peer object (for layers not attached to the map)
      */
-    CircleLayer::CircleLayer(mbgl::Map& map, std::unique_ptr<mbgl::style::CircleLayer> coreLayer)
-        : Layer(map, std::move(coreLayer)) {
-    }
+    CircleLayer::CircleLayer(std::unique_ptr<mbgl::style::CircleLayer> coreLayer) : Layer(std::move(coreLayer)) {}
 
     CircleLayer::~CircleLayer() = default;
 
@@ -213,14 +209,18 @@ namespace android {
         }
     }  // namespace
 
-    jni::Local<jni::Object<Layer>> CircleJavaLayerPeerFactory::createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, mbgl::style::Layer& layer) {
+    jni::Local<jni::Object<Layer>> CircleJavaLayerPeerFactory::createJavaLayerPeer(jni::JNIEnv& env,
+                                                                                   mbgl::style::Layer& layer) {
         assert(layer.baseImpl->getTypeInfo() == getTypeInfo());
-        return createJavaPeer(env, new CircleLayer(map, toCircleLayer(layer)));
+        return createJavaPeer(env, new CircleLayer(toCircleLayer(layer)));
     }
 
-    jni::Local<jni::Object<Layer>> CircleJavaLayerPeerFactory::createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, std::unique_ptr<mbgl::style::Layer> layer) {
+    jni::Local<jni::Object<Layer>> CircleJavaLayerPeerFactory::createJavaLayerPeer(
+        jni::JNIEnv& env, std::unique_ptr<mbgl::style::Layer> layer) {
         assert(layer->baseImpl->getTypeInfo() == getTypeInfo());
-        return createJavaPeer(env, new CircleLayer(map, std::unique_ptr<mbgl::style::CircleLayer>(static_cast<mbgl::style::CircleLayer*>(layer.release()))));
+        return createJavaPeer(env,
+                              new CircleLayer(std::unique_ptr<mbgl::style::CircleLayer>(
+                                  static_cast<mbgl::style::CircleLayer*>(layer.release()))));
     }
 
     void CircleJavaLayerPeerFactory::registerNative(jni::JNIEnv& env) {
@@ -231,7 +231,9 @@ namespace android {
 
         // Register the peer
         jni::RegisterNativePeer<CircleLayer>(
-            env, javaClass, "nativePtr",
+            env,
+            javaClass,
+            "nativePtr",
             jni::MakePeer<CircleLayer, jni::String&, jni::String&>,
             "initialize",
             "finalize",

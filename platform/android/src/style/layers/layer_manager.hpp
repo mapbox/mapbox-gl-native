@@ -21,9 +21,9 @@ class LayerManagerAndroid final : public mbgl::LayerManager {
 public:
     ~LayerManagerAndroid() final;
     static LayerManagerAndroid* get() noexcept;
-    
-    jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv&, mbgl::Map&, mbgl::style::Layer&);
-    jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, std::unique_ptr<mbgl::style::Layer>);
+
+    jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv&, mbgl::style::Layer&);
+    jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv& env, std::unique_ptr<mbgl::style::Layer>);
 
     void registerNative(jni::JNIEnv&);
 

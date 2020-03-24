@@ -26,16 +26,12 @@ namespace android {
     /**
      * Creates a non-owning peer object (for layers currently attached to the map)
      */
-    SymbolLayer::SymbolLayer(mbgl::Map& map, mbgl::style::SymbolLayer& coreLayer)
-        : Layer(map, coreLayer) {
-    }
+    SymbolLayer::SymbolLayer(mbgl::style::SymbolLayer& coreLayer) : Layer(coreLayer) {}
 
     /**
      * Creates an owning peer object (for layers not attached to the map)
      */
-    SymbolLayer::SymbolLayer(mbgl::Map& map, std::unique_ptr<mbgl::style::SymbolLayer> coreLayer)
-        : Layer(map, std::move(coreLayer)) {
-    }
+    SymbolLayer::SymbolLayer(std::unique_ptr<mbgl::style::SymbolLayer> coreLayer) : Layer(std::move(coreLayer)) {}
 
     SymbolLayer::~SymbolLayer() = default;
 
@@ -485,14 +481,18 @@ namespace android {
         }
     }  // namespace
 
-    jni::Local<jni::Object<Layer>> SymbolJavaLayerPeerFactory::createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, mbgl::style::Layer& layer) {
+    jni::Local<jni::Object<Layer>> SymbolJavaLayerPeerFactory::createJavaLayerPeer(jni::JNIEnv& env,
+                                                                                   mbgl::style::Layer& layer) {
         assert(layer.baseImpl->getTypeInfo() == getTypeInfo());
-        return createJavaPeer(env, new SymbolLayer(map, toSymbolLayer(layer)));
+        return createJavaPeer(env, new SymbolLayer(toSymbolLayer(layer)));
     }
 
-    jni::Local<jni::Object<Layer>> SymbolJavaLayerPeerFactory::createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, std::unique_ptr<mbgl::style::Layer> layer) {
+    jni::Local<jni::Object<Layer>> SymbolJavaLayerPeerFactory::createJavaLayerPeer(
+        jni::JNIEnv& env, std::unique_ptr<mbgl::style::Layer> layer) {
         assert(layer->baseImpl->getTypeInfo() == getTypeInfo());
-        return createJavaPeer(env, new SymbolLayer(map, std::unique_ptr<mbgl::style::SymbolLayer>(static_cast<mbgl::style::SymbolLayer*>(layer.release()))));
+        return createJavaPeer(env,
+                              new SymbolLayer(std::unique_ptr<mbgl::style::SymbolLayer>(
+                                  static_cast<mbgl::style::SymbolLayer*>(layer.release()))));
     }
 
     void SymbolJavaLayerPeerFactory::registerNative(jni::JNIEnv& env) {
@@ -503,7 +503,9 @@ namespace android {
 
         // Register the peer
         jni::RegisterNativePeer<SymbolLayer>(
-            env, javaClass, "nativePtr",
+            env,
+            javaClass,
+            "nativePtr",
             jni::MakePeer<SymbolLayer, jni::String&, jni::String&>,
             "initialize",
             "finalize",

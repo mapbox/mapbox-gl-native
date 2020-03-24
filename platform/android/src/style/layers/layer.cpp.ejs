@@ -38,15 +38,15 @@ namespace android {
     /**
      * Creates a non-owning peer object (for layers currently attached to the map)
      */
-    <%- camelize(type) %>Layer::<%- camelize(type) %>Layer(mbgl::Map& map, mbgl::style::<%- camelize(type) %>Layer& coreLayer)
-        : Layer(map, coreLayer) {
+    <%- camelize(type) %>Layer::<%- camelize(type) %>Layer(mbgl::style::<%- camelize(type) %>Layer& coreLayer)
+        : Layer(coreLayer) {
     }
 
     /**
      * Creates an owning peer object (for layers not attached to the map)
      */
-    <%- camelize(type) %>Layer::<%- camelize(type) %>Layer(mbgl::Map& map, std::unique_ptr<mbgl::style::<%- camelize(type) %>Layer> coreLayer)
-        : Layer(map, std::move(coreLayer)) {
+    <%- camelize(type) %>Layer::<%- camelize(type) %>Layer(std::unique_ptr<mbgl::style::<%- camelize(type) %>Layer> coreLayer)
+        : Layer(std::move(coreLayer)) {
     }
 
     <%- camelize(type) %>Layer::~<%- camelize(type) %>Layer() = default;
@@ -100,14 +100,14 @@ namespace android {
         }
     }  // namespace
 
-    jni::Local<jni::Object<Layer>> <%- camelize(type) %>JavaLayerPeerFactory::createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, mbgl::style::Layer& layer) {
+    jni::Local<jni::Object<Layer>> <%- camelize(type) %>JavaLayerPeerFactory::createJavaLayerPeer(jni::JNIEnv& env, mbgl::style::Layer& layer) {
         assert(layer.baseImpl->getTypeInfo() == getTypeInfo());
-        return createJavaPeer(env, new <%- camelize(type) %>Layer(map, to<%- camelize(type) %>Layer(layer)));
+        return createJavaPeer(env, new <%- camelize(type) %>Layer(to<%- camelize(type) %>Layer(layer)));
     }
 
-    jni::Local<jni::Object<Layer>> <%- camelize(type) %>JavaLayerPeerFactory::createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, std::unique_ptr<mbgl::style::Layer> layer) {
+    jni::Local<jni::Object<Layer>> <%- camelize(type) %>JavaLayerPeerFactory::createJavaLayerPeer(jni::JNIEnv& env, std::unique_ptr<mbgl::style::Layer> layer) {
         assert(layer->baseImpl->getTypeInfo() == getTypeInfo());
-        return createJavaPeer(env, new <%- camelize(type) %>Layer(map, std::unique_ptr<mbgl::style::<%- camelize(type) %>Layer>(static_cast<mbgl::style::<%- camelize(type) %>Layer*>(layer.release()))));
+        return createJavaPeer(env, new <%- camelize(type) %>Layer(std::unique_ptr<mbgl::style::<%- camelize(type) %>Layer>(static_cast<mbgl::style::<%- camelize(type) %>Layer*>(layer.release()))));
     }
 
     void <%- camelize(type) %>JavaLayerPeerFactory::registerNative(jni::JNIEnv& env) {

@@ -26,16 +26,13 @@ namespace android {
     /**
      * Creates a non-owning peer object (for layers currently attached to the map)
      */
-    HillshadeLayer::HillshadeLayer(mbgl::Map& map, mbgl::style::HillshadeLayer& coreLayer)
-        : Layer(map, coreLayer) {
-    }
+    HillshadeLayer::HillshadeLayer(mbgl::style::HillshadeLayer& coreLayer) : Layer(coreLayer) {}
 
     /**
      * Creates an owning peer object (for layers not attached to the map)
      */
-    HillshadeLayer::HillshadeLayer(mbgl::Map& map, std::unique_ptr<mbgl::style::HillshadeLayer> coreLayer)
-        : Layer(map, std::move(coreLayer)) {
-    }
+    HillshadeLayer::HillshadeLayer(std::unique_ptr<mbgl::style::HillshadeLayer> coreLayer)
+        : Layer(std::move(coreLayer)) {}
 
     HillshadeLayer::~HillshadeLayer() = default;
 
@@ -136,14 +133,18 @@ namespace android {
         }
     }  // namespace
 
-    jni::Local<jni::Object<Layer>> HillshadeJavaLayerPeerFactory::createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, mbgl::style::Layer& layer) {
+    jni::Local<jni::Object<Layer>> HillshadeJavaLayerPeerFactory::createJavaLayerPeer(jni::JNIEnv& env,
+                                                                                      mbgl::style::Layer& layer) {
         assert(layer.baseImpl->getTypeInfo() == getTypeInfo());
-        return createJavaPeer(env, new HillshadeLayer(map, toHillshadeLayer(layer)));
+        return createJavaPeer(env, new HillshadeLayer(toHillshadeLayer(layer)));
     }
 
-    jni::Local<jni::Object<Layer>> HillshadeJavaLayerPeerFactory::createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, std::unique_ptr<mbgl::style::Layer> layer) {
+    jni::Local<jni::Object<Layer>> HillshadeJavaLayerPeerFactory::createJavaLayerPeer(
+        jni::JNIEnv& env, std::unique_ptr<mbgl::style::Layer> layer) {
         assert(layer->baseImpl->getTypeInfo() == getTypeInfo());
-        return createJavaPeer(env, new HillshadeLayer(map, std::unique_ptr<mbgl::style::HillshadeLayer>(static_cast<mbgl::style::HillshadeLayer*>(layer.release()))));
+        return createJavaPeer(env,
+                              new HillshadeLayer(std::unique_ptr<mbgl::style::HillshadeLayer>(
+                                  static_cast<mbgl::style::HillshadeLayer*>(layer.release()))));
     }
 
     void HillshadeJavaLayerPeerFactory::registerNative(jni::JNIEnv& env) {
@@ -154,7 +155,9 @@ namespace android {
 
         // Register the peer
         jni::RegisterNativePeer<HillshadeLayer>(
-            env, javaClass, "nativePtr",
+            env,
+            javaClass,
+            "nativePtr",
             jni::MakePeer<HillshadeLayer, jni::String&, jni::String&>,
             "initialize",
             "finalize",

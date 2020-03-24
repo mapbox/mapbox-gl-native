@@ -1,20 +1,23 @@
 #pragma once
 
+#include <jni/jni.hpp>
+#include <mapbox/std/weak.hpp>
 #include <mbgl/map/map_snapshotter.hpp>
 #include <mbgl/util/util.hpp>
+
+#include <memory>
 
 #include "../file_source.hpp"
 #include "../geometry/lat_lng_bounds.hpp"
 #include "../map/camera_position.hpp"
-
-#include <jni/jni.hpp>
-
-#include <memory>
+#include "../map/image.hpp"
+#include "../style/layers/layer.hpp"
+#include "../style/sources/source.hpp"
 
 namespace mbgl {
 namespace android {
 
-class MapSnapshotter {
+class MapSnapshotter final : public mbgl::MapSnapshotterObserver {
 public:
 
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/snapshotter/MapSnapshotter"; };
@@ -34,7 +37,7 @@ public:
                    jni::jboolean showLogo,
                    const jni::String& localIdeographFontFamily);
 
-    ~MapSnapshotter();
+    virtual ~MapSnapshotter() override;
 
     void setStyleUrl(JNIEnv&, const jni::String& styleURL);
 
@@ -50,6 +53,17 @@ public:
 
     void cancel(JNIEnv&);
 
+    void addLayerAt(JNIEnv&, jlong, jni::jint);
+    void addLayerBelow(JNIEnv&, jlong, const jni::String&);
+    void addLayerAbove(JNIEnv&, jlong, const jni::String&);
+    void addSource(JNIEnv&, const jni::Object<Source>&, jlong nativePtr);
+    void addImages(JNIEnv&, const jni::Array<jni::Object<mbgl::android::Image>>&);
+
+    // MapSnapshotterObserver overrides
+    void onDidFailLoadingStyle(const std::string&) override;
+    void onDidFinishLoadingStyle() override;
+    void onStyleImageMissing(const std::string&) override;
+
 private:
     MBGL_STORE_THREAD(tid);
 
@@ -59,12 +73,12 @@ private:
     float pixelRatio;
     bool showLogo;
 
-    std::unique_ptr<mbgl::MapSnapshotter> snapshotter;
-
     FileSource *jFileSource;
     void activateFilesource(JNIEnv&);
     void deactivateFilesource(JNIEnv&);
     bool activatedFilesource = false;
+    mapbox::base::WeakPtr<mbgl::Scheduler> weakScheduler;
+    std::unique_ptr<mbgl::MapSnapshotter> snapshotter;
 };
 
 } // namespace android

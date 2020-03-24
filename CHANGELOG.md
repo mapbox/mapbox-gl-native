@@ -8,6 +8,8 @@
 
   The newly added `Renderer::clearData()` method allows to clear render data and thus save memory and make sure outdated tiles are not shown. It clears data more agressively than `Renderer::reduceMemoryUse()` does, as it clears not only the cache but all orchestration data, including the data used by the currently rendered frame.
 
+- [android] Add jni binding for styleable snapshotter ([#16286](https://github.com/mapbox/mapbox-gl-native/pull/16286))
+
 ### 🐞 Bug fixes
 
 - [core] Use `TileCoordinates` instead of `LngLat` for `within` expression calculation ([#16319](https://github.com/mapbox/mapbox-gl-native/pull/16319))

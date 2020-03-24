@@ -18,9 +18,9 @@ public:
 
     RasterLayer(jni::JNIEnv&, jni::String&, jni::String&);
 
-    RasterLayer(mbgl::Map&, mbgl::style::RasterLayer&);
+    RasterLayer(mbgl::style::RasterLayer&);
 
-    RasterLayer(mbgl::Map&, std::unique_ptr<mbgl::style::RasterLayer>);
+    RasterLayer(std::unique_ptr<mbgl::style::RasterLayer>);
 
     ~RasterLayer();
 
@@ -61,8 +61,8 @@ public:
     ~RasterJavaLayerPeerFactory() override;
 
     // JavaLayerPeerFactory overrides.
-    jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv&, mbgl::Map&, mbgl::style::Layer&) final;
-    jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, std::unique_ptr<mbgl::style::Layer>) final;
+    jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv&, mbgl::style::Layer&) final;
+    jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv& env, std::unique_ptr<mbgl::style::Layer>) final;
 
     void registerNative(jni::JNIEnv&) final;
 

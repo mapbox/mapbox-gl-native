@@ -77,16 +77,17 @@ LayerManagerAndroid::LayerManagerAndroid() {
 
 LayerManagerAndroid::~LayerManagerAndroid() = default;
 
-jni::Local<jni::Object<Layer>> LayerManagerAndroid::createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, mbgl::style::Layer& layer) {
+jni::Local<jni::Object<Layer>> LayerManagerAndroid::createJavaLayerPeer(jni::JNIEnv& env, mbgl::style::Layer& layer) {
     if (JavaLayerPeerFactory* factory = getPeerFactory(layer.getTypeInfo())) {
-        return factory->createJavaLayerPeer(env, map, layer);
+        return factory->createJavaLayerPeer(env, layer);
     }
     return jni::Local<jni::Object<Layer>>();
 }
 
-jni::Local<jni::Object<Layer>> LayerManagerAndroid::createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, std::unique_ptr<mbgl::style::Layer> layer) {
+jni::Local<jni::Object<Layer>> LayerManagerAndroid::createJavaLayerPeer(jni::JNIEnv& env,
+                                                                        std::unique_ptr<mbgl::style::Layer> layer) {
     if (JavaLayerPeerFactory* factory = getPeerFactory(layer->getTypeInfo())) {
-        return factory->createJavaLayerPeer(env, map, std::move(layer));
+        return factory->createJavaLayerPeer(env, std::move(layer));
     }
     return jni::Local<jni::Object<Layer>>();
 }

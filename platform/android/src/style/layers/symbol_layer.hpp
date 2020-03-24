@@ -18,9 +18,9 @@ public:
 
     SymbolLayer(jni::JNIEnv&, jni::String&, jni::String&);
 
-    SymbolLayer(mbgl::Map&, mbgl::style::SymbolLayer&);
+    SymbolLayer(mbgl::style::SymbolLayer&);
 
-    SymbolLayer(mbgl::Map&, std::unique_ptr<mbgl::style::SymbolLayer>);
+    SymbolLayer(std::unique_ptr<mbgl::style::SymbolLayer>);
 
     ~SymbolLayer();
 
@@ -167,8 +167,8 @@ public:
     ~SymbolJavaLayerPeerFactory() override;
 
     // JavaLayerPeerFactory overrides.
-    jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv&, mbgl::Map&, mbgl::style::Layer&) final;
-    jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, std::unique_ptr<mbgl::style::Layer>) final;
+    jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv&, mbgl::style::Layer&) final;
+    jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv& env, std::unique_ptr<mbgl::style::Layer>) final;
 
     void registerNative(jni::JNIEnv&) final;
 

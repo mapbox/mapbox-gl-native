@@ -45,33 +45,19 @@ namespace android {
     /**
      * Takes a non-owning reference. For lookup methods
      */
-    Layer::Layer(mbgl::Map& coreMap, mbgl::style::Layer& coreLayer) : layer(coreLayer) , map(&coreMap) {
-    }
-
-    /**
-     * Takes a owning reference. Ownership is transfered to this peer, eg after removing
-     * from the map
-     */
-    Layer::Layer(mbgl::Map& coreMap, std::unique_ptr<mbgl::style::Layer> coreLayer)
-        : ownedLayer(std::move(coreLayer))
-        , layer(*ownedLayer)
-        , map(&coreMap) {
-    }
+    Layer::Layer(mbgl::style::Layer& coreLayer) : layer(coreLayer) {}
 
     Layer::~Layer() {
     }
 
-    void Layer::addToMap(mbgl::Map& _map, mbgl::optional<std::string> before) {
+    void Layer::addToStyle(mbgl::style::Style& style, mbgl::optional<std::string> before) {
         // Check to see if we own the layer first
         if (!ownedLayer) {
             throw std::runtime_error("Cannot add layer twice");
         }
 
         // Add layer to map
-        _map.getStyle().addLayer(releaseCoreLayer(), before);
-
-        // Save pointer to the map
-        this->map = &_map;
+        style.addLayer(releaseCoreLayer(), before);
     }
 
     void Layer::setLayer(std::unique_ptr<mbgl::style::Layer> sourceLayer) {

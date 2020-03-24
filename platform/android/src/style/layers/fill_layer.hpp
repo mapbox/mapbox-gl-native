@@ -18,9 +18,9 @@ public:
 
     FillLayer(jni::JNIEnv&, jni::String&, jni::String&);
 
-    FillLayer(mbgl::Map&, mbgl::style::FillLayer&);
+    FillLayer(mbgl::style::FillLayer&);
 
-    FillLayer(mbgl::Map&, std::unique_ptr<mbgl::style::FillLayer>);
+    FillLayer(std::unique_ptr<mbgl::style::FillLayer>);
 
     ~FillLayer();
 
@@ -59,8 +59,8 @@ public:
     ~FillJavaLayerPeerFactory() override;
 
     // JavaLayerPeerFactory overrides.
-    jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv&, mbgl::Map&, mbgl::style::Layer&) final;
-    jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, std::unique_ptr<mbgl::style::Layer>) final;
+    jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv&, mbgl::style::Layer&) final;
+    jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv& env, std::unique_ptr<mbgl::style::Layer>) final;
 
     void registerNative(jni::JNIEnv&) final;
 
