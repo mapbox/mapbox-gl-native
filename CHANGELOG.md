@@ -25,6 +25,12 @@
 
   Fix the issue that `within` expression evaluates point features inconsistently across zoom levels if the point lies near the boundary of a GeoJSON object ([#16301](https://github.com/mapbox/mapbox-gl-native/issues/16301))
 
+ - [core][tile mode] Reduce cut-off labels ([#16336](https://github.com/mapbox/mapbox-gl-native/pull/16336))
+
+  Place tile intersecting labels first, across all the layers. Thus we reduce the amount of label cut-offs in Tile mode.
+
+  Before, labels were arranged within one symbol layer (one bucket),which was not enough for several symbol layers being placed at the same time.
+
 ## maps-v1.4.1
 
 ### 🐞 Bug fixes
