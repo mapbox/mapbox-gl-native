@@ -389,3 +389,75 @@ TEST(PropertyExpression, WithinExpression) {
         EXPECT_FALSE(evaluatedResult);
     }
 }
+
+TEST(PropertyExpression, WithinExpressionAntiMeridain) {
+    CanonicalTileID canonicalTileID(0, 0, 0);
+
+    // evaluation test with line geometries
+    {
+        static const std::string polygon1 = R"data(
+       {
+         "type": "Polygon",
+         "coordinates": [[[-190, 0], [-178, 0], [-178, 10], [-190, 10], [-190, 0]]]
+       })data";
+        // evaluation test with valid geojson source
+        std::stringstream ss;
+        ss << std::string(R"(["within", )") << polygon1 << std::string(R"( ])");
+        auto expression = createExpression(ss.str().c_str());
+        ASSERT_TRUE(expression);
+        PropertyExpression<bool> propExpr(std::move(expression));
+
+        LineString<double> testLine0{{-183, 5}, {-179, 1}};
+        auto geoLine0 = convertGeometry(testLine0, canonicalTileID);
+        StubGeometryTileFeature lineFeature0(FeatureType::LineString, geoLine0);
+
+        LineString<double> testLine1{{183, 5}, {181, 1}};
+        auto geoLine1 = convertGeometry(testLine1, canonicalTileID);
+        StubGeometryTileFeature lineFeature1(FeatureType::LineString, geoLine1);
+
+        auto evaluatedResult =
+            propExpr.evaluate(EvaluationContext(&lineFeature0).withCanonicalTileID(&canonicalTileID));
+        EXPECT_TRUE(evaluatedResult);
+        evaluatedResult = propExpr.evaluate(EvaluationContext(&lineFeature1).withCanonicalTileID(&canonicalTileID));
+        EXPECT_FALSE(evaluatedResult);
+    }
+
+    // evaluation test with point geometries
+    {
+        static const std::string polygon2 = R"data(
+       {
+         "type": "Polygon",
+         "coordinates":  [[[-185.0, 60.0], [-175.0, 60.0], [-175.0, 65.0], [-185.0, 65.0], [-185.0, 60.0]]]
+       })data";
+        // evaluation test with valid geojson source
+        std::stringstream ss;
+        ss << std::string(R"(["within", )") << polygon2 << std::string(R"( ])");
+        auto expression = createExpression(ss.str().c_str());
+        ASSERT_TRUE(expression);
+        PropertyExpression<bool> propExpr(std::move(expression));
+
+        auto getPointFeature = [&canonicalTileID](const Point<double>& testPoint) -> StubGeometryTileFeature {
+            auto geoPoint = convertGeometry(testPoint, canonicalTileID);
+            StubGeometryTileFeature pointFeature(FeatureType::Point, geoPoint);
+            return pointFeature;
+        };
+
+        // check `within` algorithm
+        auto pointFeature = getPointFeature(Point<double>(177, 62.5));
+        auto evaluatedResult =
+            propExpr.evaluate(EvaluationContext(&pointFeature).withCanonicalTileID(&canonicalTileID));
+        EXPECT_TRUE(evaluatedResult);
+
+        pointFeature = getPointFeature(Point<double>(180, 62.5));
+        evaluatedResult = propExpr.evaluate(EvaluationContext(&pointFeature).withCanonicalTileID(&canonicalTileID));
+        EXPECT_TRUE(evaluatedResult);
+
+        pointFeature = getPointFeature(Point<double>(-180, 62.5));
+        evaluatedResult = propExpr.evaluate(EvaluationContext(&pointFeature).withCanonicalTileID(&canonicalTileID));
+        EXPECT_TRUE(evaluatedResult);
+
+        pointFeature = getPointFeature(Point<double>(-190, 62.5));
+        evaluatedResult = propExpr.evaluate(EvaluationContext(&pointFeature).withCanonicalTileID(&canonicalTileID));
+        EXPECT_FALSE(evaluatedResult);
+    }
+}
