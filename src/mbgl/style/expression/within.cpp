@@ -68,13 +68,19 @@ MultiPolygon<int64_t> getTilePolygons(const Feature::geometry_type& polygonGeoSe
 }
 
 void updatePoint(Point<int64_t>& p, WithinBBox& bbox, const WithinBBox& polyBBox, const int64_t worldSize) {
-    if (p.x <= polyBBox[0] || p.x >= polyBBox[2]) {
-        int64_t shift = 0;
-        shift = (p.x - polyBBox[0] > worldSize / 2) ? -worldSize : (polyBBox[0] - p.x > worldSize / 2) ? worldSize : 0;
-        if (shift == 0) {
-            shift =
-                (p.x - polyBBox[2] > worldSize / 2) ? -worldSize : (polyBBox[2] - p.x > worldSize / 2) ? worldSize : 0;
-        }
+    if (p.x < polyBBox[0] || p.x > polyBBox[2]) {
+        const auto getShift = [](Point<int64_t>& point, const int64_t polygonSide, const int64_t size) -> int64_t {
+            if (point.x - polygonSide > size / 2) {
+                return -size;
+            }
+            if (polygonSide - point.x > size / 2) {
+                return size;
+            }
+            return 0;
+        };
+
+        int64_t shift = getShift(p, polyBBox[0], worldSize);
+        if (shift == 0) shift = getShift(p, polyBBox[2], worldSize);
         p.x += shift;
     }
     updateBBox(bbox, p);

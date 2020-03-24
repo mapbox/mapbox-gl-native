@@ -390,7 +390,7 @@ TEST(PropertyExpression, WithinExpression) {
     }
 }
 
-TEST(PropertyExpression, WithinExpressionAntiMeridain) {
+TEST(PropertyExpression, WithinExpressionAntiMeridian) {
     CanonicalTileID canonicalTileID(0, 0, 0);
 
     // evaluation test with line geometries
