@@ -37,7 +37,6 @@ public:
 
 protected:
     optional<std::string> getSource(const style::conversion::Convertible& value) const noexcept;
-    bool initSourceLayerAndFilter(style::Layer*, const style::conversion::Convertible& value) const noexcept;
 };
 
 } // namespace mbgl

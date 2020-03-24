@@ -16,12 +16,7 @@ std::unique_ptr<style::Layer> LineLayerFactory::createLayer(const std::string& i
     if (!source) {
         return nullptr;
     }
-
-    std::unique_ptr<style::Layer> layer = std::unique_ptr<style::Layer>(new style::LineLayer(id, *source));
-    if (!initSourceLayerAndFilter(layer.get(), value)) {
-        return nullptr;
-    }
-    return layer;
+    return std::unique_ptr<style::Layer>(new style::LineLayer(id, *source));
 }
 
 std::unique_ptr<Layout> LineLayerFactory::createLayout(const LayoutParameters& parameters,

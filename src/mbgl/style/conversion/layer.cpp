@@ -68,6 +68,9 @@ optional<std::unique_ptr<Layer>> Converter<std::unique_ptr<Layer>>::operator()(c
     if (!setObjectMember(layer, value, "minzoom", error)) return nullopt;
     if (!setObjectMember(layer, value, "maxzoom", error)) return nullopt;
     if (!setObjectMember(layer, value, "filter", error)) return nullopt;
+    if (layer->getTypeInfo()->source == LayerTypeInfo::Source::Required) {
+        if (!setObjectMember(layer, value, "source-layer", error)) return nullopt;
+    }
 
     auto layoutValue = objectMember(value, "layout");
     if (layoutValue) {

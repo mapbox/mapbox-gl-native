@@ -17,11 +17,7 @@ std::unique_ptr<style::Layer> CircleLayerFactory::createLayer(const std::string&
         return nullptr;
     }
 
-    std::unique_ptr<style::Layer> layer = std::unique_ptr<style::Layer>(new style::CircleLayer(id, *source));
-    if (!initSourceLayerAndFilter(layer.get(), value)) {
-        return nullptr;
-    }
-    return layer;
+    return std::unique_ptr<style::Layer>(new style::CircleLayer(id, *source));
 }
 
 std::unique_ptr<Bucket> CircleLayerFactory::createBucket(const BucketParameters& parameters, const std::vector<Immutable<style::LayerProperties>>& layers) noexcept {
