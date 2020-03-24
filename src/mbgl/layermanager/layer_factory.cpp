@@ -46,17 +46,6 @@ bool LayerFactory::initSourceLayerAndFilter(style::Layer* layer, const style::co
         }
         layer->setSourceLayer(*sourceLayer);
     }
-
-    auto filterValue = objectMember(value, "filter");
-    if (filterValue) {
-        style::conversion::Error error;
-        optional<style::Filter> filter = style::conversion::convert<style::Filter>(*filterValue, error);
-        if (!filter) {
-            return false;
-        }
-        layer->setFilter(*filter);
-    }
-
     return true;
 }
 
