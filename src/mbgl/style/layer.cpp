@@ -7,6 +7,7 @@
 #include <mbgl/tile/tile.hpp>
 
 #include <mbgl/renderer/render_layer.hpp>
+#include <mbgl/util/logging.hpp>
 
 namespace mbgl {
 namespace style {
@@ -161,6 +162,18 @@ optional<conversion::Error> Layer::setProperty(const std::string& name, const co
     } else if (name == "filter") {
         if (auto filter = convert<Filter>(value, *error)) {
             setFilter(*filter);
+            return nullopt;
+        }
+    } else if (name == "source-layer") {
+        if (auto sourceLayer = convert<std::string>(value, *error)) {
+            if (getTypeInfo()->source != LayerTypeInfo::Source::Required) {
+                Log::Warning(mbgl::Event::General,
+                             "source-layer property cannot be applied to"
+                             "the layer %s",
+                             baseImpl->id.c_str());
+                return nullopt;
+            }
+            setSourceLayer(*sourceLayer);
             return nullopt;
         }
     }

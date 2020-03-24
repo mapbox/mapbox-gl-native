@@ -17,11 +17,7 @@ std::unique_ptr<style::Layer> HeatmapLayerFactory::createLayer(const std::string
         return nullptr;
     }
 
-    std::unique_ptr<style::Layer> layer = std::unique_ptr<style::Layer>(new style::HeatmapLayer(id, *source));
-    if (!initSourceLayerAndFilter(layer.get(), value)) {
-        return nullptr;
-    }
-    return layer;
+    return std::unique_ptr<style::Layer>(new style::HeatmapLayer(id, *source));
 }
 
 std::unique_ptr<Bucket> HeatmapLayerFactory::createBucket(const BucketParameters& parameters, const std::vector<Immutable<style::LayerProperties>>& layers) noexcept {

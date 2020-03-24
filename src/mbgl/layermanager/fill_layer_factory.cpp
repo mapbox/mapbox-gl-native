@@ -17,11 +17,7 @@ std::unique_ptr<style::Layer> FillLayerFactory::createLayer(const std::string& i
         return nullptr;
     }
 
-    std::unique_ptr<style::Layer> layer = std::unique_ptr<style::Layer>(new style::FillLayer(id, *source));
-    if (!initSourceLayerAndFilter(layer.get(), value)) {
-        return nullptr;
-    }
-    return layer;
+    return std::unique_ptr<style::Layer>(new style::FillLayer(id, *source));
 }
 
 std::unique_ptr<Layout>

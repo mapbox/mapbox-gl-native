@@ -17,11 +17,7 @@ std::unique_ptr<style::Layer> FillExtrusionLayerFactory::createLayer(const std::
         return nullptr;
     }
 
-    std::unique_ptr<style::Layer> layer = std::unique_ptr<style::Layer>(new style::FillExtrusionLayer(id, *source));
-    if (!initSourceLayerAndFilter(layer.get(), value)) {
-        return nullptr;
-    }
-    return layer;
+    return std::unique_ptr<style::Layer>(new style::FillExtrusionLayer(id, *source));
 }
 
 std::unique_ptr<Layout> FillExtrusionLayerFactory::createLayout(const LayoutParameters& parameters,
