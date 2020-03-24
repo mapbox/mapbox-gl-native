@@ -1,21 +1,6 @@
 #import <Foundation/Foundation.h>
 #import <mbgl/interface/native_apple_interface.h>
 
-static NSURLSessionConfiguration *testSessionConfiguration() {
-    NSURLSessionConfiguration* sessionConfiguration = [NSURLSessionConfiguration defaultSessionConfiguration];
-
-    sessionConfiguration.timeoutIntervalForResource = 30;
-    sessionConfiguration.HTTPMaximumConnectionsPerHost = 8;
-    sessionConfiguration.requestCachePolicy = NSURLRequestReloadIgnoringLocalCacheData;
-    sessionConfiguration.URLCache = nil;
-
-    return sessionConfiguration;
-}
-
-@interface MGLNativeNetworkManager ()
-@property (nonatomic) NSURLSession *testSession;
-@end
-
 @implementation MGLNativeNetworkManager
 
 static MGLNativeNetworkManager *instance = nil;
@@ -28,59 +13,65 @@ static MGLNativeNetworkManager *instance = nil;
     return instance;
 }
 
-- (instancetype)init {
-    if ((self = [super init])) {
-        _testSession = [NSURLSession sessionWithConfiguration:testSessionConfiguration()];
-    }
-    return self;
++ (NSURLSessionConfiguration *)testSessionConfiguration {
+    NSURLSessionConfiguration* sessionConfiguration = [NSURLSessionConfiguration defaultSessionConfiguration];
+
+    sessionConfiguration.timeoutIntervalForResource = 30;
+    sessionConfiguration.HTTPMaximumConnectionsPerHost = 8;
+    sessionConfiguration.requestCachePolicy = NSURLRequestReloadIgnoringLocalCacheData;
+    sessionConfiguration.URLCache = nil;
+
+    return sessionConfiguration;
 }
 
-- (NSURLSession *)session {
-    NSURLSession *session;
-    if (_delegate && [_delegate respondsToSelector:@selector(session)]) {
-        session = [_delegate session];
-    }
-
-    // For testing. Since we get a `nil` return when SDK is modualar, we use this for testing requests.
-    // Same as `[MGLNetworkConfiguration defaultSessionConfiguration]` in `MGLNetworkConfiguration.m`.
-    return session ?: self.testSession;
-}
+#pragma mark - Optionals
 
 - (NSString *)skuToken {
-    if(_delegate && [_delegate respondsToSelector:@selector(skuToken)]) {
-        return [_delegate skuToken];
+    if([self.delegate respondsToSelector:@selector(skuToken)]) {
+        return [self.delegate skuToken];
     }
     return nil;
 }
 
-- (void)startDownloadEvent:(NSString *)event type:(NSString *)type {
-    if (_delegate && [_delegate respondsToSelector:@selector(startDownloadEvent:type:)]) {
-        [_delegate startDownloadEvent:event type:type];
+#pragma mark - Required
+
+- (NSURLSessionConfiguration *)sessionConfiguration {
+    NSURLSessionConfiguration *configuration = [_delegate sessionConfiguration];
+
+    if (!configuration) {
+        // TODO: Remove
+        NSLog(@"Using testSessionConfiguration");
+
+        // For testing. Since we get a `nil` return when SDK is modular, we use
+        // this for testing requests.
+        // Same as `[MGLNetworkConfiguration defaultSessionConfiguration]` in
+        // `MGLNetworkConfiguration.m`.
+        configuration = [MGLNativeNetworkManager testSessionConfiguration];
     }
+
+    return configuration;
+}
+
+- (void)startDownloadEvent:(NSString *)event type:(NSString *)type {
+    [self.delegate startDownloadEvent:event type:type];
 }
 
 - (void)cancelDownloadEventForResponse:(NSURLResponse *)response {
-    if (_delegate && [_delegate respondsToSelector:@selector(cancelDownloadEventForResponse:)]) {
-        return [_delegate cancelDownloadEventForResponse:response];
-    }
+    [self.delegate cancelDownloadEventForResponse:response];
 }
 
 - (void)stopDownloadEventForResponse:(NSURLResponse *)response {
-    if (_delegate && [_delegate respondsToSelector:@selector(stopDownloadEventForResponse:)]) {
-        return [_delegate stopDownloadEventForResponse:response];
-    }
+    [self.delegate stopDownloadEventForResponse:response];
 }
 
-- (void)debugLog:(NSString *)format, ...{
-    if (_delegate && [_delegate respondsToSelector:@selector(debugLog:)]) {
-        return [_delegate debugLog:format];
-    }
+- (void)debugLog:(NSString *)format, ... {
+    // TODO: Replace with existing mbgl logging handling.
+    [self.delegate debugLog:format];
 }
 
-- (void)errorLog:(NSString *)format, ...{
-    if (_delegate && [_delegate respondsToSelector:@selector(errorLog:)]) {
-        return [_delegate errorLog:format];
-    }
+- (void)errorLog:(NSString *)format, ... {
+    // TODO: Replace with existing mbgl logging handling.
+    [self.delegate errorLog:format];
 }
 
 @end

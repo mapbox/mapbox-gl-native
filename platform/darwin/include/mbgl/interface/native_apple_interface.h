@@ -2,15 +2,19 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class MGLNativeNetworkManager;
+
 @protocol MGLNativeNetworkDelegate <NSObject>
 
 @optional
 
 - (NSString *)skuToken;
 
+- (NSURLSession *)sessionForNetworkManager:(MGLNativeNetworkManager *)networkManager;
+
 @required
 
-- (NSURLSession *)session;
+- (NSURLSessionConfiguration *)sessionConfiguration;
 
 - (void)startDownloadEvent:(NSString *)event type:(NSString *)type;
 
@@ -34,7 +38,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, readonly) NSString *skuToken;
 
-@property (nonatomic, readonly) NSURLSession *session;
+@property (nonatomic, readonly) NSURLSessionConfiguration *sessionConfiguration;
 
 - (void)startDownloadEvent:(NSString *)event type:(NSString *)type;
 
