@@ -9,6 +9,18 @@ namespace mbgl {
 namespace style {
 namespace conversion {
 
+namespace {
+bool setObjectMember(std::unique_ptr<Layer>& layer, const Convertible& value, const char* member, Error& error) {
+    if (auto memberValue = objectMember(value, member)) {
+        if (auto error_ = layer->setProperty(member, *memberValue)) {
+            error = *error_;
+            return false;
+        }
+    }
+    return true;
+}
+} // namespace
+
 optional<Error> setPaintProperties(Layer& layer, const Convertible& value) {
     auto paintValue = objectMember(value, "paint");
     if (!paintValue) {
@@ -51,29 +63,11 @@ optional<std::unique_ptr<Layer>> Converter<std::unique_ptr<Layer>>::operator()(c
     }
 
     std::unique_ptr<Layer> layer = LayerManager::get()->createLayer(*type, *id, value, error);
-    if (!layer) {
-        return nullopt;
-    }
+    if (!layer) return nullopt;
 
-    auto minzoomValue = objectMember(value, "minzoom");
-    if (minzoomValue) {
-        optional<float> minzoom = toNumber(*minzoomValue);
-        if (!minzoom) {
-            error.message = "minzoom must be numeric";
-            return nullopt;
-        }
-        layer->setMinZoom(*minzoom);
-    }
-
-    auto maxzoomValue = objectMember(value, "maxzoom");
-    if (maxzoomValue) {
-        optional<float> maxzoom = toNumber(*maxzoomValue);
-        if (!maxzoom) {
-            error.message = "maxzoom must be numeric";
-            return nullopt;
-        }
-        layer->setMaxZoom(*maxzoom);
-    }
+    if (!setObjectMember(layer, value, "minzoom", error)) return nullopt;
+    if (!setObjectMember(layer, value, "maxzoom", error)) return nullopt;
+    if (!setObjectMember(layer, value, "filter", error)) return nullopt;
 
     auto layoutValue = objectMember(value, "layout");
     if (layoutValue) {
