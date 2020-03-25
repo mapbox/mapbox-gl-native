@@ -64,7 +64,7 @@ global.evaluatedType = function (property) {
   case 'boolean':
     return 'bool';
   case 'number':
-    return 'float';
+    return /location$/.test(property.name) ? 'double' : 'float';
   case 'resolvedImage':
       return 'expression::Image';
   case 'formatted':
@@ -77,7 +77,7 @@ global.evaluatedType = function (property) {
     return `Color`;
   case 'array':
     if (property.length) {
-      return `std::array<${evaluatedType({type: property.value})}, ${property.length}>`;
+      return `std::array<${evaluatedType({type: property.value, name: property.name})}, ${property.length}>`;
     } else {
       return `std::vector<${evaluatedType({type: property.value, name: property.name})}>`;
     }

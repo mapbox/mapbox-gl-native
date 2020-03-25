@@ -1,0 +1,68 @@
+{
+  "version": 8,
+  "metadata": {
+    "test": {
+      "width": 512,
+      "height": 256,
+      "operations": [
+        [
+          "addImage",
+          "puck_hat",
+          "puck_hat.png"
+        ],
+        [
+          "addImage",
+          "puck",
+          "puck.png"
+        ],
+        [
+          "addImage",
+          "puck_shadow",
+          "puck_shadow.png"
+        ]
+      ]
+    }
+  },
+  "center": [ 139.759723, 35.692799 ],
+  "zoom": 16,
+  "pitch" : 60,
+  "bearing" : 42,
+  "sources": {},
+  "layers": [
+    {
+      "id": "background",
+      "type": "background",
+      "paint": {
+        "background-color": "white"
+      }
+    },
+    {
+      "id": "puck123",
+      "type": "location-indicator",
+      "layout" : { "bearing" : 0,
+          "bearing-image" : "puck",
+          "top-image" : "puck_hat",
+          "shadow-image" : "puck_shadow",
+          "perspective-compensation" : 1,
+          "image-tilt-displacement" : 5
+      },
+      "paint" : {
+          "accuracy-radius-transition": { "duration": 0, "delay": 0 },
+          "bearing-image-size-transition": { "duration": 0, "delay": 0 },
+          "top-image-size-transition": { "duration": 0, "delay": 0 },
+          "shadow-image-size-transition": { "duration": 0, "delay": 0 },
+          "accuracy-radius-color-transition": { "duration": 0, "delay": 0 },
+          "accuracy-radius-border-color-transition": { "duration": 0, "delay": 0 },
+
+          "location" : [ 35.693055, 139.766707, 0],
+          "accuracy-radius": 90.0,
+          "bearing-image-size" : 48,
+          "top-image-size" : 16,
+          "shadow-image-size" : 112,
+
+          "accuracy-radius-color": "rgba(255,0,0,0.2)",
+          "accuracy-radius-border-color": "rgba(255,0,255,0.6)"
+      }
+    }
+  ]
+}

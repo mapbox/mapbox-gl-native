@@ -310,6 +310,10 @@ template <> type::Type valueTypeToExpressionType<type::ErrorType>() { return typ
 template type::Type valueTypeToExpressionType<std::array<double, 4>>();
 template struct ValueConverter<std::array<double, 4>>;
 
+// for LocationIndicator position
+template type::Type valueTypeToExpressionType<std::array<double, 3>>();
+template struct ValueConverter<std::array<double, 3>>;
+
 // layout/paint property types
 template type::Type valueTypeToExpressionType<float>();
 template type::Type valueTypeToExpressionType<Position>();
