@@ -14,14 +14,17 @@ namespace mbgl {
 std::unique_ptr<style::Layer> LayerManager::createLayer(
     const std::string& type, const std::string& id,
     const style::conversion::Convertible& value, style::conversion::Error& error) noexcept {
-    if (LayerFactory* factory = getFactory(type)) {
+    LayerFactory* factory = getFactory(type);
+    if (factory) {
         auto layer = factory->createLayer(id, value);
         if (!layer) {
-            error.message = "Error parsing a layer of type: " + type;
+            error.message = "Error parsing layer " + id + " of type: " + type;
         }
         return layer;
+    } else {
+        error.message = "Null factory for type: " + type;
     }
-    error.message = "Unsupported layer type: " + type;
+    error.message = "Unsupported layer type! " + error.message;
     return nullptr;
 }
 
