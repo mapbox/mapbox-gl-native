@@ -58,6 +58,8 @@ public:
     void addLayerAbove(JNIEnv&, jlong, const jni::String&);
     void addSource(JNIEnv&, const jni::Object<Source>&, jlong nativePtr);
     void addImages(JNIEnv&, const jni::Array<jni::Object<mbgl::android::Image>>&);
+    jni::Local<jni::Object<Layer>> getLayer(JNIEnv&, const jni::String&);
+    jni::Local<jni::Object<Source>> getSource(JNIEnv&, const jni::String&);
 
     // MapSnapshotterObserver overrides
     void onDidFailLoadingStyle(const std::string&) override;

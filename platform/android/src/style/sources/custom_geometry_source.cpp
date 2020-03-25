@@ -51,9 +51,8 @@ namespace android {
 
     CustomGeometrySource::CustomGeometrySource(jni::JNIEnv& env,
                                                mbgl::style::Source& coreSource,
-                                               AndroidRendererFrontend& frontend)
-        : Source(env, coreSource, createJavaPeer(env), frontend) {
-    }
+                                               AndroidRendererFrontend* frontend)
+        : Source(env, coreSource, createJavaPeer(env), frontend) {}
 
     CustomGeometrySource::~CustomGeometrySource() {
         releaseThreads();

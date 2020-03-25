@@ -34,32 +34,41 @@
 namespace mbgl {
 namespace android {
 
-    static std::unique_ptr<Source> createSourcePeer(jni::JNIEnv& env, mbgl::style::Source& coreSource, AndroidRendererFrontend& frontend) {
-        if (coreSource.is<mbgl::style::VectorSource>()) {
-            return std::make_unique<VectorSource>(env, *coreSource.as<mbgl::style::VectorSource>(), frontend);
-        } else if (coreSource.is<mbgl::style::RasterSource>()) {
-            return std::make_unique<RasterSource>(env, *coreSource.as<mbgl::style::RasterSource>(), frontend);
-        } else if (coreSource.is<mbgl::style::GeoJSONSource>()) {
-            return std::make_unique<GeoJSONSource>(env, *coreSource.as<mbgl::style::GeoJSONSource>(), frontend);
-        } else if (coreSource.is<mbgl::style::ImageSource>()) {
-            return std::make_unique<ImageSource>(env, *coreSource.as<mbgl::style::ImageSource>(), frontend);
-        } else {
-            return std::make_unique<UnknownSource>(env, coreSource, frontend);
-        }
+static std::unique_ptr<Source> createSourcePeer(jni::JNIEnv& env,
+                                                mbgl::style::Source& coreSource,
+                                                AndroidRendererFrontend* frontend) {
+    if (coreSource.is<mbgl::style::VectorSource>()) {
+        return std::make_unique<VectorSource>(env, *coreSource.as<mbgl::style::VectorSource>(), frontend);
+    } else if (coreSource.is<mbgl::style::RasterSource>()) {
+        return std::make_unique<RasterSource>(env, *coreSource.as<mbgl::style::RasterSource>(), frontend);
+    } else if (coreSource.is<mbgl::style::GeoJSONSource>()) {
+        return std::make_unique<GeoJSONSource>(env, *coreSource.as<mbgl::style::GeoJSONSource>(), frontend);
+    } else if (coreSource.is<mbgl::style::ImageSource>()) {
+        return std::make_unique<ImageSource>(env, *coreSource.as<mbgl::style::ImageSource>(), frontend);
+    } else {
+        return std::make_unique<UnknownSource>(env, coreSource, frontend);
     }
+}
 
     const jni::Object<Source>& Source::peerForCoreSource(jni::JNIEnv& env, mbgl::style::Source& coreSource, AndroidRendererFrontend& frontend) {
         if (!coreSource.peer.has_value()) {
-            coreSource.peer = createSourcePeer(env, coreSource, frontend);
+            coreSource.peer = createSourcePeer(env, coreSource, &frontend);
         }
         return coreSource.peer.get<std::unique_ptr<Source>>()->javaPeer;
     }
 
-    Source::Source(jni::JNIEnv& env, mbgl::style::Source& coreSource, const jni::Object<Source>& obj, AndroidRendererFrontend& frontend)
-        : source(coreSource)
-        , javaPeer(jni::NewGlobal(env, obj))
-        , rendererFrontend(&frontend) {
+    const jni::Object<Source>& Source::peerForCoreSource(jni::JNIEnv& env, mbgl::style::Source& coreSource) {
+        if (!coreSource.peer.has_value()) {
+            coreSource.peer = createSourcePeer(env, coreSource, nullptr);
+        }
+        return coreSource.peer.get<std::unique_ptr<Source>>()->javaPeer;
     }
+
+    Source::Source(jni::JNIEnv& env,
+                   mbgl::style::Source& coreSource,
+                   const jni::Object<Source>& obj,
+                   AndroidRendererFrontend* frontend)
+        : source(coreSource), javaPeer(jni::NewGlobal(env, obj)), rendererFrontend(frontend) {}
 
     Source::Source(jni::JNIEnv&, std::unique_ptr<mbgl::style::Source> coreSource)
         : ownedSource(std::move(coreSource))

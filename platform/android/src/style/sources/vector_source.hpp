@@ -16,7 +16,7 @@ public:
     static void registerNative(jni::JNIEnv&);
 
     VectorSource(jni::JNIEnv&, const jni::String&, const jni::Object<>&);
-    VectorSource(jni::JNIEnv&, mbgl::style::Source&, AndroidRendererFrontend&);
+    VectorSource(jni::JNIEnv&, mbgl::style::Source&, AndroidRendererFrontend*);
     ~VectorSource();
 
 private:

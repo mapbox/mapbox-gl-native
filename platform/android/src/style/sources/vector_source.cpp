@@ -30,11 +30,8 @@ namespace android {
         ) {
     }
 
-    VectorSource::VectorSource(jni::JNIEnv& env,
-                               mbgl::style::Source& coreSource,
-                               AndroidRendererFrontend& frontend)
-        : Source(env, coreSource, createJavaPeer(env), frontend) {
-    }
+    VectorSource::VectorSource(jni::JNIEnv& env, mbgl::style::Source& coreSource, AndroidRendererFrontend* frontend)
+        : Source(env, coreSource, createJavaPeer(env), frontend) {}
 
     VectorSource::~VectorSource() = default;
 

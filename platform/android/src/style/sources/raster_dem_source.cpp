@@ -24,10 +24,9 @@ namespace android {
     }
 
     RasterDEMSource::RasterDEMSource(jni::JNIEnv& env,
-                               mbgl::style::Source& coreSource,
-                               AndroidRendererFrontend& frontend)
-         : Source(env, coreSource, createJavaPeer(env), frontend) {
-    }
+                                     mbgl::style::Source& coreSource,
+                                     AndroidRendererFrontend* frontend)
+        : Source(env, coreSource, createJavaPeer(env), frontend) {}
 
     RasterDEMSource::~RasterDEMSource() = default;
 

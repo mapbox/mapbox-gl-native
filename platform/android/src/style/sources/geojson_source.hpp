@@ -43,7 +43,7 @@ public:
     static void registerNative(jni::JNIEnv&);
 
     GeoJSONSource(jni::JNIEnv&, const jni::String&, const jni::Object<>&);
-    GeoJSONSource(jni::JNIEnv&, mbgl::style::Source&, AndroidRendererFrontend&);
+    GeoJSONSource(jni::JNIEnv&, mbgl::style::Source&, AndroidRendererFrontend*);
     ~GeoJSONSource();
 
 private:
