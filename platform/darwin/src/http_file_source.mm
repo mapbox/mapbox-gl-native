@@ -250,7 +250,7 @@ std::unique_ptr<AsyncRequest> HTTPFileSource::request(const Resource& resource, 
             [MGLNativeNetworkManager.sharedManager startDownloadEvent:url.relativePath type:@"tile"];
         }
 
-        NSURLSession *session;
+        __block NSURLSession *session;
 
         // Use the delegate's session if there is one, otherwise use the one that
         // was created when this class was constructed.
@@ -268,6 +268,8 @@ std::unique_ptr<AsyncRequest> HTTPFileSource::request(const Resource& resource, 
         request->task = [session
             dataTaskWithRequest:req
               completionHandler:^(NSData* data, NSURLResponse* res, NSError* error) {
+                session = nil;
+            
                 if (error && [error code] == NSURLErrorCancelled) {
                     [MGLNativeNetworkManager.sharedManager cancelDownloadEventForResponse:res];
                     return;
