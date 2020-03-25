@@ -1,11 +1,12 @@
 #pragma once
 
+#include <mbgl/layout/symbol_projection.hpp>
+#include <mbgl/renderer/renderer.hpp>
+#include <mbgl/style/transition_options.hpp>
+#include <mbgl/text/collision_index.hpp>
+#include <mbgl/util/chrono.hpp>
 #include <string>
 #include <unordered_map>
-#include <mbgl/util/chrono.hpp>
-#include <mbgl/text/collision_index.hpp>
-#include <mbgl/layout/symbol_projection.hpp>
-#include <mbgl/style/transition_options.hpp>
 #include <unordered_set>
 
 namespace mbgl {
@@ -122,6 +123,8 @@ public:
     virtual float symbolFadeChange(TimePoint now) const;
     virtual bool hasTransitions(TimePoint now) const;
     virtual bool transitionsEnabled() const;
+    virtual void collectPlacedSymbolData(bool /*enable*/) {}
+    virtual const std::vector<PlacedSymbolData>& getPlacedSymbolsData() const;
 
     const CollisionIndex& getCollisionIndex() const;
     TimePoint getCommitTime() const { return commitTime; }
