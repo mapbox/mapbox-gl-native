@@ -64,3 +64,6 @@
 [submodule "vendor/cpp-httplib"]
 	path = vendor/cpp-httplib
 	url = https://github.com/yhirose/cpp-httplib.git
+[submodule "vendor/mapbox-gl-native-curl"]
+	path = vendor/mapbox-gl-native-curl
+	url = https://github.com/mapbox/mapbox-gl-native-curl.git
