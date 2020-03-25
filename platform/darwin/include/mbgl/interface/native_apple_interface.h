@@ -2,11 +2,15 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class MGLNativeNetworkManager;
+
 @protocol MGLNativeNetworkDelegate <NSObject>
 
 @optional
 
 - (NSString *)skuToken;
+
+- (NSURLSession *)sessionForNetworkManager:(MGLNativeNetworkManager *)networkManager;
 
 @required
 

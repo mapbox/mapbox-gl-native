@@ -13,61 +13,65 @@ static MGLNativeNetworkManager *instance = nil;
     return instance;
 }
 
-- (NSURLSessionConfiguration *)sessionConfiguration {
-    if (_delegate && [_delegate respondsToSelector:@selector(sessionConfiguration)]) {
-        return [_delegate sessionConfiguration];
-    }
-    // For testing. Since we get a `nil` return when SDK is modualar, we use this for testing requests.
-    // Same as `[MGLNetworkConfiguration defaultSessionConfiguration]` in `MGLNetworkConfiguration.m`.
-    return [self testSessionConfiguration];
-}
-
-- (NSURLSessionConfiguration *)testSessionConfiguration {
++ (NSURLSessionConfiguration *)testSessionConfiguration {
     NSURLSessionConfiguration* sessionConfiguration = [NSURLSessionConfiguration defaultSessionConfiguration];
-    
+
     sessionConfiguration.timeoutIntervalForResource = 30;
     sessionConfiguration.HTTPMaximumConnectionsPerHost = 8;
     sessionConfiguration.requestCachePolicy = NSURLRequestReloadIgnoringLocalCacheData;
     sessionConfiguration.URLCache = nil;
-    
+
     return sessionConfiguration;
 }
 
+#pragma mark - Optionals
+
 - (NSString *)skuToken {
-    if(_delegate && [_delegate respondsToSelector:@selector(skuToken)]) {
-        return [_delegate skuToken];
+    if([self.delegate respondsToSelector:@selector(skuToken)]) {
+        return [self.delegate skuToken];
     }
     return nil;
 }
 
-- (void)startDownloadEvent:(NSString *)event type:(NSString *)type {
-    if (_delegate && [_delegate respondsToSelector:@selector(startDownloadEvent:type:)]) {
-        [_delegate startDownloadEvent:event type:type];
+#pragma mark - Required
+
+- (NSURLSessionConfiguration *)sessionConfiguration {
+    NSURLSessionConfiguration *configuration = [_delegate sessionConfiguration];
+
+    if (!configuration) {
+        // TODO: Remove
+        NSLog(@"Using testSessionConfiguration");
+
+        // For testing. Since we get a `nil` return when SDK is modular, we use
+        // this for testing requests.
+        // Same as `[MGLNetworkConfiguration defaultSessionConfiguration]` in
+        // `MGLNetworkConfiguration.m`.
+        configuration = [MGLNativeNetworkManager testSessionConfiguration];
     }
+
+    return configuration;
+}
+
+- (void)startDownloadEvent:(NSString *)event type:(NSString *)type {
+    [self.delegate startDownloadEvent:event type:type];
 }
 
 - (void)cancelDownloadEventForResponse:(NSURLResponse *)response {
-    if (_delegate && [_delegate respondsToSelector:@selector(cancelDownloadEventForResponse:)]) {
-        return [_delegate cancelDownloadEventForResponse:response];
-    }
+    [self.delegate cancelDownloadEventForResponse:response];
 }
 
 - (void)stopDownloadEventForResponse:(NSURLResponse *)response {
-    if (_delegate && [_delegate respondsToSelector:@selector(stopDownloadEventForResponse:)]) {
-        return [_delegate stopDownloadEventForResponse:response];
-    }
+    [self.delegate stopDownloadEventForResponse:response];
 }
 
-- (void)debugLog:(NSString *)format, ...{
-    if (_delegate && [_delegate respondsToSelector:@selector(debugLog:)]) {
-        return [_delegate debugLog:format];
-    }
+- (void)debugLog:(NSString *)format, ... {
+    // TODO: Replace with existing mbgl logging handling.
+    [self.delegate debugLog:format];
 }
 
-- (void)errorLog:(NSString *)format, ...{
-    if (_delegate && [_delegate respondsToSelector:@selector(errorLog:)]) {
-        return [_delegate errorLog:format];
-    }
+- (void)errorLog:(NSString *)format, ... {
+    // TODO: Replace with existing mbgl logging handling.
+    [self.delegate errorLog:format];
 }
 
 @end
