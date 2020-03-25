@@ -378,6 +378,7 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(
         }
     }
     // Symbol placement.
+    assert((updateParameters->mode == MapMode::Tile) || !placedSymbolDataCollected);
     bool symbolBucketsChanged = false;
     bool symbolBucketsAdded = false;
     std::set<std::string> usedSymbolLayers;
@@ -425,6 +426,7 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(
         renderTreeParameters->placementChanged = symbolBucketsChanged = !layersNeedPlacement.empty();
         if (renderTreeParameters->placementChanged) {
             Mutable<Placement> placement = Placement::create(updateParameters);
+            placement->collectPlacedSymbolData(placedSymbolDataCollected);
             placement->placeLayers(layersNeedPlacement);
             placementController.setPlacement(std::move(placement));
         }
@@ -633,6 +635,14 @@ void RenderOrchestrator::dumpDebugLogs() {
     }
 
     imageManager->dumpDebugLogs();
+}
+
+void RenderOrchestrator::collectPlacedSymbolData(bool enable) {
+    placedSymbolDataCollected = enable;
+}
+
+const std::vector<PlacedSymbolData>& RenderOrchestrator::getPlacedSymbolsData() const {
+    return placementController.getPlacement()->getPlacedSymbolsData();
 }
 
 RenderLayer* RenderOrchestrator::getRenderLayer(const std::string& id) {

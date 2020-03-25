@@ -1142,6 +1142,11 @@ bool Placement::hasTransitions(TimePoint now) const {
            transitionOptions.duration.value_or(util::DEFAULT_TRANSITION_DURATION);
 }
 
+const std::vector<PlacedSymbolData>& Placement::getPlacedSymbolsData() const {
+    const static std::vector<PlacedSymbolData> data;
+    return data;
+}
+
 const CollisionIndex& Placement::getCollisionIndex() const {
     return collisionIndex;
 }
