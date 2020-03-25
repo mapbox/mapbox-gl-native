@@ -22,11 +22,8 @@ namespace android {
         ) {
     }
 
-    RasterSource::RasterSource(jni::JNIEnv& env,
-                               mbgl::style::Source& coreSource,
-                               AndroidRendererFrontend& frontend)
-        : Source(env, coreSource, createJavaPeer(env), frontend) {
-    }
+    RasterSource::RasterSource(jni::JNIEnv& env, mbgl::style::Source& coreSource, AndroidRendererFrontend* frontend)
+        : Source(env, coreSource, createJavaPeer(env), frontend) {}
 
     RasterSource::~RasterSource() = default;
 

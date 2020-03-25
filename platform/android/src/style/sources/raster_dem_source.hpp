@@ -15,7 +15,7 @@ public:
     static void registerNative(jni::JNIEnv&);
 
     RasterDEMSource(jni::JNIEnv&, const jni::String&, const jni::Object<>&, jni::jint);
-    RasterDEMSource(jni::JNIEnv&, mbgl::style::Source&, AndroidRendererFrontend&);
+    RasterDEMSource(jni::JNIEnv&, mbgl::style::Source&, AndroidRendererFrontend*);
     ~RasterDEMSource();
 
     jni::Local<jni::String> getURL(jni::JNIEnv&);

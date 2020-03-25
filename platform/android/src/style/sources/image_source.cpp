@@ -23,11 +23,8 @@ namespace android {
             ) {
     }
 
-    ImageSource::ImageSource(jni::JNIEnv& env,
-                             mbgl::style::Source& coreSource,
-                             AndroidRendererFrontend& frontend)
-            : Source(env, coreSource, createJavaPeer(env), frontend) {
-    }
+    ImageSource::ImageSource(jni::JNIEnv& env, mbgl::style::Source& coreSource, AndroidRendererFrontend* frontend)
+        : Source(env, coreSource, createJavaPeer(env), frontend) {}
 
     ImageSource::~ImageSource() = default;
 

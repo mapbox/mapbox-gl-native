@@ -19,7 +19,7 @@ public:
 
     ImageSource(jni::JNIEnv&, const jni::String&, const jni::Object<LatLngQuad>&);
 
-    ImageSource(jni::JNIEnv&, mbgl::style::Source&, AndroidRendererFrontend&);
+    ImageSource(jni::JNIEnv&, mbgl::style::Source&, AndroidRendererFrontend*);
 
     ~ImageSource();
 

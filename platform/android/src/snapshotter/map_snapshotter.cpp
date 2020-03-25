@@ -7,6 +7,7 @@
 #include <mbgl/util/string.hpp>
 
 #include "../attach_env.hpp"
+#include "../style/layers/layer_manager.hpp"
 #include "map_snapshot.hpp"
 
 namespace mbgl {
@@ -282,6 +283,30 @@ void MapSnapshotter::addImages(JNIEnv& env, const jni::Array<jni::Object<mbgl::a
     }
 }
 
+jni::Local<jni::Object<Layer>> MapSnapshotter::getLayer(JNIEnv& env, const jni::String& layerId) {
+    // Find the layer
+    mbgl::style::Layer* coreLayer = snapshotter->getStyle().getLayer(jni::Make<std::string>(env, layerId));
+    if (!coreLayer) {
+        mbgl::Log::Debug(mbgl::Event::JNI, "No layer found");
+        return jni::Local<jni::Object<Layer>>();
+    }
+
+    // Create and return the layer's native peer
+    return LayerManagerAndroid::get()->createJavaLayerPeer(env, *coreLayer);
+}
+
+jni::Local<jni::Object<Source>> MapSnapshotter::getSource(JNIEnv& env, const jni::String& sourceId) {
+    // Find the source
+    mbgl::style::Source* coreSource = snapshotter->getStyle().getSource(jni::Make<std::string>(env, sourceId));
+    if (!coreSource) {
+        mbgl::Log::Debug(mbgl::Event::JNI, "No source found");
+        return jni::Local<jni::Object<Source>>();
+    }
+
+    // Create and return the source's native peer
+    return jni::NewLocal(env, Source::peerForCoreSource(env, *coreSource));
+}
+
 // Static methods //
 
 void MapSnapshotter::registerNative(jni::JNIEnv& env) {
@@ -314,6 +339,8 @@ void MapSnapshotter::registerNative(jni::JNIEnv& env) {
                                             METHOD(&MapSnapshotter::addLayerAbove, "nativeAddLayerAbove"),
                                             METHOD(&MapSnapshotter::addSource, "nativeAddSource"),
                                             METHOD(&MapSnapshotter::addImages, "nativeAddImages"),
+                                            METHOD(&MapSnapshotter::getLayer, "nativeGetLayer"),
+                                            METHOD(&MapSnapshotter::getSource, "nativeGetSource"),
                                             METHOD(&MapSnapshotter::setStyleJson, "setStyleJson"),
                                             METHOD(&MapSnapshotter::setSize, "setSize"),
                                             METHOD(&MapSnapshotter::setCameraPosition, "setCameraPosition"),

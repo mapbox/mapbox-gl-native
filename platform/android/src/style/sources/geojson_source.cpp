@@ -50,7 +50,7 @@ GeoJSONSource::GeoJSONSource(jni::JNIEnv& env, const jni::String& sourceId, cons
       converter(std::make_unique<Actor<FeatureConverter>>(Scheduler::GetBackground(),
                                                           source.as<style::GeoJSONSource>()->impl().getOptions())) {}
 
-GeoJSONSource::GeoJSONSource(jni::JNIEnv& env, mbgl::style::Source& coreSource, AndroidRendererFrontend& frontend)
+GeoJSONSource::GeoJSONSource(jni::JNIEnv& env, mbgl::style::Source& coreSource, AndroidRendererFrontend* frontend)
     : Source(env, coreSource, createJavaPeer(env), frontend),
       converter(std::make_unique<Actor<FeatureConverter>>(Scheduler::GetBackground(),
                                                           source.as<style::GeoJSONSource>()->impl().getOptions())) {}
