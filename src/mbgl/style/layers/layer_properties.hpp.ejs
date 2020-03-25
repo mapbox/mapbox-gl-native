@@ -11,7 +11,7 @@
 
 #include <mbgl/style/types.hpp>
 #include <mbgl/style/layer_properties.hpp>
-#include <mbgl/style/layers/<%- type.replace('-', '_') %>_layer.hpp>
+#include <mbgl/style/layers/<%- type.replace(/-/g, '_') %>_layer.hpp>
 #include <mbgl/style/layout_property.hpp>
 #include <mbgl/style/paint_property.hpp>
 #include <mbgl/style/properties.hpp>

@@ -6,6 +6,9 @@
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/timer.hpp>
+#if defined(MBGL_RENDER_BACKEND_OPENGL) && !defined(MBGL_LAYER_CUSTOM_DISABLE_ALL)
+#include <mbgl/style/layers/location_indicator_layer.hpp>
+#endif
 
 struct GLFWwindow;
 class GLFWBackend;
@@ -61,6 +64,7 @@ public:
 
     // mbgl::MapObserver implementation
     void onDidFinishLoadingStyle() override;
+    void onWillStartRenderingFrame() override;
 
 protected:
     // mbgl::Backend implementation
@@ -91,6 +95,7 @@ private:
     void addAnimatedAnnotation();
     void updateAnimatedAnnotations();
     void toggleCustomSource();
+    void toggleLocationIndicatorLayer();
 
     void cycleDebugOptions();
     void clearAnnotations();
@@ -148,4 +153,9 @@ private:
     std::unique_ptr<mbgl::MapSnapshotter> snapshotter;
     std::unique_ptr<SnapshotObserver> snapshotterObserver;
     mbgl::ResourceOptions mapResourceOptions;
+
+#if defined(MBGL_RENDER_BACKEND_OPENGL) && !defined(MBGL_LAYER_CUSTOM_DISABLE_ALL)
+    bool puckFollowsCameraCenter = false;
+    mbgl::style::LocationIndicatorLayer *puck = nullptr;
+#endif
 };
