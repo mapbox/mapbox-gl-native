@@ -139,7 +139,7 @@ public:
 protected:
     friend SymbolBucket;
     void placeSymbolBucket(const BucketPlacementData&, std::set<uint32_t>& seenCrossTileIDs);
-    void placeLayer(const RenderLayer&);
+    void placeLayer(const RenderLayer&, std::set<uint32_t>&);
     virtual void commit();
     // Implentation specific hooks, which get called during a symbol bucket placement.
     virtual optional<CollisionBoundaries> getAvoidEdges(const SymbolBucket&, const mat4& /*posMatrix*/) {

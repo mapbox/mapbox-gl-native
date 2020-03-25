@@ -107,13 +107,13 @@ Placement::~Placement() = default;
 
 void Placement::placeLayers(const RenderLayerReferences& layers) {
     for (auto it = layers.crbegin(); it != layers.crend(); ++it) {
-        placeLayer(*it);
+        std::set<uint32_t> seenCrossTileIDs;
+        placeLayer(*it, seenCrossTileIDs);
     }
     commit();
 }
 
-void Placement::placeLayer(const RenderLayer& layer) {
-    std::set<uint32_t> seenCrossTileIDs;
+void Placement::placeLayer(const RenderLayer& layer, std::set<uint32_t>& seenCrossTileIDs) {
     for (const BucketPlacementData& data : layer.getPlacementData()) {
         Bucket& bucket = data.bucket;
         bucket.place(*this, data, seenCrossTileIDs);
@@ -1159,7 +1159,7 @@ public:
     explicit StaticPlacement(std::shared_ptr<const UpdateParameters> updateParameters_)
         : Placement(std::move(updateParameters_), nullopt) {}
 
-private:
+protected:
     void commit() override;
     float symbolFadeChange(TimePoint) const override { return 1.0f; }
     bool hasTransitions(TimePoint) const override { return false; }
@@ -1190,6 +1190,7 @@ private:
 
     std::unordered_map<uint32_t, bool> locationCache;
     optional<CollisionBoundaries> tileBorders;
+    std::set<uint32_t> seenCrossTileIDs;
     bool onlyLabelsIntersectingTileBorders;
 };
 
@@ -1197,10 +1198,17 @@ void TilePlacement::placeLayers(const RenderLayerReferences& layers) {
     // In order to avoid label cut-offs, at first, place the labels,
     // which cross tile boundaries.
     onlyLabelsIntersectingTileBorders = true;
-    StaticPlacement::placeLayers(layers);
+    seenCrossTileIDs.clear();
+    for (auto it = layers.crbegin(); it != layers.crend(); ++it) {
+        placeLayer(*it, seenCrossTileIDs);
+    }
     // Place the rest labels.
     onlyLabelsIntersectingTileBorders = false;
-    StaticPlacement::placeLayers(layers);
+    for (auto it = layers.crbegin(); it != layers.crend(); ++it) {
+        placeLayer(*it, seenCrossTileIDs);
+    }
+
+    commit();
 }
 
 optional<CollisionBoundaries> TilePlacement::getAvoidEdges(const SymbolBucket& bucket, const mat4& posMatrix) {
