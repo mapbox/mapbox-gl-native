@@ -77,6 +77,15 @@ void stringify(Writer& writer, const std::array<float, 4>& v) {
 }
 
 template <class Writer>
+void stringify(Writer& writer, const std::array<double, 3>& v) {
+    writer.StartArray();
+    writer.Double(v[0]);
+    writer.Double(v[1]);
+    writer.Double(v[2]);
+    writer.EndArray();
+}
+
+template <class Writer>
 void stringify(Writer&, const Value&);
 
 template <class Writer, class T>

@@ -808,6 +808,16 @@ if(MBGL_WITH_OPENGL)
     target_sources(
         mbgl-core
         PRIVATE
+            ${PROJECT_SOURCE_DIR}/include/mbgl/style/layers/location_component_layer.hpp
+            ${PROJECT_SOURCE_DIR}/include/mbgl/layermanager/location_component_layer_factory.hpp
+            ${PROJECT_SOURCE_DIR}/src/mbgl/layermanager/location_component_layer_factory.cpp
+            ${PROJECT_SOURCE_DIR}/src/mbgl/style/layers/location_component_layer.cpp
+            ${PROJECT_SOURCE_DIR}/src/mbgl/style/layers/location_component_layer_impl.cpp
+            ${PROJECT_SOURCE_DIR}/src/mbgl/style/layers/location_component_layer_impl.hpp
+            ${PROJECT_SOURCE_DIR}/src/mbgl/style/layers/location_component_layer_properties.cpp
+            ${PROJECT_SOURCE_DIR}/src/mbgl/style/layers/location_component_layer_properties.hpp
+            ${PROJECT_SOURCE_DIR}/src/mbgl/renderer/layers/render_location_component_layer.cpp
+            ${PROJECT_SOURCE_DIR}/src/mbgl/renderer/layers/render_location_component_layer.hpp
             ${PROJECT_SOURCE_DIR}/include/mbgl/gfx/backend.hpp
             ${PROJECT_SOURCE_DIR}/include/mbgl/gl/custom_layer.hpp
             ${PROJECT_SOURCE_DIR}/include/mbgl/gl/custom_layer_factory.hpp
