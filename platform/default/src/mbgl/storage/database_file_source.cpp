@@ -248,26 +248,28 @@ void DatabaseFileSource::updateOfflineMetadata(
     impl->actor().invoke(&DatabaseFileSourceThread::updateMetadata, regionID, metadata, std::move(callback));
 }
 
-void DatabaseFileSource::deleteOfflineRegion(OfflineRegion& region, std::function<void(std::exception_ptr)> callback) {
+void DatabaseFileSource::deleteOfflineRegion(const OfflineRegion& region,
+                                             std::function<void(std::exception_ptr)> callback) {
     impl->actor().invoke(&DatabaseFileSourceThread::deleteRegion, region, std::move(callback));
 }
 
-void DatabaseFileSource::invalidateOfflineRegion(OfflineRegion& region,
+void DatabaseFileSource::invalidateOfflineRegion(const OfflineRegion& region,
                                                  std::function<void(std::exception_ptr)> callback) {
     impl->actor().invoke(&DatabaseFileSourceThread::invalidateRegion, region.getID(), std::move(callback));
 }
 
-void DatabaseFileSource::setOfflineRegionObserver(OfflineRegion& region,
+void DatabaseFileSource::setOfflineRegionObserver(const OfflineRegion& region,
                                                   std::unique_ptr<OfflineRegionObserver> observer) {
     impl->actor().invoke(&DatabaseFileSourceThread::setRegionObserver, region.getID(), std::move(observer));
 }
 
-void DatabaseFileSource::setOfflineRegionDownloadState(OfflineRegion& region, OfflineRegionDownloadState state) {
+void DatabaseFileSource::setOfflineRegionDownloadState(const OfflineRegion& region, OfflineRegionDownloadState state) {
     impl->actor().invoke(&DatabaseFileSourceThread::setRegionDownloadState, region.getID(), state);
 }
 
 void DatabaseFileSource::getOfflineRegionStatus(
-    OfflineRegion& region, std::function<void(expected<OfflineRegionStatus, std::exception_ptr>)> callback) const {
+    const OfflineRegion& region,
+    std::function<void(expected<OfflineRegionStatus, std::exception_ptr>)> callback) const {
     impl->actor().invoke(&DatabaseFileSourceThread::getRegionStatus, region.getID(), std::move(callback));
 }
 
