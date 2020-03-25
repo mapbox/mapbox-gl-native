@@ -19,6 +19,8 @@
 
   The newly-added API is used in the style-conversion code, which made this code much simpler.
 
+- [android] Expose getLayer, getSource and Observer interface for snapshotter ([#16338](https://github.com/mapbox/mapbox-gl-native/pull/16338))
+
 ### 🐞 Bug fixes
 
 - [core] Use `TileCoordinates` instead of `LngLat` for `within` expression calculation ([#16319](https://github.com/mapbox/mapbox-gl-native/pull/16319))
