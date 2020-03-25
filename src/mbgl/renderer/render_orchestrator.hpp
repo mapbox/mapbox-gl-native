@@ -72,6 +72,8 @@ public:
 
     void reduceMemoryUse();
     void dumpDebugLogs();
+    void collectPlacedSymbolData(bool);
+    const std::vector<PlacedSymbolData>& getPlacedSymbolsData() const;
     void clearData();
 
 private:
@@ -124,6 +126,7 @@ private:
 
     const bool backgroundLayerAsColor;
     bool contextLost = false;
+    bool placedSymbolDataCollected = false;
 
     // Vectors with reserved capacity of layerImpls->size() to avoid reallocation
     // on each frame.
