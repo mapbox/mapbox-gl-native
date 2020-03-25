@@ -20,6 +20,7 @@
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/geo.hpp>
+#include <mbgl/util/io.hpp>
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/platform.hpp>
 #include <mbgl/util/string.hpp>
@@ -40,6 +41,25 @@
 #include <fstream>
 #include <iostream>
 #include <utility>
+
+#if !defined(MBGL_LAYER_CUSTOM_DISABLE_ALL)
+#include <mbgl/style/layers/location_indicator_layer.hpp>
+
+namespace {
+const std::string mbglPuckAssetsPath{MAPBOX_PUCK_ASSETS_PATH};
+
+mbgl::Color premultiply(mbgl::Color c) {
+    c.r *= c.a;
+    c.g *= c.a;
+    c.b *= c.a;
+    return c;
+}
+
+std::array<double, 3> toArray(const mbgl::LatLng &crd) {
+    return {crd.latitude(), crd.longitude(), 0};
+}
+} // namespace
+#endif
 
 class SnapshotObserver final : public mbgl::MapSnapshotterObserver {
 public:
@@ -459,6 +479,9 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
             // Snapshot with overlay
             view->makeSnapshot(true);
         } break;
+        case GLFW_KEY_G: {
+            view->toggleLocationIndicatorLayer();
+        } break;
         }
     }
 
@@ -689,6 +712,12 @@ void GLFWView::onScroll(GLFWwindow *window, double /*xOffset*/, double yOffset) 
     }
 
     view->map->scaleBy(scale, mbgl::ScreenCoordinate { view->lastX, view->lastY });
+#if !defined(MBGL_LAYER_CUSTOM_DISABLE_ALL)
+    if (view->puck && view->puckFollowsCameraCenter) {
+        mbgl::LatLng mapCenter = view->map->getCameraOptions().center.value();
+        view->puck->setLocation(toArray(mapCenter));
+    }
+#endif
 }
 
 void GLFWView::onWindowResize(GLFWwindow *window, int width, int height) {
@@ -755,7 +784,12 @@ void GLFWView::onMouseMove(GLFWwindow *window, double x, double y) {
     }
     view->lastX = x;
     view->lastY = y;
-
+#if !defined(MBGL_LAYER_CUSTOM_DISABLE_ALL)
+    if (view->puck && view->puckFollowsCameraCenter) {
+        mbgl::LatLng mapCenter = view->map->getCameraOptions().center.value();
+        view->puck->setLocation(toArray(mapCenter));
+    }
+#endif
     auto &style = view->map->getStyle();
     if (style.getLayer("state-fills")) {
         auto screenCoordinate = mbgl::ScreenCoordinate{view->lastX, view->lastY};
@@ -879,6 +913,10 @@ void GLFWView::setWindowTitle(const std::string& title) {
 }
 
 void GLFWView::onDidFinishLoadingStyle() {
+#if !defined(MBGL_LAYER_CUSTOM_DISABLE_ALL)
+    puck = nullptr;
+#endif
+
     if (show3DExtrusions) {
         toggle3DExtrusions(show3DExtrusions);
     }
@@ -932,4 +970,76 @@ void GLFWView::toggleCustomSource() {
         layer->setVisibility(layer->getVisibility() == mbgl::style::VisibilityType::Visible ?
                              mbgl::style::VisibilityType::None : mbgl::style::VisibilityType::Visible);
     }
+}
+
+void GLFWView::toggleLocationIndicatorLayer() {
+#if !defined(MBGL_LAYER_CUSTOM_DISABLE_ALL)
+    puck = static_cast<mbgl::style::LocationIndicatorLayer *>(map->getStyle().getLayer("puck"));
+    static const mbgl::LatLng puckLocation{35.683389, 139.76525}; // A location on the crossing of 4 tiles
+    if (puck == nullptr) {
+        auto puckLayer = std::make_unique<mbgl::style::LocationIndicatorLayer>("puck");
+
+        puckLayer->setLocationTransition(mbgl::style::TransitionOptions(
+            mbgl::Duration::zero(), mbgl::Duration::zero())); // Note: This is used here for demo purpose.
+                                                              // SDKs should not use this, or else the location
+                                                              // will "jump" to positions.
+        puckLayer->setLocation(toArray(puckLocation));
+        puckLayer->setAccuracyRadius(50);
+        puckLayer->setAccuracyRadiusColor(
+            premultiply(mbgl::Color{0.0, 1.0, 0.0, 0.2})); // Note: these must be fed premultiplied
+
+        puckLayer->setBearing(0);
+        puckLayer->setAccuracyRadiusBorderColor(premultiply(mbgl::Color{0.0, 1.0, 0.2, 0.4}));
+        puckLayer->setTopImageSize(24);
+        puckLayer->setBearingImageSize(72);
+        puckLayer->setShadowImageSize(96);
+        puckLayer->setImageTiltDisplacement(8.0f); // set to 0 for a "flat" puck
+        puckLayer->setPerspectiveCompensation(0.9);
+
+        map->getStyle().addImage(std::make_unique<mbgl::style::Image>(
+            "puck.png", mbgl::decodeImage(mbgl::util::read_file(mbglPuckAssetsPath + "puck.png")), 1.0));
+
+        map->getStyle().addImage(std::make_unique<mbgl::style::Image>(
+            "puck_shadow.png", mbgl::decodeImage(mbgl::util::read_file(mbglPuckAssetsPath + "puck_shadow.png")), 1.0));
+
+        map->getStyle().addImage(std::make_unique<mbgl::style::Image>(
+            "puck_hat.png", mbgl::decodeImage(mbgl::util::read_file(mbglPuckAssetsPath + "puck_hat.png")), 1.0));
+
+        puckLayer->setBearingImage(mbgl::style::expression::Image("puck.png"));
+        puckLayer->setShadowImage(mbgl::style::expression::Image("puck_shadow.png"));
+        puckLayer->setTopImage(mbgl::style::expression::Image("puck_hat.png"));
+
+        puck = puckLayer.get();
+        map->getStyle().addLayer(std::move(puckLayer));
+    } else {
+        bool visible = puck->getVisibility() == mbgl::style::VisibilityType::Visible;
+        if (visible) {
+            if (!puckFollowsCameraCenter) {
+                mbgl::LatLng mapCenter = map->getCameraOptions().center.value();
+                puck->setLocation(toArray(mapCenter));
+                puckFollowsCameraCenter = true;
+            } else {
+                puckFollowsCameraCenter = false;
+                puck->setVisibility(mbgl::style::VisibilityType(mbgl::style::VisibilityType::None));
+            }
+        } else {
+            puck->setLocation(toArray(puckLocation));
+            puck->setVisibility(mbgl::style::VisibilityType(mbgl::style::VisibilityType::Visible));
+            puckFollowsCameraCenter = false;
+        }
+    }
+#endif
+}
+
+using Nanoseconds = std::chrono::nanoseconds;
+
+void GLFWView::onWillStartRenderingFrame() {
+#if !defined(MBGL_LAYER_CUSTOM_DISABLE_ALL)
+    puck = static_cast<mbgl::style::LocationIndicatorLayer *>(map->getStyle().getLayer("puck"));
+    if (puck) {
+        uint64_t ns = mbgl::Clock::now().time_since_epoch().count();
+        const float bearing = float(ns % 2000000000) / 2000000000.0 * 360.0;
+        puck->setBearing(bearing);
+    }
+#endif
 }

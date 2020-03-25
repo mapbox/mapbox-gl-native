@@ -8,8 +8,8 @@
 
 // This file is generated. Edit scripts/generate-style-code.js, then run `make style-code`.
 
-#include <mbgl/style/layers/<%- type.replace('-', '_') %>_layer.hpp>
-#include <mbgl/style/layers/<%- type.replace('-', '_') %>_layer_impl.hpp>
+#include <mbgl/style/layers/<%- type.replace(/-/g, '_') %>_layer.hpp>
+#include <mbgl/style/layers/<%- type.replace(/-/g, '_') %>_layer_impl.hpp>
 #include <mbgl/style/layer_observer.hpp>
 #include <mbgl/style/conversion/color_ramp_property_value.hpp>
 #include <mbgl/style/conversion/constant.hpp>
@@ -80,6 +80,7 @@ layerCapabilities['heatmap']        = defaults.require('Source')
                                               .set('TileKind', 'Geometry')
                                               .finalize();
 layerCapabilities['raster']         = defaults.require('Source').set('TileKind', 'Raster').finalize();
+layerCapabilities['location-indicator']     = defaults.finalize();
 
 // Splits lines that are over 120 characters at the firts occurance of '='.
 const split120Line = line => {
@@ -99,7 +100,7 @@ const LayerTypeInfo* <%- camelize(type) %>Layer::Impl::staticTypeInfo() noexcept
 }
 
 
-<% if (type === 'background') { -%>
+<% if ((type === 'background') || (type === 'location-indicator')) { -%>
 <%- camelize(type) %>Layer::<%- camelize(type) %>Layer(const std::string& layerID)
     : Layer(makeMutable<Impl>(layerID, std::string())) {
 }

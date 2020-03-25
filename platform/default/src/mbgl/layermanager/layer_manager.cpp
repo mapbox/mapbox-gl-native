@@ -10,8 +10,10 @@
 #include <mbgl/layermanager/heatmap_layer_factory.hpp>
 #include <mbgl/layermanager/hillshade_layer_factory.hpp>
 #include <mbgl/layermanager/line_layer_factory.hpp>
+#include <mbgl/layermanager/location_indicator_layer_factory.hpp>
 #include <mbgl/layermanager/raster_layer_factory.hpp>
 #include <mbgl/layermanager/symbol_layer_factory.hpp>
+#include <mbgl/util/logging.hpp>
 
 #include <map>
 #include <memory>
@@ -65,6 +67,9 @@ LayerManagerDefault::LayerManagerDefault() {
 #if !defined(MBGL_LAYER_CUSTOM_DISABLE_ALL)
     addLayerType(std::make_unique<CustomLayerFactory>());
 #endif
+#if !defined(MBGL_LAYER_LOCATION_INDICATOR_DISABLE_ALL)
+    addLayerType(std::make_unique<LocationIndicatorLayerFactory>());
+#endif
 #endif
 }
 
@@ -72,6 +77,8 @@ void LayerManagerDefault::addLayerType(std::unique_ptr<LayerFactory> factory) {
     std::string type{factory->getTypeInfo()->type};
     if (!type.empty()) {
         typeToFactory.emplace(std::make_pair(std::move(type), factory.get()));
+    } else {
+        Log::Warning(Event::Setup, "Failure adding layer factory. getTypeInfo() returned an empty type string.");
     }
     factories.emplace_back(std::move(factory));
 }

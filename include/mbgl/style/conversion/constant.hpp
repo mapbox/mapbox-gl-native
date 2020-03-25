@@ -54,6 +54,11 @@ struct Converter<std::vector<float>> {
     optional<std::vector<float>> operator()(const Convertible& value, Error& error) const;
 };
 
+template <size_t N>
+struct Converter<std::array<double, N>> {
+    optional<std::array<double, N>> operator()(const Convertible& value, Error& error) const;
+};
+
 template <>
 struct Converter<std::vector<std::string>> {
     optional<std::vector<std::string>> operator()(const Convertible& value, Error& error) const;

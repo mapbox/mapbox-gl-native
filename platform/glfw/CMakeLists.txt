@@ -13,6 +13,11 @@ add_executable(
     ${PROJECT_SOURCE_DIR}/platform/default/src/mbgl/map/map_snapshotter.cpp
 )
 
+set_property(
+    SOURCE ${PROJECT_SOURCE_DIR}/platform/glfw/glfw_view.cpp
+    PROPERTY COMPILE_DEFINITIONS MAPBOX_PUCK_ASSETS_PATH=\"${PROJECT_SOURCE_DIR}/platform/glfw/assets/\"
+)
+
 if(MBGL_WITH_OPENGL)
     target_sources(
         mbgl-glfw

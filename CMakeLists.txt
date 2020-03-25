@@ -81,8 +81,8 @@ if(MBGL_WITH_QT)
     set(CMAKE_AUTORCC ON)
 endif()
 
-add_library(
-    mbgl-core STATIC
+set(
+    MBGL_CORE_SOURCES
     ${PROJECT_SOURCE_DIR}/include/mbgl/actor/actor.hpp
     ${PROJECT_SOURCE_DIR}/include/mbgl/actor/actor_ref.hpp
     ${PROJECT_SOURCE_DIR}/include/mbgl/actor/aspiring_actor.hpp
@@ -799,6 +799,28 @@ add_library(
     ${PROJECT_SOURCE_DIR}/src/mbgl/util/version.cpp
     ${PROJECT_SOURCE_DIR}/src/mbgl/util/version.hpp
     ${PROJECT_SOURCE_DIR}/src/mbgl/util/work_request.cpp
+)
+
+if(MBGL_WITH_OPENGL)
+    set(
+        MBGL_CORE_SOURCES
+        ${MBGL_CORE_SOURCES}
+        ${PROJECT_SOURCE_DIR}/include/mbgl/style/layers/location_indicator_layer.hpp
+        ${PROJECT_SOURCE_DIR}/include/mbgl/layermanager/location_indicator_layer_factory.hpp
+        ${PROJECT_SOURCE_DIR}/src/mbgl/style/layers/location_indicator_layer_impl.hpp
+        ${PROJECT_SOURCE_DIR}/src/mbgl/style/layers/location_indicator_layer_properties.hpp
+        ${PROJECT_SOURCE_DIR}/src/mbgl/renderer/layers/render_location_indicator_layer.hpp
+        ${PROJECT_SOURCE_DIR}/src/mbgl/layermanager/location_indicator_layer_factory.cpp
+        ${PROJECT_SOURCE_DIR}/src/mbgl/style/layers/location_indicator_layer.cpp
+        ${PROJECT_SOURCE_DIR}/src/mbgl/style/layers/location_indicator_layer_impl.cpp
+        ${PROJECT_SOURCE_DIR}/src/mbgl/style/layers/location_indicator_layer_properties.cpp
+        ${PROJECT_SOURCE_DIR}/src/mbgl/renderer/layers/render_location_indicator_layer.cpp
+    )
+endif()
+
+add_library(
+    mbgl-core STATIC
+    ${MBGL_CORE_SOURCES}
 )
 
 if(MBGL_WITH_OPENGL)
