@@ -70,8 +70,11 @@ void TransformState::matrixFor(mat4& matrix, const UnwrappedTileID& tileID) cons
     const double s = Projection::worldSize(scale) / tileScale;
 
     matrix::identity(matrix);
-    matrix::translate(
-        matrix, matrix, int64_t(tileID.canonical.x + tileID.wrap * tileScale) * s, int64_t(tileID.canonical.y) * s, 0);
+    matrix::translate(matrix,
+                      matrix,
+                      int64_t(tileID.canonical.x + tileID.wrap * static_cast<int64_t>(tileScale)) * s,
+                      int64_t(tileID.canonical.y) * s,
+                      0);
     matrix::scale(matrix, matrix, s / util::EXTENT, s / util::EXTENT, 1);
 }
 

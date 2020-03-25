@@ -1275,7 +1275,8 @@ bool OfflineDatabase::evict(uint64_t neededFreeSize, DatabaseSizeChangeStats& st
         const uint64_t tileChanges = tileQuery.changes();
 
         // Update current ambient cache size, based on how many bytes were released.
-        newAmbientCacheSize = std::max<int64_t>(newAmbientCacheSize - stats.bytesReleased(), 0u);
+        newAmbientCacheSize = std::max<int64_t>(
+            static_cast<int64_t>(newAmbientCacheSize) - static_cast<int64_t>(stats.bytesReleased()), 0u);
 
         // The cached value of offlineTileCount does not need to be updated
         // here because only non-offline tiles can be removed by eviction.
@@ -1465,9 +1466,9 @@ uint64_t OfflineDatabase::DatabaseSizeChangeStats::pageSize() const {
 }
 
 int64_t OfflineDatabase::DatabaseSizeChangeStats::diff() const {
-    const uint64_t currentSize =
-        pageSize_ * (db->getPragma<int64_t>("PRAGMA page_count") - db->getPragma<int64_t>("PRAGMA freelist_count"));
-    return currentSize - initialSize_;
+    const int64_t currentSize = static_cast<int64_t>(pageSize_) * (db->getPragma<int64_t>("PRAGMA page_count") -
+                                                                   db->getPragma<int64_t>("PRAGMA freelist_count"));
+    return currentSize - static_cast<int64_t>(initialSize_);
 }
 
 uint64_t OfflineDatabase::DatabaseSizeChangeStats::bytesReleased() const {
@@ -1478,7 +1479,7 @@ uint64_t OfflineDatabase::DatabaseSizeChangeStats::bytesReleased() const {
 void OfflineDatabase::updateAmbientCacheSize(DatabaseSizeChangeStats& stats) {
     assert(currentAmbientCacheSize);
     if (currentAmbientCacheSize) {
-        *currentAmbientCacheSize = std::max<int64_t>(*currentAmbientCacheSize + stats.diff(), 0u);
+        *currentAmbientCacheSize = std::max<int64_t>(static_cast<int64_t>(*currentAmbientCacheSize) + stats.diff(), 0u);
     }
 }
 

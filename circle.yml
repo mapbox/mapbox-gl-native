@@ -117,8 +117,6 @@ workflows:
           name: FIXME-linux-ubsan
           executor_name: ubuntu-disco
           target_is_linux: true
-          requires:
-            - sanity-checks
           config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8 -DMBGL_WITH_SANITIZER=undefined'
           test_params: '|| true'
           style_tests: true
