@@ -23,6 +23,16 @@
 
 - [android] Expose getLayer, getSource and Observer interface for snapshotter ([#16338](https://github.com/mapbox/mapbox-gl-native/pull/16338))
 
+- [core][tile mode] Introduce API to collect placed symbols data ([#16339](https://github.com/mapbox/mapbox-gl-native/pull/16339))
+
+  The following methods are added to the `Renderer` class in implemented in the Tile map mode:
+  - `collectPlacedSymbolData()`
+    enables or disables collecting of the placed symbols data
+
+  - `getPlacedSymbolsData()`
+    if collecting of the placed symbols data is enabled, returns the reference to the `PlacedSymbolData` vector holding the collected data.
+
+
 ### 🐞 Bug fixes
 
 - [core] Use `TileCoordinates` instead of `LngLat` for `within` expression calculation ([#16319](https://github.com/mapbox/mapbox-gl-native/pull/16319))
