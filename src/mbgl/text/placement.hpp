@@ -144,6 +144,11 @@ protected:
     void placeSymbolBucket(const BucketPlacementData&, std::set<uint32_t>& seenCrossTileIDs);
     void placeLayer(const RenderLayer&, std::set<uint32_t>&);
     virtual void commit();
+    virtual void newSymbolPlaced(const SymbolInstance&,
+                                 const JointPlacement&,
+                                 style::SymbolPlacementType,
+                                 const std::vector<ProjectedCollisionBox>& /*textBoxes*/,
+                                 const std::vector<ProjectedCollisionBox>& /*iconBoxes*/) {}
     // Implentation specific hooks, which get called during a symbol bucket placement.
     virtual optional<CollisionBoundaries> getAvoidEdges(const SymbolBucket&, const mat4& /*posMatrix*/) {
         return nullopt;
