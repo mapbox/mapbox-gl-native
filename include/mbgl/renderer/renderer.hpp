@@ -34,6 +34,8 @@ struct PlacedSymbolData {
     bool iconPlaced;
     // Symbol text or icon collision box intersects tile borders
     bool intersectsTileBorder;
+    // Viewport padding ({viewportPadding, viewportPadding} is a coordinate of the tile's top-left corner)
+    float viewportPadding;
 };
 
 class Renderer {
@@ -66,7 +68,9 @@ public:
     void setFeatureState(const std::string& sourceID, const optional<std::string>& sourceLayerID,
                          const std::string& featureID, const FeatureState& state);
 
-    void getFeatureState(FeatureState& state, const std::string& sourceID, const optional<std::string>& sourceLayerID,
+    void getFeatureState(FeatureState& state,
+                         const std::string& sourceID,
+                         const optional<std::string>& sourceLayerID,
                          const std::string& featureID) const;
 
     void removeFeatureState(const std::string& sourceID,
