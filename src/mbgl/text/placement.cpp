@@ -157,7 +157,7 @@ void Placement::placeSymbolBucket(const BucketPlacementData& params, std::set<ui
 
     const bool rotateIconWithMap = layout.get<style::IconRotationAlignment>() == style::AlignmentType::Map;
     const bool pitchIconWithMap = layout.get<style::IconPitchAlignment>() == style::AlignmentType::Map;
-
+    const style::SymbolPlacementType placementType = layout.get<style::SymbolPlacement>();
     const mat4& posMatrix = renderTile.matrix;
 
     mat4 textLabelPlaneMatrix =
@@ -538,8 +538,12 @@ void Placement::placeSymbolBucket(const BucketPlacementData& params, std::set<ui
             // Erase it so that the placement result from the non-fading tile supersedes it
             placements.erase(symbolInstance.crossTileID);
         }
-        
-        placements.emplace(symbolInstance.crossTileID, JointPlacement(placeText || alwaysShowText, placeIcon || alwaysShowIcon, offscreen || bucket.justReloaded));
+
+        auto pair = placements.emplace(
+            symbolInstance.crossTileID,
+            JointPlacement(placeText || alwaysShowText, placeIcon || alwaysShowIcon, offscreen || bucket.justReloaded));
+        assert(pair.second);
+        newSymbolPlaced(symbolInstance, pair.first->second, placementType, textBoxes, iconBoxes);
         seenCrossTileIDs.insert(symbolInstance.crossTileID);
     };
 
@@ -1159,6 +1163,7 @@ const RetainedQueryData& Placement::getQueryData(uint32_t bucketInstanceId) cons
     return it->second;
 }
 
+/// Placement for Static map mode.
 class StaticPlacement : public Placement {
 public:
     explicit StaticPlacement(std::shared_ptr<const UpdateParameters> updateParameters_)
@@ -1179,6 +1184,8 @@ void StaticPlacement::commit() {
             JointOpacityState(jointPlacement.second.text, jointPlacement.second.icon, jointPlacement.second.skipFade));
     }
 }
+
+/// Placement for Tile map mode.
 class TilePlacement : public StaticPlacement {
 public:
     explicit TilePlacement(std::shared_ptr<const UpdateParameters> updateParameters_)
@@ -1186,23 +1193,33 @@ public:
 
 private:
     void placeLayers(const RenderLayerReferences&) override;
+    void collectPlacedSymbolData(bool enable) override { collectData = enable; }
+    const std::vector<PlacedSymbolData>& getPlacedSymbolsData() const override { return placedSymbolsData; }
     optional<CollisionBoundaries> getAvoidEdges(const SymbolBucket&, const mat4&) override;
     SymbolInstanceReferences getSortedSymbols(const BucketPlacementData&, float pixelRatio) override;
     bool stickToFirstVariableAnchor(const CollisionBox& box,
                                     Point<float> shift,
                                     const mat4& posMatrix,
                                     float textPixelRatio) override;
+    void newSymbolPlaced(const SymbolInstance&,
+                         const JointPlacement&,
+                         style::SymbolPlacementType,
+                         const std::vector<ProjectedCollisionBox>&,
+                         const std::vector<ProjectedCollisionBox>&) override;
 
     std::unordered_map<uint32_t, bool> locationCache;
     optional<CollisionBoundaries> tileBorders;
     std::set<uint32_t> seenCrossTileIDs;
-    bool onlyLabelsIntersectingTileBorders;
+    std::vector<PlacedSymbolData> placedSymbolsData;
+    bool onlyLabelsIntersectingTileBorders = false;
+    bool collectData = false;
 };
 
 void TilePlacement::placeLayers(const RenderLayerReferences& layers) {
     // In order to avoid label cut-offs, at first, place the labels,
     // which cross tile boundaries.
     onlyLabelsIntersectingTileBorders = true;
+    placedSymbolsData.clear();
     seenCrossTileIDs.clear();
     for (auto it = layers.crbegin(); it != layers.crend(); ++it) {
         placeLayer(*it, seenCrossTileIDs);
@@ -1341,6 +1358,36 @@ bool TilePlacement::stickToFirstVariableAnchor(const CollisionBox& box,
                                                float textPixelRatio) {
     assert(tileBorders);
     return collisionIndex.intersectsTileEdges(box, shift, posMatrix, textPixelRatio, *tileBorders);
+}
+
+void TilePlacement::newSymbolPlaced(const SymbolInstance& symbol,
+                                    const JointPlacement& placement,
+                                    style::SymbolPlacementType placementType,
+                                    const std::vector<ProjectedCollisionBox>& textBoxes,
+                                    const std::vector<ProjectedCollisionBox>& iconBoxes) {
+    if (!collectData || placementType != style::SymbolPlacementType::Point) return;
+
+    optional<mapbox::geometry::box<float>> textCollisionBox;
+    if (!textBoxes.empty()) {
+        assert(textBoxes.size() == 1u);
+        auto& box = textBoxes.front();
+        assert(box.isBox());
+        textCollisionBox = box.box();
+    }
+    optional<mapbox::geometry::box<float>> iconCollisionBox;
+    if (!iconBoxes.empty()) {
+        assert(iconBoxes.size() == 1u);
+        auto& box = iconBoxes.front();
+        assert(box.isBox());
+        iconCollisionBox = box.box();
+    }
+    PlacedSymbolData symbolData{symbol.key,
+                                textCollisionBox,
+                                iconCollisionBox,
+                                placement.text,
+                                placement.icon,
+                                !placement.skipFade && onlyLabelsIntersectingTileBorders};
+    placedSymbolsData.emplace_back(std::move(symbolData));
 }
 
 // static
