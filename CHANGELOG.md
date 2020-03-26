@@ -10,6 +10,15 @@
 
   The new property sets a limit for how much parent tile can be overscaled.
 
+- [core][tile mode] Introduce API to collect placed symbols data ([#16339](https://github.com/mapbox/mapbox-gl-native/pull/16339))
+
+  The following methods are added to the `Renderer` class in implemented in the Tile map mode:
+  - `collectPlacedSymbolData()`
+    enables or disables collecting of the placed symbols data
+
+  - `getPlacedSymbolsData()`
+    if collecting of the placed symbols data is enabled, returns the reference to the `PlacedSymbolData` vector holding the collected data.
+
 ### 🐞 Bug fixes
 
 - [core] Fix assert in gfx resources cleanup ([#16349](https://github.com/mapbox/mapbox-gl-native/pull/16349))
