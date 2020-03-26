@@ -2,6 +2,8 @@
 
 ## master
 
+## maps-v1.5.0
+
 ### ✨ New features
 
 - [core] Add Renderer::clearData() ([#16323](https://github.com/mapbox/mapbox-gl-native/pull/16323))
