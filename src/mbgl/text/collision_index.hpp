@@ -50,6 +50,8 @@ public:
 
     const TransformState& getTransformState() const { return transformState; }
 
+    float getViewportPadding() const { return viewportPadding; }
+
 private:
     bool isOffscreen(const CollisionBoundaries&) const;
     bool isInsideGrid(const CollisionBoundaries&) const;
