@@ -1390,3 +1390,73 @@ TEST(Map, KeepRenderData) {
         EXPECT_EQ(resourcesCount * i, requestsCount);
     }
 }
+
+namespace {
+
+bool isInsideTile(const mapbox::geometry::box<float>& box, float padding, Size viewportSize) {
+    if (box.min.x - padding < 0) return false;
+    if (box.min.y - padding < 0) return false;
+    if (box.max.x - padding > viewportSize.width) return false;
+    if (box.max.y - padding > viewportSize.height) return false;
+    return true;
+}
+
+} // namespace
+
+TEST(Map, PlacedSymbolData) {
+    MapTest<> test{std::move(MapOptions().withMapMode(MapMode::Tile))};
+
+    test.fileSource->tileResponse = makeResponse("vector.tile", true);
+    test.fileSource->glyphsResponse = makeResponse("glyphs.pbf", true);
+    test.fileSource->styleResponse = makeResponse("style_vector.json");
+    test.fileSource->sourceResponse = makeResponse("source_vector.json");
+    test.fileSource->spriteJSONResponse = makeResponse("sprite.json");
+    test.fileSource->spriteImageResponse = makeResponse("sprite.png");
+
+    // Camera options will give exactly one tile (12/1171/1566)
+    test.map.jumpTo(CameraOptions().withZoom(12).withCenter(LatLng{38.917982, -77.037603}));
+    test.map.getStyle().loadURL("mapbox://streets");
+    Size viewportSize = test.frontend.getSize();
+    test.frontend.getRenderer()->collectPlacedSymbolData(true);
+    test.frontend.render(test.map);
+
+    const auto& placedSymbols = test.frontend.getRenderer()->getPlacedSymbolsData();
+    EXPECT_FALSE(placedSymbols.empty());
+
+    int placedTextInsideTile = 0;
+    int placedText = 0;
+
+    int placedIconInsideTile = 0;
+    int placedIcon = 0;
+
+    int placedTotal = 0;
+
+    for (const auto& placedSymbol : placedSymbols) {
+        if (placedSymbol.textPlaced && placedSymbol.textCollisionBox) {
+            if (isInsideTile(*placedSymbol.textCollisionBox, placedSymbol.viewportPadding, viewportSize)) {
+                EXPECT_FALSE(placedSymbol.intersectsTileBorder);
+                ++placedTextInsideTile;
+            }
+            ++placedText;
+        }
+        if (placedSymbol.iconPlaced && placedSymbol.iconCollisionBox) {
+            if (isInsideTile(*placedSymbol.iconCollisionBox, placedSymbol.viewportPadding, viewportSize)) {
+                EXPECT_FALSE(placedSymbol.intersectsTileBorder);
+                ++placedIconInsideTile;
+            }
+            ++placedIcon;
+        }
+        ++placedTotal;
+    }
+    EXPECT_EQ(1, placedTextInsideTile);
+    EXPECT_EQ(28, placedText);
+
+    EXPECT_EQ(2, placedIconInsideTile);
+    EXPECT_EQ(29, placedIcon);
+
+    EXPECT_EQ(50, placedTotal);
+    test.frontend.getRenderer()->collectPlacedSymbolData(false);
+    test.frontend.render(test.map);
+
+    EXPECT_TRUE(test.frontend.getRenderer()->getPlacedSymbolsData().empty());
+}
