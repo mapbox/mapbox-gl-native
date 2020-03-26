@@ -1386,7 +1386,8 @@ void TilePlacement::newSymbolPlaced(const SymbolInstance& symbol,
                                 iconCollisionBox,
                                 placement.text,
                                 placement.icon,
-                                !placement.skipFade && onlyLabelsIntersectingTileBorders};
+                                !placement.skipFade && onlyLabelsIntersectingTileBorders,
+                                collisionIndex.getViewportPadding()};
     placedSymbolsData.emplace_back(std::move(symbolData));
 }
 

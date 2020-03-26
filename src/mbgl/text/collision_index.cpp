@@ -27,7 +27,7 @@ const float viewportPaddingDefault = 100;
 // Viewport padding must be much larger for static tiles to avoid clipped labels.
 const float viewportPaddingForStaticTiles = 1024;
 
-inline float getViewportPadding(const TransformState& transformState, MapMode mapMode) {
+inline float findViewportPadding(const TransformState& transformState, MapMode mapMode) {
     if (mapMode == MapMode::Tile) return viewportPaddingForStaticTiles;
     return (transformState.getPitch() != 0.0f) ? viewportPaddingDefault * 2 : viewportPaddingDefault;
 }
@@ -36,7 +36,7 @@ inline float getViewportPadding(const TransformState& transformState, MapMode ma
 
 CollisionIndex::CollisionIndex(const TransformState& transformState_, MapMode mapMode)
     : transformState(transformState_),
-      viewportPadding(getViewportPadding(transformState_, mapMode)),
+      viewportPadding(findViewportPadding(transformState_, mapMode)),
       collisionGrid(transformState.getSize().width + 2 * viewportPadding,
                     transformState.getSize().height + 2 * viewportPadding,
                     25),
