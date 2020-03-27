@@ -175,6 +175,7 @@ struct TestMetadata {
     unsigned metricsFailed = 0;
     unsigned renderErrored = 0;
     unsigned renderFailed = 0;
+    unsigned labelCutOffFound = 0;
 
     std::string errorMessage;
     double difference = 0.0;
