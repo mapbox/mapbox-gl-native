@@ -1309,3 +1309,66 @@ TEST(UpdateRenderables, LoadOverscaledMaxZoomTile) {
               }),
               log);
 }
+
+TEST(UpdateRenderables, MaxParentOverscaleFactor) {
+    ActionLog log;
+    MockSource source;
+    auto getTileData = getTileDataFn(log, source.dataTiles);
+    auto createTileData = createTileDataFn(log, source.dataTiles);
+    auto retainTileData = retainTileDataFn(log);
+    auto renderTile = renderTileFn(log);
+
+    source.idealTiles.emplace(UnwrappedTileID{4, 0, 0});
+    source.idealTiles.emplace(UnwrappedTileID{4, 1, 0});
+
+    auto tile_0_0_0_0 = source.createTileData(OverscaledTileID{0, 0, 0});
+    tile_0_0_0_0->renderable = true;
+
+    // Set max parent overscale factor to 4, so that tile 0,0,0 would be rendered
+    algorithm::updateRenderables(
+        getTileData, createTileData, retainTileData, renderTile, source.idealTiles, source.zoomRange, 4, 4);
+    EXPECT_EQ(ActionLog({GetTileDataAction{{4, 0, {4, 0, 0}}, NotFound}, // ideal tile
+                         CreateTileDataAction{{4, 0, {4, 0, 0}}},
+                         RetainTileDataAction{{4, 0, {4, 0, 0}}, TileNecessity::Required},
+                         GetTileDataAction{{5, 0, {5, 0, 0}}, NotFound}, // child tiles
+                         GetTileDataAction{{5, 0, {5, 0, 1}}, NotFound},
+                         GetTileDataAction{{5, 0, {5, 1, 0}}, NotFound},
+                         GetTileDataAction{{5, 0, {5, 1, 1}}, NotFound},
+                         GetTileDataAction{{3, 0, {3, 0, 0}}, NotFound}, // ascent
+                         GetTileDataAction{{2, 0, {2, 0, 0}}, NotFound},
+                         GetTileDataAction{{1, 0, {1, 0, 0}}, NotFound},
+                         GetTileDataAction{{0, 0, {0, 0, 0}}, Found},
+                         RetainTileDataAction{{0, 0, {0, 0, 0}}, TileNecessity::Optional},
+                         RenderTileAction{{0, 0, 0}, *tile_0_0_0_0},     // render tile 0,0,0
+                         GetTileDataAction{{4, 0, {4, 1, 0}}, NotFound}, // ideal tile
+                         CreateTileDataAction{{4, 0, {4, 1, 0}}},
+                         RetainTileDataAction{{4, 0, {4, 1, 0}}, TileNecessity::Required},
+                         GetTileDataAction{{5, 0, {5, 2, 0}}, NotFound}, // child tiles
+                         GetTileDataAction{{5, 0, {5, 2, 1}}, NotFound},
+                         GetTileDataAction{{5, 0, {5, 3, 0}}, NotFound},
+                         GetTileDataAction{{5, 0, {5, 3, 1}}, NotFound}}),
+              log);
+
+    log.clear();
+
+    // Set max parent overscale factor to 3.
+    // Parent tile 0,0,0 should not be requested / rendered.
+    algorithm::updateRenderables(
+        getTileData, createTileData, retainTileData, renderTile, source.idealTiles, source.zoomRange, 4, 3);
+    EXPECT_EQ(ActionLog({GetTileDataAction{{4, 0, {4, 0, 0}}, Found}, // ideal tile
+                         RetainTileDataAction{{4, 0, {4, 0, 0}}, TileNecessity::Required},
+                         GetTileDataAction{{5, 0, {5, 0, 0}}, NotFound}, // child tiles
+                         GetTileDataAction{{5, 0, {5, 0, 1}}, NotFound},
+                         GetTileDataAction{{5, 0, {5, 1, 0}}, NotFound},
+                         GetTileDataAction{{5, 0, {5, 1, 1}}, NotFound},
+                         GetTileDataAction{{3, 0, {3, 0, 0}}, NotFound}, // ascent
+                         GetTileDataAction{{2, 0, {2, 0, 0}}, NotFound},
+                         GetTileDataAction{{1, 0, {1, 0, 0}}, NotFound},
+                         GetTileDataAction{{4, 0, {4, 1, 0}}, Found}, // ideal tile
+                         RetainTileDataAction{{4, 0, {4, 1, 0}}, TileNecessity::Required},
+                         GetTileDataAction{{5, 0, {5, 2, 0}}, NotFound}, // child tiles
+                         GetTileDataAction{{5, 0, {5, 2, 1}}, NotFound},
+                         GetTileDataAction{{5, 0, {5, 3, 0}}, NotFound},
+                         GetTileDataAction{{5, 0, {5, 3, 1}}, NotFound}}),
+              log);
+}
