@@ -7,8 +7,7 @@
 
 class GLFWGLRenderableResource final : public mbgl::gl::RenderableResource {
 public:
-    GLFWGLRenderableResource(GLFWGLBackend& backend_) : backend(backend_) {
-    }
+    explicit GLFWGLRenderableResource(GLFWGLBackend& backend_) : backend(backend_) {}
 
     void bind() override {
         backend.setFramebufferBinding(0);

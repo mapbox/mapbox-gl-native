@@ -70,8 +70,7 @@ const GeometryCollection& AnnotationTileFeature::getGeometries() const {
 
 class AnnotationTileLayerData {
 public:
-    AnnotationTileLayerData(std::string name_) : name(std::move(name_)) {
-    }
+    explicit AnnotationTileLayerData(std::string name_) : name(std::move(name_)) {}
 
     const std::string name;
     std::vector<std::shared_ptr<const AnnotationTileFeatureData>> features;

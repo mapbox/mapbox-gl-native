@@ -20,7 +20,7 @@ public:
 
 class SetCamera final : public TestOperationSerializer {
 public:
-    SetCamera(mbgl::CameraOptions camera_) : camera(std::move(camera_)) {}
+    explicit SetCamera(mbgl::CameraOptions camera_) : camera(std::move(camera_)) {}
 
     void serialize(Writer& writer) const override {
         if (camera.zoom) {
@@ -59,7 +59,7 @@ private:
 
 class SetStyle final : public TestOperationSerializer {
 public:
-    SetStyle(const mbgl::style::Style& style) : url(style.getURL()) {}
+    explicit SetStyle(const mbgl::style::Style& style) : url(style.getURL()) {}
 
     void serialize(Writer& writer) const override {
         writer.StartArray();
@@ -74,7 +74,7 @@ private:
 
 class SetInitialSize final : public TestOperationSerializer {
 public:
-    SetInitialSize(const mbgl::Size& size) : width(size.width), height(size.height) {}
+    explicit SetInitialSize(const mbgl::Size& size) : width(size.width), height(size.height) {}
 
     void serialize(Writer& writer) const override {
         writer.Key("width");
