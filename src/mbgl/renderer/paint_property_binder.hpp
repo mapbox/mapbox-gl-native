@@ -619,7 +619,7 @@ public:
         (void)z; // Workaround for https://gcc.gnu.org/bugzilla/show_bug.cgi?id=56958
     }
 
-    PaintPropertyBinders(PaintPropertyBinders&&) = default;
+    PaintPropertyBinders(PaintPropertyBinders&&) noexcept = default;
     PaintPropertyBinders(const PaintPropertyBinders&) = delete;
 
     void populateVertexVectors(const GeometryTileFeature& feature,

@@ -22,6 +22,11 @@ public:
           indexLength(indexLength_),
           sortKey(sortKey_) {}
 
+    // FIXME: clang-tidy-8 still complains here and clang-cl
+    // on Windows gives the error: "exception specification of
+    // explicitly defaulted move constructor does not match
+    // the calculated one" when marking this 'noexcept'.
+    // NOLINTNEXTLINE(performance-noexcept-move-constructor)
     Segment(Segment&&) = default;
 
     const std::size_t vertexOffset;

@@ -34,13 +34,9 @@ public:
 
     Image(Size size_, std::unique_ptr<uint8_t[]> data_) : size(size_), data(std::move(data_)) {}
 
-    Image(Image&& o)
-        : size(o.size),
-          data(std::move(o.data)) {
-        o.size.width = o.size.height = 0;
-    }
+    Image(Image&& o) noexcept : size(o.size), data(std::move(o.data)) { o.size.width = o.size.height = 0; }
 
-    Image& operator=(Image&& o) {
+    Image& operator=(Image&& o) noexcept {
         size = o.size;
         data = std::move(o.data);
         o.size.width = o.size.height = 0;

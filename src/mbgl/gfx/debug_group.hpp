@@ -10,9 +10,7 @@ public:
         scope->pushDebugGroup(name);
     }
 
-    DebugGroup(DebugGroup&& rhs) : scope(rhs.scope) {
-        rhs.scope = nullptr;
-    }
+    DebugGroup(DebugGroup&& rhs) noexcept : scope(rhs.scope) { rhs.scope = nullptr; }
 
     ~DebugGroup() {
         if (scope) {

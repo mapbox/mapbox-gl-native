@@ -102,7 +102,7 @@ public:
         new (static_cast<void*>(&storage)) std::decay_t<T>(std::forward<T>(value));
     }
 
-    Convertible(Convertible&& v) : vtable(v.vtable) {
+    Convertible(Convertible&& v) noexcept : vtable(v.vtable) {
         // NOLINTNEXTLINE(performance-move-const-arg)
         vtable->move(std::move(v.storage), storage);
     }
@@ -111,7 +111,7 @@ public:
         vtable->destroy(storage);
     }
 
-    Convertible& operator=(Convertible&& v) {
+    Convertible& operator=(Convertible&& v) noexcept {
         if (this != &v) {
             vtable->destroy(storage);
             vtable = v.vtable;
