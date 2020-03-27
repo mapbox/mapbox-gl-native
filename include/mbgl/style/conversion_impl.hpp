@@ -96,6 +96,7 @@ class ConversionTraits;
 class Convertible {
 public:
     template <typename T>
+    // NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
     Convertible(T&& value) : vtable(vtableForType<std::decay_t<T>>()) {
         static_assert(sizeof(Storage) >= sizeof(std::decay_t<T>), "Storage must be large enough to hold value type");
         new (static_cast<void*>(&storage)) std::decay_t<T>(std::forward<T>(value));
