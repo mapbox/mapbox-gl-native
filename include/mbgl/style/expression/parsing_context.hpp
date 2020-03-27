@@ -7,10 +7,11 @@
 
 #include <iterator>
 #include <map>
-#include <unordered_map>
-#include <string>
-#include <vector>
 #include <memory>
+#include <string>
+#include <unordered_map>
+#include <utility>
+#include <vector>
 
 namespace mbgl {
 namespace style {
@@ -122,22 +123,21 @@ public:
         Check whether `t` is a subtype of `expected`, collecting an error if not.
      */
     optional<std::string> checkType(const type::Type& t);
-    
-    optional<std::shared_ptr<Expression>> getBinding(const std::string name) {
+
+    optional<std::shared_ptr<Expression>> getBinding(const std::string& name) {
         if (!scope) return optional<std::shared_ptr<Expression>>();
         return scope->get(name);
     }
 
-    void error(std::string message) {
-        errors->push_back({message, key});
-    }
-    
+    void error(std::string message) { errors->push_back({std::move(message), key}); }
+
     void error(std::string message, std::size_t child) {
-        errors->push_back({message, key + "[" + util::toString(child) + "]"});
+        errors->push_back({std::move(message), key + "[" + util::toString(child) + "]"});
     }
     
     void error(std::string message, std::size_t child, std::size_t grandchild) {
-        errors->push_back({message, key + "[" + util::toString(child) + "][" + util::toString(grandchild) + "]"});
+        errors->push_back(
+            {std::move(message), key + "[" + util::toString(child) + "][" + util::toString(grandchild) + "]"});
     }
     
     void appendErrors(ParsingContext&& ctx) {

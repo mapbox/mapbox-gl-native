@@ -12,15 +12,9 @@ namespace expression {
 
 class Literal : public Expression {
 public:
-    Literal(Value value_)
-        : Expression(Kind::Literal, typeOf(value_))
-        , value(value_)
-    {}
-    
-    Literal(type::Array type_, std::vector<Value> value_)
-        : Expression(Kind::Literal, type_)
-        , value(value_)
-    {}
+    Literal(const Value& value_) : Expression(Kind::Literal, typeOf(value_)), value(value_) {}
+
+    Literal(const type::Array& type_, std::vector<Value> value_) : Expression(Kind::Literal, type_), value(value_) {}
 
     EvaluationResult evaluate(const EvaluationContext&) const override {
         return value;

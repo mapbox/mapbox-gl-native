@@ -10,6 +10,8 @@
 #include <mbgl/style/layers/location_indicator_layer.hpp>
 #endif
 
+#include <utility>
+
 struct GLFWwindow;
 class GLFWBackend;
 class GLFWRendererFrontend;
@@ -40,17 +42,11 @@ public:
     // The expected action is to set a new style, different to the current one.
     void setChangeStyleCallback(std::function<void()> callback);
 
-    void setPauseResumeCallback(std::function<void()> callback) {
-        pauseResumeCallback = callback;
-    };
+    void setPauseResumeCallback(std::function<void()> callback) { pauseResumeCallback = std::move(callback); };
 
-    void setOnlineStatusCallback(std::function<void()> callback) {
-        onlineStatusCallback = callback;
-    }
+    void setOnlineStatusCallback(std::function<void()> callback) { onlineStatusCallback = std::move(callback); }
 
-    void setResetCacheCallback(std::function<void()> callback) {
-        resetDatabaseCallback = callback;
-    };
+    void setResetCacheCallback(std::function<void()> callback) { resetDatabaseCallback = std::move(callback); };
 
     void setShouldClose();
 

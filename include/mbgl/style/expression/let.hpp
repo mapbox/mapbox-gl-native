@@ -49,11 +49,8 @@ private:
 
 class Var : public Expression {
 public:
-    Var(std::string name_, std::shared_ptr<Expression> value_) :
-        Expression(Kind::Var, value_->getType()),
-        name(std::move(name_)),
-        value(value_)
-    {}
+    Var(std::string name_, const std::shared_ptr<Expression>& value_)
+        : Expression(Kind::Var, value_->getType()), name(std::move(name_)), value(value_) {}
 
     static ParseResult parse(const mbgl::style::conversion::Convertible&, ParsingContext&);
 

@@ -77,8 +77,8 @@ public:
         : Thread([] { platform::makeThreadLowPriority(); }, name, std::make_tuple(std::forward<Args>(args)...)) {}
 
     template <typename... Args>
-    Thread(std::function<void()> prioritySetter, const std::string& name, Args&&... args)
-        : Thread(std::move(prioritySetter), name, std::make_tuple(std::forward<Args>(args)...)) {}
+    Thread(const std::function<void()>& prioritySetter, const std::string& name, Args&&... args)
+        : Thread(prioritySetter, name, std::make_tuple(std::forward<Args>(args)...)) {}
 
     ~Thread() {
         if (paused) {
