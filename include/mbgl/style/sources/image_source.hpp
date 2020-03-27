@@ -12,7 +12,7 @@ namespace style {
 
 class ImageSource final : public Source {
 public:
-    ImageSource(std::string id, const std::array<LatLng, 4>);
+    ImageSource(std::string id, std::array<LatLng, 4>);
     ~ImageSource() override;
 
     optional<std::string> getURL() const;

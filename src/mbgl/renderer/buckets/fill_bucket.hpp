@@ -22,8 +22,8 @@ public:
 
     FillBucket(const PossiblyEvaluatedLayoutProperties& layout,
                const std::map<std::string, Immutable<style::LayerProperties>>& layerPaintProperties,
-               const float zoom,
-               const uint32_t overscaling);
+               float zoom,
+               uint32_t overscaling);
 
     void addFeature(const GeometryTileFeature&,
                     const GeometryCollection&,

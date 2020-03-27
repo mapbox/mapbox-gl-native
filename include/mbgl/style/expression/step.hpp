@@ -24,7 +24,7 @@ public:
     void eachStop(const std::function<void(double, const Expression&)>& visit) const;
 
     const std::unique_ptr<Expression>& getInput() const { return input; }
-    Range<float> getCoveringStops(const double lower, const double upper) const;
+    Range<float> getCoveringStops(double lower, double upper) const;
 
     bool operator==(const Expression& e) const override;
 

@@ -66,10 +66,10 @@ public:
     // Updates shaped icon's bounds based on shaped text's bounds and provided
     // layout properties.
     void fitIconToText(const Shaping& shapedText,
-                       const style::IconTextFitType textFit,
+                       style::IconTextFitType textFit,
                        const std::array<float, 4>& padding,
                        const std::array<float, 2>& iconOffset,
-                       const float fontScale);
+                       float fontScale);
 
     const ImagePosition& image() const { return _image; }
     float top() const { return _top; }
@@ -86,7 +86,7 @@ Shaping getShaping(const TaggedString& string,
                    style::TextJustifyType textJustify,
                    float spacing,
                    const std::array<float, 2>& translate,
-                   const WritingModeType,
+                   WritingModeType,
                    BiDi& bidi,
                    const GlyphMap& glyphMap,
                    const GlyphPositions& glyphPositions,

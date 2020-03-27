@@ -33,9 +33,9 @@ public:
                        OverscaledTileID,
                        std::string,
                        const std::atomic<bool>&,
-                       const MapMode,
-                       const float pixelRatio,
-                       const bool showCollisionBoxes_);
+                       MapMode,
+                       float pixelRatio,
+                       bool showCollisionBoxes_);
     ~GeometryTileWorker();
 
     void setLayers(std::vector<Immutable<style::LayerProperties>>,

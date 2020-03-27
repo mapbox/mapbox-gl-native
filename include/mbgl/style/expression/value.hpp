@@ -93,7 +93,7 @@ struct ValueConverter<mbgl::Value> {
 template <>
 struct ValueConverter<float> {
     static type::Type expressionType() { return type::Number; }
-    static Value toExpressionValue(const float value);
+    static Value toExpressionValue(float value);
     static optional<float> fromExpressionValue(const Value& value);
 };
 

@@ -73,9 +73,9 @@ public:
         uniforms::size>;
     using UniformValues = gfx::UniformValues<UniformList>;
 
-    static std::unique_ptr<SymbolSizeBinder> create(const float tileZoom,
+    static std::unique_ptr<SymbolSizeBinder> create(float tileZoom,
                                                     const style::PropertyValue<float>& sizeProperty,
-                                                    const float defaultValue);
+                                                    float defaultValue);
 
     virtual Range<float> getVertexSizeData(const GeometryTileFeature& feature) = 0;
     virtual ZoomEvaluatedSize evaluateForZoom(float currentZoom) const = 0;
@@ -406,15 +406,15 @@ class SymbolIconProgram : public SymbolProgram<
 public:
     using SymbolProgram::SymbolProgram;
 
-    static LayoutUniformValues layoutUniformValues(const bool isText,
-                                                   const bool hasVariablePacement,
+    static LayoutUniformValues layoutUniformValues(bool isText,
+                                                   bool hasVariablePacement,
                                                    const style::SymbolPropertyValues&,
                                                    const Size& texsize,
                                                    const std::array<float, 2>& pixelsToGLUnits,
-                                                   const bool alongLine,
+                                                   bool alongLine,
                                                    const RenderTile&,
                                                    const TransformState&,
-                                                   const float symbolFadeChange);
+                                                   float symbolFadeChange);
 };
 
 enum class SymbolSDFPart {
@@ -457,17 +457,17 @@ public:
 
     using BaseProgram::BaseProgram;
 
-    static LayoutUniformValues layoutUniformValues(const bool isText,
-                                                   const bool hasVariablePacement,
+    static LayoutUniformValues layoutUniformValues(bool isText,
+                                                   bool hasVariablePacement,
                                                    const style::SymbolPropertyValues&,
                                                    const Size& texsize,
                                                    const std::array<float, 2>& pixelsToGLUnits,
-                                                   const float pixelRatio,
-                                                   const bool alongLine,
+                                                   float pixelRatio,
+                                                   bool alongLine,
                                                    const RenderTile&,
                                                    const TransformState&,
-                                                   const float SymbolFadeChange,
-                                                   const SymbolSDFPart);
+                                                   float SymbolFadeChange,
+                                                   SymbolSDFPart);
 };
 
 using SymbolTextAndIconProgramUniforms = TypeList<uniforms::texsize_icon>;
@@ -491,17 +491,17 @@ public:
 
     using BaseProgram::BaseProgram;
 
-    static LayoutUniformValues layoutUniformValues(const bool hasVariablePacement,
+    static LayoutUniformValues layoutUniformValues(bool hasVariablePacement,
                                                    const style::SymbolPropertyValues&,
                                                    const Size& texsize,
                                                    const Size& texsize_icon,
                                                    const std::array<float, 2>& pixelsToGLUnits,
-                                                   const float pixelRatio,
-                                                   const bool alongLine,
+                                                   float pixelRatio,
+                                                   bool alongLine,
                                                    const RenderTile&,
                                                    const TransformState&,
-                                                   const float SymbolFadeChange,
-                                                   const SymbolSDFPart);
+                                                   float SymbolFadeChange,
+                                                   SymbolSDFPart);
 };
 
 class SymbolSDFIconProgram : public SymbolSDFProgram<SymbolSDFIconProgram, style::IconPaintProperties> {

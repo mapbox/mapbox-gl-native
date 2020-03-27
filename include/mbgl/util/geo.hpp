@@ -161,7 +161,7 @@ public:
     bool contains(const LatLng& point, LatLng::WrapMode wrap = LatLng::Unwrapped) const;
     bool contains(const LatLngBounds& area, LatLng::WrapMode wrap = LatLng::Unwrapped) const;
 
-    bool intersects(const LatLngBounds area, LatLng::WrapMode wrap = LatLng::Unwrapped) const;
+    bool intersects(LatLngBounds area, LatLng::WrapMode wrap = LatLng::Unwrapped) const;
 
 private:
     LatLng sw;

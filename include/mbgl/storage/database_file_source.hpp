@@ -152,7 +152,7 @@ public:
     /*
      * Update an offline region metadata in the database.
      */
-    virtual void updateOfflineMetadata(const int64_t regionID,
+    virtual void updateOfflineMetadata(int64_t regionID,
                                        const OfflineRegionMetadata& metadata,
                                        std::function<void(expected<OfflineRegionMetadata, std::exception_ptr>)>);
 

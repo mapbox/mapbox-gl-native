@@ -122,17 +122,17 @@ public:
 
     CollisionFeature(const GeometryCoordinates& line,
                      const Anchor&,
-                     const float top,
-                     const float bottom,
-                     const float left,
-                     const float right,
+                     float top,
+                     float bottom,
+                     float left,
+                     float right,
                      const optional<Padding>& collisionPadding,
-                     const float boxScale,
-                     const float padding,
-                     const style::SymbolPlacementType,
+                     float boxScale,
+                     float padding,
+                     style::SymbolPlacementType,
                      IndexedSubfeature,
-                     const float overscaling,
-                     const float rotate);
+                     float overscaling,
+                     float rotate);
 
     std::vector<CollisionBox> boxes;
     IndexedSubfeature indexedFeature;
@@ -142,9 +142,9 @@ private:
     void bboxifyLabel(const GeometryCoordinates& line,
                       GeometryCoordinate& anchorPoint,
                       std::size_t segment,
-                      const float length,
-                      const float boxSize,
-                      const float overscaling);
+                      float length,
+                      float boxSize,
+                      float overscaling);
 };
 
 } // namespace mbgl

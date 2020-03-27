@@ -16,7 +16,7 @@ public:
     DEMData(const PremultipliedImage& image, Tileset::DEMEncoding encoding);
     void backfillBorder(const DEMData& borderTileData, int8_t dx, int8_t dy);
 
-    int32_t get(const int32_t x, const int32_t y) const;
+    int32_t get(int32_t x, int32_t y) const;
     const std::array<float, 4>& getUnpackVector() const;
 
     const PremultipliedImage* getImage() const {

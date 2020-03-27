@@ -98,7 +98,7 @@ public:
     void setPlacement(Immutable<Placement>);
     const Immutable<Placement>& getPlacement() const { return placement; }
     void setPlacementStale() { stale = true; }
-    bool placementIsRecent(TimePoint now, const float zoom, optional<Duration> periodOverride = nullopt) const;
+    bool placementIsRecent(TimePoint now, float zoom, optional<Duration> periodOverride = nullopt) const;
     bool hasTransitions(TimePoint now) const;
 
 private:
@@ -128,9 +128,9 @@ public:
 
     const CollisionIndex& getCollisionIndex() const;
     TimePoint getCommitTime() const { return commitTime; }
-    Duration getUpdatePeriod(const float zoom) const;
+    Duration getUpdatePeriod(float zoom) const;
 
-    float zoomAdjustment(const float zoom) const;
+    float zoomAdjustment(float zoom) const;
     const JointPlacement* getSymbolPlacement(const SymbolInstance&) const;
 
     const RetainedQueryData& getQueryData(uint32_t bucketInstanceId) const;
