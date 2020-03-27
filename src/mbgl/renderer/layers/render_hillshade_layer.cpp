@@ -140,7 +140,8 @@ void RenderHillshadeLayer::render(PaintParameters& parameters) {
             assert(bucket.dem);
             const uint16_t stride = bucket.getDEMData().stride;
             const uint16_t tilesize = bucket.getDEMData().dim;
-            auto view = parameters.context.createOffscreenTexture({ tilesize, tilesize });
+            auto view = parameters.context.createOffscreenTexture({tilesize, tilesize},
+                                                                  gfx::TextureChannelDataType::UnsignedByte);
 
             auto renderPass = parameters.encoder->createRenderPass(
                 "hillshade prepare", { *view, Color{ 0.0f, 0.0f, 0.0f, 0.0f }, {}, {} });

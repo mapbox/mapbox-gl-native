@@ -187,7 +187,7 @@ TEST(OffscreenTexture, ClearRenderPassColor) {
     gfx::BackendScope scope { *backend->getRendererBackend() };
     auto& context = backend->getRendererBackend()->getContext();
     auto encoder = context.createCommandEncoder();
-    auto offscreenTexture = context.createOffscreenTexture({ 128, 256 });
+    auto offscreenTexture = context.createOffscreenTexture({128, 256}, gfx::TextureChannelDataType::UnsignedByte);
     auto renderPass = encoder->createRenderPass(
         "offscreen texture", { *offscreenTexture, Color{ 1.0f, 0.0f, 0.0f, 1.0f }, {}, {} });
     renderPass.reset();
