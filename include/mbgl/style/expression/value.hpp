@@ -142,6 +142,7 @@ optional<T> fromExpressionValue(const Value& value) {
 template <typename T>
 std::vector<optional<T>> fromExpressionValues(const std::vector<optional<Value>>& values) {
     std::vector<optional<T>> result;
+    result.reserve(values.size());
     for (const auto& value : values) {
         result.push_back(value ? fromExpressionValue<T>(*value) : nullopt);
     }
