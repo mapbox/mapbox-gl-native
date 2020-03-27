@@ -20,11 +20,13 @@ public:
     State(Args&&... args) : params(std::forward_as_tuple(::std::forward<Args>(args)...)) {
     }
 
-    void operator=(const typename T::Type& value) {
+    State& operator=(const typename T::Type& value) {
         if (*this != value) {
             setCurrentValue(value);
             set(std::index_sequence_for<Args...>{});
         }
+
+        return *this;
     }
 
     bool operator==(const typename T::Type& value) const {
