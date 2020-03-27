@@ -7,6 +7,8 @@
 #include <mbgl/text/glyph_atlas.hpp>
 #include <mbgl/text/tagged_string.hpp>
 
+#include <utility>
+
 namespace mbgl {
 
 struct AnchorAlignment {
@@ -44,7 +46,7 @@ class PositionedIcon {
 private:
     PositionedIcon(
         ImagePosition image_, float top_, float bottom_, float left_, float right_, const Padding& collisionPadding_)
-        : _image(image_),
+        : _image(std::move(image_)),
           _top(top_),
           _bottom(bottom_),
           _left(left_),
