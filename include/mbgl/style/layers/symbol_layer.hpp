@@ -20,7 +20,7 @@ class TransitionOptions;
 class SymbolLayer final : public Layer {
 public:
     SymbolLayer(const std::string& layerID, const std::string& sourceID);
-    ~SymbolLayer() final;
+    ~SymbolLayer() override;
 
     // Layout properties
 

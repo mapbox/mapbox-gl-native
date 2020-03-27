@@ -17,7 +17,7 @@ class TransitionOptions;
 class FillExtrusionLayer final : public Layer {
 public:
     FillExtrusionLayer(const std::string& layerID, const std::string& sourceID);
-    ~FillExtrusionLayer() final;
+    ~FillExtrusionLayer() override;
 
     // Paint properties
 

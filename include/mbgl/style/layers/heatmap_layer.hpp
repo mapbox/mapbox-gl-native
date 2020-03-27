@@ -18,7 +18,7 @@ class TransitionOptions;
 class HeatmapLayer final : public Layer {
 public:
     HeatmapLayer(const std::string& layerID, const std::string& sourceID);
-    ~HeatmapLayer() final;
+    ~HeatmapLayer() override;
 
     // Paint properties
 

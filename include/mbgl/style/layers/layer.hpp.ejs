@@ -39,7 +39,7 @@ public:
 <% } else { -%>
     <%- camelize(type) %>Layer(const std::string& layerID, const std::string& sourceID);
 <% } -%>
-    ~<%- camelize(type) %>Layer() final;
+    ~<%- camelize(type) %>Layer() override;
 
 <% if (layoutProperties.length) { -%>
     // Layout properties

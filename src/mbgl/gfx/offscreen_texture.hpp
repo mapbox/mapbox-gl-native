@@ -15,7 +15,7 @@ protected:
     }
 
 public:
-    virtual ~OffscreenTexture() = default;
+    ~OffscreenTexture() override = default;
 
     virtual bool isRenderable() = 0;
 

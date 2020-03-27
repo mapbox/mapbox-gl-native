@@ -18,7 +18,7 @@ class TransitionOptions;
 class LocationIndicatorLayer final : public Layer {
 public:
     LocationIndicatorLayer(const std::string& layerID);
-    ~LocationIndicatorLayer();
+    ~LocationIndicatorLayer() override;
 
     // Layout properties
 
