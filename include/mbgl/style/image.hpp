@@ -40,14 +40,9 @@ public:
           float pixelRatio,
           ImageStretches stretchX = {},
           ImageStretches stretchY = {},
-          optional<ImageContent> content = nullopt)
-        : Image(std::move(id),
-                std::move(image),
-                pixelRatio,
-                false,
-                std::move(stretchX),
-                std::move(stretchY),
-                content) {}
+          const optional<ImageContent>& content = nullopt)
+        : Image(std::move(id), std::move(image), pixelRatio, false, std::move(stretchX), std::move(stretchY), content) {
+    }
     Image(const Image&);
 
     std::string getID() const;

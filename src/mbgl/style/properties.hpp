@@ -26,10 +26,7 @@ public:
         : value(std::move(value_)) {
     }
 
-    Transitioning(Value value_,
-                  Transitioning<Value> prior_,
-                  TransitionOptions transition,
-                  TimePoint now)
+    Transitioning(Value value_, Transitioning<Value> prior_, const TransitionOptions& transition, TimePoint now)
         : begin(now + transition.delay.value_or(Duration::zero())),
           end(begin + transition.duration.value_or(Duration::zero())),
           value(std::move(value_)) {
