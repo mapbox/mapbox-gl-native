@@ -64,7 +64,7 @@ struct Interpolator<std::vector<style::expression::Value>> {
                                   const std::vector<style::expression::Value>& b,
                                   const double t) const {
         assert(a.size() == b.size());
-        if (a.size() == 0) return {};
+        if (a.empty()) return {};
         std::vector<style::expression::Value> result;
         for (std::size_t i = 0; i < a.size(); i++) {
             assert(a[i].template is<double>());
