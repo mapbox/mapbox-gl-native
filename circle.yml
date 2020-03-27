@@ -684,8 +684,8 @@ jobs:
       - run:
           name: Clang Tidy
           command: |
-            run-clang-tidy-8 -quiet -j $(nproc) -p build $PWD/src/.*cpp $PWD/platform/.*cpp |tee clang-tidy.log
-            grep -o \\[[a-z].*-.*[a-z]\] clang-tidy.log |sort |uniq -c |sort -n
+            # FIXME: Run on the headers, add -header-filter='.*'
+            run-clang-tidy-8 -quiet -j $(nproc) -p build $PWD/src/.*cpp $PWD/platform/.*cpp
       - save
   baselines:
     executor: ubuntu-disco

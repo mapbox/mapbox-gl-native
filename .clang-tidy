@@ -1,4 +1,31 @@
-Checks: '-*,bugprone-*,clang-analyzer-*,google-*,modernize-*,performance-*,-clang-analyzer-osx.*,-google-readability-braces-around-statements,-google-readability-todo,-google-runtime-int,-google-runtime-references,-modernize-avoid-c-arrays'
-WarningsAsErrors: 'bugprone-use-after-move,modernize-*,performance-*'
+Checks: >
+    -*,
+    bugprone-*,
+    clang-diagnostic-*,
+    google-*,
+    misc-*,
+    modernize-*,
+    performance-*,
+    portability-*,
+    readability-*,
+    -bugprone-narrowing-conversions,
+    -google-build-using-namespace,
+    -google-readability-braces-around-statements,
+    -google-readability-todo,
+    -google-runtime-int,
+    -google-runtime-references,
+    -modernize-avoid-c-arrays,
+    -readability-braces-around-statements,
+    -readability-else-after-return,
+    -readability-implicit-bool-conversion,
+    -readability-magic-numbers,
+    -readability-named-parameter,
+    -readability-uppercase-literal-suffix
+
+WarningsAsErrors: '*'
 HeaderFilterRegex: '.*'
 FormatStyle: file
+
+CheckOptions:
+  - key:   misc-non-private-member-variables-in-classes.IgnoreClassesWithAllMemberVariablesBeingPublic
+    value: '1'
