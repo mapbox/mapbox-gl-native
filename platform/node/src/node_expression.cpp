@@ -94,7 +94,7 @@ void NodeExpression::Parse(const Nan::FunctionCallbackInfo<v8::Value>& info) {
             Nan::Set(err,
                     Nan::New("error").ToLocalChecked(),
                     Nan::New(error.message.c_str()).ToLocalChecked());
-            Nan::Set(result, Nan::New((uint32_t)i), err);
+            Nan::Set(result, Nan::New(static_cast<uint32_t>(i)), err);
         }
         info.GetReturnValue().Set(result);
     };

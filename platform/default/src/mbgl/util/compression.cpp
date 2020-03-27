@@ -40,7 +40,7 @@ std::string compress(const std::string &raw) {
         throw std::runtime_error("failed to initialize deflate");
     }
 
-    deflate_stream.next_in = (Bytef *)raw.data();
+    deflate_stream.next_in = reinterpret_cast<Bytef *>(const_cast<char *>(raw.data()));
     deflate_stream.avail_in = uInt(raw.size());
 
     std::string result;
@@ -75,7 +75,7 @@ std::string decompress(const std::string &raw) {
         throw std::runtime_error("failed to initialize inflate");
     }
 
-    inflate_stream.next_in = (Bytef *)raw.data();
+    inflate_stream.next_in = reinterpret_cast<Bytef *>(const_cast<char *>(raw.data()));
     inflate_stream.avail_in = uInt(raw.size());
 
     std::string result;
