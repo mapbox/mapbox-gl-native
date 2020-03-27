@@ -29,6 +29,7 @@
 #include <mbgl/style/style.hpp>
 #include <mbgl/util/async_request.hpp>
 #include <mbgl/util/exception.hpp>
+#include <mbgl/util/logging.hpp>
 #include <mbgl/util/premultiply.hpp>
 
 #include <unistd.h>
@@ -1428,7 +1429,11 @@ NodeMap::NodeMap(v8::Local<v8::Object> options)
 }
 
 NodeMap::~NodeMap() {
-    if (map) release();
+    try {
+        if (map) release();
+    } catch (...) {
+        mbgl::Log::Error(mbgl::Event::General, "Error release the map object when destroying NodeMap");
+    }
 }
 
 std::unique_ptr<mbgl::AsyncRequest> NodeFileSource::request(const mbgl::Resource& resource, mbgl::FileSource::Callback callback_) {
