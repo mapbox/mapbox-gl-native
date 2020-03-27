@@ -113,21 +113,19 @@ void RenderFillLayer::render(PaintParameters& parameters) {
 
                 checkRenderability(parameters, programInstance.activeBindingCount(allAttributeBindings));
 
-                programInstance.draw(
-                    parameters.context,
-                    *parameters.renderPass,
-                    drawMode,
-                    depthMode,
-                    parameters.stencilModeForClipping(tile.id),
-                    parameters.colorModeForRenderPass(),
-                    gfx::CullFaceMode::disabled(),
-                    indexBuffer,
-                    segments,
-                    allUniformValues,
-                    allAttributeBindings,
-                    std::move(textureBindings),
-                    getID()
-                );
+                programInstance.draw(parameters.context,
+                                     *parameters.renderPass,
+                                     drawMode,
+                                     depthMode,
+                                     parameters.stencilModeForClipping(tile.id),
+                                     parameters.colorModeForRenderPass(),
+                                     gfx::CullFaceMode::disabled(),
+                                     indexBuffer,
+                                     segments,
+                                     allUniformValues,
+                                     allAttributeBindings,
+                                     std::forward<decltype(textureBindings)>(textureBindings),
+                                     getID());
             };
 
             auto fillRenderPass = (evaluated.get<FillColor>().constantOr(Color()).a >= 1.0f
@@ -208,21 +206,19 @@ void RenderFillLayer::render(PaintParameters& parameters) {
 
                 checkRenderability(parameters, programInstance.activeBindingCount(allAttributeBindings));
 
-                programInstance.draw(
-                    parameters.context,
-                    *parameters.renderPass,
-                    drawMode,
-                    depthMode,
-                    parameters.stencilModeForClipping(tile.id),
-                    parameters.colorModeForRenderPass(),
-                    gfx::CullFaceMode::disabled(),
-                    indexBuffer,
-                    segments,
-                    allUniformValues,
-                    allAttributeBindings,
-                    std::move(textureBindings),
-                    getID()
-                );
+                programInstance.draw(parameters.context,
+                                     *parameters.renderPass,
+                                     drawMode,
+                                     depthMode,
+                                     parameters.stencilModeForClipping(tile.id),
+                                     parameters.colorModeForRenderPass(),
+                                     gfx::CullFaceMode::disabled(),
+                                     indexBuffer,
+                                     segments,
+                                     allUniformValues,
+                                     allAttributeBindings,
+                                     std::forward<decltype(textureBindings)>(textureBindings),
+                                     getID());
             };
 
             if (bucket.triangleIndexBuffer) {

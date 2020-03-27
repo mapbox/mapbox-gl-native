@@ -23,9 +23,8 @@ void ShapeAnnotationImpl::updateTileData(const CanonicalTileID& tileID, Annotati
 
     if (!shapeTiler) {
         mapbox::feature::feature_collection<double> features;
-        features.emplace_back(ShapeAnnotationGeometry::visit(geometry(), [] (auto&& geom) {
-            return Feature { std::move(geom) };
-        }));
+        features.emplace_back(ShapeAnnotationGeometry::visit(
+            geometry(), [](auto&& geom) { return Feature{std::forward<decltype(geom)>(geom)}; }));
         mapbox::geojsonvt::Options options;
         // The annotation source is currently hard coded to maxzoom 16, so we're topping out at z16
         // here as well.
