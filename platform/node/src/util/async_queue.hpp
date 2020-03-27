@@ -22,7 +22,7 @@ public:
             q->process();
         });
     }
-    ~AsyncQueue() {}
+    ~AsyncQueue() = default;
 
     void send(T &&data) {
         {

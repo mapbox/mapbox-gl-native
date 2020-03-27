@@ -36,9 +36,10 @@ public:
 
 private:
     union Geometry {
+        // NOLINTNEXTLINE(modernize-use-equals-default)
+        Geometry() {}
         Geometry(float x1, float y1, float x2, float y2) : box({x1, y1}, {x2, y2}) {}
         Geometry(float x, float y, float r) : circle({x, y}, r) {}
-        Geometry() {}
         mapbox::geometry::box<float> box;
         geometry::circle<float> circle;
     } geometry;
