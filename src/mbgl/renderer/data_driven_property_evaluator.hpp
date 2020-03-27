@@ -1,9 +1,11 @@
 #pragma once
 
-#include <mbgl/style/property_value.hpp>
-#include <mbgl/renderer/property_evaluation_parameters.hpp>
-#include <mbgl/renderer/possibly_evaluated_property_value.hpp>
 #include <mbgl/renderer/cross_faded_property_evaluator.hpp>
+#include <mbgl/renderer/possibly_evaluated_property_value.hpp>
+#include <mbgl/renderer/property_evaluation_parameters.hpp>
+#include <mbgl/style/property_value.hpp>
+
+#include <cmath>
 
 namespace mbgl {
 
@@ -31,7 +33,7 @@ public:
                 returnExpression.useIntegerZoom = true;
                 return ResultType(returnExpression);
             }
-            return ResultType(expression.evaluate(floor(parameters.z)));
+            return ResultType(expression.evaluate(std::floor(parameters.z)));
         } else {
             if (!expression.isFeatureConstant() || !expression.isRuntimeConstant()) {
                 return ResultType(expression);
@@ -66,7 +68,7 @@ public:
         if (!expression.isFeatureConstant() || !expression.isRuntimeConstant()) {
             return ResultType(expression);
         } else {
-            const T evaluated = expression.evaluate(floor(parameters.z));
+            const T evaluated = expression.evaluate(std::floor(parameters.z));
             return ResultType(calculate(evaluated, evaluated, evaluated));
         }
     }
