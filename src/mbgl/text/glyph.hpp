@@ -76,8 +76,8 @@ public:
           vertical(vertical_),
           font(font_),
           scale(scale_),
-          rect(std::move(rect_)),
-          metrics(std::move(metrics_)),
+          rect(rect_),
+          metrics(metrics_),
           imageID(std::move(imageID_)),
           sectionIndex(sectionIndex_) {}
 
