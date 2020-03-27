@@ -46,9 +46,7 @@ void setTempPath(const std::string& path) {
 
 class DatabaseImpl {
 public:
-    DatabaseImpl(sqlite3* db_)
-        : db(db_)
-    {
+    explicit DatabaseImpl(sqlite3* db_) : db(db_) {
         const int error = sqlite3_extended_result_codes(db, true);
         if (error != SQLITE_OK) {
             mbgl::Log::Warning(mbgl::Event::Database, error, "Failed to enable extended result codes: %s", sqlite3_errmsg(db));

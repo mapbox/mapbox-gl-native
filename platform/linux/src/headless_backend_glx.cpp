@@ -17,7 +17,7 @@ private:
     struct Key { explicit Key() = default; };
 
 public:
-    GLXDisplayConfig(Key) {
+    explicit GLXDisplayConfig(Key) {
         if (!XInitThreads()) {
             throw std::runtime_error("Failed to XInitThreads.");
         }

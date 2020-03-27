@@ -33,7 +33,7 @@ bool operator==(const VarargsType& lhs, const VarargsType& rhs) {
 template <typename T>
 struct Varargs : std::vector<T> {
     template <class... Args>
-    Varargs(Args&&... args) : std::vector<T>(std::forward<Args>(args)...) {}
+    explicit Varargs(Args&&... args) : std::vector<T>(std::forward<Args>(args)...) {}
 };
 
 namespace detail {
