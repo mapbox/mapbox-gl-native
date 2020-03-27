@@ -112,7 +112,7 @@ struct ToValue {
     v8::Local<v8::Value> operator()(const std::vector<mbgl::Value>& array) {
         Nan::EscapableHandleScope scope;
         v8::Local<v8::Array> result = Nan::New<v8::Array>();
-        for (unsigned int i = 0; i < array.size(); i++) {
+        for (std::size_t i = 0; i < array.size(); i++) {
             result->Set(i, toJS(array[i]));
         }
         return scope.Escape(result);
