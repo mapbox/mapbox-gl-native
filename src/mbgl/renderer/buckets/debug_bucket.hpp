@@ -14,10 +14,6 @@ namespace mbgl {
 
 class OverscaledTileID;
 
-namespace gl {
-class UploadPass;
-} // namespace gl
-
 class DebugBucket : private util::noncopyable {
 public:
     DebugBucket(const OverscaledTileID& id,

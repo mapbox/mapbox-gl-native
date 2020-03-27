@@ -8,7 +8,6 @@
 namespace mbgl {
 namespace gl {
 
-class Context;
 using ProcAddress = void (*)();
 using FramebufferID = uint32_t;
 
