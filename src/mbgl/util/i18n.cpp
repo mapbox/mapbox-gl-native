@@ -12,10 +12,8 @@ namespace {
     @param first The first codepoint in the block, inclusive.
     @param last The last codepoint in the block, inclusive.
  */
-#define DEFINE_IS_IN_UNICODE_BLOCK(name, first, last)                                              \
-    inline bool isIn##name(char16_t codepoint) {                                                   \
-        return codepoint >= first && codepoint <= last;                                            \
-    }
+#define DEFINE_IS_IN_UNICODE_BLOCK(name, first, last) \
+    inline bool isIn##name(char16_t codepoint) { return codepoint >= (first) && codepoint <= (last); }
 
 // The following table comes from <http://www.unicode.org/Public/12.0.0/ucd/Blocks.txt>.
 // Keep it synchronized with <http://www.unicode.org/Public/UCD/latest/ucd/Blocks.txt>.
