@@ -391,7 +391,7 @@ NodeMap::RenderOptions NodeMap::ParseOptions(v8::Local<v8::Object> obj) {
 
 class RenderRequest : public Nan::AsyncResource {
 public:
-    RenderRequest(v8::Local<v8::Function> callback_) : AsyncResource("mbgl:RenderRequest") {
+    explicit RenderRequest(v8::Local<v8::Function> callback_) : AsyncResource("mbgl:RenderRequest") {
         callback.Reset(callback_);
     }
     ~RenderRequest() {
