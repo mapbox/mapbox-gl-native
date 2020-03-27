@@ -94,33 +94,33 @@ void Layer::setMaxZoom(float maxZoom) {
 
 Value Layer::serialize() const {
     mapbox::base::ValueObject result;
-    result.emplace(std::make_pair<std::string, Value>("id", getID()));
-    result.emplace(std::make_pair<std::string, Value>("type", Layer::getTypeInfo()->type));
+    result.emplace(std::make_pair("id", getID()));
+    result.emplace(std::make_pair("type", Layer::getTypeInfo()->type));
 
     auto source = getSourceID();
     if (!source.empty()) {
-        result.emplace(std::make_pair<std::string, Value>("source", std::move(source)));
+        result.emplace(std::make_pair("source", std::move(source)));
     }
 
     auto sourceLayer = getSourceLayer();
     if (!sourceLayer.empty()) {
-        result.emplace(std::make_pair<std::string, Value>("source-layer", std::move(sourceLayer)));
+        result.emplace(std::make_pair("source-layer", std::move(sourceLayer)));
     }
 
     if (getFilter()) {
-        result.emplace(std::make_pair<std::string, Value>("filter", getFilter().serialize()));
+        result.emplace(std::make_pair("filter", getFilter().serialize()));
     }
 
     if (getMinZoom() != -std::numeric_limits<float>::infinity()) {
-        result.emplace(std::make_pair<std::string, Value>("minzoom", getMinZoom()));
+        result.emplace(std::make_pair("minzoom", getMinZoom()));
     }
 
     if (getMaxZoom() != std::numeric_limits<float>::infinity()) {
-        result.emplace(std::make_pair<std::string, Value>("maxzoom", getMaxZoom()));
+        result.emplace(std::make_pair("maxzoom", getMaxZoom()));
     }
 
     if (getVisibility() == VisibilityType::None) {
-        result["layout"] = mapbox::base::ValueObject{std::make_pair<std::string, Value>("visibility", "none")};
+        result["layout"] = mapbox::base::ValueObject{std::make_pair("visibility", "none")};
     }
 
     return result;
@@ -131,7 +131,7 @@ void Layer::serializeProperty(Value& out, const StyleProperty& property, const c
     auto& object = *(out.getObject());
     std::string propertyType = isPaint ? "paint" : "layout";
     auto it = object.find(propertyType);
-    auto pair = std::make_pair<std::string, Value>(std::string(propertyName), Value{property.getValue()});
+    auto pair = std::make_pair(std::string(propertyName), Value{property.getValue()});
     if (it != object.end()) {
         assert(it->second.getObject());
         it->second.getObject()->emplace(std::move(pair));
