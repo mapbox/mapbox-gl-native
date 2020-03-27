@@ -90,7 +90,9 @@ void StencilFunc::Set(const Type& value) {
 }
 
 StencilFunc::Type StencilFunc::Get() {
-    GLint func, ref, mask;
+    GLint func;
+    GLint ref;
+    GLint mask;
     MBGL_CHECK_ERROR(glGetIntegerv(GL_STENCIL_FUNC, &func));
     MBGL_CHECK_ERROR(glGetIntegerv(GL_STENCIL_REF, &ref));
     MBGL_CHECK_ERROR(glGetIntegerv(GL_STENCIL_VALUE_MASK, &mask));
@@ -118,7 +120,9 @@ void StencilOp::Set(const Type& value) {
 }
 
 StencilOp::Type StencilOp::Get() {
-    GLint sfail, dpfail, dppass;
+    GLint sfail;
+    GLint dpfail;
+    GLint dppass;
     MBGL_CHECK_ERROR(glGetIntegerv(GL_STENCIL_FAIL, &sfail));
     MBGL_CHECK_ERROR(glGetIntegerv(GL_STENCIL_PASS_DEPTH_FAIL, &dpfail));
     MBGL_CHECK_ERROR(glGetIntegerv(GL_STENCIL_PASS_DEPTH_PASS, &dppass));
@@ -195,7 +199,8 @@ void BlendFunc::Set(const Type& value) {
 }
 
 BlendFunc::Type BlendFunc::Get() {
-    GLint sfactor, dfactor;
+    GLint sfactor;
+    GLint dfactor;
     MBGL_CHECK_ERROR(glGetIntegerv(GL_BLEND_SRC_ALPHA, &sfactor));
     MBGL_CHECK_ERROR(glGetIntegerv(GL_BLEND_DST_ALPHA, &dfactor));
     return { Enum<gfx::ColorBlendFactorType>::from(sfactor),
@@ -549,7 +554,8 @@ void PixelZoom::Set(const Type& value) {
 }
 
 PixelZoom::Type PixelZoom::Get() {
-    GLfloat xfactor, yfactor;
+    GLfloat xfactor;
+    GLfloat yfactor;
     MBGL_CHECK_ERROR(glGetFloatv(GL_ZOOM_X, &xfactor));
     MBGL_CHECK_ERROR(glGetFloatv(GL_ZOOM_Y, &yfactor));
     return { xfactor, yfactor };

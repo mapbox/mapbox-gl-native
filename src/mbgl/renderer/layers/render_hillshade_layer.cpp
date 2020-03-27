@@ -33,13 +33,13 @@ RenderHillshadeLayer::RenderHillshadeLayer(Immutable<style::HillshadeLayer::Impl
 
 RenderHillshadeLayer::~RenderHillshadeLayer() = default;
 
-const std::array<float, 2> RenderHillshadeLayer::getLatRange(const UnwrappedTileID& id) {
-   const LatLng latlng0 = LatLng(id);
-   const LatLng latlng1 = LatLng(UnwrappedTileID(id.canonical.z, id.canonical.x, id.canonical.y + 1));
-   return {{static_cast<float>(latlng0.latitude()), static_cast<float>(latlng1.latitude())}};
+std::array<float, 2> RenderHillshadeLayer::getLatRange(const UnwrappedTileID& id) {
+    const LatLng latlng0 = LatLng(id);
+    const LatLng latlng1 = LatLng(UnwrappedTileID(id.canonical.z, id.canonical.x, id.canonical.y + 1));
+    return {{static_cast<float>(latlng0.latitude()), static_cast<float>(latlng1.latitude())}};
 }
 
-const std::array<float, 2> RenderHillshadeLayer::getLight(const PaintParameters& parameters) {
+std::array<float, 2> RenderHillshadeLayer::getLight(const PaintParameters& parameters) {
     const auto& evaluated = static_cast<const HillshadeLayerProperties&>(*evaluatedProperties).evaluated;
     float azimuthal = evaluated.get<HillshadeIlluminationDirection>() * util::DEG2RAD;
     if (evaluated.get<HillshadeIlluminationAnchor>() == HillshadeIlluminationAnchorType::Viewport) azimuthal = azimuthal - parameters.state.getBearing();
@@ -89,26 +89,22 @@ void RenderHillshadeLayer::render(PaintParameters& parameters) {
 
         const HillshadeProgram::Binders paintAttributeData{ evaluated, 0 };
 
-        const auto allUniformValues = programInstance.computeAllUniformValues(
-            HillshadeProgram::LayoutUniformValues {
-                uniforms::matrix::Value( matrix ),
-                uniforms::highlight::Value( evaluated.get<HillshadeHighlightColor>() ),
-                uniforms::shadow::Value( evaluated.get<HillshadeShadowColor>() ),
-                uniforms::accent::Value( evaluated.get<HillshadeAccentColor>() ),
-                uniforms::light::Value( getLight(parameters) ),
-                uniforms::latrange::Value( getLatRange(id) ),
+        const auto allUniformValues = HillshadeProgram::computeAllUniformValues(
+            HillshadeProgram::LayoutUniformValues{
+                uniforms::matrix::Value(matrix),
+                uniforms::highlight::Value(evaluated.get<HillshadeHighlightColor>()),
+                uniforms::shadow::Value(evaluated.get<HillshadeShadowColor>()),
+                uniforms::accent::Value(evaluated.get<HillshadeAccentColor>()),
+                uniforms::light::Value(getLight(parameters)),
+                uniforms::latrange::Value(getLatRange(id)),
             },
             paintAttributeData,
             evaluated,
-            parameters.state.getZoom()
-        );
-        const auto allAttributeBindings = programInstance.computeAllAttributeBindings(
-            vertexBuffer,
-            paintAttributeData,
-            evaluated
-        );
+            parameters.state.getZoom());
+        const auto allAttributeBindings =
+            HillshadeProgram::computeAllAttributeBindings(vertexBuffer, paintAttributeData, evaluated);
 
-        checkRenderability(parameters, programInstance.activeBindingCount(allAttributeBindings));
+        checkRenderability(parameters, HillshadeProgram::activeBindingCount(allAttributeBindings));
 
         programInstance.draw(parameters.context,
                              *parameters.renderPass,
@@ -154,29 +150,25 @@ void RenderHillshadeLayer::render(PaintParameters& parameters) {
             
             auto& programInstance = parameters.programs.getHillshadeLayerPrograms().hillshadePrepare;
 
-            const auto allUniformValues = programInstance.computeAllUniformValues(
-                HillshadePrepareProgram::LayoutUniformValues {
-                    uniforms::matrix::Value( mat ),
-                    uniforms::dimension::Value( {{stride, stride}} ),
-                    uniforms::zoom::Value( float(tile.id.canonical.z) ),
-                    uniforms::maxzoom::Value( float(maxzoom) ),
-                    uniforms::unpack::Value( bucket.getDEMData().getUnpackVector() ),
+            const auto allUniformValues = HillshadePrepareProgram::computeAllUniformValues(
+                HillshadePrepareProgram::LayoutUniformValues{
+                    uniforms::matrix::Value(mat),
+                    uniforms::dimension::Value({{stride, stride}}),
+                    uniforms::zoom::Value(float(tile.id.canonical.z)),
+                    uniforms::maxzoom::Value(float(maxzoom)),
+                    uniforms::unpack::Value(bucket.getDEMData().getUnpackVector()),
                 },
                 paintAttributeData,
                 properties,
-                parameters.state.getZoom()
-            );
-            const auto allAttributeBindings = programInstance.computeAllAttributeBindings(
-                *parameters.staticData.rasterVertexBuffer,
-                paintAttributeData,
-                properties
-            );
+                parameters.state.getZoom());
+            const auto allAttributeBindings = HillshadePrepareProgram::computeAllAttributeBindings(
+                *parameters.staticData.rasterVertexBuffer, paintAttributeData, properties);
 
-            checkRenderability(parameters, programInstance.activeBindingCount(allAttributeBindings));
+            checkRenderability(parameters, HillshadePrepareProgram::activeBindingCount(allAttributeBindings));
 
             // Copy over the segments so that we can create our own DrawScopes that get destroyed
             // after this draw call.
-            auto segments = parameters.staticData.rasterSegments();
+            auto segments = RenderStaticData::rasterSegments();
             programInstance.draw(parameters.context,
                                  *renderPass,
                                  gfx::Triangles(),
@@ -211,7 +203,7 @@ void RenderHillshadeLayer::render(PaintParameters& parameters) {
                 // Draw the full tile.
                 if (bucket.segments.empty()) {
                     // Copy over the segments so that we can create our own DrawScopes.
-                    bucket.segments = parameters.staticData.rasterSegments();
+                    bucket.segments = RenderStaticData::rasterSegments();
                 }
                 draw(parameters.matrixForTile(tile.id, true),
                      *parameters.staticData.rasterVertexBuffer,

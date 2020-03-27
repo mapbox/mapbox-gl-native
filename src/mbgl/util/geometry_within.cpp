@@ -38,7 +38,12 @@ bool lineIntersectLine(const Point<int64_t>& a,
     // check if p1 and p2 are in different sides of line segment q1->q2
     const auto twoSided =
         [](const Point<int64_t>& p1, const Point<int64_t>& p2, const Point<int64_t>& q1, const Point<int64_t>& q2) {
-            int64_t x1, y1, x2, y2, x3, y3;
+            int64_t x1;
+            int64_t y1;
+            int64_t x2;
+            int64_t y2;
+            int64_t x3;
+            int64_t y3;
 
             // q1->p1 (x1, y1), q1->p2 (x2, y2), q1->q2 (x3, y3)
             x1 = p1.x - q1.x;
@@ -49,17 +54,13 @@ bool lineIntersectLine(const Point<int64_t>& a,
             y3 = q2.y - q1.y;
             auto ret1 = (x1 * y3 - x3 * y1);
             auto ret2 = (x2 * y3 - x3 * y2);
-            if ((ret1 > 0 && ret2 < 0) || (ret1 < 0 && ret2 > 0)) {
-                return true;
-            }
-            return false;
+            return (ret1 > 0 && ret2 < 0) || (ret1 < 0 && ret2 > 0);
         };
 
     // If lines are intersecting with each other, the relative location should be:
     // a and b lie in different sides of segment c->d
     // c and d lie in different sides of segment a->b
-    if (twoSided(a, b, c, d) && twoSided(c, d, a, b)) return true;
-    return false;
+    return twoSided(a, b, c, d) && twoSided(c, d, a, b);
 }
 
 bool lineIntersectPolygon(const Point<int64_t>& p1, const Point<int64_t>& p2, const Polygon<int64_t>& polygon) {

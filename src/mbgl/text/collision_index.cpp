@@ -191,7 +191,8 @@ std::pair<bool, bool> CollisionIndex::placeLineFeature(
     // equivalent to pixel_to_tile_units
     const auto pixelsToTileUnits = 1 / (textPixelRatio * scale);
 
-    float firstTileDistance = 0, lastTileDistance = 0;
+    float firstTileDistance = 0.f;
+    float lastTileDistance = 0.f;
     if (firstAndLastGlyph) {
         firstTileDistance = approximateTileDistance(*(firstAndLastGlyph->first.tileDistance), firstAndLastGlyph->first.angle, pixelsToTileUnits, projectedAnchor.second, pitchWithMap);
         lastTileDistance = approximateTileDistance(*(firstAndLastGlyph->second.tileDistance), firstAndLastGlyph->second.angle, pixelsToTileUnits, projectedAnchor.second, pitchWithMap);

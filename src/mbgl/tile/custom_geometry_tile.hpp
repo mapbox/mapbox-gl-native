@@ -23,7 +23,7 @@ public:
                        ActorRef<style::CustomTileLoader> loader);
     ~CustomGeometryTile() override;
 
-    void setTileData(const GeoJSON& data);
+    void setTileData(const GeoJSON& geoJSON);
     void invalidateTileData();
 
     void setNecessity(TileNecessity) final;

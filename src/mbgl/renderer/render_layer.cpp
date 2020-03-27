@@ -73,16 +73,16 @@ void RenderLayer::checkRenderability(const PaintParameters& parameters,
                    "supports, and will have rendering errors. To ensure compatibility with this "
                    "device, use %d fewer data driven properties in this layer.",
                    getID().c_str(),
-                   activeBindingCount - parameters.context.minimumRequiredVertexBindingCount);
+                   activeBindingCount - gfx::Context::minimumRequiredVertexBindingCount);
         hasRenderFailures = true;
-    } else if (activeBindingCount > parameters.context.minimumRequiredVertexBindingCount) {
+    } else if (activeBindingCount > gfx::Context::minimumRequiredVertexBindingCount) {
         Log::Warning(Event::OpenGL,
-                   "The layer '%s' uses more data-driven properties than some devices may support. "
-                   "Though it will render correctly on this device, it may have rendering errors "
-                   "on other devices. To ensure compatibility with all devices, use %d fewer "
-                   "data-driven properties in this layer.",
-                   getID().c_str(),
-                   activeBindingCount - parameters.context.minimumRequiredVertexBindingCount);
+                     "The layer '%s' uses more data-driven properties than some devices may support. "
+                     "Though it will render correctly on this device, it may have rendering errors "
+                     "on other devices. To ensure compatibility with all devices, use %d fewer "
+                     "data-driven properties in this layer.",
+                     getID().c_str(),
+                     activeBindingCount - gfx::Context::minimumRequiredVertexBindingCount);
         hasRenderFailures = true;
     }
 }

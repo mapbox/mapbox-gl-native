@@ -71,8 +71,8 @@ public:
     void handleResult(CURLcode code);
 
 private:
-    static size_t headerCallback(char *const buffer, const size_t size, const size_t nmemb, void *userp);
-    static size_t writeCallback(void *const contents, const size_t size, const size_t nmemb, void *userp);
+    static size_t headerCallback(char *buffer, size_t size, size_t nmemb, void *userp);
+    static size_t writeCallback(void *contents, size_t size, size_t nmemb, void *userp);
 
     HTTPFileSource::Impl* context = nullptr;
     Resource resource;
@@ -328,7 +328,7 @@ size_t HTTPRequest::headerCallback(char *const buffer, const size_t size, const 
         baton->response->etag = std::string(buffer + begin, length - begin - 2); // remove \r\n
     } else if ((begin = headerMatches("cache-control: ", buffer, length)) != std::string::npos) {
         const std::string value { buffer + begin, length - begin - 2 }; // remove \r\n
-        const auto cc = http::CacheControl::parse(value.c_str());
+        const auto cc = http::CacheControl::parse(value);
         baton->response->expires = cc.toTimePoint();
         baton->response->mustRevalidate = cc.mustRevalidate;
     } else if ((begin = headerMatches("expires: ", buffer, length)) != std::string::npos) {

@@ -97,11 +97,7 @@ bool OfflineDatabase::disabled() {
     }
 
     auto regions = listRegions();
-    if (regions && !regions.value().empty()) {
-        return false;
-    }
-
-    return true;
+    return !(regions && !regions.value().empty());
 }
 
 void OfflineDatabase::handleError(const mapbox::sqlite::Exception& ex, const char* action) {

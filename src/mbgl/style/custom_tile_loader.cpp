@@ -52,7 +52,7 @@ void CustomTileLoader::removeTile(const OverscaledTileID& tileID) {
             break;
         }
     }
-    if (tileCallbacks->second.size() == 0) {
+    if (tileCallbacks->second.empty()) {
         tileCallbackMap.erase(tileCallbacks);
         dataCache.erase(tileID.canonical);
     }

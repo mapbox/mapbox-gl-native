@@ -79,20 +79,20 @@ public:
     const Padding& collisionPadding() const { return _collisionPadding; }
 };
 
-const Shaping getShaping(const TaggedString& string,
-                         float maxWidth,
-                         float lineHeight,
-                         style::SymbolAnchorType textAnchor,
-                         style::TextJustifyType textJustify,
-                         float spacing,
-                         const std::array<float, 2>& translate,
-                         const WritingModeType,
-                         BiDi& bidi,
-                         const GlyphMap& glyphMap,
-                         const GlyphPositions& glyphPositions,
-                         const ImagePositions& imagePositions,
-                         float layoutTextSize,
-                         float layoutTextSizeAtBucketZoomLevel,
-                         bool allowVerticalPlacement);
+Shaping getShaping(const TaggedString& string,
+                   float maxWidth,
+                   float lineHeight,
+                   style::SymbolAnchorType textAnchor,
+                   style::TextJustifyType textJustify,
+                   float spacing,
+                   const std::array<float, 2>& translate,
+                   const WritingModeType,
+                   BiDi& bidi,
+                   const GlyphMap& glyphMap,
+                   const GlyphPositions& glyphPositions,
+                   const ImagePositions& imagePositions,
+                   float layoutTextSize,
+                   float layoutTextSizeAtBucketZoomLevel,
+                   bool allowVerticalPlacement);
 
 } // namespace mbgl

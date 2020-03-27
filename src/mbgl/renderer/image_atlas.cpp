@@ -33,10 +33,10 @@ const mapbox::Bin& _packImage(mapbox::ShelfPack& pack, const style::Image::Impl&
                                 bin.y + padding
                              },
                              image.image.size);
-    uint32_t x = bin.x + padding,
-            y = bin.y + padding,
-            w = image.image.size.width,
-            h = image.image.size.height;
+    uint32_t x = bin.x + padding;
+    uint32_t y = bin.y + padding;
+    uint32_t w = image.image.size.width;
+    uint32_t h = image.image.size.height;
 
     if (imageType == ImageType::Pattern) {
             // Add 1 pixel wrapped padding on each side of the image.

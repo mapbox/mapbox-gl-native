@@ -91,8 +91,8 @@ public:
     void markRenderedIdeal() override;
     void markRenderedPreviously() override;
     void performedFadePlacement() override;
-    const std::shared_ptr<FeatureIndex> getFeatureIndex() const;
-    
+    std::shared_ptr<FeatureIndex> getFeatureIndex() const;
+
     const std::string sourceID;
 
     void setFeatureState(const LayerFeatureStates&) override;

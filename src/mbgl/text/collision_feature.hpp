@@ -143,7 +143,7 @@ private:
                       GeometryCoordinate& anchorPoint,
                       std::size_t segment,
                       const float length,
-                      const float height,
+                      const float boxSize,
                       const float overscaling);
 };
 

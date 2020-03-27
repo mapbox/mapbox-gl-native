@@ -279,7 +279,7 @@ void GeometryTile::getImages(ImageRequestPair pair) {
     imageManager.getImages(*this, std::move(pair));
 }
 
-const std::shared_ptr<FeatureIndex> GeometryTile::getFeatureIndex() const {
+std::shared_ptr<FeatureIndex> GeometryTile::getFeatureIndex() const {
     return layoutResult ? layoutResult->featureIndex : nullptr;
 }
 

@@ -368,7 +368,7 @@ const auto& hasContextCompoundExpression() {
             };
         }
 
-        return params.feature->getValue(key) ? true : false;
+        return static_cast<bool>(params.feature->getValue(key));
     });
     return signature;
 }
@@ -996,7 +996,7 @@ std::string expectedTypesError(const Definitions& definitions,
     
     std::string actualTypes;
     for (const auto& arg : args) {
-        if (actualTypes.size() > 0) {
+        if (!actualTypes.empty()) {
             actualTypes += ", ";
         }
         actualTypes += toString(arg->getType());
@@ -1043,7 +1043,7 @@ static ParseResult createCompoundExpression(const Definitions& definitions,
             }
         }
 
-        if (signatureContext.getErrors().size() == 0) {
+        if (signatureContext.getErrors().empty()) {
             return ParseResult(std::make_unique<CompoundExpression>(*signature, std::move(args)));
         }
     }

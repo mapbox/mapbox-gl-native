@@ -100,31 +100,27 @@ void RenderRasterLayer::render(PaintParameters& parameters) {
                      const std::string& drawScopeID) {
         auto& programInstance = parameters.programs.getRasterLayerPrograms().raster;
 
-        const auto allUniformValues = programInstance.computeAllUniformValues(
-            RasterProgram::LayoutUniformValues {
-                uniforms::matrix::Value( matrix ),
-                uniforms::opacity::Value( evaluated.get<RasterOpacity>() ),
-                uniforms::fade_t::Value( 1 ),
-                uniforms::brightness_low::Value( evaluated.get<RasterBrightnessMin>() ),
-                uniforms::brightness_high::Value( evaluated.get<RasterBrightnessMax>() ),
-                uniforms::saturation_factor::Value( saturationFactor(evaluated.get<RasterSaturation>()) ),
-                uniforms::contrast_factor::Value( contrastFactor(evaluated.get<RasterContrast>()) ),
-                uniforms::spin_weights::Value( spinWeights(evaluated.get<RasterHueRotate>()) ),
-                uniforms::buffer_scale::Value( 1.0f ),
-                uniforms::scale_parent::Value( 1.0f ),
-                uniforms::tl_parent::Value( std::array<float, 2> {{ 0.0f, 0.0f }} ),
+        const auto allUniformValues = RasterProgram::computeAllUniformValues(
+            RasterProgram::LayoutUniformValues{
+                uniforms::matrix::Value(matrix),
+                uniforms::opacity::Value(evaluated.get<RasterOpacity>()),
+                uniforms::fade_t::Value(1),
+                uniforms::brightness_low::Value(evaluated.get<RasterBrightnessMin>()),
+                uniforms::brightness_high::Value(evaluated.get<RasterBrightnessMax>()),
+                uniforms::saturation_factor::Value(saturationFactor(evaluated.get<RasterSaturation>())),
+                uniforms::contrast_factor::Value(contrastFactor(evaluated.get<RasterContrast>())),
+                uniforms::spin_weights::Value(spinWeights(evaluated.get<RasterHueRotate>())),
+                uniforms::buffer_scale::Value(1.0f),
+                uniforms::scale_parent::Value(1.0f),
+                uniforms::tl_parent::Value(std::array<float, 2>{{0.0f, 0.0f}}),
             },
             paintAttributeData,
             evaluated,
-            parameters.state.getZoom()
-        );
-        const auto allAttributeBindings = programInstance.computeAllAttributeBindings(
-            vertexBuffer,
-            paintAttributeData,
-            evaluated
-        );
+            parameters.state.getZoom());
+        const auto allAttributeBindings =
+            RasterProgram::computeAllAttributeBindings(vertexBuffer, paintAttributeData, evaluated);
 
-        checkRenderability(parameters, programInstance.activeBindingCount(allAttributeBindings));
+        checkRenderability(parameters, RasterProgram::activeBindingCount(allAttributeBindings));
 
         programInstance.draw(
             parameters.context,
@@ -188,7 +184,7 @@ void RenderRasterLayer::render(PaintParameters& parameters) {
                 // Draw the full tile.
                 if (bucket.segments.empty()) {
                     // Copy over the segments so that we can create our own DrawScopes.
-                    bucket.segments = parameters.staticData.rasterSegments();
+                    bucket.segments = RenderStaticData::rasterSegments();
                 }
                 draw(parameters.matrixForTile(tile.id, true),
                      *parameters.staticData.rasterVertexBuffer,

@@ -496,7 +496,7 @@ void shapeLines(Shaping& shaping,
         }
 
         // Only justify if we placed at least one glyph
-        if (positionedGlyphs.size() != 0) {
+        if (!positionedGlyphs.empty()) {
             float lineLength = x - spacing; // Don't count trailing spacing
             maxLineLength = util::max(lineLength, maxLineLength);
             justifyLine(positionedGlyphs, justify, lineOffset);
@@ -528,21 +528,21 @@ void shapeLines(Shaping& shaping,
     shaping.right = shaping.left + maxLineLength;
 }
 
-const Shaping getShaping(const TaggedString& formattedString,
-                         const float maxWidth,
-                         const float lineHeight,
-                         const style::SymbolAnchorType textAnchor,
-                         const style::TextJustifyType textJustify,
-                         const float spacing,
-                         const std::array<float, 2>& translate,
-                         const WritingModeType writingMode,
-                         BiDi& bidi,
-                         const GlyphMap& glyphMap,
-                         const GlyphPositions& glyphPositions,
-                         const ImagePositions& imagePositions,
-                         float layoutTextSize,
-                         float layoutTextSizeAtBucketZoomLevel,
-                         bool allowVerticalPlacement) {
+Shaping getShaping(const TaggedString& formattedString,
+                   const float maxWidth,
+                   const float lineHeight,
+                   const style::SymbolAnchorType textAnchor,
+                   const style::TextJustifyType textJustify,
+                   const float spacing,
+                   const std::array<float, 2>& translate,
+                   const WritingModeType writingMode,
+                   BiDi& bidi,
+                   const GlyphMap& glyphMap,
+                   const GlyphPositions& glyphPositions,
+                   const ImagePositions& imagePositions,
+                   float layoutTextSize,
+                   float layoutTextSizeAtBucketZoomLevel,
+                   bool allowVerticalPlacement) {
     assert(layoutTextSize);
     std::vector<TaggedString> reorderedLines;
     if (formattedString.sectionCount() == 1) {

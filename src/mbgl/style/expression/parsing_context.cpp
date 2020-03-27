@@ -207,7 +207,7 @@ ParseResult ParsingContext::parse(const Convertible& value,
             parsed = { annotate(std::move(*parsed), *expected, typeAnnotationOption.value_or(TypeAnnotationOption::coerce)) };
         } else {
             checkType((*parsed)->getType());
-            if (errors->size() > 0) {
+            if (!errors->empty()) {
                 return ParseResult();
             }
         }
@@ -265,13 +265,13 @@ ParseResult ParsingContext::parseLayerPropertyExpression(const Convertible& valu
     return parsed;
 }
 
-const std::string ParsingContext::getCombinedErrors() const {
+std::string ParsingContext::getCombinedErrors() const {
     std::string combinedError;
     for (const ParsingError& parsingError : *errors) {
-        if (combinedError.size() > 0) {
+        if (!combinedError.empty()) {
             combinedError += "\n";
         }
-        if (parsingError.key.size() > 0) {
+        if (!parsingError.key.empty()) {
             combinedError += parsingError.key + ": ";
         }
         combinedError += parsingError.message;

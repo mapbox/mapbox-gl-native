@@ -112,23 +112,18 @@ void RenderHeatmapLayer::render(PaintParameters& parameters) {
 
             auto& programInstance = parameters.programs.getHeatmapLayerPrograms().heatmap;
 
-            const auto allUniformValues = programInstance.computeAllUniformValues(
-                HeatmapProgram::LayoutUniformValues {
-                    uniforms::intensity::Value( evaluated.get<style::HeatmapIntensity>() ),
-                    uniforms::matrix::Value( tile.matrix ),
-                    uniforms::heatmap::extrude_scale::Value( extrudeScale )
-                },
+            const auto allUniformValues = HeatmapProgram::computeAllUniformValues(
+                HeatmapProgram::LayoutUniformValues{
+                    uniforms::intensity::Value(evaluated.get<style::HeatmapIntensity>()),
+                    uniforms::matrix::Value(tile.matrix),
+                    uniforms::heatmap::extrude_scale::Value(extrudeScale)},
                 paintPropertyBinders,
                 evaluated,
-                parameters.state.getZoom()
-            );
-            const auto allAttributeBindings = programInstance.computeAllAttributeBindings(
-                *bucket.vertexBuffer,
-                paintPropertyBinders,
-                evaluated
-            );
+                parameters.state.getZoom());
+            const auto allAttributeBindings =
+                HeatmapProgram::computeAllAttributeBindings(*bucket.vertexBuffer, paintPropertyBinders, evaluated);
 
-            checkRenderability(parameters, programInstance.activeBindingCount(allAttributeBindings));
+            checkRenderability(parameters, HeatmapProgram::activeBindingCount(allAttributeBindings));
 
             programInstance.draw(parameters.context,
                                  *renderPass,
@@ -156,27 +151,23 @@ void RenderHeatmapLayer::render(PaintParameters& parameters) {
 
         auto& programInstance = parameters.programs.getHeatmapLayerPrograms().heatmapTexture;
 
-        const auto allUniformValues = programInstance.computeAllUniformValues(
+        const auto allUniformValues = HeatmapTextureProgram::computeAllUniformValues(
             HeatmapTextureProgram::LayoutUniformValues{
-                uniforms::matrix::Value( viewportMat ),
-                uniforms::world::Value( size ),
-                uniforms::opacity::Value( getEvaluated<HeatmapLayerProperties>(evaluatedProperties).get<HeatmapOpacity>() )
-            },
+                uniforms::matrix::Value(viewportMat),
+                uniforms::world::Value(size),
+                uniforms::opacity::Value(
+                    getEvaluated<HeatmapLayerProperties>(evaluatedProperties).get<HeatmapOpacity>())},
             paintAttributeData,
             properties,
-            parameters.state.getZoom()
-        );
-        const auto allAttributeBindings = programInstance.computeAllAttributeBindings(
-            *parameters.staticData.heatmapTextureVertexBuffer,
-            paintAttributeData,
-            properties
-        );
+            parameters.state.getZoom());
+        const auto allAttributeBindings = HeatmapTextureProgram::computeAllAttributeBindings(
+            *parameters.staticData.heatmapTextureVertexBuffer, paintAttributeData, properties);
 
-        checkRenderability(parameters, programInstance.activeBindingCount(allAttributeBindings));
+        checkRenderability(parameters, HeatmapTextureProgram::activeBindingCount(allAttributeBindings));
 
         if (segments.empty()) {
             // Copy over the segments so that we can create our own DrawScopes.
-            segments = parameters.staticData.heatmapTextureSegments();
+            segments = RenderStaticData::heatmapTextureSegments();
         }
         programInstance.draw(
             parameters.context,

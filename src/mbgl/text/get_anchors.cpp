@@ -51,9 +51,9 @@ static Anchors resample(const GeometryCoordinates& line,
         while (markedDistance + spacing < distance + segmentDist) {
             markedDistance += spacing;
 
-            float t = (markedDistance - distance) / segmentDist,
-                  x = util::interpolate(float(a.x), float(b.x), t),
-                  y = util::interpolate(float(a.y), float(b.y), t);
+            float t = (markedDistance - distance) / segmentDist;
+            float x = util::interpolate(float(a.x), float(b.x), t);
+            float y = util::interpolate(float(a.y), float(b.y), t);
 
             // Check that the point is within the tile boundaries and that
             // the label would fit before the beginning and end of the line
@@ -157,9 +157,9 @@ optional<Anchor> getCenterAnchor(const GeometryCoordinates& line,
         
         if (prevDistance + segmentDistance > centerDistance) {
             // The center is on this segment
-            float t = (centerDistance - prevDistance) / segmentDistance,
-                  x = util::interpolate(float(a.x), float(b.x), t),
-                  y = util::interpolate(float(a.y), float(b.y), t);
+            float t = (centerDistance - prevDistance) / segmentDistance;
+            float x = util::interpolate(float(a.x), float(b.x), t);
+            float y = util::interpolate(float(a.y), float(b.y), t);
 
             Anchor anchor(std::round(x), std::round(y), util::angle_to(b, a), i);
 

@@ -25,8 +25,8 @@ private:
     style::HillshadePaintProperties::Unevaluated unevaluated;
     uint8_t maxzoom = util::TERRAIN_RGB_MAXZOOM;
 
-    const std::array<float, 2> getLatRange(const UnwrappedTileID& id);
-    const std::array<float, 2> getLight(const PaintParameters& parameters);
+    std::array<float, 2> getLatRange(const UnwrappedTileID& id);
+    std::array<float, 2> getLight(const PaintParameters& parameters);
 };
 
 } // namespace mbgl

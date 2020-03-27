@@ -681,11 +681,7 @@ bool RenderOrchestrator::isLoaded() const {
         }
     }
 
-    if (!imageManager->isLoaded()) {
-        return false;
-    }
-
-    return true;
+    return imageManager->isLoaded();
 }
 
 void RenderOrchestrator::clearData() {
