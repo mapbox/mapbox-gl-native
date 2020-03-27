@@ -29,7 +29,7 @@ public:
         const auto minY = static_cast<uint32_t>(util::clamp(std::floor(neProj.y), 0.0 , maxTile));
         const auto maxY = static_cast<uint32_t>(util::clamp(std::floor(swProj.y), 0.0, maxTile));
 
-        return TileRange({ {minX, minY}, {maxX, maxY} }, {minZoom, maxZoom});
+        return {{{minX, minY}, {maxX, maxY}}, {minZoom, maxZoom}};
     }
 
     // Compute the range of tiles covered by the bounds.
