@@ -213,8 +213,8 @@ public:
             // combining pos and offset to reduce number of vertex attributes passed to shader (8 max for some devices)
             {{static_cast<int16_t>(labelAnchor.x),
               static_cast<int16_t>(labelAnchor.y),
-              static_cast<int16_t>(::round(o.x * 32)), // use 1/32 pixels for placement
-              static_cast<int16_t>(::round((o.y + glyphOffsetY) * 32))}},
+              static_cast<int16_t>(std::round(o.x * 32)), // use 1/32 pixels for placement
+              static_cast<int16_t>(std::round((o.y + glyphOffsetY) * 32))}},
             {{tx, ty, aSizeMin, aSizeMax}},
             {{static_cast<int16_t>(pixelOffset.x * 16),
               static_cast<int16_t>(pixelOffset.y * 16),

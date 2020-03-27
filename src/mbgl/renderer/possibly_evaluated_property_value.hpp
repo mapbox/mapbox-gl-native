@@ -1,9 +1,11 @@
 #pragma once
 
-#include <mbgl/style/property_expression.hpp>
 #include <mbgl/renderer/cross_faded_property_evaluator.hpp>
+#include <mbgl/style/property_expression.hpp>
 #include <mbgl/util/interpolate.hpp>
 #include <mbgl/util/variant.hpp>
+
+#include <cmath>
 
 namespace mbgl {
 
@@ -110,9 +112,10 @@ public:
             [&] (const Faded<T>& constant_) { return constant_; },
             [&] (const style::PropertyExpression<T>& expression) {
                 if (!expression.isZoomConstant()) {
-                    const T min = expression.evaluate(floor(zoom), feature, availableImages, canonical, defaultValue);
+                    const T min =
+                        expression.evaluate(std::floor(zoom), feature, availableImages, canonical, defaultValue);
                     const T max =
-                        expression.evaluate(floor(zoom) + 1, feature, availableImages, canonical, defaultValue);
+                        expression.evaluate(std::floor(zoom) + 1, feature, availableImages, canonical, defaultValue);
                     return Faded<T> {min, max};
                 } else {
                     const T evaluated = expression.evaluate(feature, availableImages, defaultValue);
