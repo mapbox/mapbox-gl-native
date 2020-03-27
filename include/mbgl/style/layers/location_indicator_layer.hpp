@@ -15,10 +15,10 @@ namespace style {
 
 class TransitionOptions;
 
-class LocationIndicatorLayer : public Layer {
+class LocationIndicatorLayer final : public Layer {
 public:
     LocationIndicatorLayer(const std::string& layerID);
-    ~LocationIndicatorLayer() final;
+    ~LocationIndicatorLayer();
 
     // Layout properties
 

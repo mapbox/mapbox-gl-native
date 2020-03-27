@@ -14,7 +14,7 @@ namespace style {
 
 class TransitionOptions;
 
-class BackgroundLayer : public Layer {
+class BackgroundLayer final : public Layer {
 public:
     BackgroundLayer(const std::string& layerID);
     ~BackgroundLayer() final;

@@ -14,7 +14,7 @@ namespace style {
 
 class TransitionOptions;
 
-class RasterLayer : public Layer {
+class RasterLayer final : public Layer {
 public:
     RasterLayer(const std::string& layerID, const std::string& sourceID);
     ~RasterLayer() final;

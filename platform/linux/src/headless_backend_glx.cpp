@@ -71,7 +71,7 @@ public:
     GLXFBConfig* fbConfigs = nullptr;
 };
 
-class GLXBackendImpl : public HeadlessBackend::Impl {
+class GLXBackendImpl final : public HeadlessBackend::Impl {
 public:
     GLXBackendImpl() {
         // Try to create a legacy context.

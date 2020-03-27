@@ -9,7 +9,7 @@ namespace mbgl {
 
 namespace style {
 
-class ImageSource::Impl : public Source::Impl {
+class ImageSource::Impl final : public Source::Impl {
 public:
     Impl(std::string id, std::array<LatLng, 4> coords);
     Impl(const Impl& other, std::array<LatLng, 4> coords);

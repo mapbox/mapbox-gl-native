@@ -32,7 +32,7 @@ namespace style {
 
 class TransitionOptions;
 
-class <%- camelize(type) %>Layer : public Layer {
+class <%- camelize(type) %>Layer final : public Layer {
 public:
 <% if ((type === 'background') || (type === 'location-indicator')) { -%>
     <%- camelize(type) %>Layer(const std::string& layerID);

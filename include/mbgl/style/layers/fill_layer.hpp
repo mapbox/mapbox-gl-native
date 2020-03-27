@@ -14,7 +14,7 @@ namespace style {
 
 class TransitionOptions;
 
-class FillLayer : public Layer {
+class FillLayer final : public Layer {
 public:
     FillLayer(const std::string& layerID, const std::string& sourceID);
     ~FillLayer() final;

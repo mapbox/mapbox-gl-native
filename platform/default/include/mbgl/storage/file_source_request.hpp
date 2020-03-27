@@ -11,7 +11,7 @@ namespace mbgl {
 
 class Mailbox;
 
-class FileSourceRequest : public AsyncRequest {
+class FileSourceRequest final : public AsyncRequest {
 public:
     FileSourceRequest(FileSource::Callback&& callback);
     ~FileSourceRequest() final;

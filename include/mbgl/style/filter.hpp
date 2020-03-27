@@ -18,8 +18,8 @@ public:
 private:
     optional<mbgl::Value> legacyFilter;
 public:
-    Filter() : expression() {}
-    
+    Filter() {}
+
     Filter(expression::ParseResult _expression, optional<mbgl::Value> _filter = {})
     : expression(std::move(*_expression)),
      legacyFilter(std::move(_filter)){

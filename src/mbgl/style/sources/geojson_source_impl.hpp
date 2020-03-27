@@ -11,7 +11,7 @@ class CanonicalTileID;
 
 namespace style {
 
-class GeoJSONSource::Impl : public Source::Impl {
+class GeoJSONSource::Impl final : public Source::Impl {
 public:
     Impl(std::string id, Immutable<GeoJSONOptions>);
     Impl(const GeoJSONSource::Impl&, std::shared_ptr<GeoJSONData>);

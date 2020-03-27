@@ -61,7 +61,7 @@ public:
     virtual void deinitialize() = 0;
 };
 
-class CustomLayer : public Layer {
+class CustomLayer final : public Layer {
 public:
     CustomLayer(const std::string& id,
                 std::unique_ptr<CustomLayerHost> host);

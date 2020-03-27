@@ -17,7 +17,7 @@ public:
     explicit PropertyEvaluationParameters(float z_)
         : z(z_),
           now(Clock::time_point::max()),
-          zoomHistory(),
+
           defaultFadeDuration(0) {}
 
     PropertyEvaluationParameters(ZoomHistory zoomHistory_, TimePoint now_, Duration defaultFadeDuration_)
