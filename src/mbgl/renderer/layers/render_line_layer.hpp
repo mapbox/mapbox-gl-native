@@ -24,13 +24,18 @@ private:
     void upload(gfx::UploadPass&) override;
     void render(PaintParameters&) override;
 
-    bool queryIntersectsFeature(const GeometryCoordinates&, const GeometryTileFeature&, const float,
-                                const TransformState&, const float, const mat4&, const FeatureState&) const override;
+    bool queryIntersectsFeature(const GeometryCoordinates&,
+                                const GeometryTileFeature&,
+                                float,
+                                const TransformState&,
+                                float,
+                                const mat4&,
+                                const FeatureState&) const override;
 
     // Paint properties
     style::LinePaintProperties::Unevaluated unevaluated;
 
-    float getLineWidth(const GeometryTileFeature&, const float, const FeatureState&) const;
+    float getLineWidth(const GeometryTileFeature&, float, const FeatureState&) const;
     void updateColorRamp();
 
     PremultipliedImage colorRamp;

@@ -39,8 +39,8 @@ public:
     void createBucket(const ImagePositions&,
                       std::unique_ptr<FeatureIndex>&,
                       std::unordered_map<std::string, LayerRenderData>&,
-                      const bool firstLoad,
-                      const bool showCollisionBoxes,
+                      bool firstLoad,
+                      bool showCollisionBoxes,
                       const CanonicalTileID& canonical) override;
 
     bool hasSymbolInstances() const override;
@@ -65,7 +65,7 @@ public:
     static std::vector<float> calculateTileDistances(const GeometryCoordinates& line, const Anchor& anchor);
 
 private:
-    void addFeature(const size_t,
+    void addFeature(size_t,
                     const SymbolFeature&,
                     const ShapedTextOrientations& shapedTextOrientations,
                     optional<PositionedIcon> shapedIcon,
@@ -73,22 +73,22 @@ private:
                     std::array<float, 2> textOffset,
                     float layoutTextSize,
                     float layoutIconSize,
-                    const SymbolContent iconType);
+                    SymbolContent iconType);
 
-    bool anchorIsTooClose(const std::u16string& text, const float repeatDistance, const Anchor&);
+    bool anchorIsTooClose(const std::u16string& text, float repeatDistance, const Anchor&);
     std::map<std::u16string, std::vector<Anchor>> compareText;
 
     void addToDebugBuffers(SymbolBucket&);
 
     // Adds placed items to the buffer.
     size_t addSymbol(SymbolBucket::Buffer&,
-                     const Range<float> sizeData,
+                     Range<float> sizeData,
                      const SymbolQuad&,
                      const Anchor& labelAnchor,
                      PlacedSymbol& placedSymbol,
                      float sortKey);
     size_t addSymbols(SymbolBucket::Buffer&,
-                      const Range<float> sizeData,
+                      Range<float> sizeData,
                       const SymbolQuads&,
                       const Anchor& labelAnchor,
                       PlacedSymbol& placedSymbol,

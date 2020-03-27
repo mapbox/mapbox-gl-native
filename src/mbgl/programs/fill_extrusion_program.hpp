@@ -85,8 +85,8 @@ public:
         };
     }
 
-    static LayoutUniformValues
-    layoutUniformValues(mat4, const TransformState&, const float opacity, const EvaluatedLight&, const float verticalGradient);
+    static LayoutUniformValues layoutUniformValues(
+        mat4, const TransformState&, float opacity, const EvaluatedLight&, float verticalGradient);
 };
 
 class FillExtrusionPatternProgram : public Program<
@@ -106,11 +106,11 @@ public:
                                                    const CrossfadeParameters&,
                                                    const UnwrappedTileID&,
                                                    const TransformState&,
-                                                   const float opacity,
-                                                   const float heightFactor,
-                                                   const float pixelRatio,
+                                                   float opacity,
+                                                   float heightFactor,
+                                                   float pixelRatio,
                                                    const EvaluatedLight&,
-                                                   const float verticalGradient);
+                                                   float verticalGradient);
 };
 
 using FillExtrusionLayoutVertex = FillExtrusionProgram::LayoutVertex;

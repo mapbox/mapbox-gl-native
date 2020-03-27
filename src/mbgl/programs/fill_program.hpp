@@ -72,7 +72,7 @@ public:
                                                    const CrossfadeParameters& crossfade,
                                                    const UnwrappedTileID&,
                                                    const TransformState&,
-                                                   const float pixelRatio);
+                                                   float pixelRatio);
 };
 
 class FillOutlineProgram : public Program<

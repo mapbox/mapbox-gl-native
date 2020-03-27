@@ -17,8 +17,8 @@ public:
     bool isZoomConstant() const noexcept;
     bool isFeatureConstant() const noexcept;
     bool isRuntimeConstant() const noexcept;
-    float interpolationFactor(const Range<float>&, const float) const noexcept;
-    Range<float> getCoveringStops(const float, const float) const noexcept;
+    float interpolationFactor(const Range<float>&, float) const noexcept;
+    Range<float> getCoveringStops(float, float) const noexcept;
     const expression::Expression& getExpression() const noexcept;
 
     // Can be used for aggregating property expressions from multiple

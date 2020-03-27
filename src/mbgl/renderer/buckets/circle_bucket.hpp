@@ -18,8 +18,8 @@ public:
     using PossiblyEvaluatedLayoutProperties = style::CircleLayoutProperties::PossiblyEvaluated;
 
     CircleBucket(const std::map<std::string, Immutable<style::LayerProperties>>& layerPaintProperties,
-                 const MapMode mode,
-                 const float zoom);
+                 MapMode mode,
+                 float zoom);
     ~CircleBucket() override;
 
     bool hasData() const override;

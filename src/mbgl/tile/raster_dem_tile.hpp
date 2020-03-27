@@ -76,8 +76,8 @@ public:
     bool layerPropertiesUpdated(const Immutable<style::LayerProperties>& layerProperties) override;
 
     HillshadeBucket* getBucket() const;
-    void backfillBorder(const RasterDEMTile& borderTile, const DEMTileNeighbors mask);
-    
+    void backfillBorder(const RasterDEMTile& borderTile, DEMTileNeighbors mask);
+
     // neighboringTiles is a bitmask for which neighboring tiles have been backfilled
     // there are max 8 possible neighboring tiles, so each bit represents one neighbor
     DEMTileNeighbors neighboringTiles = DEMTileNeighbors::Empty;

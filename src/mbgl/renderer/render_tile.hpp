@@ -66,7 +66,7 @@ public:
                             const std::array<float, 2>& translation,
                             style::TranslateAnchorType anchor,
                             const TransformState& state,
-                            const bool inViewportPixelUnits) const;
+                            bool inViewportPixelUnits) const;
 
     void setFeatureState(const LayerFeatureStates&);
 

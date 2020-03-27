@@ -120,11 +120,11 @@ public:
     // North Orientation
     NorthOrientation getNorthOrientation() const;
     double getNorthOrientationAngle() const;
-    void setNorthOrientation(const NorthOrientation);
+    void setNorthOrientation(NorthOrientation);
 
     // Constrain mode
     ConstrainMode getConstrainMode() const;
-    void setConstrainMode(const ConstrainMode);
+    void setConstrainMode(ConstrainMode);
 
     // Viewport mode
     ViewportMode getViewportMode() const;
@@ -243,7 +243,7 @@ private:
     mat4 coordinatePointMatrix(const mat4& projMatrix) const;
     mat4 getPixelMatrix() const;
 
-    void setScalePoint(const double scale, const ScreenCoordinate& point);
+    void setScalePoint(double scale, const ScreenCoordinate& point);
 
     void updateMatricesIfNeeded() const;
     bool needsMatricesUpdate() const { return requestMatricesUpdate; }

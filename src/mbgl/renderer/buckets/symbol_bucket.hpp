@@ -75,7 +75,7 @@ public:
                  std::string bucketName_,
                  const std::vector<SymbolInstance>&&,
                  const std::vector<SortKeyRange>&&,
-                 const float tilePixelRatio,
+                 float tilePixelRatio,
                  bool allowVerticalPlacement,
                  std::vector<style::TextWritingModeType> placementModes,
                  bool iconsInText);
@@ -96,10 +96,9 @@ public:
     bool hasTextCollisionCircleData() const;
     bool hasFormatSectionOverrides() const;
 
-
-    void sortFeatures(const float angle);
+    void sortFeatures(float angle);
     // Returns references to the `symbolInstances` items, sorted by viewport Y.
-    SymbolInstanceReferences getSortedSymbols(const float angle) const;
+    SymbolInstanceReferences getSortedSymbols(float angle) const;
     // Returns references to the `symbolInstances` items, which belong to the `sortKeyRange` range;
     // returns references to all the symbols if |sortKeyRange| is `nullopt`.
     SymbolInstanceReferences getSymbols(const optional<SortKeyRange>& sortKeyRange = nullopt) const;

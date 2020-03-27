@@ -55,13 +55,15 @@ public:
     }
 
 protected:
-    virtual std::unique_ptr<VertexBufferResource>
-    createVertexBufferResource(const void* data, std::size_t size, const BufferUsageType) = 0;
+    virtual std::unique_ptr<VertexBufferResource> createVertexBufferResource(const void* data,
+                                                                             std::size_t size,
+                                                                             BufferUsageType) = 0;
     virtual void
     updateVertexBufferResource(VertexBufferResource&, const void* data, std::size_t size) = 0;
 
-    virtual std::unique_ptr<IndexBufferResource>
-    createIndexBufferResource(const void* data, std::size_t size, const BufferUsageType) = 0;
+    virtual std::unique_ptr<IndexBufferResource> createIndexBufferResource(const void* data,
+                                                                           std::size_t size,
+                                                                           BufferUsageType) = 0;
     virtual void
     updateIndexBufferResource(IndexBufferResource&, const void* data, std::size_t size) = 0;
 

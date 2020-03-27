@@ -61,18 +61,23 @@ public:
     
     void insert(const GeometryCollection&, std::size_t index, const std::string& sourceLayerName, const std::string& bucketLeaderID);
 
-    void query(std::unordered_map<std::string, std::vector<Feature>>& result, const GeometryCoordinates& queryGeometry,
-               const TransformState&, const mat4& posMatrix, const double tileSize, const double scale,
-               const RenderedQueryOptions& options, const UnwrappedTileID&,
-               const std::unordered_map<std::string, const RenderLayer*>&, const float additionalQueryPadding,
+    void query(std::unordered_map<std::string, std::vector<Feature>>& result,
+               const GeometryCoordinates& queryGeometry,
+               const TransformState&,
+               const mat4& posMatrix,
+               double tileSize,
+               double scale,
+               const RenderedQueryOptions& options,
+               const UnwrappedTileID&,
+               const std::unordered_map<std::string, const RenderLayer*>&,
+               float additionalQueryPadding,
                const SourceFeatureState& sourceFeatureState) const;
 
-    static optional<GeometryCoordinates> translateQueryGeometry(
-            const GeometryCoordinates& queryGeometry,
-            const std::array<float, 2>& translate,
-            const style::TranslateAnchorType,
-            const float bearing,
-            const float pixelsToTileUnits);
+    static optional<GeometryCoordinates> translateQueryGeometry(const GeometryCoordinates& queryGeometry,
+                                                                const std::array<float, 2>& translate,
+                                                                style::TranslateAnchorType,
+                                                                float bearing,
+                                                                float pixelsToTileUnits);
 
     void setBucketLayerIDs(const std::string& bucketLeaderID, const std::vector<std::string>& layerIDs);
 
@@ -84,11 +89,15 @@ public:
         const FeatureSortOrder& featureSortOrder) const;
 
 private:
-    void addFeature(std::unordered_map<std::string, std::vector<Feature>>& result, const IndexedSubfeature&,
-                    const RenderedQueryOptions& options, const CanonicalTileID&,
+    void addFeature(std::unordered_map<std::string, std::vector<Feature>>& result,
+                    const IndexedSubfeature&,
+                    const RenderedQueryOptions& options,
+                    const CanonicalTileID&,
                     const std::unordered_map<std::string, const RenderLayer*>&,
-                    const GeometryCoordinates& queryGeometry, const TransformState& transformState,
-                    const float pixelsToTileUnits, const mat4& posMatrix,
+                    const GeometryCoordinates& queryGeometry,
+                    const TransformState& transformState,
+                    float pixelsToTileUnits,
+                    const mat4& posMatrix,
                     const SourceFeatureState* sourceFeatureState) const;
 
     GridIndex<IndexedSubfeature> grid;
