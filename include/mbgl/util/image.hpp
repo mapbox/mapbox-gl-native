@@ -56,9 +56,7 @@ public:
         return !(lhs == rhs);
     }
 
-    bool valid() const {
-        return !size.isEmpty() && data.get() != nullptr;
-    }
+    bool valid() const { return !size.isEmpty() && data != nullptr; }
 
     template <typename T = Image>
     T clone() const {
