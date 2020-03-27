@@ -15,7 +15,7 @@ namespace style {
 
 class TransitionOptions;
 
-class HeatmapLayer : public Layer {
+class HeatmapLayer final : public Layer {
 public:
     HeatmapLayer(const std::string& layerID, const std::string& sourceID);
     ~HeatmapLayer() final;

@@ -17,7 +17,7 @@ namespace style {
 
 class TransitionOptions;
 
-class SymbolLayer : public Layer {
+class SymbolLayer final : public Layer {
 public:
     SymbolLayer(const std::string& layerID, const std::string& sourceID);
     ~SymbolLayer() final;

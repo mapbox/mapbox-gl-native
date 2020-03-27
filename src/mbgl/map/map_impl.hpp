@@ -26,7 +26,7 @@ struct StillImageRequest {
     Map::StillImageCallback callback;
 };
 
-class Map::Impl : public style::Observer, public RendererObserver {
+class Map::Impl final : public style::Observer, public RendererObserver {
 public:
     Impl(RendererFrontend&, MapObserver&, std::shared_ptr<FileSource>, const MapOptions&);
     ~Impl() final;

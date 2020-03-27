@@ -25,6 +25,7 @@ public:
     template <class... Args>
     GeometryCoordinates(Args&&... args) : std::vector<GeometryCoordinate>(std::forward<Args>(args)...) {}
     GeometryCoordinates(std::initializer_list<GeometryCoordinate> args) : std::vector<GeometryCoordinate>(args) {}
+    GeometryCoordinates() = default;
 };
 
 class GeometryCollection : public std::vector<GeometryCoordinates> {
@@ -35,6 +36,7 @@ public:
     GeometryCollection(std::initializer_list<GeometryCoordinates> args) : std::vector<GeometryCoordinates>(args) {}
     GeometryCollection(GeometryCollection&&) = default;
     GeometryCollection& operator=(GeometryCollection&&) = default;
+    GeometryCollection() = default;
 
     GeometryCollection clone() const { return GeometryCollection(*this); }
 

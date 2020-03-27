@@ -14,7 +14,7 @@ namespace style {
 
 class TransitionOptions;
 
-class FillExtrusionLayer : public Layer {
+class FillExtrusionLayer final : public Layer {
 public:
     FillExtrusionLayer(const std::string& layerID, const std::string& sourceID);
     ~FillExtrusionLayer() final;
