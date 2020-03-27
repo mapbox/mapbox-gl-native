@@ -47,7 +47,7 @@ public:
                 false,
                 std::move(stretchX),
                 std::move(stretchY),
-                std::move(content)) {}
+                content) {}
     Image(const Image&);
 
     std::string getID() const;
