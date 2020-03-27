@@ -1,7 +1,8 @@
-#include <mbgl/test/util.hpp>
+#include <mbgl/test/fixture_log_observer.hpp>
 #include <mbgl/test/stub_file_source.hpp>
-#include <mbgl/test/stub_style_observer.hpp>
 #include <mbgl/test/stub_render_source_observer.hpp>
+#include <mbgl/test/stub_style_observer.hpp>
+#include <mbgl/test/util.hpp>
 
 #include <mbgl/style/layers/circle_layer.hpp>
 #include <mbgl/style/layers/circle_layer_impl.hpp>
@@ -32,10 +33,11 @@
 #include <mbgl/util/premultiply.hpp>
 #include <mbgl/util/image.hpp>
 
-#include <mbgl/util/tileset.hpp>
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/range.hpp>
+#include <mbgl/util/tileset.hpp>
+#include <mbgl/util/timer.hpp>
 
 #include <mbgl/annotation/annotation_manager.hpp>
 #include <mbgl/annotation/annotation_source.hpp>
@@ -775,7 +777,8 @@ public:
             tileset.zoomRange,
             tileset.bounds,
             [&](const OverscaledTileID& tileID) { return std::make_unique<FakeTile>(*this, tileID); },
-            baseImpl->getPrefetchZoomDelta());
+            baseImpl->getPrefetchZoomDelta(),
+            baseImpl->getMaxOverscaleFactorForParentTiles());
     }
 
     const optional<Tileset>& getTileset() const override {
@@ -879,4 +882,53 @@ TEST(Source, GeoJSONSourceTilesAfterDataReset) {
     static_cast<RenderSource&>(renderSource)
         .update(source.baseImpl, layers, true, true, test.tileParameters(MapMode::Static));
     EXPECT_TRUE(renderSource.isLoaded()); // Tiles are reset in static mode.
+}
+
+TEST(Source, SetMaxParentOverscaleFactor) {
+    SourceTest test;
+    test.transform.jumpTo(CameraOptions().withCenter(LatLng()).withZoom(8.0));
+    test.transformState = test.transform.getState();
+    util::Timer timer;
+    FixtureLog log;
+
+    test.fileSource->tileResponse = [&](const Resource& res) {
+        if (res.tileData->z == 5) {
+            timer.start(Milliseconds(10), Duration::zero(), [&] { test.end(); });
+        }
+        // No tiles above zoom level 5 should be requested.
+        EXPECT_LE(5, int(res.tileData->z));
+        Response response;
+        response.noContent = true;
+        return response;
+    };
+
+    RasterLayer layer("id", "source");
+    Immutable<LayerProperties> layerProperties =
+        makeMutable<RasterLayerProperties>(staticImmutableCast<RasterLayer::Impl>(layer.baseImpl));
+    std::vector<Immutable<LayerProperties>> layers{layerProperties};
+
+    Tileset tileset;
+    tileset.tiles = {"tiles"};
+
+    RasterSource source("source", tileset, 512);
+    ASSERT_EQ(nullopt, source.getMaxOverscaleFactorForParentTiles());
+    source.setMaxOverscaleFactorForParentTiles(3);
+    ASSERT_EQ(3, *source.getMaxOverscaleFactorForParentTiles());
+    source.loadDescription(*test.fileSource);
+
+    auto renderSource = RenderSource::create(source.baseImpl);
+    renderSource->setObserver(&test.renderSourceObserver);
+    renderSource->update(source.baseImpl, layers, true, true, test.tileParameters());
+
+    test.renderSourceObserver.tileChanged = [&](RenderSource&, const OverscaledTileID&) {
+        renderSource->update(source.baseImpl, layers, true, true, test.tileParameters());
+    };
+
+    test.run();
+
+    EXPECT_EQ(
+        1u,
+        log.count(
+            {EventSeverity::Warning, Event::Style, -1, "Parent tile overscale factor will cap prefetch delta to 3"}));
+    EXPECT_EQ(0u, log.uncheckedCount());
 }
