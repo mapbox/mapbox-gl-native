@@ -1374,7 +1374,7 @@ void NodeMap::QueryRenderedFeatures(const Nan::FunctionCallbackInfo<v8::Value>& 
         }
 
         auto array = Nan::New<v8::Array>();
-        for (unsigned int i = 0; i < optional.size(); i++) {
+        for (std::size_t i = 0; i < optional.size(); i++) {
             array->Set(i, toJS(optional[i]));
         }
         info.GetReturnValue().Set(array);

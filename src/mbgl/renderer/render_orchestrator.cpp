@@ -305,7 +305,7 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(
         bool sourceNeedsRendering = false;
         bool sourceNeedsRelayout = false;
 
-        for (uint32_t index = 0u; index < orderedLayers.size(); ++index) {
+        for (std::size_t index = 0; index < orderedLayers.size(); ++index) {
             RenderLayer& layer = orderedLayers[index];
             const auto* layerInfo = layer.baseImpl->getTypeInfo();
             const bool layerIsVisible = layer.baseImpl->visibility != style::VisibilityType::None;

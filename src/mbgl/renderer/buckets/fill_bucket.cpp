@@ -80,7 +80,7 @@ void FillBucket::addFeature(const GeometryTileFeature& feature,
             vertices.emplace_back(FillProgram::layoutVertex(ring[0]));
             lines.emplace_back(lineIndex + nVertices - 1, lineIndex);
 
-            for (uint32_t i = 1; i < nVertices; i++) {
+            for (std::size_t i = 1; i < nVertices; i++) {
                 vertices.emplace_back(FillProgram::layoutVertex(ring[i]));
                 lines.emplace_back(lineIndex + i - 1, lineIndex + i);
             }
@@ -102,7 +102,7 @@ void FillBucket::addFeature(const GeometryTileFeature& feature,
         assert(triangleSegment.vertexLength <= std::numeric_limits<uint16_t>::max());
         uint16_t triangleIndex = triangleSegment.vertexLength;
 
-        for (uint32_t i = 0; i < nIndicies; i += 3) {
+        for (std::size_t i = 0; i < nIndicies; i += 3) {
             triangles.emplace_back(triangleIndex + indices[i],
                                    triangleIndex + indices[i + 1],
                                    triangleIndex + indices[i + 2]);
