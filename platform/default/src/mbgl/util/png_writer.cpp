@@ -7,8 +7,7 @@
 #include <cassert>
 #include <cstring>
 
-#define NETWORK_BYTE_UINT32(value)                                                                 \
-    char(value >> 24), char(value >> 16), char(value >> 8), char(value >> 0)
+#define NETWORK_BYTE_UINT32(value) char((value) >> 24), char((value) >> 16), char((value) >> 8), char((value) >> 0)
 
 namespace {
 
