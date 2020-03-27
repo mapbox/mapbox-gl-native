@@ -9,8 +9,6 @@
 namespace mbgl {
 namespace algorithm {
 
-namespace {
-
 template <typename T>
 bool tileNeedsMask(const std::reference_wrapper<T>& tile) { return tile.get().usedByRenderedLayers; }
 template <typename T> 
@@ -54,8 +52,6 @@ void computeTileMasks(
     const uint8_t diffZ = ref.canonical.z - root.z;
     mask.emplace(diffZ, ref.canonical.x - (root.x << diffZ), ref.canonical.y - (root.y << diffZ));
 }
-
-} // namespace
 
 // Updates the TileMasks for all renderable tiles. Each renderable tile has a corresponding UnwrappedTileID
 // indicating where it should be rendered on the screen. A TileMask describes all regions

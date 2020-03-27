@@ -8,13 +8,11 @@
 
 #include <cassert>
 
-namespace {
+namespace mbgl {
+
 inline std::exception_ptr getCantLoadTileError() {
     return std::make_exception_ptr(std::runtime_error("Can't load tile."));
 }
-} // namespace
-
-namespace mbgl {
 
 template <typename T>
 TileLoader<T>::TileLoader(T& tile_,

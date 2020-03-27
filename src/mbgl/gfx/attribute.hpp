@@ -24,8 +24,6 @@
 namespace mbgl {
 namespace gfx {
 
-namespace {
-
 template <typename, std::size_t> struct AttributeDataTypeOf;
 template <> struct AttributeDataTypeOf<int8_t, 1> : std::integral_constant<AttributeDataType, AttributeDataType::Byte> {};
 template <> struct AttributeDataTypeOf<int8_t, 2> : std::integral_constant<AttributeDataType, AttributeDataType::Byte2> {};
@@ -55,8 +53,6 @@ template <> struct AttributeDataTypeOf<float, 1> : std::integral_constant<Attrib
 template <> struct AttributeDataTypeOf<float, 2> : std::integral_constant<AttributeDataType, AttributeDataType::Float2> {};
 template <> struct AttributeDataTypeOf<float, 3> : std::integral_constant<AttributeDataType, AttributeDataType::Float3> {};
 template <> struct AttributeDataTypeOf<float, 4> : std::integral_constant<AttributeDataType, AttributeDataType::Float4> {};
-
-} // namespace
 
 template <typename T, std::size_t N>
 class AttributeType {
