@@ -7,7 +7,7 @@ namespace expression {
 
 EvaluationResult Any::evaluate(const EvaluationContext& params) const {
     for (const auto& input : inputs) {
-        const EvaluationResult result = input->evaluate(params);
+        EvaluationResult result = input->evaluate(params);
         if (!result) return result;
         if (result->get<bool>()) return EvaluationResult(true);
     }
@@ -35,7 +35,7 @@ std::vector<optional<Value>> Any::possibleOutputs() const {
 
 EvaluationResult All::evaluate(const EvaluationContext& params) const {
     for (const auto& input : inputs) {
-        const EvaluationResult result = input->evaluate(params);
+        EvaluationResult result = input->evaluate(params);
         if (!result) return result;
         if (!result->get<bool>()) return EvaluationResult(false);
     }
