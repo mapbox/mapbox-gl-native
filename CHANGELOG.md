@@ -2,6 +2,10 @@
 
 ## master
 
+### ✨ New features
+
+- [core] Move logging off the main thread ([#16325](https://github.com/mapbox/mapbox-gl-native/pull/16325))
+
 ## maps-v1.5.0
 
 ### ✨ New features
