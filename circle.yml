@@ -168,7 +168,7 @@ workflows:
           name: ios-xcode11-release
           executor_name: macos-11_3_1
           target_is_macos: true
-          config_params: '-G Xcode -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_ARCHITECTURES=arm64e -DCMAKE_OSX_SYSROOT=iphoneos'
+          config_params: '-G Xcode -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_ARCHITECTURES=arm64e -DCMAKE_OSX_SYSROOT=iphoneos -DMBGL_WITH_IOS_CCACHE=ON'
           build_params: '--config Release'
   nightly:
     triggers:
@@ -440,7 +440,7 @@ jobs:
       - prepare-ios-codesign-keychain:
           directory: render-test/ios
       - config:
-          config_params: '-G Xcode -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_SYSROOT=iphoneos -DMBGL_IOS_RENDER_TEST=ON -DCMAKE_OSX_ARCHITECTURES=arm64e'
+          config_params: '-G Xcode -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_SYSROOT=iphoneos -DMBGL_IOS_RENDER_TEST=ON -DCMAKE_OSX_ARCHITECTURES=arm64e -DMBGL_WITH_IOS_CCACHE=ON'
       - build:
           build_params: '--config Release'
       - codesign-ios-test-runner:
@@ -478,7 +478,7 @@ jobs:
       - prepare-ios-codesign-keychain:
           directory: test/ios
       - config:
-          config_params: '-G Xcode -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_SYSROOT=iphoneos -DMBGL_IOS_UNIT_TEST=ON -DCMAKE_OSX_ARCHITECTURES=arm64e'
+          config_params: '-G Xcode -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_SYSROOT=iphoneos -DMBGL_IOS_UNIT_TEST=ON -DCMAKE_OSX_ARCHITECTURES=arm64e -DMBGL_WITH_IOS_CCACHE=ON'
       - build:
           build_params: '--config Release'
       - codesign-ios-test-runner:
@@ -509,7 +509,7 @@ jobs:
       - prepare-ios-codesign-keychain:
           directory: benchmark/ios
       - config:
-          config_params: '-G Xcode -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_SYSROOT=iphoneos -DMBGL_IOS_BENCHMARK=ON -DCMAKE_OSX_ARCHITECTURES=arm64e'
+          config_params: '-G Xcode -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_SYSROOT=iphoneos -DMBGL_IOS_BENCHMARK=ON -DCMAKE_OSX_ARCHITECTURES=arm64e -DMBGL_WITH_IOS_CCACHE=ON'
       - build:
           build_params: '--config Release'
       - codesign-ios-test-runner:
