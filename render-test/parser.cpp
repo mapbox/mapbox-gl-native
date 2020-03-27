@@ -43,6 +43,7 @@
 namespace {
 
 const char* resultsStyle = R"HTML(
+<meta charset="UTF-8">
 <style>
     body { font: 18px/1.2 -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif; padding: 10px; }
     h1 { font-size: 32px; margin-bottom: 0; }
@@ -1336,8 +1337,9 @@ std::string createResultItem(const TestMetadata& metadata, bool hasFailedTests) 
         html.append("<p style=\"color: red\"><strong>Error:</strong> " + metadata.errorMessage + "</p>\n");
     }
 
-    if (metadata.metricsFailed || metadata.metricsErrored) {
-        html.append("<p style=\"color: red\"><strong>Error:</strong> " + metadata.errorMessage + "</p>\n");
+    if (metadata.metricsFailed || metadata.metricsErrored || metadata.labelCutOffFound) {
+        html.append("<p style=\"color: red\"><strong>Error:</strong> " +
+                    std::regex_replace(metadata.errorMessage, std::regex{"\n"}, "<br>") + "</p>\n");
     }
 
     if (metadata.difference != 0.0) {

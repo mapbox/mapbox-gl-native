@@ -190,7 +190,7 @@ int runRenderTests(int argc, char** argv, std::function<void()> testStatus) {
             runner.run(metadata);
         }
 
-        bool errored = metadata.metricsErrored || metadata.renderErrored;
+        bool errored = metadata.metricsErrored || metadata.renderErrored || metadata.labelCutOffFound;
         bool passed = !errored && !metadata.metricsFailed && !metadata.renderFailed;
 
         if (shouldIgnore) {
