@@ -90,8 +90,8 @@ protected:
     template <typename TaskFn, typename ReplyFn>
     void scheduleAndReplyValue(const TaskFn& task,
                                const ReplyFn& reply,
-                               const mapbox::base::WeakPtr<Scheduler>& replyScheduler) {
-        auto scheduled = [replyScheduler, task, reply] {
+                               mapbox::base::WeakPtr<Scheduler> replyScheduler) {
+        auto scheduled = [replyScheduler = std::move(replyScheduler), task, reply] {
             auto lock = replyScheduler.lock();
             if (!replyScheduler) return;
             auto scheduledReply = [reply, result = task()] { reply(result); };
