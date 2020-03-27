@@ -48,7 +48,7 @@ public:
     // Allows to forward response from one source to another.
     // Optionally, callback can be provided to receive notification for forward
     // operation.
-    virtual void forward(const Resource&, const Response&, std::function<void()> = {}) {}
+    virtual void forward(const Resource&, const Response&, std::function<void()>) {}
 
     // When a file source supports consulting a local cache only, it must return true.
     // Cache-only requests are requests that aren't as urgent, but could be useful, e.g.

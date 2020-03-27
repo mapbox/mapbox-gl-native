@@ -692,11 +692,11 @@ TEST(MainResourceLoader, TEST_REQUIRES_SERVER(CachedResourceLowPriority)) {
     // Put existing values into the cache.
     Resource resource1{Resource::Unknown, "http://127.0.0.1:3000/load/3", {}, Resource::LoadingMethod::All};
     response.data = std::make_shared<std::string>("Cached Request 3");
-    dbfs->forward(resource1, response);
+    dbfs->forward(resource1, response, [] {});
 
     Resource resource2{Resource::Unknown, "http://127.0.0.1:3000/load/4", {}, Resource::LoadingMethod::All};
     response.data = std::make_shared<std::string>("Cached Request 4");
-    dbfs->forward(resource2, response);
+    dbfs->forward(resource2, response, [] {});
 
     onlineFs->setProperty(MAX_CONCURRENT_REQUESTS_KEY, 1u);
     fs.pause();

@@ -350,12 +350,13 @@ TEST(Map, Offline) {
     const std::string prefix = "http://127.0.0.1:3000/";
     std::shared_ptr<FileSource> dbfs =
         FileSourceManager::get()->getFileSource(FileSourceType::Database, ResourceOptions{});
-    dbfs->forward(Resource::style(prefix + "style.json"), expiredItem("style.json"));
-    dbfs->forward(Resource::source(prefix + "streets.json"), expiredItem("streets.json"));
-    dbfs->forward(Resource::spriteJSON(prefix + "sprite", 1.0), expiredItem("sprite.json"));
-    dbfs->forward(Resource::spriteImage(prefix + "sprite", 1.0), expiredItem("sprite.png"));
+    dbfs->forward(Resource::style(prefix + "style.json"), expiredItem("style.json"), [] {});
+    dbfs->forward(Resource::source(prefix + "streets.json"), expiredItem("streets.json"), [] {});
+    dbfs->forward(Resource::spriteJSON(prefix + "sprite", 1.0), expiredItem("sprite.json"), [] {});
+    dbfs->forward(Resource::spriteImage(prefix + "sprite", 1.0), expiredItem("sprite.png"), [] {});
     dbfs->forward(Resource::tile(prefix + "{z}-{x}-{y}.vector.pbf", 1.0, 0, 0, 0, Tileset::Scheme::XYZ),
-                  expiredItem("0-0-0.vector.pbf"));
+                  expiredItem("0-0-0.vector.pbf"),
+                  [] {});
     dbfs->forward(Resource::glyphs(prefix + "{fontstack}/{range}.pbf", {{"Helvetica"}}, {0, 255}),
                   expiredItem("glyph.pbf"),
                   [&] { test.map.getStyle().loadURL(prefix + "style.json"); });
@@ -1337,10 +1338,10 @@ TEST(Map, TEST_REQUIRES_SERVER(ExpiredSpriteSheet)) {
     const std::string prefix = "http://127.0.0.1:3000/online/";
     std::shared_ptr<FileSource> dbfs =
         FileSourceManager::get()->getFileSource(FileSourceType::Database, ResourceOptions{});
-    dbfs->forward(Resource::style(prefix + "style.json"), makeResponse("style.json"));
-    dbfs->forward(Resource::source(prefix + "streets.json"), makeResponse("streets.json"));
-    dbfs->forward(Resource::spriteJSON(prefix + "sprite", 1.0), makeResponse("sprite.json", true));
-    dbfs->forward(Resource::spriteImage(prefix + "sprite", 1.0), makeResponse("sprite.png", true));
+    dbfs->forward(Resource::style(prefix + "style.json"), makeResponse("style.json"), [] {});
+    dbfs->forward(Resource::source(prefix + "streets.json"), makeResponse("streets.json"), [] {});
+    dbfs->forward(Resource::spriteJSON(prefix + "sprite", 1.0), makeResponse("sprite.json", true), [] {});
+    dbfs->forward(Resource::spriteImage(prefix + "sprite", 1.0), makeResponse("sprite.png", true), [] {});
     dbfs->forward(Resource::tile(prefix + "{z}-{x}-{y}.vector.pbf", 1.0, 0, 0, 0, Tileset::Scheme::XYZ),
                   makeResponse("0-0-0.vector.pbf"),
                   [&] { test.map.getStyle().loadURL(prefix + "style.json"); });

@@ -46,11 +46,11 @@ FeatureExtensionValue getLeaves(std::shared_ptr<style::GeoJSONData> clusterData,
                                               static_cast<std::uint32_t>(*limit),
                                               static_cast<std::uint32_t>(*offset));
             }
-            return clusterData->getLeaves(clusterID, static_cast<std::uint32_t>(*limit));
+            return clusterData->getLeaves(clusterID, static_cast<std::uint32_t>(*limit), 0u);
         }
     }
 
-    return clusterData->getLeaves(clusterID);
+    return clusterData->getLeaves(clusterID, 10u, 0u);
 }
 
 // NOLINTNEXTLINE(performance-unnecessary-value-param)

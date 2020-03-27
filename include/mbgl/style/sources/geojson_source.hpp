@@ -50,7 +50,7 @@ public:
 
     // SuperclusterData
     virtual Features getChildren(std::uint32_t) = 0;
-    virtual Features getLeaves(std::uint32_t, std::uint32_t limit = 10u, std::uint32_t offset = 0u) = 0;
+    virtual Features getLeaves(std::uint32_t, std::uint32_t limit, std::uint32_t offset) = 0;
     virtual std::uint8_t getClusterExpansionZoom(std::uint32_t) = 0;
 
     virtual std::shared_ptr<Scheduler> getScheduler() { return nullptr; }

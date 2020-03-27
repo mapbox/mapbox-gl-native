@@ -43,9 +43,8 @@ public:
     virtual void reduceMemoryUsage() = 0;
 
 public:
-    virtual std::unique_ptr<OffscreenTexture>
-        createOffscreenTexture(Size,
-                               TextureChannelDataType = TextureChannelDataType::UnsignedByte) = 0;
+    virtual std::unique_ptr<OffscreenTexture> createOffscreenTexture(Size, TextureChannelDataType) = 0;
+
 public:
     // Creates an empty texture with the specified dimensions.
     Texture createTexture(const Size size,
