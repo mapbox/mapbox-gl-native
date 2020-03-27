@@ -30,8 +30,7 @@ namespace mbgl {
         {}
         PlacedGlyph(PlacedGlyph&& other) noexcept
             : point(other.point), angle(other.angle), tileDistance(std::move(other.tileDistance)) {}
-        PlacedGlyph(const PlacedGlyph& other)
-            : point(other.point), angle(other.angle), tileDistance(other.tileDistance) {}
+        PlacedGlyph(const PlacedGlyph& other) = default;
         Point<float> point;
         float angle;
         optional<TileDistance> tileDistance;
