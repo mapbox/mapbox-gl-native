@@ -132,7 +132,7 @@ mapbox::util::variant<Database, Exception> Database::tryOpen(const std::string &
 Database Database::open(const std::string &filename, int flags) {
     auto result = tryOpen(filename, flags);
     if (result.is<Exception>()) {
-        throw result.get<Exception>();
+        throw std::move(result.get<Exception>());
     } else {
         return std::move(result.get<Database>());
     }

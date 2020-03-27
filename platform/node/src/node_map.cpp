@@ -315,7 +315,7 @@ NodeMap::RenderOptions NodeMap::ParseOptions(v8::Local<v8::Object> obj) {
         if (auto light = mbgl::style::conversion::convert<mbgl::style::Light>(lightObj, conversionError)) {
             options.light = *light;
         } else {
-            throw conversionError;
+            throw std::move(conversionError);
         }
     }
 
