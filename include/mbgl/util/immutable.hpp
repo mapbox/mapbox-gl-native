@@ -21,8 +21,8 @@ namespace mbgl {
 template <class T>
 class Mutable {
 public:
-    Mutable(Mutable&&) = default;
-    Mutable& operator=(Mutable&&) = default;
+    Mutable(Mutable&&) noexcept = default;
+    Mutable& operator=(Mutable&&) noexcept = default;
 
     Mutable(const Mutable&) = delete;
     Mutable& operator=(const Mutable&) = delete;
@@ -74,7 +74,7 @@ public:
     Immutable(Immutable<S> s)
         : ptr(std::move(s.ptr)) {}
 
-    Immutable(Immutable&&) = default;
+    Immutable(Immutable&&) noexcept = default;
     Immutable(const Immutable&) = default;
 
     template <class S>
@@ -83,7 +83,7 @@ public:
         return *this;
     }
 
-    Immutable& operator=(Immutable&&) = default;
+    Immutable& operator=(Immutable&&) noexcept = default;
     Immutable& operator=(const Immutable&) = default;
 
     const T* get() const { return ptr.get(); }

@@ -33,7 +33,7 @@ struct Bound {
         currentPoint = rhs.currentPoint;
         winding = rhs.winding;
     }
-    Bound& operator=(Bound&& rhs) {
+    Bound& operator=(Bound&& rhs) noexcept {
         points = std::move(rhs.points);
         currentPoint = rhs.currentPoint;
         winding = rhs.winding;
