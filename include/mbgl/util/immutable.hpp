@@ -38,7 +38,9 @@ private:
     std::shared_ptr<T> ptr;
 
     template <class S> friend class Immutable;
+    // NOLINTNEXTLINE(readability-redundant-declaration)
     template <class S, class... Args> friend Mutable<S> makeMutable(Args&&...);
+    // NOLINTNEXTLINE(readability-redundant-declaration)
     template <class S, class U> friend Mutable<S> staticMutableCast(const Mutable<U>&);
 };
 
@@ -103,6 +105,8 @@ private:
     std::shared_ptr<const T> ptr;
 
     template <class S> friend class Immutable;
+
+    // NOLINTNEXTLINE(readability-redundant-declaration)
     template <class S, class U> friend Immutable<S> staticImmutableCast(const Immutable<U>&);
 };
 
