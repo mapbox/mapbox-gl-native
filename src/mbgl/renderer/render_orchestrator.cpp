@@ -43,16 +43,16 @@ public:
     LayerRenderItem(RenderLayer& layer_, RenderSource* source_, uint32_t index_)
         : layer(layer_), source(source_), index(index_) {}
     bool operator<(const LayerRenderItem& other) const { return index < other.index; }
+
     std::reference_wrapper<RenderLayer> layer;
     RenderSource* source;
+    const uint32_t index;
 
 private:
     bool hasRenderPass(RenderPass pass) const override { return layer.get().hasRenderPass(pass); }
     void upload(gfx::UploadPass& pass) const override { layer.get().upload(pass); }
     void render(PaintParameters& parameters) const override { layer.get().render(parameters); }
     const std::string& getName() const override { return layer.get().getID(); } 
-
-    uint32_t index;
 };
 
 class RenderTreeImpl final : public RenderTree {

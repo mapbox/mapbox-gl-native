@@ -11,7 +11,6 @@
 namespace mbgl {
 
 using namespace style;
-namespace geojsonvt = mapbox::geojsonvt;
 
 ShapeAnnotationImpl::ShapeAnnotationImpl(const AnnotationID id_)
     : id(id_),
