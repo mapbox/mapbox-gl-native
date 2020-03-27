@@ -28,8 +28,6 @@ target_include_directories(
     PRIVATE ${PROJECT_SOURCE_DIR}/src
 )
 
-include(${PROJECT_SOURCE_DIR}/vendor/cheap-ruler-cpp.cmake)
-
 # Use target_link_directories when we move away from CMake 3.10.
 target_link_libraries(
     mbgl-glfw
@@ -45,7 +43,7 @@ target_link_libraries(
         Mapbox::Base::Extras::rapidjson
         Mapbox::Map
         mbgl-compiler-options
-        mbgl-vendor-cheap-ruler-cpp
+        Mapbox::Base::cheap-ruler-cpp
 )
 
 if(MBGL_WITH_OPENGL)
