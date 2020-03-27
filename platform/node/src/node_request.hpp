@@ -34,7 +34,7 @@ public:
     static void New(const Nan::FunctionCallbackInfo<v8::Value>&);
     static void HandleCallback(const Nan::FunctionCallbackInfo<v8::Value>&);
 
-    void unref();
+    void unrefRequest();
 
     mbgl::FileSource::Callback callback;
     NodeAsyncRequest* asyncRequest;
