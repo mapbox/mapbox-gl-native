@@ -15,7 +15,7 @@ public:
                  std::unique_ptr<Expression> minFractionDigits_,
                  std::unique_ptr<Expression> maxFractionDigits_);
 
-    ~NumberFormat();
+    ~NumberFormat() override;
 
     static ParseResult parse(const mbgl::style::conversion::Convertible& value, ParsingContext& ctx);
 

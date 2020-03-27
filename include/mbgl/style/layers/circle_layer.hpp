@@ -17,7 +17,7 @@ class TransitionOptions;
 class CircleLayer final : public Layer {
 public:
     CircleLayer(const std::string& layerID, const std::string& sourceID);
-    ~CircleLayer() final;
+    ~CircleLayer() override;
 
     // Layout properties
 

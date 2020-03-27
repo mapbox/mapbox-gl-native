@@ -17,7 +17,7 @@ class TransitionOptions;
 class BackgroundLayer final : public Layer {
 public:
     BackgroundLayer(const std::string& layerID);
-    ~BackgroundLayer() final;
+    ~BackgroundLayer() override;
 
     // Paint properties
 

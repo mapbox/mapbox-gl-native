@@ -17,7 +17,7 @@ class TransitionOptions;
 class FillLayer final : public Layer {
 public:
     FillLayer(const std::string& layerID, const std::string& sourceID);
-    ~FillLayer() final;
+    ~FillLayer() override;
 
     // Layout properties
 
