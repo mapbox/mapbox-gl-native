@@ -93,7 +93,7 @@ public:
         for (const auto& layerProperties : group) {
             const std::string& layerId = layerProperties->baseImpl->id;
             const auto& evaluated = style::getEvaluated<LayerPropertiesType>(layerProperties);
-            const auto patternProperty = evaluated.template get<PatternPropertyType>();
+            const auto& patternProperty = evaluated.template get<PatternPropertyType>();
             const auto constantPattern = patternProperty.constantOr(Faded<style::expression::Image>{"", ""});
             // determine if layer group has any layers that use *-pattern property and add
             // constant pattern dependencies.
@@ -122,7 +122,7 @@ public:
                     const auto it = layerPropertiesMap.find(layerId);
                     if (it != layerPropertiesMap.end()) {
                         const auto paint = static_cast<const LayerPropertiesType&>(*it->second).evaluated;
-                        const auto patternProperty = paint.template get<PatternPropertyType>();
+                        const auto& patternProperty = paint.template get<PatternPropertyType>();
                         if (!patternProperty.isConstant()) {
                             // For layers with non-data-constant pattern properties, evaluate their expression and add
                             // the patterns to the dependency vector
