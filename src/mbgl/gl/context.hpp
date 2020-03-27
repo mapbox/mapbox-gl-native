@@ -187,8 +187,7 @@ private:
     State<value::PointSize> pointSize;
 #endif // MBGL_USE_GLES2
 
-    std::unique_ptr<gfx::OffscreenTexture> createOffscreenTexture(
-        Size, gfx::TextureChannelDataType = gfx::TextureChannelDataType::UnsignedByte) override;
+    std::unique_ptr<gfx::OffscreenTexture> createOffscreenTexture(Size, gfx::TextureChannelDataType) override;
 
     std::unique_ptr<gfx::TextureResource>
         createTextureResource(Size, gfx::TexturePixelType, gfx::TextureChannelDataType) override;
