@@ -727,8 +727,8 @@ void RenderOrchestrator::onTileChanged(RenderSource&, const OverscaledTileID&) {
     observer->onInvalidate();
 }
 
-void RenderOrchestrator::onStyleImageMissing(const std::string& id, std::function<void()> done) {
-    observer->onStyleImageMissing(id, std::move(done));
+void RenderOrchestrator::onStyleImageMissing(const std::string& id, const std::function<void()>& done) {
+    observer->onStyleImageMissing(id, done);
 }
 
 void RenderOrchestrator::onRemoveUnusedStyleImages(const std::vector<std::string>& unusedImageIDs) {

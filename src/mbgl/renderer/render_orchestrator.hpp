@@ -100,7 +100,7 @@ private:
     void onTileError(RenderSource&, const OverscaledTileID&, std::exception_ptr) override;
 
     // ImageManagerObserver implementation
-    void onStyleImageMissing(const std::string&, std::function<void()>) override;
+    void onStyleImageMissing(const std::string&, const std::function<void()>&) override;
     void onRemoveUnusedStyleImages(const std::vector<std::string>&) override;
 
     RendererObserver* observer;

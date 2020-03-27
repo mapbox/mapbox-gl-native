@@ -191,7 +191,7 @@ public:
      * responsibility of the SDK bindings to wrap this object in an interface that
      * re-executes the user-provided implementation on the main thread.
      */
-    virtual void responseError(Response::Error) {}
+    virtual void responseError(Response::Error) {} // NOLINT(performance-unnecessary-value-param)
 
     /*
      * Implement this method to be notified when the limit on the number of Mapbox
