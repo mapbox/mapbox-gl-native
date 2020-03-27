@@ -68,12 +68,11 @@ void RenderBackgroundLayer::render(PaintParameters& parameters) {
     const BackgroundProgram::Binders paintAttributeData(properties, 0);
 
     auto draw = [&](auto& program, auto&& uniformValues, const auto& textureBindings, const uint32_t id) {
-        const auto allUniformValues = program.computeAllUniformValues(
-            std::move(uniformValues),
-            paintAttributeData,
-            properties,
-            parameters.state.getZoom()
-        );
+        const auto allUniformValues =
+            program.computeAllUniformValues(std::forward<decltype(uniformValues)>(uniformValues),
+                                            paintAttributeData,
+                                            properties,
+                                            parameters.state.getZoom());
         const auto allAttributeBindings = program.computeAllAttributeBindings(
             *parameters.staticData.tileVertexBuffer,
             paintAttributeData,
