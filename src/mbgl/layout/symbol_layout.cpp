@@ -210,7 +210,7 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
 }
 
 bool SymbolLayout::hasDependencies() const {
-    return features.size() != 0;
+    return !features.empty();
 }
 
 bool SymbolLayout::hasSymbolInstances() const {

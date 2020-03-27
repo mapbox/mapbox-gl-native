@@ -143,14 +143,15 @@ void PaintParameters::renderTileClippingMasks(const RenderTiles& renderTiles) {
                      gfx::CullFaceMode::disabled(),
                      *staticData.quadTriangleIndexBuffer,
                      staticData.clippingMaskSegments,
-                     program.computeAllUniformValues(
+                     ClippingMaskProgram::computeAllUniformValues(
                          ClippingMaskProgram::LayoutUniformValues{
                              uniforms::matrix::Value(matrixForTile(renderTile.id)),
                          },
                          paintAttributeData,
                          properties,
                          state.getZoom()),
-                     program.computeAllAttributeBindings(*staticData.tileVertexBuffer, paintAttributeData, properties),
+                     ClippingMaskProgram::computeAllAttributeBindings(
+                         *staticData.tileVertexBuffer, paintAttributeData, properties),
                      ClippingMaskProgram::TextureBindings{},
                      "clipping/" + util::toString(stencilID));
     }

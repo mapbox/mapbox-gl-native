@@ -63,7 +63,7 @@ void RasterDEMTile::onParsed(std::unique_ptr<HillshadeBucket> result, const uint
     if (resultCorrelationID == correlationID) {
         pending = false;
     }
-    renderable = bucket ? true : false;
+    renderable = static_cast<bool>(bucket);
     observer->onTileChanged(*this);
 }
 

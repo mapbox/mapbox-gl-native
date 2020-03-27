@@ -87,7 +87,7 @@ public:
     std::string getKey() const { return key; }
     optional<type::Type> getExpected() const { return expected; }
     const std::vector<ParsingError>& getErrors() const { return *errors; }
-    const std::string getCombinedErrors() const;
+    std::string getCombinedErrors() const;
 
     /*
         Parse the given style-spec JSON value as an expression.

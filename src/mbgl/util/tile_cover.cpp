@@ -34,7 +34,7 @@ struct edge {
 };
 
 // scan-line conversion
-static void scanSpans(edge e0, edge e1, int32_t ymin, int32_t ymax, ScanLine& scanLine) {
+void scanSpans(edge e0, edge e1, int32_t ymin, int32_t ymax, ScanLine& scanLine) {
     double y0 = ::fmax(ymin, std::floor(e1.y0));
     double y1 = ::fmin(ymax, std::ceil(e1.y1));
 
@@ -58,7 +58,12 @@ static void scanSpans(edge e0, edge e1, int32_t ymin, int32_t ymax, ScanLine& sc
 }
 
 // scan-line conversion
-static void scanTriangle(const Point<double>& a, const Point<double>& b, const Point<double>& c, int32_t ymin, int32_t ymax, ScanLine& scanLine) {
+void scanTriangle(const Point<double>& a,
+                  const Point<double>& b,
+                  const Point<double>& c,
+                  int32_t ymin,
+                  int32_t ymax,
+                  ScanLine& scanLine) {
     edge ab = edge(a, b);
     edge bc = edge(b, c);
     edge ca = edge(c, a);
@@ -98,7 +103,8 @@ std::vector<UnwrappedTileID> tileCover(const Point<double>& tl,
         int32_t x;
         if (y >= 0 && y <= tiles) {
             for (x = x0; x < x1; ++x) {
-                const auto dx = x + 0.5 - c.x, dy = y + 0.5 - c.y;
+                const auto dx = x + 0.5 - c.x;
+                const auto dy = y + 0.5 - c.y;
                 t.emplace_back(ID{ x, y, dx * dx + dy * dy });
             }
         }

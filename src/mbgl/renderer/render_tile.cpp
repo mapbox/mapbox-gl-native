@@ -138,57 +138,54 @@ void RenderTile::finishRender(PaintParameters& parameters) const {
 
     if (parameters.debugOptions & (MapDebugOptions::Timestamps | MapDebugOptions::ParseStatus)) {
         assert(debugBucket);
-        const auto allAttributeBindings = program.computeAllAttributeBindings(
-            *debugBucket->vertexBuffer,
-            paintAttributeData,
-            properties
-        );
+        const auto allAttributeBindings =
+            DebugProgram::computeAllAttributeBindings(*debugBucket->vertexBuffer, paintAttributeData, properties);
 
-        program.draw(
-            parameters.context,
-            *parameters.renderPass,
-            gfx::Lines{4.0f * parameters.pixelRatio},
-            gfx::DepthMode::disabled(),
-            gfx::StencilMode::disabled(),
-            gfx::ColorMode::unblended(),
-            gfx::CullFaceMode::disabled(),
-            *debugBucket->indexBuffer,
-            debugBucket->segments,
-            program.computeAllUniformValues(DebugProgram::LayoutUniformValues{uniforms::matrix::Value(matrix),
-                                                                              uniforms::color::Value(Color::white()),
-                                                                              uniforms::overlay_scale::Value(1.0f)},
-                                            paintAttributeData,
-                                            properties,
-                                            parameters.state.getZoom()),
-            allAttributeBindings,
-            DebugProgram::TextureBindings{textures::image::Value{debugBucket->texture->getResource()}},
-            "text-outline");
+        program.draw(parameters.context,
+                     *parameters.renderPass,
+                     gfx::Lines{4.0f * parameters.pixelRatio},
+                     gfx::DepthMode::disabled(),
+                     gfx::StencilMode::disabled(),
+                     gfx::ColorMode::unblended(),
+                     gfx::CullFaceMode::disabled(),
+                     *debugBucket->indexBuffer,
+                     debugBucket->segments,
+                     DebugProgram::computeAllUniformValues(
+                         DebugProgram::LayoutUniformValues{uniforms::matrix::Value(matrix),
+                                                           uniforms::color::Value(Color::white()),
+                                                           uniforms::overlay_scale::Value(1.0f)},
+                         paintAttributeData,
+                         properties,
+                         parameters.state.getZoom()),
+                     allAttributeBindings,
+                     DebugProgram::TextureBindings{textures::image::Value{debugBucket->texture->getResource()}},
+                     "text-outline");
 
-        program.draw(
-            parameters.context,
-            *parameters.renderPass,
-            gfx::Lines{2.0f * parameters.pixelRatio},
-            gfx::DepthMode::disabled(),
-            gfx::StencilMode::disabled(),
-            gfx::ColorMode::unblended(),
-            gfx::CullFaceMode::disabled(),
-            *debugBucket->indexBuffer,
-            debugBucket->segments,
-            program.computeAllUniformValues(DebugProgram::LayoutUniformValues{uniforms::matrix::Value(matrix),
-                                                                              uniforms::color::Value(Color::black()),
-                                                                              uniforms::overlay_scale::Value(1.0f)},
-                                            paintAttributeData,
-                                            properties,
-                                            parameters.state.getZoom()),
-            allAttributeBindings,
-            DebugProgram::TextureBindings{textures::image::Value{debugBucket->texture->getResource()}},
-            "text");
+        program.draw(parameters.context,
+                     *parameters.renderPass,
+                     gfx::Lines{2.0f * parameters.pixelRatio},
+                     gfx::DepthMode::disabled(),
+                     gfx::StencilMode::disabled(),
+                     gfx::ColorMode::unblended(),
+                     gfx::CullFaceMode::disabled(),
+                     *debugBucket->indexBuffer,
+                     debugBucket->segments,
+                     DebugProgram::computeAllUniformValues(
+                         DebugProgram::LayoutUniformValues{uniforms::matrix::Value(matrix),
+                                                           uniforms::color::Value(Color::black()),
+                                                           uniforms::overlay_scale::Value(1.0f)},
+                         paintAttributeData,
+                         properties,
+                         parameters.state.getZoom()),
+                     allAttributeBindings,
+                     DebugProgram::TextureBindings{textures::image::Value{debugBucket->texture->getResource()}},
+                     "text");
     }
 
     if (parameters.debugOptions & MapDebugOptions::TileBorders) {
         assert(debugBucket);
         if (debugBucket->tileBorderSegments.empty()) {
-            debugBucket->tileBorderSegments = parameters.staticData.tileBorderSegments();
+            debugBucket->tileBorderSegments = RenderStaticData::tileBorderSegments();
         }
         parameters.programs.debug.draw(
             parameters.context,
@@ -200,13 +197,14 @@ void RenderTile::finishRender(PaintParameters& parameters) const {
             gfx::CullFaceMode::disabled(),
             *parameters.staticData.tileBorderIndexBuffer,
             debugBucket->tileBorderSegments,
-            program.computeAllUniformValues(DebugProgram::LayoutUniformValues{uniforms::matrix::Value(matrix),
-                                                                              uniforms::color::Value(Color::red()),
-                                                                              uniforms::overlay_scale::Value(1.0f)},
-                                            paintAttributeData,
-                                            properties,
-                                            parameters.state.getZoom()),
-            program.computeAllAttributeBindings(
+            DebugProgram::computeAllUniformValues(
+                DebugProgram::LayoutUniformValues{uniforms::matrix::Value(matrix),
+                                                  uniforms::color::Value(Color::red()),
+                                                  uniforms::overlay_scale::Value(1.0f)},
+                paintAttributeData,
+                properties,
+                parameters.state.getZoom()),
+            DebugProgram::computeAllAttributeBindings(
                 *parameters.staticData.tileVertexBuffer, paintAttributeData, properties),
             DebugProgram::TextureBindings{textures::image::Value{debugBucket->texture->getResource()}},
             "border");

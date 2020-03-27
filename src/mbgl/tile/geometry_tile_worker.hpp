@@ -46,9 +46,12 @@ public:
                  uint64_t correlationID);
     void reset(uint64_t correlationID_);
     void setShowCollisionBoxes(bool showCollisionBoxes_, uint64_t correlationID_);
-    
-    void onGlyphsAvailable(GlyphMap glyphs);
-    void onImagesAvailable(ImageMap icons, ImageMap patterns, ImageVersionMap versionMap, uint64_t imageCorrelationID);
+
+    void onGlyphsAvailable(GlyphMap newGlyphMap);
+    void onImagesAvailable(ImageMap newIconMap,
+                           ImageMap newPatternMap,
+                           ImageVersionMap versionMap,
+                           uint64_t imageCorrelationID);
 
 private:
     void coalesced();

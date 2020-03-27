@@ -26,7 +26,8 @@ GLFWGLBackend::GLFWGLBackend(GLFWwindow* window_, const bool capFrameRate)
     : mbgl::gl::RendererBackend(mbgl::gfx::ContextMode::Unique),
       mbgl::gfx::Renderable(
           [window_] {
-              int fbWidth, fbHeight;
+              int fbWidth;
+              int fbHeight;
               glfwGetFramebufferSize(window_, &fbWidth, &fbHeight);
               return mbgl::Size{ static_cast<uint32_t>(fbWidth), static_cast<uint32_t>(fbHeight) };
           }(),

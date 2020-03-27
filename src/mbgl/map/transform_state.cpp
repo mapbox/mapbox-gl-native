@@ -131,7 +131,8 @@ void TransformState::getProjMatrix(mat4& projMatrix, uint16_t nearZ, bool aligne
 
     matrix::rotate_z(projMatrix, projMatrix, getBearing() + getNorthOrientationAngle());
 
-    const double dx = pixel_x() - size.width / 2.0f, dy = pixel_y() - size.height / 2.0f;
+    const double dx = pixel_x() - size.width / 2.0f;
+    const double dy = pixel_y() - size.height / 2.0f;
     matrix::translate(projMatrix, projMatrix, dx, dy, 0);
 
     if (axonometric) {
@@ -153,8 +154,10 @@ void TransformState::getProjMatrix(mat4& projMatrix, uint16_t nearZ, bool aligne
     // of the transformation so that 0°, 90°, 180°, and 270° rasters are crisp, and adjust the shift so that
     // it is always <= 0.5 pixels.
     if (aligned) {
-        const float xShift = float(size.width % 2) / 2, yShift = float(size.height % 2) / 2;
-        const double bearingCos = std::cos(bearing), bearingSin = std::sin(bearing);
+        const float xShift = float(size.width % 2) / 2;
+        const float yShift = float(size.height % 2) / 2;
+        const double bearingCos = std::cos(bearing);
+        const double bearingSin = std::sin(bearing);
         double devNull;
         const float dxa = -std::modf(dx, &devNull) + bearingCos * xShift + bearingSin * yShift;
         const float dya = -std::modf(dy, &devNull) + bearingCos * yShift + bearingSin * xShift;

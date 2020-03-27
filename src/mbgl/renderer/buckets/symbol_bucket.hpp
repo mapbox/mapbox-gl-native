@@ -72,7 +72,7 @@ public:
                  float zoom,
                  bool iconsNeedLinear,
                  bool sortFeaturesByY,
-                 std::string bucketLeaderID,
+                 std::string bucketName_,
                  const std::vector<SymbolInstance>&&,
                  const std::vector<SortKeyRange>&&,
                  const float tilePixelRatio,

@@ -21,7 +21,8 @@
 namespace {
 std::string unaccent(const std::string& str) {
     std::stringstream output;
-    char const *itr = str.c_str(), *nitr;
+    char const* itr = str.c_str();
+    char const* nitr;
     char const* end = itr + str.length();
     char lo[5] = {0};
 

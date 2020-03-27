@@ -16,7 +16,7 @@ public:
 
     void setSize(size_t);
     size_t getSize() const { return size; };
-    void add(const OverscaledTileID& key, std::unique_ptr<Tile> data);
+    void add(const OverscaledTileID& key, std::unique_ptr<Tile> tile);
     std::unique_ptr<Tile> pop(const OverscaledTileID& key);
     Tile* get(const OverscaledTileID& key);
     bool has(const OverscaledTileID& key);

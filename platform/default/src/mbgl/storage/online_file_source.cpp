@@ -213,7 +213,7 @@ private:
     //                              firstLowPriorityRequest
 
     struct PendingRequests {
-        PendingRequests() : queue(), firstLowPriorityRequest(queue.begin()) {}
+        PendingRequests() : firstLowPriorityRequest(queue.begin()) {}
 
         std::list<OnlineFileRequest*> queue;
         std::list<OnlineFileRequest*>::iterator firstLowPriorityRequest;

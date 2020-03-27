@@ -764,7 +764,7 @@ void GLFWView::onMouseMove(GLFWwindow *window, double x, double y) {
         using namespace mbgl;
         FeatureState newState;
 
-        if (result.size() > 0) {
+        if (!result.empty()) {
             FeatureIdentifier id = result[0].id;
             optional<std::string> idStr = featureIDtoString(id);
 

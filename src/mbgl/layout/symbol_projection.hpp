@@ -58,9 +58,10 @@ namespace mbgl {
                                                             const mat4& labelPlaneMatrix,
                                                             const bool returnTileDistance);
 
-    void hideGlyphs(std::size_t numGlyphs, gfx::VertexVector<gfx::Vertex<SymbolDynamicLayoutAttributes>>& dynamicVertices);
+    void hideGlyphs(std::size_t numGlyphs,
+                    gfx::VertexVector<gfx::Vertex<SymbolDynamicLayoutAttributes>>& dynamicVertexArray);
     void addDynamicAttributes(const Point<float>& anchorPoint,
                               const float angle,
-                              gfx::VertexVector<gfx::Vertex<SymbolDynamicLayoutAttributes>>& dynamicVertices);
+                              gfx::VertexVector<gfx::Vertex<SymbolDynamicLayoutAttributes>>& dynamicVertexArray);
 
 } // end namespace mbgl

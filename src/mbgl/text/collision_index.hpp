@@ -53,8 +53,8 @@ public:
 private:
     bool isOffscreen(const CollisionBoundaries&) const;
     bool isInsideGrid(const CollisionBoundaries&) const;
-    bool isInsideTile(const CollisionBoundaries& box, const CollisionBoundaries& tileBoundaries) const;
-    bool overlapsTile(const CollisionBoundaries& box, const CollisionBoundaries& tileBoundaries) const;
+    bool isInsideTile(const CollisionBoundaries& boundaries, const CollisionBoundaries& tileBoundaries) const;
+    bool overlapsTile(const CollisionBoundaries& boundaries, const CollisionBoundaries& tileBoundaries) const;
 
     std::pair<bool, bool> placeLineFeature(
         const CollisionFeature& feature,

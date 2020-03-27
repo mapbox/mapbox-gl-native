@@ -32,7 +32,9 @@ void GridIndex<T>::insert(T&& t, const BBox& bbox) {
     auto cx2 = convertToXCellCoord(bbox.max.x);
     auto cy2 = convertToYCellCoord(bbox.max.y);
 
-    std::size_t x, y, cellIndex;
+    std::size_t x;
+    std::size_t y;
+    std::size_t cellIndex;
     for (x = cx1; x <= cx2; ++x) {
         for (y = cy1; y <= cy2; ++y) {
             cellIndex = xCellCount * y + x;
@@ -52,7 +54,9 @@ void GridIndex<T>::insert(T&& t, const BCircle& bcircle) {
     auto cx2 = convertToXCellCoord(bcircle.center.x + bcircle.radius);
     auto cy2 = convertToYCellCoord(bcircle.center.y + bcircle.radius);
 
-    std::size_t x, y, cellIndex;
+    std::size_t x;
+    std::size_t y;
+    std::size_t cellIndex;
     for (x = cx1; x <= cx2; ++x) {
         for (y = cy1; y <= cy2; ++y) {
             cellIndex = xCellCount * y + x;
@@ -153,7 +157,9 @@ void GridIndex<T>::query(const BBox& queryBBox, std::function<bool (const T&, co
     auto cx2 = convertToXCellCoord(queryBBox.max.x);
     auto cy2 = convertToYCellCoord(queryBBox.max.y);
 
-    std::size_t x, y, cellIndex;
+    std::size_t x;
+    std::size_t y;
+    std::size_t cellIndex;
     for (x = cx1; x <= cx2; ++x) {
         for (y = cy1; y <= cy2; ++y) {
             cellIndex = xCellCount * y + x;
@@ -216,7 +222,9 @@ void GridIndex<T>::query(const BCircle& queryBCircle, std::function<bool (const 
     auto cx2 = convertToXCellCoord(queryBCircle.center.x + queryBCircle.radius);
     auto cy2 = convertToYCellCoord(queryBCircle.center.y + queryBCircle.radius);
 
-    std::size_t x, y, cellIndex;
+    std::size_t x;
+    std::size_t y;
+    std::size_t cellIndex;
     for (x = cx1; x <= cx2; ++x) {
         for (y = cy1; y <= cy2; ++y) {
             cellIndex = xCellCount * y + x;

@@ -10,7 +10,7 @@ namespace mbgl {
 
 namespace {
 
-static std::unique_ptr<Log::Observer> currentObserver;
+std::unique_ptr<Log::Observer> currentObserver;
 
 } // namespace
 

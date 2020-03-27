@@ -52,7 +52,7 @@ void RasterTile::onParsed(std::unique_ptr<RasterBucket> result, const uint64_t r
     if (resultCorrelationID == correlationID) {
         pending = false;
     }
-    renderable = bucket ? true : false;
+    renderable = static_cast<bool>(bucket);
     observer->onTileChanged(*this);
 }
 

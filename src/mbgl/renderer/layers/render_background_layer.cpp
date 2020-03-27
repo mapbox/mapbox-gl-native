@@ -100,7 +100,7 @@ void RenderBackgroundLayer::render(PaintParameters& parameters) {
     };
 
     if (segments.empty()) {
-        segments = parameters.staticData.tileTriangleSegments();
+        segments = RenderStaticData::tileTriangleSegments();
     }
 
     const auto& evaluated = static_cast<const BackgroundLayerProperties&>(*evaluatedProperties).evaluated;

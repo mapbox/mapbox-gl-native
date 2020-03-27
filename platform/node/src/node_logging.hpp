@@ -20,7 +20,10 @@ public:
     ~NodeLogObserver();
 
     // Log::Observer implementation
-    virtual bool onRecord(mbgl::EventSeverity severity, mbgl::Event event, int64_t code, const std::string &msg) override;
+    virtual bool onRecord(mbgl::EventSeverity severity,
+                          mbgl::Event event,
+                          int64_t code,
+                          const std::string& text) override;
 
 private:
     Nan::Persistent<v8::Object> module;

@@ -281,7 +281,7 @@ TileCover::Impl::Impl(int32_t z, const Geometry<double>& geom, bool project)
 
     BuildBoundsMap toBoundsMap(z, project);
     boundsMap = apply_visitor(toBoundsMap, geom);
-    if (boundsMap.size() == 0) return;
+    if (boundsMap.empty()) return;
 
     //Iniitalize the active edge table, and current row span
     currentBounds = boundsMap.begin();
@@ -300,7 +300,7 @@ TileCover::Impl::Impl(int32_t z, const Geometry<double>& geom, bool project)
 void TileCover::Impl::nextRow() {
     // Update activeBounds for next row
     if (currentBounds != boundsMap.end()) {
-        if (activeBounds.size() == 0 && currentBounds->first > tileY) {
+        if (activeBounds.empty() && currentBounds->first > tileY) {
             //For multi-geoms: use the next row with an edge table starting point
             tileY = currentBounds->first;
         }
@@ -312,7 +312,7 @@ void TileCover::Impl::nextRow() {
     }
     //Scan the active bounds and update currentRange with x_min, x_max pairs
     auto xps = util::scan_row(tileY, activeBounds);
-    if (xps.size() == 0) {
+    if (xps.empty()) {
         return;
     }
 

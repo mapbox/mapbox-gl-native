@@ -60,10 +60,15 @@ private:
     };
 
     class Distances;
-    void addCurrentVertex(const GeometryCoordinate& currentVertex, double& distance,
-            const Point<double>& normal, double endLeft, double endRight, bool round,
-            std::size_t startVertex, std::vector<LineBucket::TriangleElement>& triangleStore,
-            optional<Distances> distances);
+    void addCurrentVertex(const GeometryCoordinate& currentCoordinate,
+                          double& distance,
+                          const Point<double>& normal,
+                          double endLeft,
+                          double endRight,
+                          bool round,
+                          std::size_t startVertex,
+                          std::vector<LineBucket::TriangleElement>& triangleStore,
+                          optional<Distances> distances);
 
     void addPieSliceVertex(const GeometryCoordinate& currentVertex, double distance,
             const Point<double>& extrude, bool lineTurnsLeft, std::size_t startVertex,

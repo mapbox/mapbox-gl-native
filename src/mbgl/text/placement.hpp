@@ -19,7 +19,7 @@ enum class PlacedSymbolOrientation : bool;
 class OpacityState {
 public:
     OpacityState(bool placed, bool skipFade);
-    OpacityState(const OpacityState& prevOpacityState, float increment, bool placed);
+    OpacityState(const OpacityState& prevState, float increment, bool placed);
     bool isHidden() const;
     float opacity;
     bool placed;
@@ -27,8 +27,8 @@ public:
 
 class JointOpacityState {
 public:
-    JointOpacityState(bool placedIcon, bool placedText, bool skipFade);
-    JointOpacityState(const JointOpacityState& prevOpacityState, float increment, bool placedIcon, bool placedText);
+    JointOpacityState(bool placedText, bool placedIcon, bool skipFade);
+    JointOpacityState(const JointOpacityState& prevOpacityState, float increment, bool placedText, bool placedIcon);
     bool isHidden() const;
     OpacityState icon;
     OpacityState text;
