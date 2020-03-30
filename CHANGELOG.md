@@ -37,6 +37,10 @@
 
 - [core] Fix issue that `within` expression returns incorrect results for geometries crossing the anti-meridian ([#16330](https://github.com/mapbox/mapbox-gl-native/pull/16330))
 
+- [core] Fix assert in gfx resources cleanup ([#16349](https://github.com/mapbox/mapbox-gl-native/pull/16349))
+
+  Fix a resource leak assertion in `gl::Context::~Context()` that is evaluating false in scenarios where graphics context has been marked as lost.
+
 ## maps-v1.4.1
 
 ### 🐞 Bug fixes
