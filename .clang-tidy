@@ -8,8 +8,10 @@ Checks: >
     performance-*,
     portability-*,
     readability-*,
+    -bugprone-macro-parentheses,
     -bugprone-narrowing-conversions,
     -google-build-using-namespace,
+    -google-explicit-constructor,
     -google-readability-braces-around-statements,
     -google-readability-todo,
     -google-runtime-int,
@@ -26,3 +28,7 @@ Checks: >
 WarningsAsErrors: '*'
 HeaderFilterRegex: '.*'
 FormatStyle: file
+
+CheckOptions:
+  - key:   performance-unnecessary-value-param.AllowedTypes
+    value: 'exception_ptr'
