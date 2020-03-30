@@ -100,7 +100,7 @@ const LayerTypeInfo* <%- camelize(type) %>Layer::Impl::staticTypeInfo() noexcept
 }
 
 
-<% if ((type === 'background') || (type === 'location-component')) { -%>
+<% if (type === 'background' || type === 'location-component') { -%>
 <%- camelize(type) %>Layer::<%- camelize(type) %>Layer(const std::string& layerID)
     : Layer(makeMutable<Impl>(layerID, std::string())) {
 }

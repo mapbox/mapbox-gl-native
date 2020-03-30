@@ -17,6 +17,7 @@
 #include "raster_layer.hpp"
 #include "symbol_layer.hpp"
 #include "fill_extrusion_layer.hpp"
+#include "location_component_layer.hpp"
 
 namespace mbgl {
 
@@ -72,6 +73,9 @@ LayerManagerAndroid::LayerManagerAndroid() {
     addLayerTypeCoreOnly(std::make_unique<CustomLayerFactory>());
 #elif !defined(MBGL_LAYER_CUSTOM_DISABLE_ALL)
     addLayerType(std::make_unique<CustomJavaLayerPeerFactory>());
+#endif
+#if !defined(MBGL_LAYER_LOCATION_COMPONENT_DISABLE_ALL)
+    addLayerType(std::make_unique<LocationComponentJavaLayerPeerFactory>());
 #endif
 }
 

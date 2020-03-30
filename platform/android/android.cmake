@@ -179,6 +179,8 @@ target_sources(
         ${PROJECT_SOURCE_DIR}/platform/android/src/style/layers/raster_layer.hpp
         ${PROJECT_SOURCE_DIR}/platform/android/src/style/layers/symbol_layer.cpp
         ${PROJECT_SOURCE_DIR}/platform/android/src/style/layers/symbol_layer.hpp
+        ${PROJECT_SOURCE_DIR}/platform/android/src/style/layers/location_component_layer.cpp
+        ${PROJECT_SOURCE_DIR}/platform/android/src/style/layers/location_component_layer.hpp
         ${PROJECT_SOURCE_DIR}/platform/android/src/style/light.cpp
         ${PROJECT_SOURCE_DIR}/platform/android/src/style/light.hpp
         ${PROJECT_SOURCE_DIR}/platform/android/src/style/position.cpp

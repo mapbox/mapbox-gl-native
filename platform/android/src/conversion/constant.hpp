@@ -72,6 +72,17 @@ struct Converter<jni::Local<jni::Object<>>, std::array<float, N>> {
     }
 };
 
+template <std::size_t N>
+struct Converter<jni::Local<jni::Object<>>, std::array<double, N>> {
+    Result<jni::Local<jni::Object<>>> operator()(jni::JNIEnv& env, const std::array<double, N>& value) const {
+        std::vector<double> v;
+        for (const double& id : value) {
+            v.push_back(id);
+        }
+        return convert<jni::Local<jni::Object<>>, std::vector<double>>(env, v);
+    }
+};
+
 template <>
 struct Converter<jni::Local<jni::Object<>>, std::vector<std::string>> {
     Result<jni::Local<jni::Object<>>> operator()(jni::JNIEnv& env, const std::vector<std::string>& value) const;
@@ -80,6 +91,11 @@ struct Converter<jni::Local<jni::Object<>>, std::vector<std::string>> {
 template <>
 struct Converter<jni::Local<jni::Object<>>, std::vector<float>> {
     Result<jni::Local<jni::Object<>>> operator()(jni::JNIEnv& env, const std::vector<float>& value) const;
+};
+
+template <>
+struct Converter<jni::Local<jni::Object<>>, std::vector<double>> {
+    Result<jni::Local<jni::Object<>>> operator()(jni::JNIEnv& env, const std::vector<double>& value) const;
 };
 
 template <class T>

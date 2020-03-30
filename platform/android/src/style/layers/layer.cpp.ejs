@@ -20,7 +20,7 @@ namespace android {
         return static_cast<mbgl::style::<%- camelize(type) %>Layer&>(layer);
     }
 
-<% if (type === 'background') { -%>
+<% if (type === 'background' || type === 'location-component') { -%>
     /**
      * Creates an owning peer object (for layers not attached to the map) from the JVM side
      */
@@ -121,7 +121,7 @@ namespace android {
             env,
             javaClass,
             "nativePtr",
-<% if (type === 'background') { -%>
+<% if (type === 'background' || type === 'location-component') { -%>
             jni::MakePeer<<%- camelize(type) %>Layer, jni::String&>,
 <% } else { -%>
             jni::MakePeer<<%- camelize(type) %>Layer, jni::String&, jni::String&>,

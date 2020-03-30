@@ -26,13 +26,16 @@ namespace android {
     /**
      * Creates a non-owning peer object (for layers currently attached to the map)
      */
-    BackgroundLayer::BackgroundLayer(mbgl::style::BackgroundLayer& coreLayer) : Layer(coreLayer) {}
+    BackgroundLayer::BackgroundLayer(mbgl::style::BackgroundLayer& coreLayer)
+        : Layer(coreLayer) {
+    }
 
     /**
      * Creates an owning peer object (for layers not attached to the map)
      */
     BackgroundLayer::BackgroundLayer(std::unique_ptr<mbgl::style::BackgroundLayer> coreLayer)
-        : Layer(std::move(coreLayer)) {}
+        : Layer(std::move(coreLayer)) {
+    }
 
     BackgroundLayer::~BackgroundLayer() = default;
 
@@ -105,18 +108,14 @@ namespace android {
         }
     }  // namespace
 
-    jni::Local<jni::Object<Layer>> BackgroundJavaLayerPeerFactory::createJavaLayerPeer(jni::JNIEnv& env,
-                                                                                       mbgl::style::Layer& layer) {
+    jni::Local<jni::Object<Layer>> BackgroundJavaLayerPeerFactory::createJavaLayerPeer(jni::JNIEnv& env, mbgl::style::Layer& layer) {
         assert(layer.baseImpl->getTypeInfo() == getTypeInfo());
         return createJavaPeer(env, new BackgroundLayer(toBackgroundLayer(layer)));
     }
 
-    jni::Local<jni::Object<Layer>> BackgroundJavaLayerPeerFactory::createJavaLayerPeer(
-        jni::JNIEnv& env, std::unique_ptr<mbgl::style::Layer> layer) {
+    jni::Local<jni::Object<Layer>> BackgroundJavaLayerPeerFactory::createJavaLayerPeer(jni::JNIEnv& env, std::unique_ptr<mbgl::style::Layer> layer) {
         assert(layer->baseImpl->getTypeInfo() == getTypeInfo());
-        return createJavaPeer(env,
-                              new BackgroundLayer(std::unique_ptr<mbgl::style::BackgroundLayer>(
-                                  static_cast<mbgl::style::BackgroundLayer*>(layer.release()))));
+        return createJavaPeer(env, new BackgroundLayer(std::unique_ptr<mbgl::style::BackgroundLayer>(static_cast<mbgl::style::BackgroundLayer*>(layer.release()))));
     }
 
     void BackgroundJavaLayerPeerFactory::registerNative(jni::JNIEnv& env) {

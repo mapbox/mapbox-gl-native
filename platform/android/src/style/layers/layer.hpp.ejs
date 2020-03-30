@@ -20,7 +20,7 @@ public:
     using SuperTag = Layer;
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/style/layers/<%- camelize(type) %>Layer"; };
 
-<% if (type === 'background') { -%>
+<% if (type === 'background' || type === 'location-component') { -%>
     <%- camelize(type) %>Layer(jni::JNIEnv&, jni::String&);
 <% } else { -%>
     <%- camelize(type) %>Layer(jni::JNIEnv&, jni::String&, jni::String&);

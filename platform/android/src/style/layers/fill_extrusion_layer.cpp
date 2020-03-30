@@ -26,13 +26,16 @@ namespace android {
     /**
      * Creates a non-owning peer object (for layers currently attached to the map)
      */
-    FillExtrusionLayer::FillExtrusionLayer(mbgl::style::FillExtrusionLayer& coreLayer) : Layer(coreLayer) {}
+    FillExtrusionLayer::FillExtrusionLayer(mbgl::style::FillExtrusionLayer& coreLayer)
+        : Layer(coreLayer) {
+    }
 
     /**
      * Creates an owning peer object (for layers not attached to the map)
      */
     FillExtrusionLayer::FillExtrusionLayer(std::unique_ptr<mbgl::style::FillExtrusionLayer> coreLayer)
-        : Layer(std::move(coreLayer)) {}
+        : Layer(std::move(coreLayer)) {
+    }
 
     FillExtrusionLayer::~FillExtrusionLayer() = default;
 
@@ -169,18 +172,14 @@ namespace android {
         }
     }  // namespace
 
-    jni::Local<jni::Object<Layer>> FillExtrusionJavaLayerPeerFactory::createJavaLayerPeer(jni::JNIEnv& env,
-                                                                                          mbgl::style::Layer& layer) {
+    jni::Local<jni::Object<Layer>> FillExtrusionJavaLayerPeerFactory::createJavaLayerPeer(jni::JNIEnv& env, mbgl::style::Layer& layer) {
         assert(layer.baseImpl->getTypeInfo() == getTypeInfo());
         return createJavaPeer(env, new FillExtrusionLayer(toFillExtrusionLayer(layer)));
     }
 
-    jni::Local<jni::Object<Layer>> FillExtrusionJavaLayerPeerFactory::createJavaLayerPeer(
-        jni::JNIEnv& env, std::unique_ptr<mbgl::style::Layer> layer) {
+    jni::Local<jni::Object<Layer>> FillExtrusionJavaLayerPeerFactory::createJavaLayerPeer(jni::JNIEnv& env, std::unique_ptr<mbgl::style::Layer> layer) {
         assert(layer->baseImpl->getTypeInfo() == getTypeInfo());
-        return createJavaPeer(env,
-                              new FillExtrusionLayer(std::unique_ptr<mbgl::style::FillExtrusionLayer>(
-                                  static_cast<mbgl::style::FillExtrusionLayer*>(layer.release()))));
+        return createJavaPeer(env, new FillExtrusionLayer(std::unique_ptr<mbgl::style::FillExtrusionLayer>(static_cast<mbgl::style::FillExtrusionLayer*>(layer.release()))));
     }
 
     void FillExtrusionJavaLayerPeerFactory::registerNative(jni::JNIEnv& env) {
@@ -203,10 +202,8 @@ namespace android {
             METHOD(&FillExtrusionLayer::getFillExtrusionColorTransition, "nativeGetFillExtrusionColorTransition"),
             METHOD(&FillExtrusionLayer::setFillExtrusionColorTransition, "nativeSetFillExtrusionColorTransition"),
             METHOD(&FillExtrusionLayer::getFillExtrusionColor, "nativeGetFillExtrusionColor"),
-            METHOD(&FillExtrusionLayer::getFillExtrusionTranslateTransition,
-                   "nativeGetFillExtrusionTranslateTransition"),
-            METHOD(&FillExtrusionLayer::setFillExtrusionTranslateTransition,
-                   "nativeSetFillExtrusionTranslateTransition"),
+            METHOD(&FillExtrusionLayer::getFillExtrusionTranslateTransition, "nativeGetFillExtrusionTranslateTransition"),
+            METHOD(&FillExtrusionLayer::setFillExtrusionTranslateTransition, "nativeSetFillExtrusionTranslateTransition"),
             METHOD(&FillExtrusionLayer::getFillExtrusionTranslate, "nativeGetFillExtrusionTranslate"),
             METHOD(&FillExtrusionLayer::getFillExtrusionTranslateAnchor, "nativeGetFillExtrusionTranslateAnchor"),
             METHOD(&FillExtrusionLayer::getFillExtrusionPatternTransition, "nativeGetFillExtrusionPatternTransition"),
