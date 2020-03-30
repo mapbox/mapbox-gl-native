@@ -39,9 +39,6 @@ static MGLNativeNetworkManager *instance = nil;
     NSURLSessionConfiguration *configuration = [_delegate sessionConfiguration];
 
     if (!configuration) {
-        // TODO: Remove
-        NSLog(@"Using testSessionConfiguration");
-
         // For testing. Since we get a `nil` return when SDK is modular, we use
         // this for testing requests.
         // Same as `[MGLNetworkConfiguration defaultSessionConfiguration]` in
