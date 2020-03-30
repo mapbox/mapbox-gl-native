@@ -15,7 +15,7 @@ static std::string getQuadKey(int32_t x, int32_t y, int8_t z) {
     int32_t mask;
     for (int8_t i = z; i > 0; i--) {
         mask = 1 << (i - 1);
-        quadKey += '0' + ((x & mask ? 1 : 0) + (y & mask ? 2 : 0));
+        quadKey += static_cast<char>('0' + ((x & mask ? 1 : 0) + (y & mask ? 2 : 0)));
     }
     return quadKey;
 }
