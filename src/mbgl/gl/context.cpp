@@ -61,8 +61,8 @@ Context::Context(RendererBackend& backend_)
 Context::~Context() {
     if (cleanupOnDestruction) {
         reset();
+        assert(stats.isZero());
     }
-    assert(stats.isZero());
 }
 
 void Context::initializeExtensions(const std::function<gl::ProcAddress(const char*)>& getProcAddress) {
