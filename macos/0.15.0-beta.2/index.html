@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Mapbox  Reference</title>
+    <link rel="stylesheet" type="text/css" href="css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="css/highlight.css" />
+    <meta charset="utf-8">
+    <script src="js/jquery.min.js" defer></script>
+    <script src="js/jazzy.js" defer></script>
+    <link rel='shortcut icon' href='https://www.mapbox.com/img/favicon.ico' type='image/x-icon' />
+
+    <script src="js/lunr.min.js" defer></script>
+    <script src="js/typeahead.jquery.js" defer></script>
+    <script src="js/jazzy.search.js" defer></script>
+    <meta class="swiftype" name="type" data-type="enum" content="Mapbox Reference" />
+    <meta class="swiftype" name="title" data-type="string" content="Mapbox" />
+    <style type="text/css">
+      .nav-group-name[data-name="Mapbox"] > .small-heading,
+      .nav-group-task[data-name="Mapbox"] {
+        background-color: #f5f8fc;
+        font-family: "Open Sans Bold";
+        border-left: 3px solid #3a68d8;
+        padding-left: 5px
+      }
+    </style>
+  </head>
+  <body>
+
+
+    <a title="Mapbox  Reference"></a>
+
+    <header class="header-container">
+      <div class="limiter">
+        <div class="header">
+        <p class="header-col header-col--primary">
+          <a class="header-link" href="index.html">
+            <img style="height: 25px;"  class="header-icon" src="img/mapbox.svg" alt="Mapbox Docs"/>
+            <span class='header-tag'>Maps SDK for macOS Reference (0.15.0-beta.2)</span>
+          </a>
+          
+        </p>
+    
+          <p class="header-col header-col--secondary">
+            <a class="header-link space-right2" href="https://github.com/mapbox/mapbox-gl-native-ios">
+              <svg style="margin-bottom: 1px;" class="header-icon" viewBox="0 0 33 33" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+      		      <path stroke="none" stroke-width="1" fill="white" fill-rule="evenodd" d="M16.6,0.4 C7.6,0.4 0.3,7.7 0.3,16.7 C0.3,23.9 5,30 11.4,32.2 C12.2,32.3 12.5,31.8 12.5,31.4 L12.5,28.6 C8,29.6 7,26.4 7,26.4 C6.3,24.5 5.2,24 5.2,24 C3.7,23 5.3,23 5.3,23 C6.9,23.1 7.8,24.7 7.8,24.7 C9.3,27.2 11.6,26.5 12.5,26.1 C12.6,25 13.1,24.3 13.5,23.9 C9.9,23.5 6.1,22.1 6.1,15.8 C6.1,14 6.7,12.6 7.8,11.4 C7.6,11 7.1,9.3 8,7.1 C8,7.1 9.4,6.7 12.5,8.8 C13.8,8.4 15.2,8.3 16.6,8.3 C18,8.3 19.4,8.5 20.7,8.8 C23.8,6.7 25.2,7.1 25.2,7.1 C26.1,9.3 25.5,11 25.4,11.4 C26.4,12.5 27.1,14 27.1,15.8 C27.1,22.1 23.3,23.4 19.7,23.8 C20.3,24.3 20.8,25.3 20.8,26.8 L20.8,31.3 C20.8,31.7 21.1,32.2 21.9,32.1 C28.4,29.9 33,23.8 33,16.6 C32.9,7.7 25.6,0.4 16.6,0.4 L16.6,0.4 Z"></path>
+              </svg>
+              View on GitHub
+            </a>
+          </p>
+    
+          <p class="header-col header-col--secondary">
+            <a class="header-link bold" href="dash-feed://https%3A%2F%2Fmapbox%2Egithub%2Eio%2Fmapbox%2Dgl%2Dnative%2Fmacos%2Fdocsets%2FMapbox%2Exml">
+              <img style="margin-bottom: 1px;" class="header-icon" src="img/dash.png"/>
+              Install in Dash
+            </a>
+          </p>
+      </div>
+      </div>
+    </header>
+
+    <div class="breadcrumbs">
+      <div class="limiter">
+        <a class="breadcrumb" href="index.html">Mapbox Reference</a>
+        <img class="carat" src="img/carat.png" />
+        Mapbox  Reference
+      </div>
+    </div>
+
+    <div class="content-wrapper limiter">
+      <nav class="navigation">
+          <div class="header-col--secondary">
+            <form role="search" action="search.json">
+              <input type="text" placeholder="Search documentation" data-typeahead>
+            </form>
+          </div>
+        <ul class="nav-groups">
+          <li class="nav-group-name" data-name="Appendices">
+            <a class="small-heading" href="Appendices.html">Appendices<span class="anchor-icon" /></a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task" data-name="Working with GeoJSON Data" data-url="working-with-geojson-data.html">
+                <a title="Working with GeoJSON Data" class="nav-group-task-link" href="working-with-geojson-data.html">Working with GeoJSON Data</a>
+              </li>
+              <li class="nav-group-task" data-name="Predicates and Expressions" data-url="predicates-and-expressions.html">
+                <a title="Predicates and Expressions" class="nav-group-task-link" href="predicates-and-expressions.html">Predicates and Expressions</a>
+              </li>
+              <li class="nav-group-task" data-name="For Style Authors" data-url="for-style-authors.html">
+                <a title="For Style Authors" class="nav-group-task-link" href="for-style-authors.html">For Style Authors</a>
+              </li>
+              <li class="nav-group-task" data-name="Migrating to Expressions" data-url="migrating-to-expressions.html">
+                <a title="Migrating to Expressions" class="nav-group-task-link" href="migrating-to-expressions.html">Migrating to Expressions</a>
+              </li>
+              <li class="nav-group-task" data-name="Tile URL Templates" data-url="tile-url-templates.html">
+                <a title="Tile URL Templates" class="nav-group-task-link" href="tile-url-templates.html">Tile URL Templates</a>
+              </li>
+              <li class="nav-group-task" data-name="Info.plist Keys" data-url="infoplist-keys.html">
+                <a title="Info.plist Keys" class="nav-group-task-link" href="infoplist-keys.html">Info.plist Keys</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name" data-name="Maps">
+            <a class="small-heading" href="Maps.html">Maps<span class="anchor-icon" /></a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task" data-name="MGLAccountManager" data-url="Classes/MGLAccountManager.html">
+                <a title="MGLAccountManager" class="nav-group-task-link" href="Classes/MGLAccountManager.html">MGLAccountManager</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLMapCamera" data-url="Classes/MGLMapCamera.html">
+                <a title="MGLMapCamera" class="nav-group-task-link" href="Classes/MGLMapCamera.html">MGLMapCamera</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLMapView" data-url="Classes/MGLMapView.html">
+                <a title="MGLMapView" class="nav-group-task-link" href="Classes/MGLMapView.html">MGLMapView</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLMapViewDelegate" data-url="Protocols/MGLMapViewDelegate.html">
+                <a title="MGLMapViewDelegate" class="nav-group-task-link" href="Protocols/MGLMapViewDelegate.html">MGLMapViewDelegate</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLMapSnapshot" data-url="Classes/MGLMapSnapshot.html">
+                <a title="MGLMapSnapshot" class="nav-group-task-link" href="Classes/MGLMapSnapshot.html">MGLMapSnapshot</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLMapSnapshotOptions" data-url="Classes/MGLMapSnapshotOptions.html">
+                <a title="MGLMapSnapshotOptions" class="nav-group-task-link" href="Classes/MGLMapSnapshotOptions.html">MGLMapSnapshotOptions</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLMapSnapshotter" data-url="Classes/MGLMapSnapshotter.html">
+                <a title="MGLMapSnapshotter" class="nav-group-task-link" href="Classes/MGLMapSnapshotter.html">MGLMapSnapshotter</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name" data-name="Shapes and Annotations">
+            <a class="small-heading" href="Shapes and Annotations.html">Shapes and Annotations<span class="anchor-icon" /></a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task" data-name="MGLAnnotation" data-url="Protocols/MGLAnnotation.html">
+                <a title="MGLAnnotation" class="nav-group-task-link" href="Protocols/MGLAnnotation.html">MGLAnnotation</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLAnnotationImage" data-url="Classes/MGLAnnotationImage.html">
+                <a title="MGLAnnotationImage" class="nav-group-task-link" href="Classes/MGLAnnotationImage.html">MGLAnnotationImage</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLOverlay" data-url="Protocols/MGLOverlay.html">
+                <a title="MGLOverlay" class="nav-group-task-link" href="Protocols/MGLOverlay.html">MGLOverlay</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLShape" data-url="Classes/MGLShape.html">
+                <a title="MGLShape" class="nav-group-task-link" href="Classes/MGLShape.html">MGLShape</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLMultiPoint" data-url="Classes/MGLMultiPoint.html">
+                <a title="MGLMultiPoint" class="nav-group-task-link" href="Classes/MGLMultiPoint.html">MGLMultiPoint</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLPointAnnotation" data-url="Classes/MGLPointAnnotation.html">
+                <a title="MGLPointAnnotation" class="nav-group-task-link" href="Classes/MGLPointAnnotation.html">MGLPointAnnotation</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLPointCollection" data-url="Classes/MGLPointCollection.html">
+                <a title="MGLPointCollection" class="nav-group-task-link" href="Classes/MGLPointCollection.html">MGLPointCollection</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLPolygon" data-url="Classes/MGLPolygon.html">
+                <a title="MGLPolygon" class="nav-group-task-link" href="Classes/MGLPolygon.html">MGLPolygon</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLPolyline" data-url="Classes/MGLPolyline.html">
+                <a title="MGLPolyline" class="nav-group-task-link" href="Classes/MGLPolyline.html">MGLPolyline</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLMultiPolygon" data-url="Classes/MGLMultiPolygon.html">
+                <a title="MGLMultiPolygon" class="nav-group-task-link" href="Classes/MGLMultiPolygon.html">MGLMultiPolygon</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLMultiPolyline" data-url="Classes/MGLMultiPolyline.html">
+                <a title="MGLMultiPolyline" class="nav-group-task-link" href="Classes/MGLMultiPolyline.html">MGLMultiPolyline</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLShapeCollection" data-url="Classes/MGLShapeCollection.html">
+                <a title="MGLShapeCollection" class="nav-group-task-link" href="Classes/MGLShapeCollection.html">MGLShapeCollection</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name" data-name="Styling the Map">
+            <a class="small-heading" href="Styling the Map.html">Styling the Map<span class="anchor-icon" /></a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task" data-name="MGLStyle" data-url="Classes/MGLStyle.html">
+                <a title="MGLStyle" class="nav-group-task-link" href="Classes/MGLStyle.html">MGLStyle</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLLight" data-url="Classes/MGLLight.html">
+                <a title="MGLLight" class="nav-group-task-link" href="Classes/MGLLight.html">MGLLight</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name" data-name="Content Primitives">
+            <a class="small-heading" href="Content Primitives.html">Content Primitives<span class="anchor-icon" /></a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task" data-name="MGLFeature" data-url="Protocols/MGLFeature.html">
+                <a title="MGLFeature" class="nav-group-task-link" href="Protocols/MGLFeature.html">MGLFeature</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLPointFeature" data-url="Content%20Primitives.html#/c:objc(cs)MGLPointFeature">
+                <a title="MGLPointFeature" class="nav-group-task-link" href="Content%20Primitives.html#/c:objc(cs)MGLPointFeature">MGLPointFeature</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLPolygonFeature" data-url="Content%20Primitives.html#/c:objc(cs)MGLPolygonFeature">
+                <a title="MGLPolygonFeature" class="nav-group-task-link" href="Content%20Primitives.html#/c:objc(cs)MGLPolygonFeature">MGLPolygonFeature</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLPolylineFeature" data-url="Content%20Primitives.html#/c:objc(cs)MGLPolylineFeature">
+                <a title="MGLPolylineFeature" class="nav-group-task-link" href="Content%20Primitives.html#/c:objc(cs)MGLPolylineFeature">MGLPolylineFeature</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLMultiPolygonFeature" data-url="Content%20Primitives.html#/c:objc(cs)MGLMultiPolygonFeature">
+                <a title="MGLMultiPolygonFeature" class="nav-group-task-link" href="Content%20Primitives.html#/c:objc(cs)MGLMultiPolygonFeature">MGLMultiPolygonFeature</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLMultiPolylineFeature" data-url="Content%20Primitives.html#/c:objc(cs)MGLMultiPolylineFeature">
+                <a title="MGLMultiPolylineFeature" class="nav-group-task-link" href="Content%20Primitives.html#/c:objc(cs)MGLMultiPolylineFeature">MGLMultiPolylineFeature</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLPointCollectionFeature" data-url="Content%20Primitives.html#/c:objc(cs)MGLPointCollectionFeature">
+                <a title="MGLPointCollectionFeature" class="nav-group-task-link" href="Content%20Primitives.html#/c:objc(cs)MGLPointCollectionFeature">MGLPointCollectionFeature</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLShapeCollectionFeature" data-url="Content%20Primitives.html#/c:objc(cs)MGLShapeCollectionFeature">
+                <a title="MGLShapeCollectionFeature" class="nav-group-task-link" href="Content%20Primitives.html#/c:objc(cs)MGLShapeCollectionFeature">MGLShapeCollectionFeature</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name" data-name="Content Sources">
+            <a class="small-heading" href="Content Sources.html">Content Sources<span class="anchor-icon" /></a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task" data-name="MGLSource" data-url="Classes/MGLSource.html">
+                <a title="MGLSource" class="nav-group-task-link" href="Classes/MGLSource.html">MGLSource</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLShapeSource" data-url="Classes/MGLShapeSource.html">
+                <a title="MGLShapeSource" class="nav-group-task-link" href="Classes/MGLShapeSource.html">MGLShapeSource</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLComputedShapeSource" data-url="Classes/MGLComputedShapeSource.html">
+                <a title="MGLComputedShapeSource" class="nav-group-task-link" href="Classes/MGLComputedShapeSource.html">MGLComputedShapeSource</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLTileSource" data-url="Classes/MGLTileSource.html">
+                <a title="MGLTileSource" class="nav-group-task-link" href="Classes/MGLTileSource.html">MGLTileSource</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLRasterTileSource" data-url="Classes/MGLRasterTileSource.html">
+                <a title="MGLRasterTileSource" class="nav-group-task-link" href="Classes/MGLRasterTileSource.html">MGLRasterTileSource</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLRasterDEMSource" data-url="Content%20Sources.html#/c:objc(cs)MGLRasterDEMSource">
+                <a title="MGLRasterDEMSource" class="nav-group-task-link" href="Content%20Sources.html#/c:objc(cs)MGLRasterDEMSource">MGLRasterDEMSource</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLVectorTileSource" data-url="Classes/MGLVectorTileSource.html">
+                <a title="MGLVectorTileSource" class="nav-group-task-link" href="Classes/MGLVectorTileSource.html">MGLVectorTileSource</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLImageSource" data-url="Classes/MGLImageSource.html">
+                <a title="MGLImageSource" class="nav-group-task-link" href="Classes/MGLImageSource.html">MGLImageSource</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name" data-name="Style Layers">
+            <a class="small-heading" href="Style Layers.html">Style Layers<span class="anchor-icon" /></a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task" data-name="MGLStyleLayer" data-url="Classes/MGLStyleLayer.html">
+                <a title="MGLStyleLayer" class="nav-group-task-link" href="Classes/MGLStyleLayer.html">MGLStyleLayer</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLForegroundStyleLayer" data-url="Classes/MGLForegroundStyleLayer.html">
+                <a title="MGLForegroundStyleLayer" class="nav-group-task-link" href="Classes/MGLForegroundStyleLayer.html">MGLForegroundStyleLayer</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLBackgroundStyleLayer" data-url="Classes/MGLBackgroundStyleLayer.html">
+                <a title="MGLBackgroundStyleLayer" class="nav-group-task-link" href="Classes/MGLBackgroundStyleLayer.html">MGLBackgroundStyleLayer</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLRasterStyleLayer" data-url="Classes/MGLRasterStyleLayer.html">
+                <a title="MGLRasterStyleLayer" class="nav-group-task-link" href="Classes/MGLRasterStyleLayer.html">MGLRasterStyleLayer</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLVectorStyleLayer" data-url="Classes/MGLVectorStyleLayer.html">
+                <a title="MGLVectorStyleLayer" class="nav-group-task-link" href="Classes/MGLVectorStyleLayer.html">MGLVectorStyleLayer</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLCircleStyleLayer" data-url="Classes/MGLCircleStyleLayer.html">
+                <a title="MGLCircleStyleLayer" class="nav-group-task-link" href="Classes/MGLCircleStyleLayer.html">MGLCircleStyleLayer</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLFillStyleLayer" data-url="Classes/MGLFillStyleLayer.html">
+                <a title="MGLFillStyleLayer" class="nav-group-task-link" href="Classes/MGLFillStyleLayer.html">MGLFillStyleLayer</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLFillExtrusionStyleLayer" data-url="Classes/MGLFillExtrusionStyleLayer.html">
+                <a title="MGLFillExtrusionStyleLayer" class="nav-group-task-link" href="Classes/MGLFillExtrusionStyleLayer.html">MGLFillExtrusionStyleLayer</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLHeatmapStyleLayer" data-url="Classes/MGLHeatmapStyleLayer.html">
+                <a title="MGLHeatmapStyleLayer" class="nav-group-task-link" href="Classes/MGLHeatmapStyleLayer.html">MGLHeatmapStyleLayer</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLHillshadeStyleLayer" data-url="Classes/MGLHillshadeStyleLayer.html">
+                <a title="MGLHillshadeStyleLayer" class="nav-group-task-link" href="Classes/MGLHillshadeStyleLayer.html">MGLHillshadeStyleLayer</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLLineStyleLayer" data-url="Classes/MGLLineStyleLayer.html">
+                <a title="MGLLineStyleLayer" class="nav-group-task-link" href="Classes/MGLLineStyleLayer.html">MGLLineStyleLayer</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLSymbolStyleLayer" data-url="Classes/MGLSymbolStyleLayer.html">
+                <a title="MGLSymbolStyleLayer" class="nav-group-task-link" href="Classes/MGLSymbolStyleLayer.html">MGLSymbolStyleLayer</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name" data-name="Offline Maps">
+            <a class="small-heading" href="Offline Maps.html">Offline Maps<span class="anchor-icon" /></a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task" data-name="MGLOfflineRegion" data-url="Protocols/MGLOfflineRegion.html">
+                <a title="MGLOfflineRegion" class="nav-group-task-link" href="Protocols/MGLOfflineRegion.html">MGLOfflineRegion</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLOfflineStorage" data-url="Classes/MGLOfflineStorage.html">
+                <a title="MGLOfflineStorage" class="nav-group-task-link" href="Classes/MGLOfflineStorage.html">MGLOfflineStorage</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLOfflinePack" data-url="Classes/MGLOfflinePack.html">
+                <a title="MGLOfflinePack" class="nav-group-task-link" href="Classes/MGLOfflinePack.html">MGLOfflinePack</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLOfflinePackProgress" data-url="Structs/MGLOfflinePackProgress.html">
+                <a title="MGLOfflinePackProgress" class="nav-group-task-link" href="Structs/MGLOfflinePackProgress.html">MGLOfflinePackProgress</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLOfflinePackState" data-url="Enums/MGLOfflinePackState.html">
+                <a title="MGLOfflinePackState" class="nav-group-task-link" href="Enums/MGLOfflinePackState.html">MGLOfflinePackState</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLTilePyramidOfflineRegion" data-url="Classes/MGLTilePyramidOfflineRegion.html">
+                <a title="MGLTilePyramidOfflineRegion" class="nav-group-task-link" href="Classes/MGLTilePyramidOfflineRegion.html">MGLTilePyramidOfflineRegion</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLShapeOfflineRegion" data-url="Classes/MGLShapeOfflineRegion.html">
+                <a title="MGLShapeOfflineRegion" class="nav-group-task-link" href="Classes/MGLShapeOfflineRegion.html">MGLShapeOfflineRegion</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name" data-name="Geometry">
+            <a class="small-heading" href="Geometry.html">Geometry<span class="anchor-icon" /></a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task" data-name="MGLCoordinateBounds" data-url="Structs/MGLCoordinateBounds.html">
+                <a title="MGLCoordinateBounds" class="nav-group-task-link" href="Structs/MGLCoordinateBounds.html">MGLCoordinateBounds</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLCoordinateBoundsEqualToCoordinateBounds" data-url="Geometry.html#/c:MGLGeometry.h@F@MGLCoordinateBoundsEqualToCoordinateBounds">
+                <a title="MGLCoordinateBoundsEqualToCoordinateBounds" class="nav-group-task-link" href="Geometry.html#/c:MGLGeometry.h@F@MGLCoordinateBoundsEqualToCoordinateBounds">MGLCoordinateBoundsEqualToCoordinateBounds</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLCoordinateBoundsGetCoordinateSpan" data-url="Geometry.html#/c:MGLGeometry.h@F@MGLCoordinateBoundsGetCoordinateSpan">
+                <a title="MGLCoordinateBoundsGetCoordinateSpan" class="nav-group-task-link" href="Geometry.html#/c:MGLGeometry.h@F@MGLCoordinateBoundsGetCoordinateSpan">MGLCoordinateBoundsGetCoordinateSpan</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLCoordinateBoundsIntersectsCoordinateBounds" data-url="Geometry.html#/c:MGLGeometry.h@F@MGLCoordinateBoundsIntersectsCoordinateBounds">
+                <a title="MGLCoordinateBoundsIntersectsCoordinateBounds" class="nav-group-task-link" href="Geometry.html#/c:MGLGeometry.h@F@MGLCoordinateBoundsIntersectsCoordinateBounds">MGLCoordinateBoundsIntersectsCoordinateBounds</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLCoordinateBoundsIsEmpty" data-url="Geometry.html#/c:MGLGeometry.h@F@MGLCoordinateBoundsIsEmpty">
+                <a title="MGLCoordinateBoundsIsEmpty" class="nav-group-task-link" href="Geometry.html#/c:MGLGeometry.h@F@MGLCoordinateBoundsIsEmpty">MGLCoordinateBoundsIsEmpty</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLCoordinateBoundsMake" data-url="Geometry.html#/c:MGLGeometry.h@F@MGLCoordinateBoundsMake">
+                <a title="MGLCoordinateBoundsMake" class="nav-group-task-link" href="Geometry.html#/c:MGLGeometry.h@F@MGLCoordinateBoundsMake">MGLCoordinateBoundsMake</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLCoordinateBoundsOffset" data-url="Geometry.html#/c:MGLGeometry.h@F@MGLCoordinateBoundsOffset">
+                <a title="MGLCoordinateBoundsOffset" class="nav-group-task-link" href="Geometry.html#/c:MGLGeometry.h@F@MGLCoordinateBoundsOffset">MGLCoordinateBoundsOffset</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLCoordinateInCoordinateBounds" data-url="Geometry.html#/c:MGLGeometry.h@F@MGLCoordinateInCoordinateBounds">
+                <a title="MGLCoordinateInCoordinateBounds" class="nav-group-task-link" href="Geometry.html#/c:MGLGeometry.h@F@MGLCoordinateInCoordinateBounds">MGLCoordinateInCoordinateBounds</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLCoordinateSpan" data-url="Structs/MGLCoordinateSpan.html">
+                <a title="MGLCoordinateSpan" class="nav-group-task-link" href="Structs/MGLCoordinateSpan.html">MGLCoordinateSpan</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLCoordinateSpanEqualToCoordinateSpan" data-url="Geometry.html#/c:MGLGeometry.h@F@MGLCoordinateSpanEqualToCoordinateSpan">
+                <a title="MGLCoordinateSpanEqualToCoordinateSpan" class="nav-group-task-link" href="Geometry.html#/c:MGLGeometry.h@F@MGLCoordinateSpanEqualToCoordinateSpan">MGLCoordinateSpanEqualToCoordinateSpan</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLCoordinateSpanMake" data-url="Geometry.html#/c:MGLGeometry.h@F@MGLCoordinateSpanMake">
+                <a title="MGLCoordinateSpanMake" class="nav-group-task-link" href="Geometry.html#/c:MGLGeometry.h@F@MGLCoordinateSpanMake">MGLCoordinateSpanMake</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLCoordinateSpanZero" data-url="Geometry.html#/c:@MGLCoordinateSpanZero">
+                <a title="MGLCoordinateSpanZero" class="nav-group-task-link" href="Geometry.html#/c:@MGLCoordinateSpanZero">MGLCoordinateSpanZero</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLDegreesFromRadians" data-url="Geometry.html#/c:MGLGeometry.h@F@MGLDegreesFromRadians">
+                <a title="MGLDegreesFromRadians" class="nav-group-task-link" href="Geometry.html#/c:MGLGeometry.h@F@MGLDegreesFromRadians">MGLDegreesFromRadians</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLRadiansFromDegrees" data-url="Geometry.html#/c:MGLGeometry.h@F@MGLRadiansFromDegrees">
+                <a title="MGLRadiansFromDegrees" class="nav-group-task-link" href="Geometry.html#/c:MGLGeometry.h@F@MGLRadiansFromDegrees">MGLRadiansFromDegrees</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLStringFromCoordinateBounds" data-url="Geometry.html#/c:MGLGeometry.h@F@MGLStringFromCoordinateBounds">
+                <a title="MGLStringFromCoordinateBounds" class="nav-group-task-link" href="Geometry.html#/c:MGLGeometry.h@F@MGLStringFromCoordinateBounds">MGLStringFromCoordinateBounds</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name" data-name="Formatters">
+            <a class="small-heading" href="Formatters.html">Formatters<span class="anchor-icon" /></a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task" data-name="MGLClockDirectionFormatter" data-url="Classes/MGLClockDirectionFormatter.html">
+                <a title="MGLClockDirectionFormatter" class="nav-group-task-link" href="Classes/MGLClockDirectionFormatter.html">MGLClockDirectionFormatter</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLCompassDirectionFormatter" data-url="Classes/MGLCompassDirectionFormatter.html">
+                <a title="MGLCompassDirectionFormatter" class="nav-group-task-link" href="Classes/MGLCompassDirectionFormatter.html">MGLCompassDirectionFormatter</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLCoordinateFormatter" data-url="Classes/MGLCoordinateFormatter.html">
+                <a title="MGLCoordinateFormatter" class="nav-group-task-link" href="Classes/MGLCoordinateFormatter.html">MGLCoordinateFormatter</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLDistanceFormatter" data-url="Classes/MGLDistanceFormatter.html">
+                <a title="MGLDistanceFormatter" class="nav-group-task-link" href="Classes/MGLDistanceFormatter.html">MGLDistanceFormatter</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name" data-name="Other Categories">
+            <a class="small-heading" href="Other Categories.html">Other Categories<span class="anchor-icon" /></a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task" data-name="NSExpression(MGLAdditions)" data-url="Categories/NSExpression%28MGLAdditions%29.html">
+                <a title="NSExpression(MGLAdditions)" class="nav-group-task-link" href="Categories/NSExpression%28MGLAdditions%29.html">NSExpression(MGLAdditions)</a>
+              </li>
+              <li class="nav-group-task" data-name="NSValue(MGLAdditions)" data-url="Categories/NSValue%28MGLAdditions%29.html">
+                <a title="NSValue(MGLAdditions)" class="nav-group-task-link" href="Categories/NSValue%28MGLAdditions%29.html">NSValue(MGLAdditions)</a>
+              </li>
+              <li class="nav-group-task" data-name="NSValue(MGLCircleStyleLayerAdditions)" data-url="Categories/NSValue%28MGLCircleStyleLayerAdditions%29.html">
+                <a title="NSValue(MGLCircleStyleLayerAdditions)" class="nav-group-task-link" href="Categories/NSValue%28MGLCircleStyleLayerAdditions%29.html">NSValue(MGLCircleStyleLayerAdditions)</a>
+              </li>
+              <li class="nav-group-task" data-name="NSValue(MGLFillExtrusionStyleLayerAdditions)" data-url="Categories/NSValue%28MGLFillExtrusionStyleLayerAdditions%29.html">
+                <a title="NSValue(MGLFillExtrusionStyleLayerAdditions)" class="nav-group-task-link" href="Categories/NSValue%28MGLFillExtrusionStyleLayerAdditions%29.html">NSValue(MGLFillExtrusionStyleLayerAdditions)</a>
+              </li>
+              <li class="nav-group-task" data-name="NSValue(MGLFillStyleLayerAdditions)" data-url="Categories/NSValue%28MGLFillStyleLayerAdditions%29.html">
+                <a title="NSValue(MGLFillStyleLayerAdditions)" class="nav-group-task-link" href="Categories/NSValue%28MGLFillStyleLayerAdditions%29.html">NSValue(MGLFillStyleLayerAdditions)</a>
+              </li>
+              <li class="nav-group-task" data-name="NSValue(MGLHillshadeStyleLayerAdditions)" data-url="Categories/NSValue%28MGLHillshadeStyleLayerAdditions%29.html">
+                <a title="NSValue(MGLHillshadeStyleLayerAdditions)" class="nav-group-task-link" href="Categories/NSValue%28MGLHillshadeStyleLayerAdditions%29.html">NSValue(MGLHillshadeStyleLayerAdditions)</a>
+              </li>
+              <li class="nav-group-task" data-name="NSValue(MGLLineStyleLayerAdditions)" data-url="Categories/NSValue%28MGLLineStyleLayerAdditions%29.html">
+                <a title="NSValue(MGLLineStyleLayerAdditions)" class="nav-group-task-link" href="Categories/NSValue%28MGLLineStyleLayerAdditions%29.html">NSValue(MGLLineStyleLayerAdditions)</a>
+              </li>
+              <li class="nav-group-task" data-name="NSValue(MGLRasterStyleLayerAdditions)" data-url="Categories/NSValue%28MGLRasterStyleLayerAdditions%29.html">
+                <a title="NSValue(MGLRasterStyleLayerAdditions)" class="nav-group-task-link" href="Categories/NSValue%28MGLRasterStyleLayerAdditions%29.html">NSValue(MGLRasterStyleLayerAdditions)</a>
+              </li>
+              <li class="nav-group-task" data-name="NSValue(MGLSymbolStyleLayerAdditions)" data-url="Categories/NSValue%28MGLSymbolStyleLayerAdditions%29.html">
+                <a title="NSValue(MGLSymbolStyleLayerAdditions)" class="nav-group-task-link" href="Categories/NSValue%28MGLSymbolStyleLayerAdditions%29.html">NSValue(MGLSymbolStyleLayerAdditions)</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name" data-name="Other Classes">
+            <a class="small-heading" href="Other Classes.html">Other Classes<span class="anchor-icon" /></a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task" data-name="MGLAttributedExpression" data-url="Classes/MGLAttributedExpression.html">
+                <a title="MGLAttributedExpression" class="nav-group-task-link" href="Classes/MGLAttributedExpression.html">MGLAttributedExpression</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLAttributionInfo" data-url="Classes/MGLAttributionInfo.html">
+                <a title="MGLAttributionInfo" class="nav-group-task-link" href="Classes/MGLAttributionInfo.html">MGLAttributionInfo</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLEmptyFeature" data-url="Other%20Classes.html#/c:objc(cs)MGLEmptyFeature">
+                <a title="MGLEmptyFeature" class="nav-group-task-link" href="Other%20Classes.html#/c:objc(cs)MGLEmptyFeature">MGLEmptyFeature</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLLoggingConfiguration" data-url="Classes/MGLLoggingConfiguration.html">
+                <a title="MGLLoggingConfiguration" class="nav-group-task-link" href="Classes/MGLLoggingConfiguration.html">MGLLoggingConfiguration</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLMapSnapshotOverlay" data-url="Classes/MGLMapSnapshotOverlay.html">
+                <a title="MGLMapSnapshotOverlay" class="nav-group-task-link" href="Classes/MGLMapSnapshotOverlay.html">MGLMapSnapshotOverlay</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLNetworkConfiguration" data-url="Classes/MGLNetworkConfiguration.html">
+                <a title="MGLNetworkConfiguration" class="nav-group-task-link" href="Classes/MGLNetworkConfiguration.html">MGLNetworkConfiguration</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLPointFeatureCluster" data-url="Other%20Classes.html#/c:objc(cs)MGLPointFeatureCluster">
+                <a title="MGLPointFeatureCluster" class="nav-group-task-link" href="Other%20Classes.html#/c:objc(cs)MGLPointFeatureCluster">MGLPointFeatureCluster</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name" data-name="Other Constants">
+            <a class="small-heading" href="Other Constants.html">Other Constants<span class="anchor-icon" /></a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task" data-name="MGLClusterIdentifierInvalid" data-url="Other%20Constants.html#/c:@MGLClusterIdentifierInvalid">
+                <a title="MGLClusterIdentifierInvalid" class="nav-group-task-link" href="Other%20Constants.html#/c:@MGLClusterIdentifierInvalid">MGLClusterIdentifierInvalid</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLErrorDomain" data-url="Other%20Constants.html#/c:@MGLErrorDomain">
+                <a title="MGLErrorDomain" class="nav-group-task-link" href="Other%20Constants.html#/c:@MGLErrorDomain">MGLErrorDomain</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLExpressionInterpolationModeCubicBezier" data-url="Other%20Constants.html#/c:@MGLExpressionInterpolationModeCubicBezier">
+                <a title="MGLExpressionInterpolationModeCubicBezier" class="nav-group-task-link" href="Other%20Constants.html#/c:@MGLExpressionInterpolationModeCubicBezier">MGLExpressionInterpolationModeCubicBezier</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLExpressionInterpolationModeExponential" data-url="Other%20Constants.html#/c:@MGLExpressionInterpolationModeExponential">
+                <a title="MGLExpressionInterpolationModeExponential" class="nav-group-task-link" href="Other%20Constants.html#/c:@MGLExpressionInterpolationModeExponential">MGLExpressionInterpolationModeExponential</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLExpressionInterpolationModeLinear" data-url="Other%20Constants.html#/c:@MGLExpressionInterpolationModeLinear">
+                <a title="MGLExpressionInterpolationModeLinear" class="nav-group-task-link" href="Other%20Constants.html#/c:@MGLExpressionInterpolationModeLinear">MGLExpressionInterpolationModeLinear</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLFontColorAttribute" data-url="Other%20Constants.html#/c:@MGLFontColorAttribute">
+                <a title="MGLFontColorAttribute" class="nav-group-task-link" href="Other%20Constants.html#/c:@MGLFontColorAttribute">MGLFontColorAttribute</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLFontNamesAttribute" data-url="Other%20Constants.html#/c:@MGLFontNamesAttribute">
+                <a title="MGLFontNamesAttribute" class="nav-group-task-link" href="Other%20Constants.html#/c:@MGLFontNamesAttribute">MGLFontNamesAttribute</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLFontScaleAttribute" data-url="Other%20Constants.html#/c:@MGLFontScaleAttribute">
+                <a title="MGLFontScaleAttribute" class="nav-group-task-link" href="Other%20Constants.html#/c:@MGLFontScaleAttribute">MGLFontScaleAttribute</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLOfflinePackErrorNotification" data-url="Other%20Constants.html#/c:@MGLOfflinePackErrorNotification">
+                <a title="MGLOfflinePackErrorNotification" class="nav-group-task-link" href="Other%20Constants.html#/c:@MGLOfflinePackErrorNotification">MGLOfflinePackErrorNotification</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLOfflinePackMaximumMapboxTilesReachedNotification" data-url="Other%20Constants.html#/c:@MGLOfflinePackMaximumMapboxTilesReachedNotification">
+                <a title="MGLOfflinePackMaximumMapboxTilesReachedNotification" class="nav-group-task-link" href="Other%20Constants.html#/c:@MGLOfflinePackMaximumMapboxTilesReachedNotification">MGLOfflinePackMaximumMapboxTilesReachedNotification</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLOfflinePackProgressChangedNotification" data-url="Other%20Constants.html#/c:@MGLOfflinePackProgressChangedNotification">
+                <a title="MGLOfflinePackProgressChangedNotification" class="nav-group-task-link" href="Other%20Constants.html#/c:@MGLOfflinePackProgressChangedNotification">MGLOfflinePackProgressChangedNotification</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLOfflinePackUserInfoKeyError" data-url="Other%20Constants.html#/c:@MGLOfflinePackUserInfoKeyError">
+                <a title="MGLOfflinePackUserInfoKeyError" class="nav-group-task-link" href="Other%20Constants.html#/c:@MGLOfflinePackUserInfoKeyError">MGLOfflinePackUserInfoKeyError</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLOfflinePackUserInfoKeyMaximumCount" data-url="Other%20Constants.html#/c:@MGLOfflinePackUserInfoKeyMaximumCount">
+                <a title="MGLOfflinePackUserInfoKeyMaximumCount" class="nav-group-task-link" href="Other%20Constants.html#/c:@MGLOfflinePackUserInfoKeyMaximumCount">MGLOfflinePackUserInfoKeyMaximumCount</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLOfflinePackUserInfoKeyProgress" data-url="Other%20Constants.html#/c:@MGLOfflinePackUserInfoKeyProgress">
+                <a title="MGLOfflinePackUserInfoKeyProgress" class="nav-group-task-link" href="Other%20Constants.html#/c:@MGLOfflinePackUserInfoKeyProgress">MGLOfflinePackUserInfoKeyProgress</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLOfflinePackUserInfoKeyState" data-url="Other%20Constants.html#/c:@MGLOfflinePackUserInfoKeyState">
+                <a title="MGLOfflinePackUserInfoKeyState" class="nav-group-task-link" href="Other%20Constants.html#/c:@MGLOfflinePackUserInfoKeyState">MGLOfflinePackUserInfoKeyState</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLShapeSourceOptionBuffer" data-url="Other%20Constants.html#/c:@MGLShapeSourceOptionBuffer">
+                <a title="MGLShapeSourceOptionBuffer" class="nav-group-task-link" href="Other%20Constants.html#/c:@MGLShapeSourceOptionBuffer">MGLShapeSourceOptionBuffer</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLShapeSourceOptionClipsCoordinates" data-url="Other%20Constants.html#/c:@MGLShapeSourceOptionClipsCoordinates">
+                <a title="MGLShapeSourceOptionClipsCoordinates" class="nav-group-task-link" href="Other%20Constants.html#/c:@MGLShapeSourceOptionClipsCoordinates">MGLShapeSourceOptionClipsCoordinates</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLShapeSourceOptionClusterProperties" data-url="Other%20Constants.html#/c:@MGLShapeSourceOptionClusterProperties">
+                <a title="MGLShapeSourceOptionClusterProperties" class="nav-group-task-link" href="Other%20Constants.html#/c:@MGLShapeSourceOptionClusterProperties">MGLShapeSourceOptionClusterProperties</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLShapeSourceOptionClusterRadius" data-url="Other%20Constants.html#/c:@MGLShapeSourceOptionClusterRadius">
+                <a title="MGLShapeSourceOptionClusterRadius" class="nav-group-task-link" href="Other%20Constants.html#/c:@MGLShapeSourceOptionClusterRadius">MGLShapeSourceOptionClusterRadius</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLShapeSourceOptionClustered" data-url="Other%20Constants.html#/c:@MGLShapeSourceOptionClustered">
+                <a title="MGLShapeSourceOptionClustered" class="nav-group-task-link" href="Other%20Constants.html#/c:@MGLShapeSourceOptionClustered">MGLShapeSourceOptionClustered</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLShapeSourceOptionLineDistanceMetrics" data-url="Other%20Constants.html#/c:@MGLShapeSourceOptionLineDistanceMetrics">
+                <a title="MGLShapeSourceOptionLineDistanceMetrics" class="nav-group-task-link" href="Other%20Constants.html#/c:@MGLShapeSourceOptionLineDistanceMetrics">MGLShapeSourceOptionLineDistanceMetrics</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLShapeSourceOptionMaximumZoomLevel" data-url="Other%20Constants.html#/c:@MGLShapeSourceOptionMaximumZoomLevel">
+                <a title="MGLShapeSourceOptionMaximumZoomLevel" class="nav-group-task-link" href="Other%20Constants.html#/c:@MGLShapeSourceOptionMaximumZoomLevel">MGLShapeSourceOptionMaximumZoomLevel</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLShapeSourceOptionMaximumZoomLevelForClustering" data-url="Other%20Constants.html#/c:@MGLShapeSourceOptionMaximumZoomLevelForClustering">
+                <a title="MGLShapeSourceOptionMaximumZoomLevelForClustering" class="nav-group-task-link" href="Other%20Constants.html#/c:@MGLShapeSourceOptionMaximumZoomLevelForClustering">MGLShapeSourceOptionMaximumZoomLevelForClustering</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLShapeSourceOptionMinimumZoomLevel" data-url="Other%20Constants.html#/c:@MGLShapeSourceOptionMinimumZoomLevel">
+                <a title="MGLShapeSourceOptionMinimumZoomLevel" class="nav-group-task-link" href="Other%20Constants.html#/c:@MGLShapeSourceOptionMinimumZoomLevel">MGLShapeSourceOptionMinimumZoomLevel</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLShapeSourceOptionSimplificationTolerance" data-url="Other%20Constants.html#/c:@MGLShapeSourceOptionSimplificationTolerance">
+                <a title="MGLShapeSourceOptionSimplificationTolerance" class="nav-group-task-link" href="Other%20Constants.html#/c:@MGLShapeSourceOptionSimplificationTolerance">MGLShapeSourceOptionSimplificationTolerance</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLShapeSourceOptionWrapsCoordinates" data-url="Other%20Constants.html#/c:@MGLShapeSourceOptionWrapsCoordinates">
+                <a title="MGLShapeSourceOptionWrapsCoordinates" class="nav-group-task-link" href="Other%20Constants.html#/c:@MGLShapeSourceOptionWrapsCoordinates">MGLShapeSourceOptionWrapsCoordinates</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLStyleDefaultVersion" data-url="Other%20Constants.html#/c:MGLStyle.h@MGLStyleDefaultVersion">
+                <a title="MGLStyleDefaultVersion" class="nav-group-task-link" href="Other%20Constants.html#/c:MGLStyle.h@MGLStyleDefaultVersion">MGLStyleDefaultVersion</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLTileSourceOptionAttributionHTMLString" data-url="Other%20Constants.html#/c:@MGLTileSourceOptionAttributionHTMLString">
+                <a title="MGLTileSourceOptionAttributionHTMLString" class="nav-group-task-link" href="Other%20Constants.html#/c:@MGLTileSourceOptionAttributionHTMLString">MGLTileSourceOptionAttributionHTMLString</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLTileSourceOptionAttributionInfos" data-url="Other%20Constants.html#/c:@MGLTileSourceOptionAttributionInfos">
+                <a title="MGLTileSourceOptionAttributionInfos" class="nav-group-task-link" href="Other%20Constants.html#/c:@MGLTileSourceOptionAttributionInfos">MGLTileSourceOptionAttributionInfos</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLTileSourceOptionCoordinateBounds" data-url="Other%20Constants.html#/c:@MGLTileSourceOptionCoordinateBounds">
+                <a title="MGLTileSourceOptionCoordinateBounds" class="nav-group-task-link" href="Other%20Constants.html#/c:@MGLTileSourceOptionCoordinateBounds">MGLTileSourceOptionCoordinateBounds</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLTileSourceOptionDEMEncoding" data-url="Other%20Constants.html#/c:@MGLTileSourceOptionDEMEncoding">
+                <a title="MGLTileSourceOptionDEMEncoding" class="nav-group-task-link" href="Other%20Constants.html#/c:@MGLTileSourceOptionDEMEncoding">MGLTileSourceOptionDEMEncoding</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLTileSourceOptionMaximumZoomLevel" data-url="Other%20Constants.html#/c:@MGLTileSourceOptionMaximumZoomLevel">
+                <a title="MGLTileSourceOptionMaximumZoomLevel" class="nav-group-task-link" href="Other%20Constants.html#/c:@MGLTileSourceOptionMaximumZoomLevel">MGLTileSourceOptionMaximumZoomLevel</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLTileSourceOptionMinimumZoomLevel" data-url="Other%20Constants.html#/c:@MGLTileSourceOptionMinimumZoomLevel">
+                <a title="MGLTileSourceOptionMinimumZoomLevel" class="nav-group-task-link" href="Other%20Constants.html#/c:@MGLTileSourceOptionMinimumZoomLevel">MGLTileSourceOptionMinimumZoomLevel</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLTileSourceOptionTileCoordinateSystem" data-url="Other%20Constants.html#/c:@MGLTileSourceOptionTileCoordinateSystem">
+                <a title="MGLTileSourceOptionTileCoordinateSystem" class="nav-group-task-link" href="Other%20Constants.html#/c:@MGLTileSourceOptionTileCoordinateSystem">MGLTileSourceOptionTileCoordinateSystem</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLTileSourceOptionTileSize" data-url="Other%20Constants.html#/c:@MGLTileSourceOptionTileSize">
+                <a title="MGLTileSourceOptionTileSize" class="nav-group-task-link" href="Other%20Constants.html#/c:@MGLTileSourceOptionTileSize">MGLTileSourceOptionTileSize</a>
+              </li>
+              <li class="nav-group-task" data-name="MapboxVersionNumber" data-url="Other%20Constants.html#/c:@MapboxVersionNumber">
+                <a title="MapboxVersionNumber" class="nav-group-task-link" href="Other%20Constants.html#/c:@MapboxVersionNumber">MapboxVersionNumber</a>
+              </li>
+              <li class="nav-group-task" data-name="MapboxVersionString" data-url="Other%20Constants.html#/c:@MapboxVersionString">
+                <a title="MapboxVersionString" class="nav-group-task-link" href="Other%20Constants.html#/c:@MapboxVersionString">MapboxVersionString</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name" data-name="Other Enumerations">
+            <a class="small-heading" href="Other Enumerations.html">Other Enumerations<span class="anchor-icon" /></a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task" data-name="MGLAttributionInfoStyle" data-url="Enums/MGLAttributionInfoStyle.html">
+                <a title="MGLAttributionInfoStyle" class="nav-group-task-link" href="Enums/MGLAttributionInfoStyle.html">MGLAttributionInfoStyle</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLCirclePitchAlignment" data-url="Enums/MGLCirclePitchAlignment.html">
+                <a title="MGLCirclePitchAlignment" class="nav-group-task-link" href="Enums/MGLCirclePitchAlignment.html">MGLCirclePitchAlignment</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLCircleScaleAlignment" data-url="Enums/MGLCircleScaleAlignment.html">
+                <a title="MGLCircleScaleAlignment" class="nav-group-task-link" href="Enums/MGLCircleScaleAlignment.html">MGLCircleScaleAlignment</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLCircleTranslationAnchor" data-url="Enums/MGLCircleTranslationAnchor.html">
+                <a title="MGLCircleTranslationAnchor" class="nav-group-task-link" href="Enums/MGLCircleTranslationAnchor.html">MGLCircleTranslationAnchor</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLDEMEncoding" data-url="Enums/MGLDEMEncoding.html">
+                <a title="MGLDEMEncoding" class="nav-group-task-link" href="Enums/MGLDEMEncoding.html">MGLDEMEncoding</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLErrorCode" data-url="Enums/MGLErrorCode.html">
+                <a title="MGLErrorCode" class="nav-group-task-link" href="Enums/MGLErrorCode.html">MGLErrorCode</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLFillExtrusionTranslationAnchor" data-url="Enums/MGLFillExtrusionTranslationAnchor.html">
+                <a title="MGLFillExtrusionTranslationAnchor" class="nav-group-task-link" href="Enums/MGLFillExtrusionTranslationAnchor.html">MGLFillExtrusionTranslationAnchor</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLFillTranslationAnchor" data-url="Enums/MGLFillTranslationAnchor.html">
+                <a title="MGLFillTranslationAnchor" class="nav-group-task-link" href="Enums/MGLFillTranslationAnchor.html">MGLFillTranslationAnchor</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLHillshadeIlluminationAnchor" data-url="Enums/MGLHillshadeIlluminationAnchor.html">
+                <a title="MGLHillshadeIlluminationAnchor" class="nav-group-task-link" href="Enums/MGLHillshadeIlluminationAnchor.html">MGLHillshadeIlluminationAnchor</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLIconAnchor" data-url="Enums/MGLIconAnchor.html">
+                <a title="MGLIconAnchor" class="nav-group-task-link" href="Enums/MGLIconAnchor.html">MGLIconAnchor</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLIconPitchAlignment" data-url="Enums/MGLIconPitchAlignment.html">
+                <a title="MGLIconPitchAlignment" class="nav-group-task-link" href="Enums/MGLIconPitchAlignment.html">MGLIconPitchAlignment</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLIconRotationAlignment" data-url="Enums/MGLIconRotationAlignment.html">
+                <a title="MGLIconRotationAlignment" class="nav-group-task-link" href="Enums/MGLIconRotationAlignment.html">MGLIconRotationAlignment</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLIconTextFit" data-url="Enums/MGLIconTextFit.html">
+                <a title="MGLIconTextFit" class="nav-group-task-link" href="Enums/MGLIconTextFit.html">MGLIconTextFit</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLIconTranslationAnchor" data-url="Enums/MGLIconTranslationAnchor.html">
+                <a title="MGLIconTranslationAnchor" class="nav-group-task-link" href="Enums/MGLIconTranslationAnchor.html">MGLIconTranslationAnchor</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLLightAnchor" data-url="Enums/MGLLightAnchor.html">
+                <a title="MGLLightAnchor" class="nav-group-task-link" href="Enums/MGLLightAnchor.html">MGLLightAnchor</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLLineCap" data-url="Enums/MGLLineCap.html">
+                <a title="MGLLineCap" class="nav-group-task-link" href="Enums/MGLLineCap.html">MGLLineCap</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLLineJoin" data-url="Enums/MGLLineJoin.html">
+                <a title="MGLLineJoin" class="nav-group-task-link" href="Enums/MGLLineJoin.html">MGLLineJoin</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLLineTranslationAnchor" data-url="Enums/MGLLineTranslationAnchor.html">
+                <a title="MGLLineTranslationAnchor" class="nav-group-task-link" href="Enums/MGLLineTranslationAnchor.html">MGLLineTranslationAnchor</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLLoggingLevel" data-url="Enums/MGLLoggingLevel.html">
+                <a title="MGLLoggingLevel" class="nav-group-task-link" href="Enums/MGLLoggingLevel.html">MGLLoggingLevel</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLMapDebugMaskOptions" data-url="Enums/MGLMapDebugMaskOptions.html">
+                <a title="MGLMapDebugMaskOptions" class="nav-group-task-link" href="Enums/MGLMapDebugMaskOptions.html">MGLMapDebugMaskOptions</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLOrnamentVisibility" data-url="Enums/MGLOrnamentVisibility.html">
+                <a title="MGLOrnamentVisibility" class="nav-group-task-link" href="Enums/MGLOrnamentVisibility.html">MGLOrnamentVisibility</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLRasterResamplingMode" data-url="Enums/MGLRasterResamplingMode.html">
+                <a title="MGLRasterResamplingMode" class="nav-group-task-link" href="Enums/MGLRasterResamplingMode.html">MGLRasterResamplingMode</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLResourceKind" data-url="Enums/MGLResourceKind.html">
+                <a title="MGLResourceKind" class="nav-group-task-link" href="Enums/MGLResourceKind.html">MGLResourceKind</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLSymbolPlacement" data-url="Enums/MGLSymbolPlacement.html">
+                <a title="MGLSymbolPlacement" class="nav-group-task-link" href="Enums/MGLSymbolPlacement.html">MGLSymbolPlacement</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLSymbolZOrder" data-url="Enums/MGLSymbolZOrder.html">
+                <a title="MGLSymbolZOrder" class="nav-group-task-link" href="Enums/MGLSymbolZOrder.html">MGLSymbolZOrder</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLTextAnchor" data-url="Enums/MGLTextAnchor.html">
+                <a title="MGLTextAnchor" class="nav-group-task-link" href="Enums/MGLTextAnchor.html">MGLTextAnchor</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLTextJustification" data-url="Enums/MGLTextJustification.html">
+                <a title="MGLTextJustification" class="nav-group-task-link" href="Enums/MGLTextJustification.html">MGLTextJustification</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLTextPitchAlignment" data-url="Enums/MGLTextPitchAlignment.html">
+                <a title="MGLTextPitchAlignment" class="nav-group-task-link" href="Enums/MGLTextPitchAlignment.html">MGLTextPitchAlignment</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLTextRotationAlignment" data-url="Enums/MGLTextRotationAlignment.html">
+                <a title="MGLTextRotationAlignment" class="nav-group-task-link" href="Enums/MGLTextRotationAlignment.html">MGLTextRotationAlignment</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLTextTransform" data-url="Enums/MGLTextTransform.html">
+                <a title="MGLTextTransform" class="nav-group-task-link" href="Enums/MGLTextTransform.html">MGLTextTransform</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLTextTranslationAnchor" data-url="Enums/MGLTextTranslationAnchor.html">
+                <a title="MGLTextTranslationAnchor" class="nav-group-task-link" href="Enums/MGLTextTranslationAnchor.html">MGLTextTranslationAnchor</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLTextWritingMode" data-url="Enums/MGLTextWritingMode.html">
+                <a title="MGLTextWritingMode" class="nav-group-task-link" href="Enums/MGLTextWritingMode.html">MGLTextWritingMode</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLTileCoordinateSystem" data-url="Enums/MGLTileCoordinateSystem.html">
+                <a title="MGLTileCoordinateSystem" class="nav-group-task-link" href="Enums/MGLTileCoordinateSystem.html">MGLTileCoordinateSystem</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name" data-name="Other Protocols">
+            <a class="small-heading" href="Other Protocols.html">Other Protocols<span class="anchor-icon" /></a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task" data-name="MGLCluster" data-url="Protocols/MGLCluster.html">
+                <a title="MGLCluster" class="nav-group-task-link" href="Protocols/MGLCluster.html">MGLCluster</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLComputedShapeSourceDataSource" data-url="Protocols/MGLComputedShapeSourceDataSource.html">
+                <a title="MGLComputedShapeSourceDataSource" class="nav-group-task-link" href="Protocols/MGLComputedShapeSourceDataSource.html">MGLComputedShapeSourceDataSource</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLMapSnapshotterDelegate" data-url="Protocols/MGLMapSnapshotterDelegate.html">
+                <a title="MGLMapSnapshotterDelegate" class="nav-group-task-link" href="Protocols/MGLMapSnapshotterDelegate.html">MGLMapSnapshotterDelegate</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLOfflineStorageDelegate" data-url="Protocols/MGLOfflineStorageDelegate.html">
+                <a title="MGLOfflineStorageDelegate" class="nav-group-task-link" href="Protocols/MGLOfflineStorageDelegate.html">MGLOfflineStorageDelegate</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLStylable" data-url="Protocols/MGLStylable.html">
+                <a title="MGLStylable" class="nav-group-task-link" href="Protocols/MGLStylable.html">MGLStylable</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name" data-name="Other Type Definitions">
+            <a class="small-heading" href="Other Type Definitions.html">Other Type Definitions<span class="anchor-icon" /></a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task" data-name="MGLAttributedExpressionKey" data-url="Other%20Type%20Definitions.html#/c:MGLAttributedExpression.h@T@MGLAttributedExpressionKey">
+                <a title="MGLAttributedExpressionKey" class="nav-group-task-link" href="Other%20Type%20Definitions.html#/c:MGLAttributedExpression.h@T@MGLAttributedExpressionKey">MGLAttributedExpressionKey</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLBatchedOfflinePackAdditionCompletionHandler" data-url="Other%20Type%20Definitions.html#/c:MGLOfflineStorage.h@T@MGLBatchedOfflinePackAdditionCompletionHandler">
+                <a title="MGLBatchedOfflinePackAdditionCompletionHandler" class="nav-group-task-link" href="Other%20Type%20Definitions.html#/c:MGLOfflineStorage.h@T@MGLBatchedOfflinePackAdditionCompletionHandler">MGLBatchedOfflinePackAdditionCompletionHandler</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLLoggingBlockHandler" data-url="Other%20Type%20Definitions.html#/c:MGLLoggingConfiguration.h@T@MGLLoggingBlockHandler">
+                <a title="MGLLoggingBlockHandler" class="nav-group-task-link" href="Other%20Type%20Definitions.html#/c:MGLLoggingConfiguration.h@T@MGLLoggingBlockHandler">MGLLoggingBlockHandler</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLMapSnapshotCompletionHandler" data-url="Other%20Type%20Definitions.html#/c:MGLMapSnapshotter.h@T@MGLMapSnapshotCompletionHandler">
+                <a title="MGLMapSnapshotCompletionHandler" class="nav-group-task-link" href="Other%20Type%20Definitions.html#/c:MGLMapSnapshotter.h@T@MGLMapSnapshotCompletionHandler">MGLMapSnapshotCompletionHandler</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLMapSnapshotOverlayHandler" data-url="Other%20Type%20Definitions.html#/c:MGLMapSnapshotter.h@T@MGLMapSnapshotOverlayHandler">
+                <a title="MGLMapSnapshotOverlayHandler" class="nav-group-task-link" href="Other%20Type%20Definitions.html#/c:MGLMapSnapshotter.h@T@MGLMapSnapshotOverlayHandler">MGLMapSnapshotOverlayHandler</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLOfflinePackAdditionCompletionHandler" data-url="Other%20Type%20Definitions.html#/c:MGLOfflineStorage.h@T@MGLOfflinePackAdditionCompletionHandler">
+                <a title="MGLOfflinePackAdditionCompletionHandler" class="nav-group-task-link" href="Other%20Type%20Definitions.html#/c:MGLOfflineStorage.h@T@MGLOfflinePackAdditionCompletionHandler">MGLOfflinePackAdditionCompletionHandler</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLOfflinePackRemovalCompletionHandler" data-url="Other%20Type%20Definitions.html#/c:MGLOfflineStorage.h@T@MGLOfflinePackRemovalCompletionHandler">
+                <a title="MGLOfflinePackRemovalCompletionHandler" class="nav-group-task-link" href="Other%20Type%20Definitions.html#/c:MGLOfflineStorage.h@T@MGLOfflinePackRemovalCompletionHandler">MGLOfflinePackRemovalCompletionHandler</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLOfflinePackUserInfoKey" data-url="Other%20Type%20Definitions.html#/c:MGLOfflineStorage.h@T@MGLOfflinePackUserInfoKey">
+                <a title="MGLOfflinePackUserInfoKey" class="nav-group-task-link" href="Other%20Type%20Definitions.html#/c:MGLOfflineStorage.h@T@MGLOfflinePackUserInfoKey">MGLOfflinePackUserInfoKey</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLOfflinePreloadDataCompletionHandler" data-url="Other%20Type%20Definitions.html#/c:MGLOfflineStorage.h@T@MGLOfflinePreloadDataCompletionHandler">
+                <a title="MGLOfflinePreloadDataCompletionHandler" class="nav-group-task-link" href="Other%20Type%20Definitions.html#/c:MGLOfflineStorage.h@T@MGLOfflinePreloadDataCompletionHandler">MGLOfflinePreloadDataCompletionHandler</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLShapeSourceOption" data-url="Other%20Type%20Definitions.html#/c:MGLShapeSource.h@T@MGLShapeSourceOption">
+                <a title="MGLShapeSourceOption" class="nav-group-task-link" href="Other%20Type%20Definitions.html#/c:MGLShapeSource.h@T@MGLShapeSourceOption">MGLShapeSourceOption</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLTileSourceOption" data-url="Other%20Type%20Definitions.html#/c:MGLTileSource.h@T@MGLTileSourceOption">
+                <a title="MGLTileSourceOption" class="nav-group-task-link" href="Other%20Type%20Definitions.html#/c:MGLTileSource.h@T@MGLTileSourceOption">MGLTileSourceOption</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name" data-name="Other Functions">
+            <a class="small-heading" href="Other Functions.html">Other Functions<span class="anchor-icon" /></a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task" data-name="MGLAltitudeForZoomLevel" data-url="Other%20Functions.html#/c:@F@MGLAltitudeForZoomLevel">
+                <a title="MGLAltitudeForZoomLevel" class="nav-group-task-link" href="Other%20Functions.html#/c:@F@MGLAltitudeForZoomLevel">MGLAltitudeForZoomLevel</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLCoordinateQuadFromCoordinateBounds" data-url="Other%20Functions.html#/c:MGLGeometry.h@F@MGLCoordinateQuadFromCoordinateBounds">
+                <a title="MGLCoordinateQuadFromCoordinateBounds" class="nav-group-task-link" href="Other%20Functions.html#/c:MGLGeometry.h@F@MGLCoordinateQuadFromCoordinateBounds">MGLCoordinateQuadFromCoordinateBounds</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLCoordinateQuadMake" data-url="Other%20Functions.html#/c:MGLGeometry.h@F@MGLCoordinateQuadMake">
+                <a title="MGLCoordinateQuadMake" class="nav-group-task-link" href="Other%20Functions.html#/c:MGLGeometry.h@F@MGLCoordinateQuadMake">MGLCoordinateQuadMake</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLMapPointForCoordinate" data-url="Other%20Functions.html#/c:@F@MGLMapPointForCoordinate">
+                <a title="MGLMapPointForCoordinate" class="nav-group-task-link" href="Other%20Functions.html#/c:@F@MGLMapPointForCoordinate">MGLMapPointForCoordinate</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLMapPointMake" data-url="Other%20Functions.html#/c:MGLGeometry.h@F@MGLMapPointMake">
+                <a title="MGLMapPointMake" class="nav-group-task-link" href="Other%20Functions.html#/c:MGLGeometry.h@F@MGLMapPointMake">MGLMapPointMake</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLSphericalPositionMake" data-url="Other%20Functions.html#/c:MGLLight.h@F@MGLSphericalPositionMake">
+                <a title="MGLSphericalPositionMake" class="nav-group-task-link" href="Other%20Functions.html#/c:MGLLight.h@F@MGLSphericalPositionMake">MGLSphericalPositionMake</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLStringFromCoordinateQuad" data-url="Other%20Functions.html#/c:MGLGeometry.h@F@MGLStringFromCoordinateQuad">
+                <a title="MGLStringFromCoordinateQuad" class="nav-group-task-link" href="Other%20Functions.html#/c:MGLGeometry.h@F@MGLStringFromCoordinateQuad">MGLStringFromCoordinateQuad</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLTransitionMake" data-url="Other%20Functions.html#/c:MGLTypes.h@F@MGLTransitionMake">
+                <a title="MGLTransitionMake" class="nav-group-task-link" href="Other%20Functions.html#/c:MGLTypes.h@F@MGLTransitionMake">MGLTransitionMake</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLZoomLevelForAltitude" data-url="Other%20Functions.html#/c:@F@MGLZoomLevelForAltitude">
+                <a title="MGLZoomLevelForAltitude" class="nav-group-task-link" href="Other%20Functions.html#/c:@F@MGLZoomLevelForAltitude">MGLZoomLevelForAltitude</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name" data-name="Other Structures">
+            <a class="small-heading" href="Other Structures.html">Other Structures<span class="anchor-icon" /></a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task" data-name="MGLCoordinateQuad" data-url="Structs/MGLCoordinateQuad.html">
+                <a title="MGLCoordinateQuad" class="nav-group-task-link" href="Structs/MGLCoordinateQuad.html">MGLCoordinateQuad</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLSphericalPosition" data-url="Structs/MGLSphericalPosition.html">
+                <a title="MGLSphericalPosition" class="nav-group-task-link" href="Structs/MGLSphericalPosition.html">MGLSphericalPosition</a>
+              </li>
+              <li class="nav-group-task" data-name="MGLTransition" data-url="Structs/MGLTransition.html">
+                <a title="MGLTransition" class="nav-group-task-link" href="Structs/MGLTransition.html">MGLTransition</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+
+        <section class="section">
+          <div class="section-content">
+            
+            <h1 id='a-href-https-github-com-mapbox-mapbox-gl-native-ios-tree-master-platform-macos-mapbox-maps-sdk-for-macos-a' class='heading'><a href="https://github.com/mapbox/mapbox-gl-native-ios/tree/master/platform/macos/">Mapbox Maps SDK for macOS</a></h1>
+
+<p>Put interactive, scalable world maps into your native Cocoa application with the open-source Mapbox Maps SDK for macOS.</p>
+
+<ul>
+<li>Mapbox-curated <a href="https://www.mapbox.com/maps/">map styles</a> and <a href="https://www.mapbox.com/vector-tiles/mapbox-streets-v7/">OpenStreetMap-based</a> <a href="https://www.mapbox.com/vector-tiles/">vector tiles</a> make it easy to get started.</li>
+<li>Customize every aspect of the map’s appearance in code or visually using <a href="https://www.mapbox.com/mapbox-studio/">Mapbox Studio</a>.</li>
+<li>High-performance OpenGL rendering and multitouch gestures keep your users happy.</li>
+<li>A well-designed, fully documented API helps you stay productive.</li>
+<li>Develop across <a href="https://www.mapbox.com/maps/">multiple platforms</a>, including <a href="https://docs.mapbox.com/ios/maps/">iOS</a>, using the same styles and similar APIs.</li>
+</ul>
+
+<p><img src="img/screenshot.jpg" alt=""></p>
+
+<p>The Mapbox Maps SDK for macOS is compatible with macOS 10.11.0 and above for Cocoa applications developed in Objective-C, Swift, Interface Builder, or AppleScript. For hybrid applications, consider <a href="https://www.mapbox.com/mapbox-gl-js/">Mapbox GL JS</a>.</p>
+<h2 id='installation' class='heading'>Installation</h2>
+
+<p>There are three ways to install the Mapbox Maps SDK for macOS:</p>
+<h3 id='manually' class='heading'>Manually</h3>
+
+<ol>
+<li><p>Download the <a href="https://github.com/mapbox/mapbox-gl-native-ios/releases/">latest Mapbox Maps SDK for macOS release</a> from GitHub – look for a release that begins with “macos-”.</p></li>
+<li><p>Open the project editor, select your application target, then go to the General tab. Drag Mapbox.framework into the “Embedded Binaries” section. (Don’t drag it into the “Linked Frameworks and Libraries” section; Xcode will add it there automatically.) In the sheet that appears, make sure “Copy items if needed” is checked, then click Finish.</p></li>
+</ol>
+<h3 id='via-carthage' class='heading'>Via Carthage</h3>
+
+<p>The Mapbox Maps SDK for macOS is a binary-only dependency, so you’ll need Carthage 0.19 or above. In your <a href="https://github.com/Carthage/Carthage/blob/master/Documentation/Artifacts.md#binary-only-frameworks">Cartfile</a>, specify this dependency (plus an optional version requirement):</p>
+<pre class="highlight plaintext"><code>binary "https://mapbox.github.io/mapbox-gl-native-ios/macos/Mapbox-macOS-SDK.json"
+</code></pre>
+
+<p>After running <code>carthage update</code>, you’ll find Mapbox.framework in the Carthage/Build/ folder. Follow <a href="https://github.com/Carthage/Carthage#if-youre-building-for-os-x">these instructions</a> to integrate it into your project.</p>
+<h3 id='via-cocoapods' class='heading'>Via CocoaPods</h3>
+
+<p>Create a <a href="https://guides.cocoapods.org/syntax/podfile.html">Podfile</a> with the following specification:</p>
+<pre class="highlight ruby"><code><span class="n">platform</span> <span class="ss">:osx</span><span class="p">,</span> <span class="s1">'10.11'</span>
+
+<span class="n">target</span> <span class="s1">'TargetNameForYourApp'</span> <span class="k">do</span>
+  <span class="n">pod</span> <span class="s1">'Mapbox-macOS-SDK'</span><span class="p">,</span> <span class="s1">'~&gt; x.y'</span>
+<span class="k">end</span>
+</code></pre>
+
+<p>where <em>x.y</em> is the current version. In Terminal, run <code>pod install</code>.</p>
+<h2 id='usage' class='heading'>Usage</h2>
+
+<p>Mapbox vector tiles require a Mapbox account and API access token. In the project editor, select the application target, then go to the Info tab. Under the “Custom macOS Application Target Properties” section, set <code>MGLMapboxAccessToken</code> to your access token. You can obtain an access token from the <a href="https://www.mapbox.com/studio/account/tokens/">Mapbox account page</a>.</p>
+
+<p>Then, in a storyboard or XIB:</p>
+
+<ol>
+<li>Add a view to your view controller or window. (Drag Custom View from the Object library to the View Controller scene on the Interface Builder canvas. In a XIB, drag it instead to the window on the canvas.)</li>
+<li>In the Identity inspector, set the view’s custom class to <code><a href="Classes/MGLMapView.html">MGLMapView</a></code>.</li>
+<li>MGLMapView needs to be layer-backed:
+
+<ul>
+<li>You can make the window layer-backed by selecting the window and checking Full Size Content View in the Attributes inspector. This allows the map view to underlap the title bar and toolbar.</li>
+<li>Alternatively, if you don’t want the entire window to be layer-backed, you can make just the map view layer-backed by selecting it and checking its entry under the View Effects inspector’s Core Animation Layer section.</li>
+</ul></li>
+<li>Add a map feedback item to your Help menu. (Drag Menu Item from the Object library into Main Menu ‣ Help ‣ Menu.) Title it “Improve This Map” or similar, and connect it to the <code>giveFeedback:</code> action of First Responder.</li>
+</ol>
+
+<p>If you need to manipulate the map view programmatically:</p>
+
+<ol>
+<li>Switch to the Assistant Editor.</li>
+<li>Import the <code>Mapbox</code> module.</li>
+<li>Connect the map view to a new outlet in your view controller class. (Control-drag from the map view in Interface Builder to a valid location in your view controller implementation.) The resulting outlet declaration should look something like this:</li>
+</ol>
+<pre class="highlight objective_c"><code><span class="c1">// ViewController.m</span>
+<span class="k">@import</span> <span class="n">Mapbox</span><span class="p">;</span>
+
+<span class="k">@interface</span> <span class="nc">ViewController</span> <span class="p">:</span> <span class="nc">NSViewController</span>
+
+<span class="k">@property</span> <span class="p">(</span><span class="n">strong</span><span class="p">)</span> <span class="n">IBOutlet</span> <span class="n">MGLMapView</span> <span class="o">*</span><span class="n">mapView</span><span class="p">;</span>
+
+<span class="k">@end</span>
+</code></pre>
+<pre class="highlight swift"><code><span class="c1">// ViewController.swift</span>
+<span class="kd">import</span> <span class="kt">Mapbox</span>
+
+<span class="kd">class</span> <span class="kt">ViewController</span><span class="p">:</span> <span class="kt">NSViewController</span> <span class="p">{</span>
+    <span class="kd">@IBOutlet</span> <span class="k">var</span> <span class="nv">mapView</span><span class="p">:</span> <span class="kt">MGLMapView</span><span class="o">!</span>
+<span class="p">}</span>
+</code></pre>
+<pre class="highlight applescript"><code><span class="c1">-- AppDelegate.applescript</span><span class="w">
+</span><span class="k">script</span> <span class="nv">AppDelegate</span><span class="w">
+    </span><span class="k">property</span><span class="w"> </span><span class="nv">parent</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="na">class</span><span class="w"> </span><span class="s2">"NSObject"</span><span class="w">
+    </span><span class="k">property</span><span class="w"> </span><span class="nv">theMapView</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nb">missing value</span><span class="w">
+</span><span class="k">end</span><span class="w"> </span><span class="nv">script</span><span class="w">
+</span></code></pre>
+
+<p>Full API documentation is included in this package, within the <code>documentation</code> folder, and <a href="https://mapbox.github.io/mapbox-gl-native/macos/">online</a>. The <a href="https://docs.mapbox.com/ios/maps/">Mapbox Maps SDK for iOS</a> has <a href="https://docs.mapbox.com/ios/api/maps/">API documentation</a> and <a href="https://docs.mapbox.com/ios/maps/examples/">online examples</a> that apply to the Mapbox Maps SDK for macOS with few differences, mostly around unimplemented features like user location tracking.</p>
+
+<p>Mapbox does not officially support the macOS SDK to the same extent as the iOS SDK; however, <a href="https://github.com/mapbox/mapbox-gl-native-ios/issues/">bug reports and pull requests</a> are certainly welcome.</p>
+<h2 id='changes-in-a-href-https-github-com-mapbox-mapbox-gl-native-ios-releases-tag-macos-v0-15-0-beta-2-version-0-15-0-a' class='heading'>Changes in <a href="https://github.com/mapbox/mapbox-gl-native-ios/releases/tag/macos-v0.15.0-beta.2">version 0.15.0</a></h2>
+<h3 id='styles-and-rendering' class='heading'>Styles and rendering</h3>
+
+<ul>
+<li>Added the <code><a href="Protocols/MGLMapViewDelegate.html#/c:objc(pl)MGLMapViewDelegate(im)mapView:shouldRemoveStyleImage:">-[MGLMapViewDelegate mapView:shouldRemoveStyleImage:]</a></code> method for optimizing style image caching. (<a href="https://github.com/mapbox/mapbox-gl-native/pull/14769">#14769</a>)</li>
+<li>Added the <code>image</code> expression function for converting an image name into a style image. Use this function in expressions in style JSON or with the <code>MGL_FUNCTION()</code> syntax in an <code>NSExpression</code> format string. Image expressions are compatible with the <code>mgl_attributed:</code> expression function and <code><a href="Classes/MGLAttributedExpression.html">MGLAttributedExpression</a></code> classes for embedding icons inline in text labels. (<a href="https://github.com/mapbox/mapbox-gl-native/pull/15877">#15877</a>, <a href="https://github.com/mapbox/mapbox-gl-native/pull/15937">#15937</a>)</li>
+<li>The <code>IN</code> and <code>CONTAINS</code> predicate operators can now test whether a string is a substring of another string or whether the evaluated feature (<code>SELF</code>) lies within a given <code><a href="Classes/MGLShape.html">MGLShape</a></code> or <code><a href="Protocols/MGLFeature.html">MGLFeature</a></code>. (<a href="https://github.com/mapbox/mapbox-gl-native-ios/pull/183">#183</a>, <a href="https://github.com/mapbox/mapbox-gl-native-ios/pull/184%5D">#184</a></li>
+<li>Added the <code><a href="Classes/MGLSymbolStyleLayer.html#/c:objc(cs)MGLSymbolStyleLayer(py)textWritingModes">MGLSymbolStyleLayer.textWritingModes</a></code> layout property. This property can be set to <code>MGLTextWritingModeHorizontal</code> or <code>MGLTextWritingModeVertical</code>. (<a href="https://github.com/mapbox/mapbox-gl-native/pull/14932">#14932</a>)</li>
+<li>Added the <code><a href="Classes/MGLLineStyleLayer.html#/c:objc(cs)MGLLineStyleLayer(py)lineSortKey">MGLLineStyleLayer.lineSortKey</a></code> and <code><a href="Classes/MGLFillStyleLayer.html#/c:objc(cs)MGLFillStyleLayer(py)fillSortKey">MGLFillStyleLayer.fillSortKey</a></code> properties. (<a href="https://github.com/mapbox/mapbox-gl-native-ios/pull/179">#179</a>)</li>
+<li>The <code>MGLIdeographicFontFamilyName</code> Info.plist key now also accepts an array of font family names, to customize font fallback behavior. It can also be set to a Boolean value of <code>NO</code> to force the SDK to typeset CJK characters in a remote font specified by <code><a href="Classes/MGLSymbolStyleLayer.html#/c:objc(cs)MGLSymbolStyleLayer(py)textFontNames">MGLSymbolStyleLayer.textFontNames</a></code>. (<a href="https://github.com/mapbox/mapbox-gl-native/pull/14862">#14862</a>)</li>
+<li>The <code><a href="Classes/MGLSymbolStyleLayer.html#/c:objc(cs)MGLSymbolStyleLayer(py)iconTextFit">MGLSymbolStyleLayer.iconTextFit</a></code> property now respects the cap insets of any nine-part stretchable image passed into the <code><a href="Classes/MGLStyle.html#/c:objc(cs)MGLStyle(im)setImage:forName:">-[MGLStyle setImage:forName:]</a></code> method. You can define the stretchable area in Xcode’s asset catalog or by setting the <code>NSImage.capInsets</code> property. (<a href="https://github.com/mapbox/mapbox-gl-native-ios/pull/182">#182</a>)</li>
+<li>The <code><a href="Classes/MGLStyle.html#/c:objc(cs)MGLStyle(im)localizeLabelsIntoLocale:">-[MGLStyle localizeLabelsIntoLocale:]</a></code> and <code>-[NSExpression mgl_expressionLocalizedIntoLocale:]</code> methods can now localize text into Traditional Chinese and Vietnamese. (<a href="https://github.com/mapbox/mapbox-gl-native-ios/pull/173">#173</a>)</li>
+<li>Fixed crashes triggered when <code><a href="Classes/MGLSource.html">MGLSource</a></code> and <code><a href="Classes/MGLStyleLayer.html">MGLStyleLayer</a></code> objects are accessed after having been invalidated after a style change. (<a href="https://github.com/mapbox/mapbox-gl-native/pull/15539">#15539</a>)</li>
+<li>Fixed an issue where fill extrusion layers would be incorrectly rendered above other layers. (<a href="https://github.com/mapbox/mapbox-gl-native/pull/15065">#15065</a>)</li>
+<li>Fixed rendering and collision detection issues with using <code><a href="Classes/MGLSymbolStyleLayer.html#/c:objc(cs)MGLSymbolStyleLayer(py)textVariableAnchor">MGLSymbolStyleLayer.textVariableAnchor</a></code> and <code><a href="Classes/MGLSymbolStyleLayer.html#/c:objc(cs)MGLSymbolStyleLayer(py)iconTextFit">MGLSymbolStyleLayer.iconTextFit</a></code> properties on the same layer. (<a href="https://github.com/mapbox/mapbox-gl-native/pull/15367">#15367</a>)</li>
+<li>Fixed symbol overlap when zooming out quickly. (<a href="https://github.com/mapbox/mapbox-gl-native/pull/15416">#15416</a>)</li>
+<li>Fixed an issue where non-template images would draw as template images when used in the same style layer. (<a href="https://github.com/mapbox/mapbox-gl-native/pull/15456">#15456</a>)</li>
+<li>Fixed an issue where the collision boxes for symbols would not be updated when <code><a href="Classes/MGLSymbolStyleLayer.html#/c:objc(cs)MGLSymbolStyleLayer(py)textTranslation">MGLSymbolStyleLayer.textTranslation</a></code> or <code><a href="Classes/MGLSymbolStyleLayer.html#/c:objc(cs)MGLSymbolStyleLayer(py)iconTranslation">MGLSymbolStyleLayer.iconTranslation</a></code> were used. (<a href="https://github.com/mapbox/mapbox-gl-native/pull/15467">#15467</a>)</li>
+<li>Fixed an issue that caused <code><a href="Other%20Constants.html#/c:@MGLTileSourceOptionMaximumZoomLevel">MGLTileSourceOptionMaximumZoomLevel</a></code> to be ignored when setting <code><a href="Classes/MGLTileSource.html#/c:objc(cs)MGLTileSource(py)configurationURL">MGLTileSource.configurationURL</a></code>. (<a href="https://github.com/mapbox/mapbox-gl-native/pull/15581">#15581</a>)</li>
+<li>Fixed an issue where <code><a href="Classes/MGLSymbolStyleLayer.html#/c:objc(cs)MGLSymbolStyleLayer(py)symbolSortKey">MGLSymbolStyleLayer.symbolSortKey</a></code> could sort text and icons incorrectly. (<a href="https://github.com/mapbox/mapbox-gl-native/pull/16023">#16023</a>)</li>
+<li>Fixed an issue where style layers backed by a shape source could flicker when transitioning between styles. (<a href="https://github.com/mapbox/mapbox-gl-native/pull/15907">#15907</a>, <a href="https://github.com/mapbox/mapbox-gl-native/pull/15941">#15941</a>)</li>
+<li>Improved the performance of loading a style that has many style images. (<a href="https://github.com/mapbox/mapbox-gl-native/pull/16187">#16187</a>)</li>
+<li>Updated “map ID” to the more accurate term “tileset ID” in documentation; updated “style&rsquo;s Map ID” to the more accurate term “style URL”. (<a href="https://github.com/mapbox/mapbox-gl-native/pull/15116">#15116</a>)</li>
+</ul>
+<h3 id='camera' class='heading'>Camera</h3>
+
+<ul>
+<li>Setting <code>MGLMapView.contentInset</code> now moves the map’s focal point to the center of the content frame after insetting. (<a href="https://github.com/mapbox/mapbox-gl-native/pull/14664">#14664</a>)</li>
+<li>The <code><a href="Classes/MGLMapView.html#/c:objc(cs)MGLMapView(im)setCamera:withDuration:animationTimingFunction:edgePadding:completionHandler:">-[MGLMapView setCamera:withDuration:animationTimingFunction:edgePadding:completionHandler:]</a></code> method now adds the current value of the <code><a href="Classes/MGLMapView.html#/c:objc(cs)MGLMapView(py)contentInsets">MGLMapView.contentInsets</a></code> property to the <code>edgePadding</code> parameter. (<a href="https://github.com/mapbox/mapbox-gl-native/pull/14813">#14813</a>)</li>
+<li>Added variants of multiple animated <code><a href="Classes/MGLMapView.html">MGLMapView</a></code> methods that accept completion handlers (<a href="https://github.com/mapbox/mapbox-gl-native/pull/14381">#14381</a>):
+
+<ul>
+<li><code><a href="Classes/MGLMapView.html#/c:objc(cs)MGLMapView(im)setVisibleCoordinateBounds:edgePadding:animated:completionHandler:">-[MGLMapView setVisibleCoordinateBounds:edgePadding:animated:completionHandler:]</a></code></li>
+<li><code><a href="Classes/MGLMapView.html#/c:objc(cs)MGLMapView(im)setContentInsets:animated:completionHandler:">-[MGLMapView setContentInsets:animated:completionHandler:]</a></code></li>
+<li><code><a href="Classes/MGLMapView.html#/c:objc(cs)MGLMapView(im)showAnnotations:edgePadding:animated:completionHandler:">-[MGLMapView showAnnotations:edgePadding:animated:completionHandler:]</a></code></li>
+</ul></li>
+<li>Added the <code><a href="Classes/MGLMapView.html#/c:objc(cs)MGLMapView(py)minimumPitch">MGLMapView.minimumPitch</a></code> and <code><a href="Classes/MGLMapView.html#/c:objc(cs)MGLMapView(py)maximumPitch">MGLMapView.maximumPitch</a></code> properties to further limit how much the user or your code can tilt the map. (<a href="https://github.com/mapbox/mapbox-gl-native-ios/pull/208">#208</a>)</li>
+<li>Fixed an issue where it was possible to set the map’s content insets then tilt the map enough to see the horizon, causing performance issues. (<a href="https://github.com/mapbox/mapbox-gl-native/pull/15195">#15195</a>)</li>
+<li>Fixed an issue where animated camera transitions zoomed in or out too dramatically. (<a href="https://github.com/mapbox/mapbox-gl-native/pull/15281">#15281</a>)</li>
+<li>Improved performance when continuously animating a tilted map. (<a href="https://github.com/mapbox/mapbox-gl-native/pull/16287">#16287</a>)</li>
+</ul>
+<h3 id='feature-querying' class='heading'>Feature querying</h3>
+
+<ul>
+<li>Fixed an issue where <code><a href="Classes/MGLMapView.html#/c:objc(cs)MGLMapView(im)visibleFeaturesInRect:">-[MGLMapView visibleFeaturesInRect:]</a></code> and <code><a href="Classes/MGLShapeSource.html#/c:objc(cs)MGLShapeSource(im)featuresMatchingPredicate:">-[MGLShapeSource featuresMatchingPredicate:]</a></code> omitted some features from the return value. (<a href="https://github.com/mapbox/mapbox-gl-native/pull/14884">#14884</a>)</li>
+<li>Fixed an issue where <code><a href="Classes/MGLMapView.html#/c:objc(cs)MGLMapView(im)visibleFeaturesInRect:">-[MGLMapView visibleFeaturesInRect:]</a></code> and <code><a href="Classes/MGLShapeSource.html#/c:objc(cs)MGLShapeSource(im)featuresMatchingPredicate:">-[MGLShapeSource featuresMatchingPredicate:]</a></code> could return incorrect coordinates at zoom levels 20 and higher. (<a href="https://github.com/mapbox/mapbox-gl-native/pull/15560">#15560</a>)</li>
+<li>Improved feature querying performance. (<a href="https://github.com/mapbox/mapbox-gl-native/pull/14930">#14930</a>)</li>
+</ul>
+<h3 id='snapshots' class='heading'>Snapshots</h3>
+
+<ul>
+<li>Added an <code><a href="Classes/MGLMapSnapshotter.html#/c:objc(cs)MGLMapSnapshotter(im)startWithOverlayHandler:completionHandler:">-[MGLMapSnapshotter startWithOverlayHandler:completionHandler:]</a></code> method to provide the snapshot&rsquo;s current <code>CGContext</code> in order to perform custom drawing on <code><a href="Classes/MGLMapSnapshot.html">MGLMapSnapshot</a></code> objects. (<a href="https://github.com/mapbox/mapbox-gl-native/pull/15530">#15530</a>)</li>
+<li>Added the <code><a href="Classes/MGLMapSnapshotter.html#/c:objc(cs)MGLMapSnapshotter(py)delegate">MGLMapSnapshotter.delegate</a></code> property and <code><a href="Protocols/MGLMapSnapshotterDelegate.html">MGLMapSnapshotterDelegate</a></code> protocol for customizing the style before taking a snapshot. (<a href="https://github.com/mapbox/mapbox-gl-native-ios/pull/235">#235</a>)</li>
+<li>You no longer need to explicitly capture the <code><a href="Classes/MGLMapSnapshotter.html">MGLMapSnapshotter</a></code> object in the completion handler that you specify in <code><a href="Classes/MGLMapSnapshotter.html#/c:objc(cs)MGLMapSnapshotter(im)startWithCompletionHandler:">-[MGLMapSnapshotter startWithCompletionHandler:]</a></code>. Even if you declare the snapshotter locally without holding a strong reference to it, the snapshotter is only deallocated after the completion handler finishes, and the completion handler generally receives a valid snapshot. (<a href="https://github.com/mapbox/mapbox-gl-native-ios/pull/210">#210</a>)</li>
+<li>The <code><a href="Classes/MGLMapSnapshotter.html#/c:objc(cs)MGLMapSnapshotter(im)cancel">-[MGLMapSnapshotter cancel]</a></code> method no longer calls the completion handler passed into <code><a href="Classes/MGLMapSnapshotter.html#/c:objc(cs)MGLMapSnapshotter(im)startWithCompletionHandler:">-[MGLMapSnapshotter startWithCompletionHandler:]</a></code>. (<a href="https://github.com/mapbox/mapbox-gl-native-ios/pull/210">#210</a>)</li>
+<li>Fixed an issue where the <code><a href="Classes/MGLMapSnapshotter.html#/c:objc(cs)MGLMapSnapshotter(py)loading">MGLMapSnapshotter.loading</a></code> property always returned <code>NO</code>, even while loading a snapshot. (<a href="https://github.com/mapbox/mapbox-gl-native-ios/pull/210">#210</a>)</li>
+</ul>
+<h3 id='networking-and-storage' class='heading'>Networking and storage</h3>
+
+<ul>
+<li>Ideographic glyphs from Chinese, Japanese, and Korean are no longer downloaded by default as part of offline packs; they are instead rendered on-device, saving bandwidth and storage while improving performance. (<a href="https://github.com/mapbox/mapbox-gl-native/pull/14176">#14176</a>)</li>
+<li>Downloaded offline packs no longer reduce the storage space available for ambient caching of tiles and other resources. (<a href="https://github.com/mapbox/mapbox-gl-native/pull/15622">#15622</a>)</li>
+<li>Added the <code><a href="Classes/MGLMapView.html#/c:objc(cs)MGLMapView(py)prefetchesTiles">MGLMapView.prefetchesTiles</a></code> property to configure lower-resolution tile prefetching behavior. (<a href="https://github.com/mapbox/mapbox-gl-native/pull/14816">#14816</a>)</li>
+<li>Added the <code><a href="Classes/MGLOfflineStorage.html#/c:objc(cs)MGLOfflineStorage(im)preloadData:forURL:modificationDate:expirationDate:eTag:mustRevalidate:completionHandler:">-[MGLOfflineStorage preloadData:forURL:modificationDate:expirationDate:eTag:mustRevalidate:completionHandler:]</a></code> method for determining when the data is ready to retrieve from the cache. (<a href="https://github.com/mapbox/mapbox-gl-native-ios/pull/188">#188</a>)</li>
+<li>Fixed a crash when <code>-[MGLOfflinePack invalidate]</code> is called on different threads. (<a href="https://github.com/mapbox/mapbox-gl-native/pull/15582">#15582</a>)</li>
+<li>Fixed issues where an offline pack would stop downloading before completion. (<a href="https://github.com/mapbox/mapbox-gl-native/pull/16230">#16230</a>, <a href="https://github.com/mapbox/mapbox-gl-native/pull/16240">#16240</a>)</li>
+<li>When an offline pack encounters an HTTP 404 error, the <code><a href="Other%20Constants.html#/c:@MGLOfflinePackUserInfoKeyError">MGLOfflinePackUserInfoKeyError</a></code> user info key of the <code><a href="Other%20Constants.html#/c:@MGLOfflinePackErrorNotification">MGLOfflinePackErrorNotification</a></code> now indicates the resource that could not be downloaded. (<a href="https://github.com/mapbox/mapbox-gl-native/pull/16240">#16240</a>)</li>
+<li>Expired resources are now fetched at a lower priority than new resources. (<a href="https://github.com/mapbox/mapbox-gl-native/pull/15950">#15950</a>)</li>
+</ul>
+<h3 id='other-changes' class='heading'>Other changes</h3>
+
+<ul>
+<li>Fixed a memory leak when zooming with any options enabled in the <code><a href="Classes/MGLMapView.html#/c:objc(cs)MGLMapView(py)debugMask">MGLMapView.debugMask</a></code> property. (<a href="https://github.com/mapbox/mapbox-gl-native/issues/15179">#15179</a>)</li>
+<li><code><a href="Enums/MGLLoggingLevel.html">MGLLoggingLevel</a></code> has been updated to better match core log levels. You can now use <code><a href="Classes/MGLLoggingConfiguration.html#/c:objc(cs)MGLLoggingConfiguration(py)loggingLevel">MGLLoggingConfiguration.loggingLevel</a></code> to filter logs from core. (<a href="https://github.com/mapbox/mapbox-gl-native/pull/15120">#15120</a>)</li>
+</ul>
+
+          </div>
+        </section>
+
+
+      </article>
+    </div>
+    <section class="footer limiter">
+      <p>© 2014–2019 <a class="link" href="https://www.mapbox.com/" target="_blank" rel="external">Mapbox</a>. See <a class="link" href="https://github.com/mapbox/mapbox-gl-native-ios/blob/master/LICENSE.md" target="_blank" rel="external">license</a> for more details.</p> Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.13.1</a>, a <a class="link" href="http://realm.io" target="_blank" rel="external">Realm</a> project.
+    </section>
+  </body>
+</div>
+</html>
