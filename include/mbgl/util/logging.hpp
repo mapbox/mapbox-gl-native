@@ -3,6 +3,7 @@
 #include <mbgl/util/event.hpp>
 
 #include <mbgl/util/noncopyable.hpp>
+#include <mbgl/util/optional.hpp>
 
 #include <memory>
 #include <string>
@@ -36,6 +37,11 @@ private:
     }
 
 public:
+    Log();
+    ~Log();
+
+    static void useLogThread(bool enable);
+
     template <typename ...Args>
     static void Debug(Event event, Args&& ...args) {
         Record(EventSeverity::Debug, event, ::std::forward<Args>(args)...);
@@ -66,15 +72,23 @@ public:
     }
 
 private:
+    static Log* get() noexcept;
+
     static void record(EventSeverity severity, Event event, const std::string &msg);
     static void record(EventSeverity severity, Event event, const char* format = "", ...);
     static void record(EventSeverity severity, Event event, int64_t code, const char* format = "", ...);
-    static void record(EventSeverity severity, Event event, int64_t code, const std::string &msg);
+    static void record(EventSeverity severity,
+                       Event event,
+                       int64_t code,
+                       const std::string& msg,
+                       const optional<std::string>& threadName);
 
     // This method is the data sink that must be implemented by each platform we
     // support. It should ideally output the error message in a human readable
     // format to the developer.
     static void platformRecord(EventSeverity severity, const std::string &msg);
+    class Impl;
+    const std::unique_ptr<Impl> impl;
 };
 
 } // namespace mbgl
