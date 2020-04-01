@@ -72,7 +72,7 @@ public:
                      const RenderTile& renderTile_,
                      const TransformState& state_,
                      float placementZoom,
-                     const CollisionGroups::CollisionGroup& collisionGroup_,
+                     CollisionGroups::CollisionGroup collisionGroup_,
                      optional<CollisionBoundaries> avoidEdges_ = nullopt)
         : bucket(bucket_),
           renderTile(renderTile_),
@@ -80,7 +80,7 @@ public:
           pixelsToTileUnits(renderTile_.id.pixelsToTileUnits(1, placementZoom)),
           scale(std::pow(2, placementZoom - getOverscaledID().overscaledZ)),
           pixelRatio(util::tileSize * getOverscaledID().overscaleFactor() / util::EXTENT),
-          collisionGroup(collisionGroup_),
+          collisionGroup(std::move(collisionGroup_)),
           partiallyEvaluatedTextSize(bucket_.textSizeBinder->evaluateForZoom(placementZoom)),
           partiallyEvaluatedIconSize(bucket_.iconSizeBinder->evaluateForZoom(placementZoom)),
           avoidEdges(std::move(avoidEdges_)) {}
@@ -230,7 +230,7 @@ Point<float> calculateVariableLayoutOffset(style::SymbolAnchorType anchor,
 
 void Placement::placeSymbolBucket(const BucketPlacementData& params, std::set<uint32_t>& seenCrossTileIDs) {
     assert(updateParameters);
-    const SymbolBucket& symbolBucket = static_cast<const SymbolBucket&>(params.bucket.get());
+    const auto& symbolBucket = static_cast<const SymbolBucket&>(params.bucket.get());
     const RenderTile& renderTile = params.tile;
     PlacementContext ctx{symbolBucket,
                          params.tile,
@@ -1244,10 +1244,13 @@ void StaticPlacement::commit() {
 /// Placement for Tile map mode.
 
 struct Intersection {
-    Intersection(const SymbolInstance& symbol_, const PlacementContext& ctx_) : symbol(symbol_), ctx(ctx_) {}
+    Intersection(const SymbolInstance& symbol_, PlacementContext ctx_, IntersectStatus status_)
+        : symbol(symbol_), ctx(std::move(ctx_)), status(status_) {}
     std::reference_wrapper<const SymbolInstance> symbol;
     PlacementContext ctx;
+    IntersectStatus status;
 };
+
 class TilePlacement : public StaticPlacement {
 public:
     explicit TilePlacement(std::shared_ptr<const UpdateParameters> updateParameters_)
@@ -1290,8 +1293,17 @@ void TilePlacement::placeLayers(const RenderLayerReferences& layers) {
         placeLayer(*it, seenCrossTileIDs);
     }
 
-    // Add more stability, sorting intersections by their Y position.
     std::stable_sort(intersections.begin(), intersections.end(), [](const Intersection& a, const Intersection& b) {
+        uint8_t flagsA = a.status.flags;
+        uint8_t flagsB = b.status.flags;
+        // Items arranged as: VerticalBorders & HorizontalBorders (3) ->
+        // VerticalBorders (2) -> HorizontalBorders (1)
+        if (flagsA != flagsB) return flagsA > flagsB;
+        // If both intersects the same border(s), look for a more noticable cut-off.
+        if (a.status.minSectionLength != b.status.minSectionLength) {
+            return a.status.minSectionLength > b.status.minSectionLength;
+        }
+        // Finally, look at Y position.
         return a.symbol.get().anchor.point.y < b.symbol.get().anchor.point.y;
     });
     // Place intersections.
@@ -1369,12 +1381,13 @@ void TilePlacement::placeSymbolBucket(const BucketPlacementData& params, std::se
         {collisionIndex, UnwrappedTileID(z, x + 1, y), {-util::EXTENT, 0.0f}}  // right
     }};
 
-    auto collisionBoxIntersectsTileEdges = [&](const CollisionBox& collisionBox, Point<float> shift) noexcept->bool {
-        bool intersects =
+    auto collisionBoxIntersectsTileEdges = [&](const CollisionBox& collisionBox,
+                                               Point<float> shift) noexcept->IntersectStatus {
+        IntersectStatus intersects =
             collisionIndex.intersectsTileEdges(collisionBox, shift, renderTile.matrix, ctx.pixelRatio, *tileBorders);
         // Check if this symbol intersects the neighbor tile borders. If so, it also shall be placed with priority.
         for (const auto& neighbor : neighbours) {
-            if (intersects) break;
+            if (intersects.flags != IntersectStatus::None) break;
             intersects = collisionIndex.intersectsTileEdges(
                 collisionBox, shift + neighbor.shift, neighbor.matrix, ctx.pixelRatio, neighbor.borders);
         }
@@ -1387,8 +1400,8 @@ void TilePlacement::placeSymbolBucket(const BucketPlacementData& params, std::se
         pitchTextWithMap = ctx.pitchTextWithMap,
         rotateTextWithMap = ctx.rotateTextWithMap,
         bearing = ctx.getTransformState().getBearing()
-    ](const SymbolInstance& symbol) noexcept->bool {
-        bool intersects = false;
+    ](const SymbolInstance& symbol) noexcept->IntersectStatus {
+        IntersectStatus result;
         if (!symbol.textCollisionFeature.boxes.empty()) {
             const auto& textCollisionBox = symbol.textCollisionFeature.boxes.front();
 
@@ -1405,19 +1418,23 @@ void TilePlacement::placeSymbolBucket(const BucketPlacementData& params, std::se
                                                        pitchTextWithMap,
                                                        bearing);
             }
-            intersects = collisionBoxIntersectsTileEdges(textCollisionBox, offset);
+            result = collisionBoxIntersectsTileEdges(textCollisionBox, offset);
         }
 
-        if (!symbol.iconCollisionFeature.boxes.empty() && !intersects) {
+        if (!symbol.iconCollisionFeature.boxes.empty()) {
             const auto& iconCollisionBox = symbol.iconCollisionFeature.boxes.front();
-            intersects = collisionBoxIntersectsTileEdges(iconCollisionBox, {});
+            auto iconIntersects = collisionBoxIntersectsTileEdges(iconCollisionBox, {});
+            result.flags |= iconIntersects.flags;
+            result.minSectionLength = std::max(result.minSectionLength, iconIntersects.minSectionLength);
         }
 
-        return intersects;
+        return result;
     };
 
     for (const SymbolInstance& symbol : symbolInstances) {
-        if (symbolIntersectsTileEdges(symbol)) intersections.emplace_back(symbol, ctx);
+        auto intersectStatus = symbolIntersectsTileEdges(symbol);
+        if (intersectStatus.flags == IntersectStatus::None) continue;
+        intersections.emplace_back(symbol, ctx, intersectStatus);
     }
 }
 
@@ -1426,7 +1443,8 @@ bool TilePlacement::stickToFirstVariableAnchor(const CollisionBox& box,
                                                const mat4& posMatrix,
                                                float textPixelRatio) {
     assert(tileBorders);
-    return collisionIndex.intersectsTileEdges(box, shift, posMatrix, textPixelRatio, *tileBorders);
+    auto status = collisionIndex.intersectsTileEdges(box, shift, posMatrix, textPixelRatio, *tileBorders);
+    return status.flags != IntersectStatus::None;
 }
 
 void TilePlacement::newSymbolPlaced(const SymbolInstance& symbol,

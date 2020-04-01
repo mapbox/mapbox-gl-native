@@ -15,17 +15,22 @@ class PlacedSymbol;
 struct TileDistance;
 
 using CollisionBoundaries = std::array<float, 4>; // [x1, y1, x2, y2]
-
+struct IntersectStatus {
+    enum Flags : uint8_t { None = 0, HorizontalBorders = 1 << 0, VerticalBorders = 1 << 1 };
+    Flags flags = None;
+    // Assuming tile border divides box in two sections
+    int minSectionLength = 0;
+};
 class CollisionIndex {
 public:
     using CollisionGrid = GridIndex<IndexedSubfeature>;
 
     explicit CollisionIndex(const TransformState&, MapMode);
-    bool intersectsTileEdges(const CollisionBox&,
-                             Point<float> shift,
-                             const mat4& posMatrix,
-                             const float textPixelRatio,
-                             const CollisionBoundaries& tileEdges) const;
+    IntersectStatus intersectsTileEdges(const CollisionBox&,
+                                        Point<float> shift,
+                                        const mat4& posMatrix,
+                                        const float textPixelRatio,
+                                        const CollisionBoundaries& tileEdges) const;
     std::pair<bool, bool> placeFeature(
         const CollisionFeature& feature,
         Point<float> shift,
