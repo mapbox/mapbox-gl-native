@@ -31,14 +31,16 @@ void HillshadeBucket::upload(gfx::UploadPass& uploadPass) {
         return;
     }
 
-
     const PremultipliedImage* image = demdata.getImage();
     dem = uploadPass.createTexture(*image);
 
-    if (!segments.empty()) {
+    if (!vertices.empty()) {
         vertexBuffer = uploadPass.createVertexBuffer(std::move(vertices));
+    }
+    if (!indices.empty()) {
         indexBuffer = uploadPass.createIndexBuffer(std::move(indices));
     }
+
     uploaded = true;
 }
 
