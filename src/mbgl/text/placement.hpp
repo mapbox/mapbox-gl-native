@@ -91,7 +91,7 @@ private:
 };
 
 class Placement;
-
+class PlacementContext;
 class PlacementController {
 public:
     PlacementController();
@@ -142,6 +142,9 @@ public:
 protected:
     friend SymbolBucket;
     void placeSymbolBucket(const BucketPlacementData&, std::set<uint32_t>& seenCrossTileIDs);
+    void placeSymbol(const SymbolInstance& symbolInstance,
+                     const PlacementContext&,
+                     std::set<uint32_t>& seenCrossTileIDs);
     void placeLayer(const RenderLayer&, std::set<uint32_t>&);
     virtual void commit();
     virtual void newSymbolPlaced(const SymbolInstance&,
@@ -191,6 +194,10 @@ protected:
     CollisionGroups collisionGroups;
     mutable optional<Immutable<Placement>> prevPlacement;
     bool showCollisionBoxes = false;
+
+    // Cache being used by placeSymbol()
+    std::vector<ProjectedCollisionBox> textBoxes;
+    std::vector<ProjectedCollisionBox> iconBoxes;
     // Used for debug purposes.
     std::unordered_map<const CollisionFeature*, std::vector<ProjectedCollisionBox>> collisionCircles;
 };
