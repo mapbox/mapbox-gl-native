@@ -6,6 +6,12 @@
 
 - [core] Move logging off the main thread ([#16325](https://github.com/mapbox/mapbox-gl-native/pull/16325))
 
+### 🐞 Bug fixes
+
+- Hillshade bucket fix for mapbox-gl-native-ios #240 ([#16362](https://github.com/mapbox/mapbox-gl-native/pull/16362))
+
+  When dem tiles are loaded, border in neighboring tiles is updated, too leading to bucket re-upload. if std::move moved indices / vertices previously, they are empty and we get crash. Re-upload requires that only DEM texture is re-uploaded, not the quad vertices and indices.
+
 ## maps-v1.5.0
 
 ### ✨ New features
