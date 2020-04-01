@@ -14,6 +14,7 @@ Checks: >
     -google-readability-todo,
     -google-runtime-int,
     -google-runtime-references,
+    -misc-non-private-member-variables-in-classes,
     -modernize-avoid-c-arrays,
     -readability-braces-around-statements,
     -readability-else-after-return,
@@ -25,7 +26,3 @@ Checks: >
 WarningsAsErrors: '*'
 HeaderFilterRegex: '.*'
 FormatStyle: file
-
-CheckOptions:
-  - key:   misc-non-private-member-variables-in-classes.IgnoreClassesWithAllMemberVariablesBeingPublic
-    value: '1'
