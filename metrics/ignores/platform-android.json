@@ -9,5 +9,6 @@
     "render-tests/regressions/mapbox-gl-js#5911a": "Needs to be investigated and fixed.",
     "render-tests/regressions/mapbox-gl-native#9976": "Needs to be investigated and fixed.",
     "render-tests/runtime-styling/image-add-pattern": "Needs to be investigated and fixed.",
-    "render-tests/runtime-styling/image-update-pattern": "Needs to be investigated and fixed."
+    "render-tests/runtime-styling/image-update-pattern": "Needs to be investigated and fixed.",
+    "render-tests/text-variable-anchor/left-top-right-bottom-offset-tile-map-mode": "https://github.com/mapbox/api-gl/issues/1265"
 }
