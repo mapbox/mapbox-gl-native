@@ -141,7 +141,7 @@ public:
 
 protected:
     friend SymbolBucket;
-    void placeSymbolBucket(const BucketPlacementData&, std::set<uint32_t>& seenCrossTileIDs);
+    virtual void placeSymbolBucket(const BucketPlacementData&, std::set<uint32_t>& seenCrossTileIDs);
     void placeSymbol(const SymbolInstance& symbolInstance,
                      const PlacementContext&,
                      std::set<uint32_t>& seenCrossTileIDs);
@@ -156,7 +156,7 @@ protected:
     virtual optional<CollisionBoundaries> getAvoidEdges(const SymbolBucket&, const mat4& /*posMatrix*/) {
         return nullopt;
     }
-    virtual SymbolInstanceReferences getSortedSymbols(const BucketPlacementData&, float pixelRatio);
+    SymbolInstanceReferences getSortedSymbols(const BucketPlacementData&, float pixelRatio);
     virtual bool stickToFirstVariableAnchor(const CollisionBox&,
                                             Point<float> /*shift*/,
                                             const mat4& /*posMatrix*/,
