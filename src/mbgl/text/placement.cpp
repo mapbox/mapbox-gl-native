@@ -97,30 +97,30 @@ public:
         return getLayout().get<style::TextVariableAnchor>();
     }
 
-    const float pixelsToTileUnits;
-    const float scale;
-    const float pixelRatio;
+    float pixelsToTileUnits;
+    float scale;
+    float pixelRatio;
 
-    const bool rotateTextWithMap = getLayout().get<TextRotationAlignment>() == AlignmentType::Map;
-    const bool pitchTextWithMap = getLayout().get<TextPitchAlignment>() == AlignmentType::Map;
-    const bool rotateIconWithMap = getLayout().get<IconRotationAlignment>() == AlignmentType::Map;
-    const bool pitchIconWithMap = getLayout().get<IconPitchAlignment>() == AlignmentType::Map;
-    const SymbolPlacementType placementType = getLayout().get<SymbolPlacement>();
+    bool rotateTextWithMap = getLayout().get<TextRotationAlignment>() == AlignmentType::Map;
+    bool pitchTextWithMap = getLayout().get<TextPitchAlignment>() == AlignmentType::Map;
+    bool rotateIconWithMap = getLayout().get<IconRotationAlignment>() == AlignmentType::Map;
+    bool pitchIconWithMap = getLayout().get<IconPitchAlignment>() == AlignmentType::Map;
+    SymbolPlacementType placementType = getLayout().get<SymbolPlacement>();
 
-    const mat4 textLabelPlaneMatrix =
+    mat4 textLabelPlaneMatrix =
         getLabelPlaneMatrix(renderTile.get().matrix, pitchTextWithMap, rotateTextWithMap, state, pixelsToTileUnits);
-    const mat4 iconLabelPlaneMatrix =
+    mat4 iconLabelPlaneMatrix =
         (rotateTextWithMap == rotateIconWithMap && pitchTextWithMap == pitchIconWithMap)
             ? textLabelPlaneMatrix
             : getLabelPlaneMatrix(
                   renderTile.get().matrix, pitchIconWithMap, rotateIconWithMap, state, pixelsToTileUnits);
 
-    const CollisionGroups::CollisionGroup collisionGroup;
-    const ZoomEvaluatedSize partiallyEvaluatedTextSize;
-    const ZoomEvaluatedSize partiallyEvaluatedIconSize;
+    CollisionGroups::CollisionGroup collisionGroup;
+    ZoomEvaluatedSize partiallyEvaluatedTextSize;
+    ZoomEvaluatedSize partiallyEvaluatedIconSize;
 
-    const bool textAllowOverlap = getLayout().get<style::TextAllowOverlap>();
-    const bool iconAllowOverlap = getLayout().get<style::IconAllowOverlap>();
+    bool textAllowOverlap = getLayout().get<style::TextAllowOverlap>();
+    bool iconAllowOverlap = getLayout().get<style::IconAllowOverlap>();
     // This logic is similar to the "defaultOpacityState" logic below in updateBucketOpacities
     // If we know a symbol is always supposed to show, force it to be marked visible even if
     // it wasn't placed into the collision index (because some or all of it was outside the range
@@ -135,15 +135,15 @@ public:
     //  This is the reverse of our normal policy of "fade in on pan", but should look like any other
     //  collision and hopefully not be too noticeable.
     // See https://github.com/mapbox/mapbox-gl-native/issues/12683
-    const bool alwaysShowText =
+    bool alwaysShowText =
         textAllowOverlap && (iconAllowOverlap || !(getBucket().hasIconData() || getBucket().hasSdfIconData()) ||
                              getLayout().get<style::IconOptional>());
-    const bool alwaysShowIcon =
+    bool alwaysShowIcon =
         iconAllowOverlap && (textAllowOverlap || !getBucket().hasTextData() || getLayout().get<style::TextOptional>());
 
-    const bool hasIconTextFit = getLayout().get<IconTextFit>() != IconTextFitType::None;
+    bool hasIconTextFit = getLayout().get<IconTextFit>() != IconTextFitType::None;
 
-    const optional<CollisionBoundaries> avoidEdges;
+    optional<CollisionBoundaries> avoidEdges;
 };
 
 // PlacementController implemenation
@@ -1242,6 +1242,12 @@ void StaticPlacement::commit() {
 }
 
 /// Placement for Tile map mode.
+
+struct Intersection {
+    Intersection(const SymbolInstance& symbol_, const PlacementContext& ctx_) : symbol(symbol_), ctx(ctx_) {}
+    std::reference_wrapper<const SymbolInstance> symbol;
+    PlacementContext ctx;
+};
 class TilePlacement : public StaticPlacement {
 public:
     explicit TilePlacement(std::shared_ptr<const UpdateParameters> updateParameters_)
@@ -1249,10 +1255,11 @@ public:
 
 private:
     void placeLayers(const RenderLayerReferences&) override;
+    void placeSymbolBucket(const BucketPlacementData&, std::set<uint32_t>&) override;
     void collectPlacedSymbolData(bool enable) override { collectData = enable; }
     const std::vector<PlacedSymbolData>& getPlacedSymbolsData() const override { return placedSymbolsData; }
+
     optional<CollisionBoundaries> getAvoidEdges(const SymbolBucket&, const mat4&) override;
-    SymbolInstanceReferences getSortedSymbols(const BucketPlacementData&, float pixelRatio) override;
     bool stickToFirstVariableAnchor(const CollisionBox& box,
                                     Point<float> shift,
                                     const mat4& posMatrix,
@@ -1262,30 +1269,40 @@ private:
                          style::SymbolPlacementType,
                          const std::vector<ProjectedCollisionBox>&,
                          const std::vector<ProjectedCollisionBox>&) override;
+    void populateIntersectingSymbols();
 
     std::unordered_map<uint32_t, bool> locationCache;
     optional<CollisionBoundaries> tileBorders;
     std::set<uint32_t> seenCrossTileIDs;
     std::vector<PlacedSymbolData> placedSymbolsData;
-    bool onlyLabelsIntersectingTileBorders = false;
+    std::vector<Intersection> intersections;
+    bool populateIntersections = false;
     bool collectData = false;
 };
 
 void TilePlacement::placeLayers(const RenderLayerReferences& layers) {
-    // In order to avoid label cut-offs, at first, place the labels,
-    // which cross tile boundaries.
-    onlyLabelsIntersectingTileBorders = true;
     placedSymbolsData.clear();
     seenCrossTileIDs.clear();
-    for (auto it = layers.crbegin(); it != layers.crend(); ++it) {
-        placeLayer(*it, seenCrossTileIDs);
-    }
-    // Place the rest labels.
-    onlyLabelsIntersectingTileBorders = false;
+    intersections.clear();
+    // Populale intersections.
+    populateIntersections = true;
     for (auto it = layers.crbegin(); it != layers.crend(); ++it) {
         placeLayer(*it, seenCrossTileIDs);
     }
 
+    // Add more stability, sorting intersections by their Y position.
+    std::stable_sort(intersections.begin(), intersections.end(), [](const Intersection& a, const Intersection& b) {
+        return a.symbol.get().anchor.point.y < b.symbol.get().anchor.point.y;
+    });
+    // Place intersections.
+    for (const auto& intersection : intersections) {
+        placeSymbol(intersection.symbol, intersection.ctx, seenCrossTileIDs);
+    }
+    // Place the rest labels.
+    populateIntersections = false;
+    for (auto it = layers.crbegin(); it != layers.crend(); ++it) {
+        placeLayer(*it, seenCrossTileIDs);
+    }
     commit();
 }
 
@@ -1299,20 +1316,27 @@ optional<CollisionBoundaries> TilePlacement::getAvoidEdges(const SymbolBucket& b
     return nullopt;
 }
 
-SymbolInstanceReferences TilePlacement::getSortedSymbols(const BucketPlacementData& params, float pixelRatio) {
+void TilePlacement::placeSymbolBucket(const BucketPlacementData& params, std::set<uint32_t>& seen) {
+    assert(updateParameters);
     const auto& bucket = static_cast<const SymbolBucket&>(params.bucket.get());
     const auto& layout = *bucket.layout;
-    const RenderTile& renderTile = params.tile;
-    const auto& state = collisionIndex.getTransformState();
-    if (layout.get<style::SymbolPlacement>() != style::SymbolPlacementType::Point ||
-        layout.get<style::SymbolAvoidEdges>()) {
-        return onlyLabelsIntersectingTileBorders ? SymbolInstanceReferences()
-                                                 : StaticPlacement::getSortedSymbols(params, pixelRatio);
+    if (!populateIntersections) {
+        Placement::placeSymbolBucket(params, seen);
+        return;
     }
-    const bool rotateTextWithMap = layout.get<style::TextRotationAlignment>() == style::AlignmentType::Map;
-    const bool pitchTextWithMap = layout.get<style::TextPitchAlignment>() == style::AlignmentType::Map;
+    if (layout.get<SymbolPlacement>() != SymbolPlacementType::Point || layout.get<SymbolAvoidEdges>()) {
+        // Collect intersection only for point placement.
+        return;
+    }
+    const RenderTile& renderTile = params.tile;
+    PlacementContext ctx{bucket,
+                         params.tile,
+                         collisionIndex.getTransformState(),
+                         placementZoom,
+                         collisionGroups.get(params.sourceId),
+                         getAvoidEdges(bucket, renderTile.matrix)};
 
-    std::vector<style::TextVariableAnchorType> variableTextAnchors = layout.get<style::TextVariableAnchor>();
+    const auto& variableTextAnchors = ctx.getVariableTextAnchors();
     // In this case we first try to place symbols, which intersects the tile borders, so that
     // those symbols will remain even if each tile is handled independently.
     SymbolInstanceReferences symbolInstances =
@@ -1347,12 +1371,12 @@ SymbolInstanceReferences TilePlacement::getSortedSymbols(const BucketPlacementDa
 
     auto collisionBoxIntersectsTileEdges = [&](const CollisionBox& collisionBox, Point<float> shift) noexcept->bool {
         bool intersects =
-            collisionIndex.intersectsTileEdges(collisionBox, shift, renderTile.matrix, pixelRatio, *tileBorders);
+            collisionIndex.intersectsTileEdges(collisionBox, shift, renderTile.matrix, ctx.pixelRatio, *tileBorders);
         // Check if this symbol intersects the neighbor tile borders. If so, it also shall be placed with priority.
         for (const auto& neighbor : neighbours) {
             if (intersects) break;
             intersects = collisionIndex.intersectsTileEdges(
-                collisionBox, shift + neighbor.shift, neighbor.matrix, pixelRatio, neighbor.borders);
+                collisionBox, shift + neighbor.shift, neighbor.matrix, ctx.pixelRatio, neighbor.borders);
         }
         return intersects;
     };
@@ -1360,9 +1384,9 @@ SymbolInstanceReferences TilePlacement::getSortedSymbols(const BucketPlacementDa
     auto symbolIntersectsTileEdges = [
         &collisionBoxIntersectsTileEdges,
         variableAnchor,
-        pitchTextWithMap,
-        rotateTextWithMap,
-        bearing = state.getBearing()
+        pitchTextWithMap = ctx.pitchTextWithMap,
+        rotateTextWithMap = ctx.rotateTextWithMap,
+        bearing = ctx.getTransformState().getBearing()
     ](const SymbolInstance& symbol) noexcept->bool {
         bool intersects = false;
         if (!symbol.textCollisionFeature.boxes.empty()) {
@@ -1392,20 +1416,9 @@ SymbolInstanceReferences TilePlacement::getSortedSymbols(const BucketPlacementDa
         return intersects;
     };
 
-    if (onlyLabelsIntersectingTileBorders) {
-        SymbolInstanceReferences filtered;
-        filtered.reserve(symbolInstances.size());
-        for (const SymbolInstance& symbol : symbolInstances) {
-            if (symbolIntersectsTileEdges(symbol)) filtered.push_back(symbol);
-        }
-        // Add more stability, sorting tile border labels by their Y position.
-        std::stable_sort(filtered.begin(), filtered.end(), [](const SymbolInstance& a, const SymbolInstance& b) {
-            return a.anchor.point.y < b.anchor.point.y;
-        });
-        return filtered;
+    for (const SymbolInstance& symbol : symbolInstances) {
+        if (symbolIntersectsTileEdges(symbol)) intersections.emplace_back(symbol, ctx);
     }
-
-    return symbolInstances;
 }
 
 bool TilePlacement::stickToFirstVariableAnchor(const CollisionBox& box,
@@ -1442,7 +1455,7 @@ void TilePlacement::newSymbolPlaced(const SymbolInstance& symbol,
                                 iconCollisionBox,
                                 placement.text,
                                 placement.icon,
-                                !placement.skipFade && onlyLabelsIntersectingTileBorders,
+                                !placement.skipFade && populateIntersections,
                                 collisionIndex.getViewportPadding()};
     placedSymbolsData.emplace_back(std::move(symbolData));
 }
