@@ -1,0 +1,25 @@
+#############################################################################
+# Ignore system libraries.
+src:*/usr/*
+
+#############################################################################
+# Mostly hash functions where integer overflow is OK.
+src:*/mbgl/util/hash.hpp
+
+#############################################################################
+# vendor libs
+
+# unsigned integer overflow: unsigned interger index in for loop
+src:*/vendor/earcut.hpp/include/mapbox/earcut.hpp
+
+# unsigned integer overflow: hash function: str_hash 
+src:*/vendor/eternal/*/eternal.hpp
+
+# unsigned integer overflow
+src: */vendor/*/rapidjson/include/rapidjson/reader.h
+
+# Boost bug: Implicit conversion
+src:*/include/boost/locale/utf.hpp
+
+# Boost bug: unsigned integer overflow
+src:*/include/boost/crc.hpp
