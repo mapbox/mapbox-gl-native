@@ -104,13 +104,42 @@ inline bool CollisionIndex::overlapsTile(const CollisionBoundaries& boundaries,
            boundaries[1] < tileBoundaries[3] && boundaries[3] > tileBoundaries[1];
 }
 
-bool CollisionIndex::intersectsTileEdges(const CollisionBox& box,
-                                         Point<float> shift,
-                                         const mat4& posMatrix,
-                                         const float textPixelRatio,
-                                         const CollisionBoundaries& tileEdges) const {
-    auto collisionBoundaries = getProjectedCollisionBoundaries(posMatrix, shift, textPixelRatio, box);
-    return overlapsTile(collisionBoundaries, tileEdges) && !isInsideTile(collisionBoundaries, tileEdges);
+IntersectStatus CollisionIndex::intersectsTileEdges(const CollisionBox& box,
+                                                    Point<float> shift,
+                                                    const mat4& posMatrix,
+                                                    const float textPixelRatio,
+                                                    const CollisionBoundaries& tileEdges) const {
+    auto boundaries = getProjectedCollisionBoundaries(posMatrix, shift, textPixelRatio, box);
+    IntersectStatus result;
+    const float x1 = boundaries[0];
+    const float y1 = boundaries[1];
+    const float x2 = boundaries[2];
+    const float y2 = boundaries[3];
+
+    const float tileX1 = tileEdges[0];
+    const float tileY1 = tileEdges[1];
+    const float tileX2 = tileEdges[2];
+    const float tileY2 = tileEdges[3];
+
+    // Check left border
+    int minSectionLength = std::min(tileX1 - x1, x2 - tileX1);
+    if (minSectionLength <= 0) { // Check right border
+        minSectionLength = std::min(tileX2 - x1, x2 - tileX2);
+    }
+    if (minSectionLength > 0) {
+        result.flags |= IntersectStatus::VerticalBorders;
+        result.minSectionLength = minSectionLength;
+    }
+    // Check top border
+    minSectionLength = std::min(tileY1 - y1, y2 - tileY1);
+    if (minSectionLength <= 0) { // Check bottom border
+        minSectionLength = std::min(tileY2 - y1, y2 - tileY2);
+    }
+    if (minSectionLength > 0) {
+        result.flags |= IntersectStatus::HorizontalBorders;
+        result.minSectionLength = std::min(result.minSectionLength, minSectionLength);
+    }
+    return result;
 }
 
 std::pair<bool, bool> CollisionIndex::placeFeature(
