@@ -118,7 +118,6 @@ workflows:
           executor_name: ubuntu-disco
           target_is_linux: true
           config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8 -DMBGL_WITH_SANITIZER=undefined'
-          test_params: '|| true'
           style_tests: true
       - build-template:
           name: qt5-linux-gcc5-release
@@ -242,7 +241,7 @@ executors:
     working_directory: /src
     environment:
       DISPLAY: :99
-      UBSAN_OPTIONS: print_stacktrace=1:halt_on_error=0
+      UBSAN_OPTIONS: print_stacktrace=1:halt_on_error=0:report_error_type=1
       ASAN_OPTIONS: strict_string_checks=1:detect_stack_use_after_return=1:check_initialization_order=1:strict_init_order=1:halt_on_error=0
       QT_INSTALL_DOCS: /usr/share/qt5/doc
       QT_VERSION: 5
