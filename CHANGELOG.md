@@ -19,6 +19,8 @@
   - `getPlacedSymbolsData()`
     if collecting of the placed symbols data is enabled, returns the reference to the `PlacedSymbolData` vector holding the collected data.
 
+## maps-v1.5.1
+
 ### 🐞 Bug fixes
 
 - [core] Fix assert in gfx resources cleanup ([#16349](https://github.com/mapbox/mapbox-gl-native/pull/16349))
