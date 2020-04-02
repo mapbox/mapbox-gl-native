@@ -34,7 +34,7 @@ static std::shared_ptr<std::string> randomString(size_t size) {
     std::mt19937 random;
 
     for (size_t i = 0; i < size; i++) {
-        (*result)[i] = random();
+        (*result)[i] = static_cast<char>(random());
     }
 
     return result;

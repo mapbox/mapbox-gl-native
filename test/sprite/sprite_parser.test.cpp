@@ -54,7 +54,7 @@ TEST(Sprite, SpriteImageCreationInvalid) {
                   EventSeverity::Error,
                   Event::Sprite,
                   int64_t(-1),
-                  "Can't create image with invalid metrics: 4294967295x16@0,0 in 200x299@1x sprite",
+                  "Can't create image with invalid metrics: -1x16@0,0 in 200x299@1x sprite",
               }));
     EXPECT_EQ(0u, log.uncheckedCount());
 
@@ -64,7 +64,7 @@ TEST(Sprite, SpriteImageCreationInvalid) {
                   EventSeverity::Error,
                   Event::Sprite,
                   int64_t(-1),
-                  "Can't create image with invalid metrics: 16x4294967295@0,0 in 200x299@1x sprite",
+                  "Can't create image with invalid metrics: 16x-1@0,0 in 200x299@1x sprite",
               }));
     EXPECT_EQ(0u, log.uncheckedCount());
 
@@ -124,7 +124,7 @@ TEST(Sprite, SpriteImageCreationInvalid) {
                   EventSeverity::Error,
                   Event::Sprite,
                   int64_t(-1),
-                  "Can't create image with invalid metrics: 16x16@4294967295,0 in 200x299@1x sprite",
+                  "Can't create image with invalid metrics: 16x16@-1,0 in 200x299@1x sprite",
               }));
     EXPECT_EQ(0u, log.uncheckedCount());
 
@@ -134,7 +134,7 @@ TEST(Sprite, SpriteImageCreationInvalid) {
                   EventSeverity::Error,
                   Event::Sprite,
                   int64_t(-1),
-                  "Can't create image with invalid metrics: 16x16@0,4294967295 in 200x299@1x sprite",
+                  "Can't create image with invalid metrics: 16x16@0,-1 in 200x299@1x sprite",
               }));
     EXPECT_EQ(0u, log.uncheckedCount());
 

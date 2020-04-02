@@ -16,7 +16,7 @@ src:*/vendor/earcut.hpp/include/mapbox/earcut.hpp
 src:*/vendor/eternal/*/eternal.hpp
 
 # unsigned integer overflow
-src: */vendor/*/rapidjson/include/rapidjson/reader.h
+src: */vendor/mapbox-base/extras/rapidjson/include/rapidjson/reader.h
 
 # Boost bug: Implicit conversion
 src:*/include/boost/locale/utf.hpp

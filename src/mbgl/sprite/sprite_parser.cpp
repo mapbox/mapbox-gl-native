@@ -17,21 +17,21 @@ namespace mbgl {
 
 std::unique_ptr<style::Image> createStyleImage(const std::string& id,
                                                const PremultipliedImage& image,
-                                               const uint32_t srcX,
-                                               const uint32_t srcY,
-                                               const uint32_t width,
-                                               const uint32_t height,
+                                               const int32_t srcX,
+                                               const int32_t srcY,
+                                               const int32_t width,
+                                               const int32_t height,
                                                const double ratio,
                                                const bool sdf,
                                                style::ImageStretches&& stretchX,
                                                style::ImageStretches&& stretchY,
                                                const optional<style::ImageContent>& content) {
     // Disallow invalid parameter configurations.
-    if (width <= 0 || height <= 0 || width > 1024 || height > 1024 || ratio <= 0 || ratio > 10 ||
-        srcX >= image.size.width || srcY >= image.size.height || srcX + width > image.size.width ||
-        srcY + height > image.size.height) {
+    if (width <= 0 || height <= 0 || width > 1024 || height > 1024 || ratio <= 0 || ratio > 10 || srcX < 0 || srcY < 0 ||
+        srcX >= static_cast<int32_t>(image.size.width) || srcY >= static_cast<int32_t>(image.size.height) || srcX + width > static_cast<int32_t>(image.size.width) ||
+        srcY + height > static_cast<int32_t>(image.size.height)) {
         Log::Error(Event::Sprite,
-                   "Can't create image with invalid metrics: %ux%u@%u,%u in %ux%u@%sx sprite",
+                   "Can't create image with invalid metrics: %dx%d@%d,%d in %ux%u@%sx sprite",
                    width,
                    height,
                    srcX,
@@ -42,10 +42,11 @@ std::unique_ptr<style::Image> createStyleImage(const std::string& id,
         return nullptr;
     }
 
-    PremultipliedImage dstImage({width, height});
+    const Size size(static_cast<uint32_t>(width), static_cast<uint32_t>(height));
+    PremultipliedImage dstImage(size);
 
     // Copy from the source image into our individual sprite image
-    PremultipliedImage::copy(image, dstImage, {srcX, srcY}, {0, 0}, {width, height});
+    PremultipliedImage::copy(image, dstImage, {static_cast<uint32_t>(srcX), static_cast<uint32_t>(srcY)}, {0, 0}, size);
 
     try {
         return std::make_unique<style::Image>(
