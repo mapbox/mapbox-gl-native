@@ -2,8 +2,8 @@
     "file-size": [
         [
             "android-armeabi-v7a",
-            "/tmp/attach/install/android-armeabi-v7a-release/lib/libmapbox-gl.so",
-            1664652
+            "/tmp/attach/install/android-armeabi-v7a-release/lib/libmbgl-render-test-runner.so",
+            1532970
         ]
     ]
 }
