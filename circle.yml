@@ -668,6 +668,8 @@ jobs:
           command: |
             metricsResult=$(gsutil ls -d gs://test-lab-186672a0qp5bq-ycr70axads3nc/render-test-app-${CIRCLE_BUILD_NUM}/*/*/sdcard/baselines/*) || true
             gsutil -m cp -r $metricsResult metrics/android-render-test-runner/ || true
+            mkdir -p /tmp/tests/render-test-app/rebaselined_metrics
+            gsutil -m cp -r $metricsResult /tmp/tests/render-test-app/rebaselined_metrics || true
       - save
   trigger-pipeline:
     executor: ubuntu-disco
