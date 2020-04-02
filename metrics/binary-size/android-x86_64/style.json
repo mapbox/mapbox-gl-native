@@ -3,7 +3,7 @@
   "metadata": {
     "test": {
       "operations": [
-        ["probeFileSize", "android-x86_64", "/tmp/attach/install/android-x86_64-release/lib/libmapbox-gl.so", 0.01, "compressed"]
+        ["probeFileSize", "android-x86_64", "/tmp/attach/install/android-x86_64-release/lib/libmbgl-render-test-runner.so", 0.01, "compressed"]
       ],
       "width": 64,
       "height": 64

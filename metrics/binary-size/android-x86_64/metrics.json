@@ -2,7 +2,7 @@
     "file-size": [
         [
             "android-x86_64",
-            "/tmp/attach/install/android-x86_64-release/lib/libmapbox-gl.so",
+            "/tmp/attach/install/android-x86_64-release/lib/libmbgl-render-test-runner.so",
             2008352
         ]
     ]
