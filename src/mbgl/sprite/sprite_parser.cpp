@@ -27,8 +27,9 @@ std::unique_ptr<style::Image> createStyleImage(const std::string& id,
                                                style::ImageStretches&& stretchY,
                                                const optional<style::ImageContent>& content) {
     // Disallow invalid parameter configurations.
-    if (width <= 0 || height <= 0 || width > 1024 || height > 1024 || ratio <= 0 || ratio > 10 || srcX < 0 || srcY < 0 ||
-        srcX >= static_cast<int32_t>(image.size.width) || srcY >= static_cast<int32_t>(image.size.height) || srcX + width > static_cast<int32_t>(image.size.width) ||
+    if (width <= 0 || height <= 0 || width > 1024 || height > 1024 || ratio <= 0 || ratio > 10 || srcX < 0 ||
+        srcY < 0 || srcX >= static_cast<int32_t>(image.size.width) || srcY >= static_cast<int32_t>(image.size.height) ||
+        srcX + width > static_cast<int32_t>(image.size.width) ||
         srcY + height > static_cast<int32_t>(image.size.height)) {
         Log::Error(Event::Sprite,
                    "Can't create image with invalid metrics: %dx%d@%d,%d in %ux%u@%sx sprite",

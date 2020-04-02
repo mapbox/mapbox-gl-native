@@ -15,6 +15,7 @@
 #include <mapbox/eternal.hpp>
 
 #include <cmath>
+#include <limits>
 
 namespace mbgl {
 namespace style {
@@ -498,7 +499,13 @@ const auto& multiplyCompoundExpression() {
 }
 
 const auto& divideCompoundExpression() {
-    static auto signature = detail::makeSignature("/", [](double a, double b) -> Result<double> { return a / b; });
+    static auto signature = detail::makeSignature("/", [](double a, double b) -> Result<double> {
+        if (b == 0) {
+            if (a == 0) return std::numeric_limits<double>::quiet_NaN();
+            return std::numeric_limits<double>::infinity();
+        }
+        return a / b;
+    });
     return signature;
 }
 

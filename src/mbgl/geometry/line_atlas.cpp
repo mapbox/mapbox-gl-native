@@ -60,7 +60,11 @@ void addRoundDash(
         DashRange range = ranges[currIndex];
 
         for (uint32_t x = 0; x < image.size.width; ++x) {
-            if (x / range.right > 1.0f && ++currIndex < ranges.size()) {
+            if (range.right == 0) {
+                if (x != 0 && ++currIndex < ranges.size()) {
+                    range = ranges[currIndex];
+                }
+            } else if (x / range.right > 1.0f && ++currIndex < ranges.size()) {
                 range = ranges[currIndex];
             }
 
