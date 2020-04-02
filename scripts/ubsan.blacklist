@@ -16,7 +16,10 @@ src:*/vendor/earcut.hpp/include/mapbox/earcut.hpp
 src:*/vendor/eternal/*/eternal.hpp
 
 # unsigned integer overflow
-src: */vendor/mapbox-base/extras/rapidjson/include/rapidjson/reader.h
+src:*/vendor/*/rapidjson/reader.h
+
+# division by zero: ill usage of test data in 'render-tests/filter/in', latitude shouldn't be +/-90
+src:*/vendor/*/geojsonvt/convert.hpp
 
 # Boost bug: Implicit conversion
 src:*/include/boost/locale/utf.hpp
