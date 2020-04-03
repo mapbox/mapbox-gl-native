@@ -114,7 +114,7 @@ workflows:
           config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8 -DCMAKE_CXX_FLAGS=-DSANITIZE'
           test_params: '-j 4 -E "mbgl-node|gl-benchmark" -D ExperimentalMemCheck || true'
       - build-template:
-          name: FIXME-linux-ubsan
+          name: linux-ubsan
           executor_name: ubuntu-disco
           target_is_linux: true
           requires:
