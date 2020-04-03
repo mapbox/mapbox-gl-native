@@ -502,7 +502,9 @@ const auto& divideCompoundExpression() {
     static auto signature = detail::makeSignature("/", [](double a, double b) -> Result<double> {
         if (b == 0) {
             if (a == 0) return std::numeric_limits<double>::quiet_NaN();
-            return std::numeric_limits<double>::infinity();
+            double inf = std::numeric_limits<double>::infinity();
+            if (a > 0) return inf;
+            if (a < 0) return -inf;
         }
         return a / b;
     });
