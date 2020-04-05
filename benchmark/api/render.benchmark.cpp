@@ -34,9 +34,17 @@ public:
     util::RunLoop loop;
 };
 
-static void prepare(Map& map, optional<std::string> json = {}) {
+void prepare(Map& map, optional<std::string> json = nullopt) {
     map.getStyle().loadJSON(json ? *json : util::read_file("benchmark/fixtures/api/style.json"));
     map.jumpTo(CameraOptions().withCenter(LatLng { 40.726989, -73.992857 }).withZoom(15.0)); // Manhattan
+
+    auto image = decodeImage(util::read_file("benchmark/fixtures/api/default_marker.png"));
+    map.getStyle().addImage(std::make_unique<style::Image>("test-icon", std::move(image), 1.0));
+}
+
+void prepare_map2(Map& map, optional<std::string> json = nullopt) {
+    map.getStyle().loadJSON(json ? *json : util::read_file("benchmark/fixtures/api/style.json"));
+    map.jumpTo(CameraOptions().withCenter(LatLng{41.379800, 2.176810}).withZoom(15.0)); // Barcelona
 
     auto image = decodeImage(util::read_file("benchmark/fixtures/api/default_marker.png"));
     map.getStyle().addImage(std::make_unique<style::Image>("test-icon", std::move(image), 1.0));
@@ -52,7 +60,7 @@ static void API_renderStill_reuse_map(::benchmark::State& state) {
               ResourceOptions().withCachePath(cachePath).withAccessToken("foobar") };
     prepare(map);
 
-    while (state.KeepRunning()) {
+    for (auto _ : state) {
         frontend.render(map);
     }
 }
@@ -65,7 +73,7 @@ static void API_renderStill_reuse_map_formatted_labels(::benchmark::State& state
               ResourceOptions().withCachePath(cachePath).withAccessToken("foobar") };
     prepare(map, util::read_file("benchmark/fixtures/api/style_formatted_labels.json"));
 
-    while (state.KeepRunning()) {
+    for (auto _ : state) {
         frontend.render(map);
     }
 }
@@ -77,7 +85,7 @@ static void API_renderStill_reuse_map_switch_styles(::benchmark::State& state) {
               MapOptions().withMapMode(MapMode::Static).withSize(size).withPixelRatio(pixelRatio),
               ResourceOptions().withCachePath(cachePath).withAccessToken("foobar") };
 
-    while (state.KeepRunning()) {
+    for (auto _ : state) {
         prepare(map, { "{}" });
         frontend.render(map);
         prepare(map);
@@ -88,12 +96,26 @@ static void API_renderStill_reuse_map_switch_styles(::benchmark::State& state) {
 static void API_renderStill_recreate_map(::benchmark::State& state) {
     RenderBenchmark bench;
 
-    while (state.KeepRunning()) {
+    for (auto _ : state) {
         HeadlessFrontend frontend { size, pixelRatio };
         Map map { frontend, MapObserver::nullObserver(),
                   MapOptions().withMapMode(MapMode::Static).withSize(size).withPixelRatio(pixelRatio),
                   ResourceOptions().withCachePath(cachePath).withAccessToken("foobar") };
         prepare(map);
+        frontend.render(map);
+    }
+}
+
+static void API_renderStill_recreate_map_2(::benchmark::State& state) {
+    RenderBenchmark bench;
+
+    for (auto _ : state) {
+        HeadlessFrontend frontend{size, pixelRatio};
+        Map map{frontend,
+                MapObserver::nullObserver(),
+                MapOptions().withMapMode(MapMode::Static).withSize(size).withPixelRatio(pixelRatio),
+                ResourceOptions().withCachePath(cachePath).withAccessToken("foobar")};
+        prepare_map2(map);
         frontend.render(map);
     }
 }
@@ -124,13 +146,14 @@ static void API_renderStill_multiple_sources(::benchmark::State& state) {
         }
     }
 
-    while (state.KeepRunning()) {
+    for (auto _ : state) {
         frontend.render(map);
     }
 }
 
-BENCHMARK(API_renderStill_reuse_map);
-BENCHMARK(API_renderStill_reuse_map_formatted_labels);
-BENCHMARK(API_renderStill_reuse_map_switch_styles);
-BENCHMARK(API_renderStill_recreate_map);
-BENCHMARK(API_renderStill_multiple_sources);
+BENCHMARK(API_renderStill_reuse_map)->Unit(benchmark::kMillisecond);
+BENCHMARK(API_renderStill_reuse_map_formatted_labels)->Unit(benchmark::kMillisecond);
+BENCHMARK(API_renderStill_reuse_map_switch_styles)->Unit(benchmark::kMillisecond);
+BENCHMARK(API_renderStill_recreate_map)->Unit(benchmark::kMillisecond);
+BENCHMARK(API_renderStill_recreate_map_2)->Unit(benchmark::kMillisecond);
+BENCHMARK(API_renderStill_multiple_sources)->Unit(benchmark::kMillisecond);
