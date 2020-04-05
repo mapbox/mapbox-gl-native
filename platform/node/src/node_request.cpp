@@ -137,7 +137,7 @@ void NodeRequest::unrefRequest() {
     Unref();
 }
 
-NodeAsyncRequest::NodeAsyncRequest() : request(nullptr) {}
+NodeAsyncRequest::NodeAsyncRequest() = default;
 
 NodeAsyncRequest::~NodeAsyncRequest() {
     if (request) {

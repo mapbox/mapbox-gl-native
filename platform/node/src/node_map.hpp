@@ -31,7 +31,7 @@ public:
     class RenderWorker;
 
     NodeMap(v8::Local<v8::Object>);
-    ~NodeMap();
+    ~NodeMap() override;
 
     static Nan::Persistent<v8::Function> constructor;
     static Nan::Persistent<v8::Object> parseError;
@@ -97,7 +97,7 @@ public:
 
 struct NodeFileSource : public mbgl::FileSource {
     NodeFileSource(NodeMap* nodeMap_) : nodeMap(nodeMap_) {}
-    ~NodeFileSource() = default;
+    ~NodeFileSource() override = default;
     std::unique_ptr<mbgl::AsyncRequest> request(const mbgl::Resource&, mbgl::FileSource::Callback) final;
     bool canRequest(const mbgl::Resource&) const override;
     NodeMap* nodeMap;

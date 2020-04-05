@@ -11,20 +11,17 @@
 #include <nan.h>
 #pragma GCC diagnostic pop
 
-using namespace mbgl::style::expression;
-
 namespace node_mbgl {
 
-v8::Local<v8::Value> toJS(const Value&);
+v8::Local<v8::Value> toJS(const mbgl::style::expression::Value&);
 
 class NodeExpression : public Nan::ObjectWrap {
 public:
     static void Init(v8::Local<v8::Object>);
 
 private:
-    NodeExpression(std::unique_ptr<Expression> expression_) :
-        expression(std::move(expression_))
-    {};
+    NodeExpression(std::unique_ptr<mbgl::style::expression::Expression> expression_)
+        : expression(std::move(expression_)){};
 
     static void New(const Nan::FunctionCallbackInfo<v8::Value>&);
     static void Parse(const Nan::FunctionCallbackInfo<v8::Value>&);
@@ -37,7 +34,7 @@ private:
 
     static Nan::Persistent<v8::Function> constructor;
 
-    std::unique_ptr<Expression> expression;
+    std::unique_ptr<mbgl::style::expression::Expression> expression;
 };
 
 } // namespace node_mbgl
