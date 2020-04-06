@@ -5,6 +5,7 @@
 #include <mbgl/style/expression/image.hpp>
 #include <mbgl/style/layer.hpp>
 #include <mbgl/style/property_value.hpp>
+#include <mbgl/style/rotation.hpp>
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/util/feature.hpp>
 #include <mbgl/util/geojson.hpp>
@@ -340,6 +341,13 @@ template <>
 struct ValueFactory<Position> {
     static Value make(const Position& position) {
         return ValueFactory<std::array<float, 3>>::make(position.getSpherical());
+    }
+};
+
+template <>
+struct ValueFactory<Rotation> {
+    static Value make(const Rotation& rotation) {
+        return {rotation.getAngle()};
     }
 };
 

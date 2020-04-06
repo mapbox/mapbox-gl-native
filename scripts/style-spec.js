@@ -47,20 +47,6 @@ referenceSpec["layout_location-indicator"] = {
         },
         "doc": "The amount of the perspective compensation, between 0 and 1. A value of 1 produces a location indicator of constant width across the screen. A value of 0 makes it scale naturally according to the viewing projection."
     },
-    "bearing": {
-        "type": "number",
-        "default": "0",
-        "default": 0,
-        "period": 360,
-        "units": "degrees",
-        "property-type": "data-constant",
-        "expression": {
-            "interpolated": false,
-            "parameters": [ ]
-        },
-        "transition": false,
-        "doc": "The bearing of the location indicator."
-    },
     "image-tilt-displacement": {
         "type": "number",
         "property-type": "data-constant",
@@ -176,6 +162,20 @@ referenceSpec["paint_location-indicator"] = {
         },
         "transition": true,
         "doc": "The color for drawing the accuracy radius border. To adjust transparency, set the alpha component of the color accordingly."
+    },
+    "bearing": {
+        "type": "number",
+        "default": "0",
+        "default": 0,
+        "period": 360,
+        "units": "degrees",
+        "property-type": "data-constant",
+        "expression": {
+            "interpolated": false,
+            "parameters": [ ]
+        },
+        "transition": false,
+        "doc": "The bearing of the location indicator."
     }
 };
 

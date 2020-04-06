@@ -7,7 +7,7 @@
 #include <mbgl/style/layer.hpp>
 #include <mbgl/style/filter.hpp>
 #include <mbgl/style/property_value.hpp>
-#include <mbgl/style/expression/formatted.hpp>
+#include <mbgl/style/rotation.hpp>
 #include <mbgl/util/color.hpp>
 
 namespace mbgl {
@@ -21,10 +21,6 @@ public:
     ~LocationIndicatorLayer() final;
 
     // Layout properties
-
-    static PropertyValue<float> getDefaultBearing();
-    const PropertyValue<float>& getBearing() const;
-    void setBearing(const PropertyValue<float>&);
 
     static PropertyValue<expression::Image> getDefaultBearingImage();
     const PropertyValue<expression::Image>& getBearingImage() const;
@@ -65,6 +61,12 @@ public:
     void setAccuracyRadiusColor(const PropertyValue<Color>&);
     void setAccuracyRadiusColorTransition(const TransitionOptions&);
     TransitionOptions getAccuracyRadiusColorTransition() const;
+
+    static PropertyValue<Rotation> getDefaultBearing();
+    const PropertyValue<Rotation>& getBearing() const;
+    void setBearing(const PropertyValue<Rotation>&);
+    void setBearingTransition(const TransitionOptions&);
+    TransitionOptions getBearingTransition() const;
 
     static PropertyValue<float> getDefaultBearingImageSize();
     const PropertyValue<float>& getBearingImageSize() const;

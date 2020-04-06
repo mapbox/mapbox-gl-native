@@ -3,6 +3,7 @@
 #include <mbgl/util/color.hpp>
 #include <mbgl/util/range.hpp>
 #include <mbgl/style/position.hpp>
+#include <mbgl/style/rotation.hpp>
 #include <mbgl/style/expression/value.hpp>
 
 #include <array>
@@ -99,6 +100,27 @@ public:
             interpolate(a.b, b.b, t),
             interpolate(a.a, b.a, t)
         };
+    }
+};
+
+template <>
+struct Interpolator<style::Rotation> {
+public:
+    style::Rotation operator()(const style::Rotation& a, const style::Rotation& b, const double t) {
+        assert(a.period() == b.period());
+        auto period = a.period();
+        auto aAngle = std::fmod(a.getAngle(), period);
+        auto bAngle = std::fmod(b.getAngle(), period);
+
+        if (aAngle - bAngle > period * 0.5) {
+            return {std::fmod(aAngle * (1.0 - t) + (bAngle + period) * t, period)};
+        }
+
+        if (aAngle - bAngle < period * -0.5) {
+            return {std::fmod((aAngle + period) * (1.0 - t) + bAngle * t, period)};
+        }
+
+        return {aAngle * (1.0 - t) + bAngle * t};
     }
 };
 

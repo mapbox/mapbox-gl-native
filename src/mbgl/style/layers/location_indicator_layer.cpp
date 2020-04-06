@@ -63,21 +63,6 @@ void LocationIndicatorLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::
 
 // Layout properties
 
-PropertyValue<float> LocationIndicatorLayer::getDefaultBearing() {
-    return Bearing::defaultValue();
-}
-
-const PropertyValue<float>& LocationIndicatorLayer::getBearing() const {
-    return impl().layout.get<Bearing>();
-}
-
-void LocationIndicatorLayer::setBearing(const PropertyValue<float>& value) {
-    if (value == getBearing()) return;
-    auto impl_ = mutableImpl();
-    impl_->layout.get<Bearing>() = value;
-    baseImpl = std::move(impl_);
-    observer->onLayerChanged(*this);
-}
 PropertyValue<expression::Image> LocationIndicatorLayer::getDefaultBearingImage() {
     return BearingImage::defaultValue();
 }
@@ -237,6 +222,33 @@ TransitionOptions LocationIndicatorLayer::getAccuracyRadiusColorTransition() con
     return impl().paint.template get<AccuracyRadiusColor>().options;
 }
 
+PropertyValue<Rotation> LocationIndicatorLayer::getDefaultBearing() {
+    return {0};
+}
+
+const PropertyValue<Rotation>& LocationIndicatorLayer::getBearing() const {
+    return impl().paint.template get<Bearing>().value;
+}
+
+void LocationIndicatorLayer::setBearing(const PropertyValue<Rotation>& value) {
+    if (value == getBearing())
+        return;
+    auto impl_ = mutableImpl();
+    impl_->paint.template get<Bearing>().value = value;
+    baseImpl = std::move(impl_);
+    observer->onLayerChanged(*this);
+}
+
+void LocationIndicatorLayer::setBearingTransition(const TransitionOptions& options) {
+    auto impl_ = mutableImpl();
+    impl_->paint.template get<Bearing>().options = options;
+    baseImpl = std::move(impl_);
+}
+
+TransitionOptions LocationIndicatorLayer::getBearingTransition() const {
+    return impl().paint.template get<Bearing>().options;
+}
+
 PropertyValue<float> LocationIndicatorLayer::getDefaultBearingImageSize() {
     return {0};
 }
@@ -349,12 +361,13 @@ using namespace conversion;
 
 namespace {
 
-constexpr uint8_t kPaintPropertyCount = 14u;
+constexpr uint8_t kPaintPropertyCount = 16u;
 
 enum class Property : uint8_t {
     AccuracyRadius,
     AccuracyRadiusBorderColor,
     AccuracyRadiusColor,
+    Bearing,
     BearingImageSize,
     Location,
     ShadowImageSize,
@@ -362,12 +375,12 @@ enum class Property : uint8_t {
     AccuracyRadiusTransition,
     AccuracyRadiusBorderColorTransition,
     AccuracyRadiusColorTransition,
+    BearingTransition,
     BearingImageSizeTransition,
     LocationTransition,
     ShadowImageSizeTransition,
     TopImageSizeTransition,
-    Bearing = kPaintPropertyCount,
-    BearingImage,
+    BearingImage = kPaintPropertyCount,
     ImageTiltDisplacement,
     PerspectiveCompensation,
     ShadowImage,
@@ -383,6 +396,7 @@ MAPBOX_ETERNAL_CONSTEXPR const auto layerProperties = mapbox::eternal::hash_map<
     {{"accuracy-radius", toUint8(Property::AccuracyRadius)},
      {"accuracy-radius-border-color", toUint8(Property::AccuracyRadiusBorderColor)},
      {"accuracy-radius-color", toUint8(Property::AccuracyRadiusColor)},
+     {"bearing", toUint8(Property::Bearing)},
      {"bearing-image-size", toUint8(Property::BearingImageSize)},
      {"location", toUint8(Property::Location)},
      {"shadow-image-size", toUint8(Property::ShadowImageSize)},
@@ -390,11 +404,11 @@ MAPBOX_ETERNAL_CONSTEXPR const auto layerProperties = mapbox::eternal::hash_map<
      {"accuracy-radius-transition", toUint8(Property::AccuracyRadiusTransition)},
      {"accuracy-radius-border-color-transition", toUint8(Property::AccuracyRadiusBorderColorTransition)},
      {"accuracy-radius-color-transition", toUint8(Property::AccuracyRadiusColorTransition)},
+     {"bearing-transition", toUint8(Property::BearingTransition)},
      {"bearing-image-size-transition", toUint8(Property::BearingImageSizeTransition)},
      {"location-transition", toUint8(Property::LocationTransition)},
      {"shadow-image-size-transition", toUint8(Property::ShadowImageSizeTransition)},
      {"top-image-size-transition", toUint8(Property::TopImageSizeTransition)},
-     {"bearing", toUint8(Property::Bearing)},
      {"bearing-image", toUint8(Property::BearingImage)},
      {"image-tilt-displacement", toUint8(Property::ImageTiltDisplacement)},
      {"perspective-compensation", toUint8(Property::PerspectiveCompensation)},
@@ -409,6 +423,8 @@ StyleProperty getLayerProperty(const LocationIndicatorLayer& layer, Property pro
             return makeStyleProperty(layer.getAccuracyRadiusBorderColor());
         case Property::AccuracyRadiusColor:
             return makeStyleProperty(layer.getAccuracyRadiusColor());
+        case Property::Bearing:
+            return makeStyleProperty(layer.getBearing());
         case Property::BearingImageSize:
             return makeStyleProperty(layer.getBearingImageSize());
         case Property::Location:
@@ -423,6 +439,8 @@ StyleProperty getLayerProperty(const LocationIndicatorLayer& layer, Property pro
             return makeStyleProperty(layer.getAccuracyRadiusBorderColorTransition());
         case Property::AccuracyRadiusColorTransition:
             return makeStyleProperty(layer.getAccuracyRadiusColorTransition());
+        case Property::BearingTransition:
+            return makeStyleProperty(layer.getBearingTransition());
         case Property::BearingImageSizeTransition:
             return makeStyleProperty(layer.getBearingImageSizeTransition());
         case Property::LocationTransition:
@@ -431,8 +449,6 @@ StyleProperty getLayerProperty(const LocationIndicatorLayer& layer, Property pro
             return makeStyleProperty(layer.getShadowImageSizeTransition());
         case Property::TopImageSizeTransition:
             return makeStyleProperty(layer.getTopImageSizeTransition());
-        case Property::Bearing:
-            return makeStyleProperty(layer.getBearing());
         case Property::BearingImage:
             return makeStyleProperty(layer.getBearingImage());
         case Property::ImageTiltDisplacement:
@@ -475,7 +491,7 @@ optional<Error> LocationIndicatorLayer::setPropertyInternal(const std::string& n
     auto property = static_cast<Property>(it->second);
 
     if (property == Property::AccuracyRadius || property == Property::BearingImageSize ||
-        property == Property::ShadowImageSize || property == Property::TopImageSize || property == Property::Bearing ||
+        property == Property::ShadowImageSize || property == Property::TopImageSize ||
         property == Property::ImageTiltDisplacement || property == Property::PerspectiveCompensation) {
         Error error;
         const auto& typedValue = convert<PropertyValue<float>>(value, error, false, false);
@@ -500,11 +516,6 @@ optional<Error> LocationIndicatorLayer::setPropertyInternal(const std::string& n
 
         if (property == Property::TopImageSize) {
             setTopImageSize(*typedValue);
-            return nullopt;
-        }
-
-        if (property == Property::Bearing) {
-            setBearing(*typedValue);
             return nullopt;
         }
 
@@ -534,6 +545,16 @@ optional<Error> LocationIndicatorLayer::setPropertyInternal(const std::string& n
             setAccuracyRadiusColor(*typedValue);
             return nullopt;
         }
+    }
+    if (property == Property::Bearing) {
+        Error error;
+        const auto& typedValue = convert<PropertyValue<Rotation>>(value, error, false, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setBearing(*typedValue);
+        return nullopt;
     }
     if (property == Property::Location) {
         Error error;
@@ -586,6 +607,11 @@ optional<Error> LocationIndicatorLayer::setPropertyInternal(const std::string& n
 
     if (property == Property::AccuracyRadiusColorTransition) {
         setAccuracyRadiusColorTransition(*transition);
+        return nullopt;
+    }
+
+    if (property == Property::BearingTransition) {
+        setBearingTransition(*transition);
         return nullopt;
     }
 

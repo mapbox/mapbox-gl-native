@@ -16,11 +16,6 @@
 namespace mbgl {
 namespace style {
 
-struct Bearing : LayoutProperty<float> {
-    static constexpr const char *name() { return "bearing"; }
-    static float defaultValue() { return 0; }
-};
-
 struct BearingImage : LayoutProperty<expression::Image> {
     static constexpr const char *name() { return "bearing-image"; }
     static expression::Image defaultValue() { return {}; }
@@ -58,6 +53,10 @@ struct AccuracyRadiusColor : PaintProperty<Color> {
     static Color defaultValue() { return Color::white(); }
 };
 
+struct Bearing : PaintProperty<Rotation> {
+    static Rotation defaultValue() { return 0; }
+};
+
 struct BearingImageSize : PaintProperty<float> {
     static float defaultValue() { return 0; }
 };
@@ -75,7 +74,6 @@ struct TopImageSize : PaintProperty<float> {
 };
 
 class LocationIndicatorLayoutProperties : public Properties<
-    Bearing,
     BearingImage,
     ImageTiltDisplacement,
     PerspectiveCompensation,
@@ -87,6 +85,7 @@ class LocationIndicatorPaintProperties : public Properties<
     AccuracyRadius,
     AccuracyRadiusBorderColor,
     AccuracyRadiusColor,
+    Bearing,
     BearingImageSize,
     Location,
     ShadowImageSize,

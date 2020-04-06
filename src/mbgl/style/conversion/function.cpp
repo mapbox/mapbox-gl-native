@@ -1,5 +1,6 @@
 #include <mbgl/style/conversion/function.hpp>
 #include <mbgl/style/conversion/position.hpp>
+#include <mbgl/style/conversion/rotation.hpp>
 #include <mbgl/style/conversion_impl.hpp>
 #include <mbgl/style/expression/case.hpp>
 #include <mbgl/style/expression/dsl.hpp>
@@ -159,6 +160,8 @@ template optional<PropertyExpression<Formatted>>
 template optional<PropertyExpression<std::vector<TextWritingModeType>>>
     convertFunctionToExpression<std::vector<TextWritingModeType>>(const Convertible&, Error&, bool);
 template optional<PropertyExpression<Image>> convertFunctionToExpression<Image>(const Convertible&, Error&, bool);
+template optional<PropertyExpression<Rotation>>
+    convertFunctionToExpression<Rotation>(const Convertible&, Error&, bool);
 
 // Ad-hoc Converters for double and int64_t. We should replace float with double wholesale,
 // and promote the int64_t Converter to general use (and it should check that the input is

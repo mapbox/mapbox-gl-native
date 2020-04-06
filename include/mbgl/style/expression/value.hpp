@@ -5,6 +5,7 @@
 #include <mbgl/style/expression/image.hpp>
 #include <mbgl/style/expression/type.hpp>
 #include <mbgl/style/position.hpp>
+#include <mbgl/style/rotation.hpp>
 #include <mbgl/style/types.hpp>
 #include <mbgl/util/color.hpp>
 #include <mbgl/util/enum.hpp>
@@ -146,6 +147,13 @@ std::vector<optional<T>> fromExpressionValues(const std::vector<optional<Value>>
     }
     return result;
 }
+
+template <>
+struct ValueConverter<Rotation> {
+    static type::Type expressionType() { return type::Number; }
+    static Value toExpressionValue(const mbgl::style::Rotation& value);
+    static optional<Rotation> fromExpressionValue(const Value& v);
+};
 
 } // namespace expression
 } // namespace style
