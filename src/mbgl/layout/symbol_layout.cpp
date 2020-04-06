@@ -743,7 +743,7 @@ std::vector<float> SymbolLayout::calculateTileDistances(const GeometryCoordinate
             if (i != 0u) {
                 sumBackwardLength += util::dist<float>(line[i - 1], line[i]);
             } else {
-                break;
+                break; // Add break to avoid unsigned integer overflow when i==0
             }
         }
     }

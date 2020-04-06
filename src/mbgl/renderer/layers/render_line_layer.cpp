@@ -242,11 +242,7 @@ GeometryCollection offsetLine(const GeometryCollection& rings, double offset) {
             Point<double> extrude = util::unit(aToB + bToC);
 
             const double cosHalfAngle = extrude.x * bToC.x + extrude.y * bToC.y;
-            if (cosHalfAngle == 0) {
-                extrude = zero;
-            } else {
-                extrude *= (1.0 / cosHalfAngle);
-            }
+            extrude *= (cosHalfAngle != 0) ? (1.0 / cosHalfAngle) : 0;
 
             newRing.emplace_back(convertPoint<int16_t>(extrude * offset) + p);
         }
