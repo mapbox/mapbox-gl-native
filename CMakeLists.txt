@@ -21,6 +21,7 @@ option(MBGL_WITH_QT "Build Mapbox GL Qt bindings" OFF)
 option(MBGL_WITH_SANITIZER "Use [address|thread|undefined] here" OFF)
 option(MBGL_WITH_RTTI "Compile with runtime type information" OFF)
 option(MBGL_WITH_OPENGL "Build with OpenGL renderer" ON)
+option(MBGL_WITH_WERROR "Make all compilation warnings errors" ON)
 
 add_library(
     mbgl-compiler-options INTERFACE
@@ -42,7 +43,7 @@ target_compile_options(
         $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<NOT:$<PLATFORM_ID:Windows>>>:-Wall>
         $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<NOT:$<PLATFORM_ID:Windows>>>:-Wshadow>
         $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<NOT:$<PLATFORM_ID:Windows>>>:-Wextra>
-        $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<NOT:$<PLATFORM_ID:Windows>>>:-Werror>
+        $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<NOT:$<PLATFORM_ID:Windows>>,$<BOOL:${MBGL_WITH_WERROR}>>:-Werror>
         $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<PLATFORM_ID:Android>>:-Wno-error=tautological-constant-compare>
         $<$<CXX_COMPILER_ID:GNU>:-Wno-error=maybe-uninitialized>
         $<$<CXX_COMPILER_ID:GNU>:-Wno-error=return-type>
