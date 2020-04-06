@@ -176,6 +176,7 @@ struct TestMetadata {
     unsigned renderErrored = 0;
     unsigned renderFailed = 0;
     unsigned labelCutOffFound = 0;
+    unsigned duplicationsCount = 0;
 
     std::string errorMessage;
     double difference = 0.0;

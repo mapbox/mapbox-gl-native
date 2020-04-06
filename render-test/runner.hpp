@@ -53,6 +53,7 @@ private:
                                TestMetadata&);
     void checkRenderTestResults(mbgl::PremultipliedImage&& image, TestMetadata&);
     void checkProbingResults(TestMetadata&);
+    void appendLabelCutOffResults(TestMetadata&, const std::string&, const std::string&);
     void registerProxyFileSource();
 
     struct Impl {
