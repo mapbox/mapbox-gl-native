@@ -751,7 +751,6 @@ void TestRunner::run(TestMetadata& metadata) {
     HeadlessFrontend::RenderResult result{};
     std::string cutOffLabelsReport;
     std::string duplicationsReport;
-    std::size_t duplicationsCount = 0u;
 
     if (metadata.mapMode == MapMode::Tile) {
         assert(camera.zoom);
@@ -764,6 +763,7 @@ void TestRunner::run(TestMetadata& metadata) {
             UnwrappedTileID tileId;
             mapbox::geometry::box<float> location;
             bool placed;
+            bool isIcon;
         };
         std::map<std::u16string, std::vector<SymbolLocationAndStatus>> symbolIndex;
 
@@ -792,41 +792,54 @@ void TestRunner::run(TestMetadata& metadata) {
             auto yOffset = getImageTileOffset(yDims, tileId.canonical.y, metadata.pixelRatio);
 
             const auto& placedSymbols = ctx.getFrontend().getRenderer()->getPlacedSymbolsData();
+
+            auto findCutOffs =
+                [&](const PlacedSymbolData& placedSymbol, mapbox::geometry::box<float> box, bool placed, bool isIcon) {
+                    box.min.x += xOffset - placedSymbol.viewportPadding;
+                    box.max.x += xOffset - placedSymbol.viewportPadding;
+                    box.min.y += yOffset - placedSymbol.viewportPadding;
+                    box.max.y += yOffset - placedSymbol.viewportPadding;
+
+                    auto& symbols = symbolIndex[placedSymbol.key];
+                    auto it = std::find_if(symbols.begin(), symbols.end(), [isIcon, box](const auto& a) {
+                        return a.isIcon == isIcon && a.location.min == box.min && a.location.max == box.max;
+                    });
+                    static std::wstring_convert<std::codecvt_utf8<char16_t>, char16_t> cv;
+                    if (it == symbols.end()) {
+                        symbols.push_back({tileId, box, placed, isIcon});
+                        return;
+                    }
+                    if (tileId == it->tileId && isIcon == it->isIcon) {
+                        std::stringstream ss;
+                        ss << std::endl
+                           << ++metadata.duplicationsCount << ". \"" << cv.to_bytes(placedSymbol.key) << "\" "
+                           << (isIcon ? "icon" : "text") << " ((" << box.min.x << ", " << box.min.y << "), ("
+                           << box.max.x << ", " << box.max.y << ")) "
+                           << "at " << util::toString(tileId);
+                        duplicationsReport += ss.str();
+                        return;
+                    }
+                    if (it->placed != placed && isIcon == it->isIcon) {
+                        std::stringstream ss;
+                        ss << std::endl
+                           << ++metadata.labelCutOffFound << ". \"" << cv.to_bytes(placedSymbol.key) << "\" "
+                           << (isIcon ? "icon" : "text") << " ((" << box.min.x << ", " << box.min.y << "), ("
+                           << box.max.x << ", " << box.max.y << "))"
+                           << (placed ? " is placed at " : " is not placed at ") << util::toString(tileId) << " and"
+                           << (it->placed ? " placed at " : " not placed at ") << util::toString(it->tileId);
+                        cutOffLabelsReport += ss.str();
+                    }
+                };
+
             for (const auto& placedSymbol : placedSymbols) {
                 if (placedSymbol.intersectsTileBorder) {
                     if (placedSymbol.textCollisionBox) {
-                        mapbox::geometry::box<float> box = *placedSymbol.textCollisionBox;
-                        box.min.x += xOffset - placedSymbol.viewportPadding;
-                        box.max.x += xOffset - placedSymbol.viewportPadding;
-                        box.min.y += yOffset - placedSymbol.viewportPadding;
-                        box.max.y += yOffset - placedSymbol.viewportPadding;
-
-                        auto& symbols = symbolIndex[placedSymbol.key];
-                        auto it = std::find_if(symbols.begin(), symbols.end(), [box](const auto& a) {
-                            return a.location.min == box.min && a.location.max == box.max;
-                        });
-
-                        static std::wstring_convert<std::codecvt_utf8<char16_t>, char16_t> cv;
-                        if (it == symbols.end()) {
-                            symbols.push_back({tileId, box, placedSymbol.textPlaced});
-                        } else if (tileId == it->tileId) {
-                            std::stringstream ss;
-                            ss << std::endl
-                               << ++duplicationsCount << ". \"" << cv.to_bytes(placedSymbol.key) << "\" ((" << box.min.x
-                               << ", " << box.min.y << "), (" << box.max.x << ", " << box.max.y << ")) "
-                               << "at " << util::toString(tileId);
-                            duplicationsReport += ss.str();
-                            continue;
-                        } else if (it->placed != placedSymbol.textPlaced) {
-                            std::stringstream ss;
-                            ss << std::endl
-                               << ++metadata.labelCutOffFound << ". \"" << cv.to_bytes(placedSymbol.key) << "\" (("
-                               << box.min.x << ", " << box.min.y << "), (" << box.max.x << ", " << box.max.y << "))"
-                               << (placedSymbol.textPlaced ? " is placed at " : " is not placed at ")
-                               << util::toString(tileId) << " and" << (it->placed ? " placed at " : " not placed at ")
-                               << util::toString(it->tileId);
-                            cutOffLabelsReport += ss.str();
-                        }
+                        findCutOffs(
+                            placedSymbol, *placedSymbol.textCollisionBox, placedSymbol.textPlaced, false /*isIcon*/);
+                    }
+                    if (placedSymbol.iconCollisionBox) {
+                        findCutOffs(
+                            placedSymbol, *placedSymbol.iconCollisionBox, placedSymbol.iconPlaced, true /*isIcon*/);
                     }
                 }
             }
@@ -849,14 +862,7 @@ void TestRunner::run(TestMetadata& metadata) {
 
     if (metadata.renderTest) {
         checkProbingResults(metadata);
-        if (metadata.labelCutOffFound) { // Append label cut-off statistics.
-            metadata.errorMessage += "\n Label cut-offs:";
-            metadata.errorMessage += cutOffLabelsReport;
-            if (duplicationsCount) {
-                metadata.errorMessage += "\n\n Label duplications:";
-                metadata.errorMessage += duplicationsReport;
-            }
-        }
+        appendLabelCutOffResults(metadata, cutOffLabelsReport, duplicationsReport);
         checkRenderTestResults(std::move(result.image), metadata);
     } else {
         std::vector<mbgl::Feature> features;
@@ -868,6 +874,19 @@ void TestRunner::run(TestMetadata& metadata) {
             features = frontend.getRenderer()->queryRenderedFeatures(metadata.queryGeometryBox, metadata.queryOptions);
         }
         checkQueryTestResults(std::move(result.image), std::move(features), metadata);
+    }
+}
+
+void TestRunner::appendLabelCutOffResults(TestMetadata& resultMetadata,
+                                          const std::string& cutOffLabelsReport,
+                                          const std::string& duplicationsReport) {
+    if (resultMetadata.labelCutOffFound) { // Append label cut-off statistics.
+        resultMetadata.errorMessage += "\n Label cut-offs:";
+        resultMetadata.errorMessage += cutOffLabelsReport;
+        if (resultMetadata.duplicationsCount) {
+            resultMetadata.errorMessage += "\n\n Label duplications:";
+            resultMetadata.errorMessage += duplicationsReport;
+        }
     }
 }
 
