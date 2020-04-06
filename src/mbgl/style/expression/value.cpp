@@ -269,6 +269,15 @@ optional<Position> ValueConverter<Position>::fromExpressionValue(const Value& v)
     return pos ? optional<Position>(Position(*pos)) : optional<Position>();
 }
 
+Value ValueConverter<Rotation>::toExpressionValue(const mbgl::style::Rotation& value) {
+    return ValueConverter<float>::toExpressionValue(value.getAngle());
+}
+
+optional<Rotation> ValueConverter<Rotation>::fromExpressionValue(const Value& v) {
+    auto angle = ValueConverter<float>::fromExpressionValue(v);
+    return angle ? optional<Rotation>(Rotation(*angle)) : optional<Rotation>();
+}
+
 template <typename T>
 Value ValueConverter<T, std::enable_if_t< std::is_enum<T>::value >>::toExpressionValue(const T& value) {
     return std::string(Enum<T>::toString(value));
@@ -317,6 +326,7 @@ template struct ValueConverter<std::array<double, 3>>;
 // layout/paint property types
 template type::Type valueTypeToExpressionType<float>();
 template type::Type valueTypeToExpressionType<Position>();
+template type::Type valueTypeToExpressionType<Rotation>();
 
 template type::Type valueTypeToExpressionType<std::array<float, 2>>();
 template struct ValueConverter<std::array<float, 2>>;

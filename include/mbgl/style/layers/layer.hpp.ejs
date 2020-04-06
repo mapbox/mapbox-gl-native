@@ -15,7 +15,12 @@
 #include <mbgl/style/layer.hpp>
 #include <mbgl/style/filter.hpp>
 #include <mbgl/style/property_value.hpp>
+<% if (type === 'location-indicator') { -%>
+#include <mbgl/style/rotation.hpp>
+<% } -%>
+<% if (type === 'symbol') { -%>
 #include <mbgl/style/expression/formatted.hpp>
+<% } -%>
 #include <mbgl/util/color.hpp>
 
 <% if (type === 'line' || type === 'symbol') { -%>

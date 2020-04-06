@@ -64,6 +64,13 @@ global.evaluatedType = function (property) {
   case 'boolean':
     return 'bool';
   case 'number':
+    // TODO: Check if 'Rotation' should be used for other properties,
+    // such as icon-rotate
+    if (/bearing$/.test(property.name) &&
+        property.period == 360 &&
+        property.units =='degrees') {
+      return 'Rotation';
+    }
     return /location$/.test(property.name) ? 'double' : 'float';
   case 'resolvedImage':
       return 'expression::Image';

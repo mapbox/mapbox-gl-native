@@ -1,5 +1,6 @@
-#include <mbgl/style/conversion/property_value.hpp>
 #include <mbgl/style/conversion/position.hpp>
+#include <mbgl/style/conversion/property_value.hpp>
+#include <mbgl/style/conversion/rotation.hpp>
 #include <mbgl/style/conversion_impl.hpp>
 
 namespace mbgl {
@@ -106,6 +107,9 @@ mbgl::style::conversion::Converter<PropertyValue<std::array<double, 3>>, void>::
     PropertyValue<std::array<double, 3>> r(res);
     return r;
 }
+
+template optional<PropertyValue<Rotation>> Converter<PropertyValue<Rotation>>::operator()(
+    conversion::Convertible const&, conversion::Error&, bool, bool) const;
 
 } // namespace conversion
 } // namespace style

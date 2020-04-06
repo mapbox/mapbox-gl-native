@@ -988,7 +988,8 @@ void GLFWView::toggleLocationIndicatorLayer() {
         puckLayer->setAccuracyRadiusColor(
             premultiply(mbgl::Color{0.0, 1.0, 0.0, 0.2})); // Note: these must be fed premultiplied
 
-        puckLayer->setBearing(0);
+        puckLayer->setBearingTransition(mbgl::style::TransitionOptions(mbgl::Duration::zero(), mbgl::Duration::zero()));
+        puckLayer->setBearing(mbgl::style::Rotation(0.0));
         puckLayer->setAccuracyRadiusBorderColor(premultiply(mbgl::Color{0.0, 1.0, 0.2, 0.4}));
         puckLayer->setTopImageSize(24);
         puckLayer->setBearingImageSize(72);
@@ -1038,8 +1039,8 @@ void GLFWView::onWillStartRenderingFrame() {
     puck = static_cast<mbgl::style::LocationIndicatorLayer *>(map->getStyle().getLayer("puck"));
     if (puck) {
         uint64_t ns = mbgl::Clock::now().time_since_epoch().count();
-        const float bearing = float(ns % 2000000000) / 2000000000.0 * 360.0;
-        puck->setBearing(bearing);
+        const double bearing = double(ns % 2000000000) / 2000000000.0 * 360.0;
+        puck->setBearing(mbgl::style::Rotation(bearing));
     }
 #endif
 }

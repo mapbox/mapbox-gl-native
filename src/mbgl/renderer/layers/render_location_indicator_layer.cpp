@@ -714,13 +714,12 @@ void RenderLocationIndicatorLayer::evaluate(const PropertyEvaluationParameters& 
     renderImpl->parameters.puckSizePx = evaluated.get<style::BearingImageSize>();
     renderImpl->parameters.puckHatSizePx = evaluated.get<style::TopImageSize>();
     renderImpl->parameters.puckShadowSizePx = evaluated.get<style::ShadowImageSize>();
+    renderImpl->parameters.puckBearing = evaluated.get<style::Bearing>().getAngle();
 
     const std::array<double, 3> pos = evaluated.get<style::Location>();
     renderImpl->parameters.puckPosition = LatLng{pos[0], pos[1]};
 
     // layout
-    if (!layout.get<style::Bearing>().isUndefined())
-        renderImpl->parameters.puckBearing = layout.get<style::Bearing>().asConstant();
     if (!layout.get<style::BearingImage>().isUndefined())
         renderImpl->parameters.puckImagePath = layout.get<style::BearingImage>().asConstant().id();
     if (!layout.get<style::ShadowImage>().isUndefined())
