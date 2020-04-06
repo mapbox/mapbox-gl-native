@@ -157,11 +157,13 @@ protected:
         return nullopt;
     }
     SymbolInstanceReferences getSortedSymbols(const BucketPlacementData&, float pixelRatio);
-    virtual bool stickToFirstVariableAnchor(const CollisionBox&,
-                                            Point<float> /*shift*/,
-                                            const mat4& /*posMatrix*/,
-                                            float /*textPixelRatio*/) {
-        return false;
+    virtual bool canPlaceAtVariableAnchor(const CollisionBox&,
+                                          style::TextVariableAnchorType,
+                                          Point<float> /*shift*/,
+                                          std::vector<style::TextVariableAnchorType>&,
+                                          const mat4& /*posMatrix*/,
+                                          float /*textPixelRatio*/) {
+        return true;
     }
 
     // Returns `true` if bucket vertices were updated; returns `false` otherwise.
