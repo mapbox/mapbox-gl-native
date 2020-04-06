@@ -390,7 +390,6 @@ void Placement::placeSymbol(const SymbolInstance& symbolInstance,
                 const size_t placementAttempts = ctx.textAllowOverlap ? anchorsSize * 2 : anchorsSize;
                 for (size_t i = 0u; i < placementAttempts; ++i) {
                     auto anchor = variableTextAnchors[i % anchorsSize];
-                    const bool isFirstAnchor = (anchor == variableTextAnchors.front());
                     const bool allowOverlap = (i >= anchorsSize);
                     shift = calculateVariableLayoutOffset(anchor,
                                                           width,
@@ -401,9 +400,8 @@ void Placement::placeSymbol(const SymbolInstance& symbolInstance,
                                                           ctx.pitchTextWithMap,
                                                           ctx.getTransformState().getBearing());
                     textBoxes.clear();
-                    if (!isFirstAnchor &&
-                        stickToFirstVariableAnchor(
-                            symbolInstance.textCollisionFeature.boxes.front(), shift, posMatrix, ctx.pixelRatio)) {
+                    if (!canPlaceAtVariableAnchor(
+                            textBox, anchor, shift, variableTextAnchors, posMatrix, ctx.pixelRatio)) {
                         continue;
                     }
 
@@ -1263,10 +1261,12 @@ private:
     const std::vector<PlacedSymbolData>& getPlacedSymbolsData() const override { return placedSymbolsData; }
 
     optional<CollisionBoundaries> getAvoidEdges(const SymbolBucket&, const mat4&) override;
-    bool stickToFirstVariableAnchor(const CollisionBox& box,
-                                    Point<float> shift,
-                                    const mat4& posMatrix,
-                                    float textPixelRatio) override;
+    bool canPlaceAtVariableAnchor(const CollisionBox& box,
+                                  TextVariableAnchorType anchor,
+                                  Point<float> shift,
+                                  std::vector<style::TextVariableAnchorType>& anchors,
+                                  const mat4& posMatrix,
+                                  float textPixelRatio) override;
     void newSymbolPlaced(const SymbolInstance&,
                          const JointPlacement&,
                          style::SymbolPlacementType,
@@ -1438,12 +1438,19 @@ void TilePlacement::placeSymbolBucket(const BucketPlacementData& params, std::se
     }
 }
 
-bool TilePlacement::stickToFirstVariableAnchor(const CollisionBox& box,
-                                               Point<float> shift,
-                                               const mat4& posMatrix,
-                                               float textPixelRatio) {
+bool TilePlacement::canPlaceAtVariableAnchor(const CollisionBox& box,
+                                             TextVariableAnchorType anchor,
+                                             Point<float> shift,
+                                             std::vector<style::TextVariableAnchorType>& anchors,
+                                             const mat4& posMatrix,
+                                             float textPixelRatio) {
     assert(tileBorders);
     auto status = collisionIndex.intersectsTileEdges(box, shift, posMatrix, textPixelRatio, *tileBorders);
+    if (status.flags == IntersectStatus::None) return true;
+
+    if (anchor != anchors.front()) return false;
+
+    status = collisionIndex.intersectsTileEdges(box, {}, posMatrix, textPixelRatio, *tileBorders);
     return status.flags != IntersectStatus::None;
 }
 
