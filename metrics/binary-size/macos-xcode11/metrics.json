@@ -3,17 +3,17 @@
         [
             "mbgl-glfw",
             "/tmp/attach/install/macos-xcode11-release/bin/mbgl-glfw",
-            5082384
+            5152840
         ],
         [
             "mbgl-offline",
             "/tmp/attach/install/macos-xcode11-release/bin/mbgl-offline",
-            4323200
+            4385280
         ],
         [
             "mbgl-render",
             "/tmp/attach/install/macos-xcode11-release/bin/mbgl-render",
-            4937096
+            4999184
         ]
     ]
 }
