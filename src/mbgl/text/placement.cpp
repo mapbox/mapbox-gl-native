@@ -1303,8 +1303,15 @@ void TilePlacement::placeLayers(const RenderLayerReferences& layers) {
         if (a.status.minSectionLength != b.status.minSectionLength) {
             return a.status.minSectionLength > b.status.minSectionLength;
         }
-        // Finally, look at Y position.
-        return a.symbol.get().anchor.point.y < b.symbol.get().anchor.point.y;
+        // Look at the anchor coordinates
+        if (a.symbol.get().anchor.point.y != b.symbol.get().anchor.point.y) {
+            return a.symbol.get().anchor.point.y < b.symbol.get().anchor.point.y;
+        }
+        if (a.symbol.get().anchor.point.x != b.symbol.get().anchor.point.x) {
+            return a.symbol.get().anchor.point.x < b.symbol.get().anchor.point.x;
+        }
+        // Finally, looking at the key hashes.
+        return std::hash<std::u16string>()(a.symbol.get().key) < std::hash<std::u16string>()(b.symbol.get().key);
     });
     // Place intersections.
     for (const auto& intersection : intersections) {
