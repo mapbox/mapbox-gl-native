@@ -84,8 +84,9 @@ HillshadeBucket* RasterDEMTile::getBucket() const {
 }
 
 void RasterDEMTile::backfillBorder(const RasterDEMTile& borderTile, const DEMTileNeighbors mask) {
-    int32_t dx = borderTile.id.canonical.x - id.canonical.x;
-    const int8_t dy = borderTile.id.canonical.y - id.canonical.y;
+    int32_t dx = static_cast<int32_t>(borderTile.id.canonical.x) - static_cast<int32_t>(id.canonical.x);
+    const auto dy =
+        static_cast<int8_t>(static_cast<int32_t>(borderTile.id.canonical.y) - static_cast<int32_t>(id.canonical.y));
     const uint32_t dim = pow(2, id.canonical.z);
     if (dx == 0 && dy == 0) return;
     if (std::abs(dy) > 1) return;

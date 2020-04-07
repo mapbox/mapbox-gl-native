@@ -54,13 +54,17 @@ void addRoundDash(
     if (ranges.empty()) return;
 
     for (int y = -n; y <= n; y++) {
-        int row = yOffset + n + y;
+        int row = static_cast<int32_t>(yOffset) + n + y;
         const uint32_t index = image.size.width * row;
         uint32_t currIndex = 0;
         DashRange range = ranges[currIndex];
 
         for (uint32_t x = 0; x < image.size.width; ++x) {
-            if (x / range.right > 1.0f && ++currIndex < ranges.size()) {
+            if (range.right == 0) {
+                if (x != 0 && ++currIndex < ranges.size()) {
+                    range = ranges[currIndex];
+                }
+            } else if (x / range.right > 1.0f && ++currIndex < ranges.size()) {
                 range = ranges[currIndex];
             }
 

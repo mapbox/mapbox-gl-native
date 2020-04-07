@@ -40,9 +40,9 @@ UnassociatedImage unpremultiply(PremultipliedImage&& src) {
         uint8_t& b = data[i + 2];
         uint8_t& a = data[i + 3];
         if (a) {
-            r = (255 * r + (a / 2)) / a;
-            g = (255 * g + (a / 2)) / a;
-            b = (255 * b + (a / 2)) / a;
+            r = static_cast<uint8_t>((255 * r + (a / 2)) / a);
+            g = static_cast<uint8_t>((255 * g + (a / 2)) / a);
+            b = static_cast<uint8_t>((255 * b + (a / 2)) / a);
         }
     }
 

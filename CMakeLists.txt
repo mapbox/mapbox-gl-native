@@ -27,6 +27,8 @@ add_library(
     mbgl-compiler-options INTERFACE
 )
 
+set(UBSAN_BLACKLIST ${PROJECT_SOURCE_DIR}/scripts/ubsan.blacklist)
+
 target_compile_options(
     mbgl-compiler-options
     INTERFACE
@@ -36,9 +38,16 @@ target_compile_options(
         $<$<BOOL:${MBGL_WITH_SANITIZER}>:-fno-optimize-sibling-calls>
         $<$<STREQUAL:${MBGL_WITH_SANITIZER},address>:-fsanitize=address>
         $<$<STREQUAL:${MBGL_WITH_SANITIZER},thread>:-fsanitize=thread>
-        $<$<STREQUAL:${MBGL_WITH_SANITIZER},undefined>:-fsanitize=implicit-conversion>
-        $<$<STREQUAL:${MBGL_WITH_SANITIZER},undefined>:-fsanitize=undefined>
-        $<$<STREQUAL:${MBGL_WITH_SANITIZER},undefined>:-fsanitize=unsigned-integer-overflow>
+        $<$<STREQUAL:${MBGL_WITH_SANITIZER},undefined>:-fsanitize=implicit-conversion,
+        -fsanitize-blacklist=${UBSAN_BLACKLIST}>
+        $<$<STREQUAL:${MBGL_WITH_SANITIZER},undefined>:-fsanitize=undefined,
+        -fsanitize-blacklist=${UBSAN_BLACKLIST}>
+        $<$<STREQUAL:${MBGL_WITH_SANITIZER},undefined>:-fsanitize=unsigned-integer-overflow,
+        -fsanitize-blacklist=${UBSAN_BLACKLIST}>
+        $<$<STREQUAL:${MBGL_WITH_SANITIZER},undefined>:-fsanitize=nullability,
+        -fsanitize-blacklist=${UBSAN_BLACKLIST}>
+        $<$<STREQUAL:${MBGL_WITH_SANITIZER},undefined>:-fsanitize=float-divide-by-zero,
+        -fsanitize-blacklist=${UBSAN_BLACKLIST}>
         $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<NOT:$<BOOL:${MBGL_WITH_RTTI}>>>:-fno-rtti>
         $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<NOT:$<PLATFORM_ID:Windows>>>:-Wall>
         $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<NOT:$<PLATFORM_ID:Windows>>>:-Wshadow>

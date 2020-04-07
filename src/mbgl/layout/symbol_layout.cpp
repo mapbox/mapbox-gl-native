@@ -738,10 +738,12 @@ std::vector<float> SymbolLayout::calculateTileDistances(const GeometryCoordinate
                 sumForwardLength += util::dist<float>(line[i + 1], line[i]);
             }
         }
-        for (std::size_t i = ++segment; i-- > 0;) {
+        for (std::size_t i = segment;; --i) {
             tileDistances[i] = sumBackwardLength;
             if (i != 0u) {
                 sumBackwardLength += util::dist<float>(line[i - 1], line[i]);
+            } else {
+                break; // Add break to avoid unsigned integer overflow when i==0
             }
         }
     }
