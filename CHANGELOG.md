@@ -19,6 +19,21 @@
   - `getPlacedSymbolsData()`
     if collecting of the placed symbols data is enabled, returns the reference to the `PlacedSymbolData` vector holding the collected data.
 
+### 🐞 Bug fixes
+
+- [core][tile mode] Reduce cut-off labels (part 2) ([#16369](https://github.com/mapbox/mapbox-gl-native/pull/16369))
+
+  Now, the intersecting symbols are placed across all layers _symbol by symbol_ according to the following rules:
+
+  1. First we look, which of the tile border(s) the symbol intersects and prioritize the the symbol placement accordingly (high priority -> low priority): `vertical & horizontal -> vertical -> horizontal`
+  2. For the symbols that intersect the same tile border(s), assuming the tile border split symbol into several sections, we look at the minimal section length. The symbol with a larger minimal section length is placed first.
+  3. For the symbols that intersect the same tile border(s), and have equal minimal section length, we look at the anchor coordinates.
+  4. Finally, if all the previous criteria are the same, we look at the symbol key hashes.
+
+- [core][tile mode] Fix variable placement for labels with the `icon-text-fit` property set ([#16382](https://github.com/mapbox/mapbox-gl-native/pull/16382))
+
+  The `symbolIntersectsTileEdges()` util in `mbgl::TilePlacement` now considers icon shift for the variable symbols with enabled icon-text-fit setting, thus providing more accurate results.
+
 ## maps-v1.5.1
 
 ### 🐞 Bug fixes
@@ -30,15 +45,6 @@
 - Hillshade bucket fix for mapbox-gl-native-ios #240 ([#16362](https://github.com/mapbox/mapbox-gl-native/pull/16362))
 
   When dem tiles are loaded, border in neighboring tiles is updated, too leading to bucket re-upload. if std::move moved indices / vertices previously, they are empty and we get crash. Re-upload requires that only DEM texture is re-uploaded, not the quad vertices and indices.
-
-- [core][tile mode] Reduce cut-off labels (part 2) ([#16369](https://github.com/mapbox/mapbox-gl-native/pull/16369))
-
-  Now, the intersecting symbols are placed across all layers _symbol by symbol_ according to the following rules:
-
-  1. First we look, which of the tile border(s) the symbol intersects and prioritize the the symbol placement accordingly (high priority -> low priority): `vertical & horizontal -> vertical -> horizontal`
-  2. For the symbols that intersect the same tile border(s), assuming the tile border split symbol into several sections, we look at the minimal section length. The symbol with a larger minimal section length is placed first.
-  3. For the symbols that intersect the same tile border(s), and have equal minimal section length, we look at the anchor coordinates.
-  4. Finally, if all the previous criteria are the same, we look at the symbol key hashes.
 
 ## maps-v1.5.0
 
