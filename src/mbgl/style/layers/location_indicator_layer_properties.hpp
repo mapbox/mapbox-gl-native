@@ -21,16 +21,6 @@ struct BearingImage : LayoutProperty<expression::Image> {
     static expression::Image defaultValue() { return {}; }
 };
 
-struct ImageTiltDisplacement : LayoutProperty<float> {
-    static constexpr const char *name() { return "image-tilt-displacement"; }
-    static float defaultValue() { return 0; }
-};
-
-struct PerspectiveCompensation : LayoutProperty<float> {
-    static constexpr const char *name() { return "perspective-compensation"; }
-    static float defaultValue() { return 0.85; }
-};
-
 struct ShadowImage : LayoutProperty<expression::Image> {
     static constexpr const char *name() { return "shadow-image"; }
     static expression::Image defaultValue() { return {}; }
@@ -58,6 +48,10 @@ struct Bearing : PaintProperty<Rotation> {
 };
 
 struct BearingImageSize : PaintProperty<float> {
+    static float defaultValue() { return 1; }
+};
+
+struct ImageTiltDisplacement : PaintProperty<float> {
     static float defaultValue() { return 0; }
 };
 
@@ -65,18 +59,20 @@ struct Location : PaintProperty<std::array<double, 3>> {
     static std::array<double, 3> defaultValue() { return {{0, 0, 0}}; }
 };
 
+struct PerspectiveCompensation : PaintProperty<float> {
+    static float defaultValue() { return 0.85; }
+};
+
 struct ShadowImageSize : PaintProperty<float> {
-    static float defaultValue() { return 0; }
+    static float defaultValue() { return 1; }
 };
 
 struct TopImageSize : PaintProperty<float> {
-    static float defaultValue() { return 0; }
+    static float defaultValue() { return 1; }
 };
 
 class LocationIndicatorLayoutProperties : public Properties<
     BearingImage,
-    ImageTiltDisplacement,
-    PerspectiveCompensation,
     ShadowImage,
     TopImage
 > {};
@@ -87,7 +83,9 @@ class LocationIndicatorPaintProperties : public Properties<
     AccuracyRadiusColor,
     Bearing,
     BearingImageSize,
+    ImageTiltDisplacement,
     Location,
+    PerspectiveCompensation,
     ShadowImageSize,
     TopImageSize
 > {};

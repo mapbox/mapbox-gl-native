@@ -48,9 +48,9 @@ struct LocationIndicatorRenderParameters {
     double errorRadiusMeters;
     mbgl::Color errorRadiusColor{0, 0, 0, 0};
     mbgl::Color errorRadiusBorderColor{0, 0, 0, 0};
-    int puckSizePx = 0;
-    int puckHatSizePx = 0;
-    int puckShadowSizePx = 0;
+    float puckScale = 0;
+    float puckHatScale = 0;
+    float puckShadowScale = 0;
     float puckLayersDisplacement = 0;
     float perspectiveCompensation = 0;
     std::string puckImagePath;
@@ -266,7 +266,6 @@ public:
         ~Texture() { release(); }
         void release() {
             MBGL_CHECK_ERROR(glDeleteTextures(1, &texId));
-            texId = 0;
             image = nullptr;
         }
         /*
@@ -276,10 +275,16 @@ public:
             if ((img && &img->get()->image == image) || (!img && !image)) return;
             imageDirty = true;
             image = (img) ? &img->get()->image : nullptr;
-            if (img)
+            width = height = 0;
+            pixelRatio = 1.0f;
+            if (img) {
                 sharedImage = *img; // keep reference until uploaded
-            else
+                width = image->size.width;
+                height = image->size.height;
+                pixelRatio = img->get()->pixelRatio;
+            } else {
                 sharedImage = nullopt;
+            }
         }
 
         void upload() {
@@ -329,13 +334,21 @@ public:
         const mbgl::PremultipliedImage* image = nullptr;
         optional<Immutable<style::Image::Impl>> sharedImage;
         bool imageDirty = false;
+        size_t width = 0;
+        size_t height = 0;
+        float pixelRatio = 1.0f;
     };
 
     RenderLocationIndicatorImpl() : ruler(0, mapbox::cheap_ruler::CheapRuler::Meters) {}
 
-    static bool hasExtension(const std::string& ext) {
-        if (const auto* extensions = reinterpret_cast<const char*>(MBGL_CHECK_ERROR(glGetString(GL_EXTENSIONS)))) {
-            if (strstr(extensions, ext.c_str()) != nullptr) return true;
+    static bool hasAnisotropicFiltering() {
+        const auto* extensions = reinterpret_cast<const char*>(glGetString(GL_EXTENSIONS));
+        GLenum error = glGetError();
+        if (error != GL_NO_ERROR) { // glGetString(GL_EXTENSIONS) is deprecated in OpenGL Desktop 3.0+. But OpenGL 3.0+
+                                    // has anisotropic filtering.
+            return true;
+        } else {
+            if (strstr(extensions, "GL_EXT_texture_filter_anisotropic") != nullptr) return true;
         }
         return false;
     }
@@ -343,7 +356,7 @@ public:
         // Check if anisotropic filtering is available
         if (initialized) return;
         initialized = true;
-        if (hasExtension("GL_EXT_texture_filter_anisotropic")) anisotropicFilteringAvailable = true;
+        if (hasAnisotropicFiltering()) anisotropicFilteringAvailable = true;
         simpleShader.initialize();
         texturedShader.initialize();
         texCoords = {{{0.0f, 1.0f},
@@ -363,7 +376,7 @@ public:
 
     void release() {
         if (!simpleShader.program) return;
-        textures.clear();
+        for (const auto& t : textures) t.second->release();
         buffer.release();
         circleBuffer.release();
         puckBuffer.release();
@@ -382,16 +395,13 @@ public:
         } else if (params.puckBearing != oldParams.puckBearing ||
                    params.puckLayersDisplacement != oldParams.puckLayersDisplacement ||
                    params.perspectiveCompensation != oldParams.perspectiveCompensation ||
-                   params.puckSizePx != oldParams.puckSizePx || params.puckHatSizePx != oldParams.puckHatSizePx ||
-                   params.puckShadowSizePx != oldParams.puckShadowSizePx)
+                   params.puckScale != oldParams.puckScale || params.puckHatScale != oldParams.puckHatScale ||
+                   params.puckShadowScale != oldParams.puckShadowScale)
             bearingChanged = true; // changes puck geometry but not necessarily the location
         if (params.errorRadiusMeters != oldParams.errorRadiusMeters) radiusChanged = true;
-        if (params.puckImagePath != oldParams.puckImagePath)
-            setTextureFromImageID(params.puckImagePath, texPuck, params);
-        if (params.puckShadowImagePath != oldParams.puckShadowImagePath)
-            setTextureFromImageID(params.puckShadowImagePath, texShadow, params);
-        if (params.puckHatImagePath != oldParams.puckHatImagePath)
-            setTextureFromImageID(params.puckHatImagePath, texPuckHat, params);
+        setTextureFromImageID(params.puckImagePath, texPuck, params);
+        setTextureFromImageID(params.puckShadowImagePath, texShadow, params);
+        setTextureFromImageID(params.puckHatImagePath, texPuckHat, params);
 
         projectionCircle = params.projectionMatrix;
         const Point<double> positionMercator = project(params.puckPosition, *params.state);
@@ -539,10 +549,12 @@ protected:
                 params.perspectiveCompensation; // Compensation factor for the perspective deformation
         //     ^ clamping this to 0.8 to avoid growing the puck too much close to the camera.
         const double shadowRadius =
-            params.puckShadowSizePx * M_SQRT2 * 0.5 *
+            ((texShadow) ? texShadow->width / texShadow->pixelRatio : 0.0) * params.puckShadowScale * M_SQRT2 * 0.5 *
             horizontalScaleFactor; // Technically it's not the radius, but the half diagonal of the quad.
-        const double puckRadius = params.puckSizePx * M_SQRT2 * 0.5 * horizontalScaleFactor;
-        const double hatRadius = params.puckHatSizePx * M_SQRT2 * 0.5 * horizontalScaleFactor;
+        const double puckRadius = ((texPuck) ? texPuck->width / texPuck->pixelRatio : 0.0) * params.puckScale *
+                                  M_SQRT2 * 0.5 * horizontalScaleFactor;
+        const double hatRadius = ((texPuckHat) ? texPuckHat->width / texPuckHat->pixelRatio : 0.0) *
+                                 params.puckHatScale * M_SQRT2 * 0.5 * horizontalScaleFactor;
 
         for (unsigned long i = 0; i < 4; ++i) {
             const auto b = util::wrap<float>(params.puckBearing + bearings[i], 0.0f, 360.0f);
@@ -634,6 +646,11 @@ protected:
             else
                 tx->assign(nullptr);
             textures[imagePath] = tx;
+        } else {
+            const Immutable<style::Image::Impl>* ima = params.imageManager->getSharedImage(imagePath);
+            const mbgl::PremultipliedImage* img = (ima) ? &ima->get()->image : nullptr;
+            if (textures.at(imagePath)->image != img) // image for the ID might have changed.
+                textures.at(imagePath)->assign(ima);
         }
         tex = textures.at(imagePath);
     }
@@ -690,7 +707,6 @@ RenderLocationIndicatorLayer::RenderLocationIndicatorLayer(Immutable<style::Loca
 }
 
 RenderLocationIndicatorLayer::~RenderLocationIndicatorLayer() {
-    assert(gfx::BackendScope::exists());
     if (!contextDestroyed) MBGL_CHECK_ERROR(renderImpl->release());
 }
 
@@ -711,10 +727,12 @@ void RenderLocationIndicatorLayer::evaluate(const PropertyEvaluationParameters& 
     renderImpl->parameters.errorRadiusColor = evaluated.get<style::AccuracyRadiusColor>();
     renderImpl->parameters.errorRadiusBorderColor = evaluated.get<style::AccuracyRadiusBorderColor>();
     renderImpl->parameters.errorRadiusMeters = evaluated.get<style::AccuracyRadius>();
-    renderImpl->parameters.puckSizePx = evaluated.get<style::BearingImageSize>();
-    renderImpl->parameters.puckHatSizePx = evaluated.get<style::TopImageSize>();
-    renderImpl->parameters.puckShadowSizePx = evaluated.get<style::ShadowImageSize>();
+    renderImpl->parameters.puckScale = evaluated.get<style::BearingImageSize>();
+    renderImpl->parameters.puckHatScale = evaluated.get<style::TopImageSize>();
+    renderImpl->parameters.puckShadowScale = evaluated.get<style::ShadowImageSize>();
     renderImpl->parameters.puckBearing = evaluated.get<style::Bearing>().getAngle();
+    renderImpl->parameters.puckLayersDisplacement = evaluated.get<style::ImageTiltDisplacement>();
+    renderImpl->parameters.perspectiveCompensation = evaluated.get<style::PerspectiveCompensation>();
 
     const std::array<double, 3> pos = evaluated.get<style::Location>();
     renderImpl->parameters.puckPosition = LatLng{pos[0], pos[1]};
@@ -726,10 +744,6 @@ void RenderLocationIndicatorLayer::evaluate(const PropertyEvaluationParameters& 
         renderImpl->parameters.puckShadowImagePath = layout.get<style::ShadowImage>().asConstant().id();
     if (!layout.get<style::TopImage>().isUndefined())
         renderImpl->parameters.puckHatImagePath = layout.get<style::TopImage>().asConstant().id();
-    if (!layout.get<style::ImageTiltDisplacement>().isUndefined())
-        renderImpl->parameters.puckLayersDisplacement = layout.get<style::ImageTiltDisplacement>().asConstant();
-    if (!layout.get<style::PerspectiveCompensation>().isUndefined())
-        renderImpl->parameters.perspectiveCompensation = layout.get<style::PerspectiveCompensation>().asConstant();
 
     evaluatedProperties = std::move(properties);
 }

@@ -26,14 +26,6 @@ public:
     const PropertyValue<expression::Image>& getBearingImage() const;
     void setBearingImage(const PropertyValue<expression::Image>&);
 
-    static PropertyValue<float> getDefaultImageTiltDisplacement();
-    const PropertyValue<float>& getImageTiltDisplacement() const;
-    void setImageTiltDisplacement(const PropertyValue<float>&);
-
-    static PropertyValue<float> getDefaultPerspectiveCompensation();
-    const PropertyValue<float>& getPerspectiveCompensation() const;
-    void setPerspectiveCompensation(const PropertyValue<float>&);
-
     static PropertyValue<expression::Image> getDefaultShadowImage();
     const PropertyValue<expression::Image>& getShadowImage() const;
     void setShadowImage(const PropertyValue<expression::Image>&);
@@ -74,11 +66,23 @@ public:
     void setBearingImageSizeTransition(const TransitionOptions&);
     TransitionOptions getBearingImageSizeTransition() const;
 
+    static PropertyValue<float> getDefaultImageTiltDisplacement();
+    const PropertyValue<float>& getImageTiltDisplacement() const;
+    void setImageTiltDisplacement(const PropertyValue<float>&);
+    void setImageTiltDisplacementTransition(const TransitionOptions&);
+    TransitionOptions getImageTiltDisplacementTransition() const;
+
     static PropertyValue<std::array<double, 3>> getDefaultLocation();
     const PropertyValue<std::array<double, 3>>& getLocation() const;
     void setLocation(const PropertyValue<std::array<double, 3>>&);
     void setLocationTransition(const TransitionOptions&);
     TransitionOptions getLocationTransition() const;
+
+    static PropertyValue<float> getDefaultPerspectiveCompensation();
+    const PropertyValue<float>& getPerspectiveCompensation() const;
+    void setPerspectiveCompensation(const PropertyValue<float>&);
+    void setPerspectiveCompensationTransition(const TransitionOptions&);
+    TransitionOptions getPerspectiveCompensationTransition() const;
 
     static PropertyValue<float> getDefaultShadowImageSize();
     const PropertyValue<float>& getShadowImageSize() const;

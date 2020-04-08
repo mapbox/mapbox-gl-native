@@ -34,7 +34,10 @@ referenceSpec["layout_location-indicator"] = {
             ]
         },
         "doc": "Name of image in sprite to use as the background of the location indicator."
-    },
+    }
+};
+
+referenceSpec["paint_location-indicator"] = {
     "perspective-compensation": {
         "type": "number",
         "default": "0.85",
@@ -59,10 +62,7 @@ referenceSpec["layout_location-indicator"] = {
             ]
         },
         "doc": "The displacement off the center of the top image and the shadow image when the pitch of the map is greater than 0. This helps producing a three-dimensional appearence."
-    }
-};
-
-referenceSpec["paint_location-indicator"] = {
+    },
     "bearing": {
         "type": "number",
         "default": "0",
@@ -74,7 +74,7 @@ referenceSpec["paint_location-indicator"] = {
             "interpolated": false,
             "parameters": [ ]
         },
-        "transition": false,
+        "transition": true,
         "doc": "The bearing of the location indicator."
     },
     "location": {
@@ -110,9 +110,9 @@ referenceSpec["paint_location-indicator"] = {
     },
     "top-image-size": {
         "type": "number",
-        "units": "pixels",
+        "units": "factor of the original icon size",
         "property-type": "data-constant",
-        "default": 0,
+        "default": 1,
         "expression": {
             "interpolated": true,
             "parameters": [
@@ -120,13 +120,13 @@ referenceSpec["paint_location-indicator"] = {
             ]
         },
         "transition": true,
-        "doc": "The size of the top image, in pixels."
+        "doc": "The size of the top image, as a scale factor applied to the size of the specified image."
     },
     "bearing-image-size": {
         "type": "number",
-        "units": "pixels",
+        "units": "factor of the original icon size",
         "property-type": "data-constant",
-        "default": 0,
+        "default": 1,
         "expression": {
             "interpolated": true,
             "parameters": [
@@ -134,13 +134,13 @@ referenceSpec["paint_location-indicator"] = {
             ]
         },
         "transition": true,
-        "doc": "The size of the bearing image, in pixels."
+        "doc": "The size of the bearing image, as a scale factor applied to the size of the specified image."
     },
     "shadow-image-size": {
         "type": "number",
-        "units": "pixels",
+        "units": "factor of the original icon size",
         "property-type": "data-constant",
-        "default": 0,
+        "default": 1,
         "expression": {
             "interpolated": true,
             "parameters": [
@@ -148,7 +148,7 @@ referenceSpec["paint_location-indicator"] = {
             ]
         },
         "transition": true,
-        "doc": "The size of the shadow image, in pixels."
+        "doc": "The size of the shadow image, as a scale factor applied to the size of the specified image."
     },
     "accuracy-radius-color": {
         "type": "color",

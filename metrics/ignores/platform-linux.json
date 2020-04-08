@@ -6,5 +6,20 @@
     "render-tests/line-pattern/opacity": "Flaky on Linux: https://github.com/mapbox/mapbox-gl-native/issues/15320",
     "render-tests/line-translate/literal": "Flaky on Linux: https://github.com/mapbox/mapbox-gl-native/issues/14859",
     "render-tests/regressions/mapbox-gl-js#5642": "Failing with mbgl-render-test",
-    "render-tests/regressions/mapbox-gl-js#7066": "Failing with mbgl-render-test"
+    "render-tests/regressions/mapbox-gl-js#7066": "Failing with mbgl-render-test",
+    "location_indicator/dateline": "Would need a different baseline when ran on llvmpipe not supporting anisotropic filtering",
+    "location_indicator/default": "Would need a different baseline when ran on llvmpipe not supporting anisotropic filtering",
+    "location_indicator/no_radius_border": "Would need a different baseline when ran on llvmpipe not supporting anisotropic filtering",
+    "location_indicator/no_radius_fill": "Would need a different baseline when ran on llvmpipe not supporting anisotropic filtering",
+    "location_indicator/no_textures": "Would need a different baseline when ran on llvmpipe not supporting anisotropic filtering",
+    "location_indicator/one_texture": "Would need a different baseline when ran on llvmpipe not supporting anisotropic filtering",
+    "location_indicator/rotated": "Would need a different baseline when ran on llvmpipe not supporting anisotropic filtering",
+    "location_indicator/tilted": "Would need a different baseline when ran on llvmpipe not supporting anisotropic filtering",
+    "location_indicator/tilted_texture_shift": "Would need a different baseline when ran on llvmpipe not supporting anisotropic filtering",
+    "location_indicator/tilted_texture_shift_bottom_left": "Would need a different baseline when ran on llvmpipe not supporting anisotropic filtering",
+    "location_indicator/tilted_texture_shift_bottom_right": "Would need a different baseline when ran on llvmpipe not supporting anisotropic filtering",
+    "location_indicator/tilted_texture_shift_top_left": "Would need a different baseline when ran on llvmpipe not supporting anisotropic filtering",
+    "location_indicator/tilted_texture_shift_top_right": "Would need a different baseline when ran on llvmpipe not supporting anisotropic filtering",
+    "location_indicator/two_textures": "Would need a different baseline when ran on llvmpipe not supporting anisotropic filtering",
+    "location_indicator/image_pixel_ratio": "Would need a different baseline when ran on llvmpipe not supporting anisotropic filtering"
 }

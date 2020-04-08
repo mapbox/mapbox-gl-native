@@ -991,10 +991,10 @@ void GLFWView::toggleLocationIndicatorLayer() {
         puckLayer->setBearingTransition(mbgl::style::TransitionOptions(mbgl::Duration::zero(), mbgl::Duration::zero()));
         puckLayer->setBearing(mbgl::style::Rotation(0.0));
         puckLayer->setAccuracyRadiusBorderColor(premultiply(mbgl::Color{0.0, 1.0, 0.2, 0.4}));
-        puckLayer->setTopImageSize(24);
-        puckLayer->setBearingImageSize(72);
-        puckLayer->setShadowImageSize(96);
-        puckLayer->setImageTiltDisplacement(8.0f); // set to 0 for a "flat" puck
+        puckLayer->setTopImageSize(0.18);
+        puckLayer->setBearingImageSize(0.26);
+        puckLayer->setShadowImageSize(0.2);
+        puckLayer->setImageTiltDisplacement(7.0f); // set to 0 for a "flat" puck
         puckLayer->setPerspectiveCompensation(0.9);
 
         map->getStyle().addImage(std::make_unique<mbgl::style::Image>(
