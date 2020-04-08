@@ -7,18 +7,22 @@
       "operations": [
         [
           "addImage",
-          "puck_hat",
-          "puck_hat.png"
+          "puck_hat@2x",
+          "puck_hat.png",
+          {"pixelRatio": 2.0}
         ],
         [
           "addImage",
-          "puck",
-          "puck.png"
+          "puck@2x",
+          "puck.png",
+          {"pixelRatio": 2.0}
+
         ],
         [
           "addImage",
-          "puck_shadow",
-          "puck_shadow.png"
+          "puck_shadow@2x",
+          "puck_shadow.png",
+          {"pixelRatio": 2.0}
         ]
       ]
     }
@@ -50,7 +54,7 @@
   "zoom": 16,
   "pitch" : 0,
   "bearing" : 42,
-  "sources": {},
+  "sprite" : "local://sprites/emerald@2x",
   "layers": [
     {
       "id": "background",
@@ -72,9 +76,9 @@
       "id": "puck124",
       "type": "location-indicator",
       "layout" : {
-          "bearing-image" : "puck",
-          "top-image" : "puck_hat",
-          "shadow-image" : "puck_shadow"
+          "bearing-image" : "puck@2x",
+          "top-image" : "marker_icon",
+          "shadow-image" : "puck_shadow@2x"
       },
       "paint" : {
           "bearing" : 45,
@@ -82,9 +86,9 @@
           "image-tilt-displacement" : 6.5,
           "location" : [ 35.693055, 139.766707, 0],
           "accuracy-radius": 90.0,
-          "bearing-image-size" : 0.26,
-          "top-image-size" : 0.18,
-          "shadow-image-size" : 0.2,
+          "bearing-image-size" : 0.52,
+          "top-image-size" : 1,
+          "shadow-image-size" : 0.4,
 
           "accuracy-radius-color": "rgba(255,0,0,0.2)",
           "accuracy-radius-border-color": "rgba(255,0,255,0.6)"

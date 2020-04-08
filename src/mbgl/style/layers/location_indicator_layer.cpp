@@ -78,36 +78,6 @@ void LocationIndicatorLayer::setBearingImage(const PropertyValue<expression::Ima
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
-PropertyValue<float> LocationIndicatorLayer::getDefaultImageTiltDisplacement() {
-    return ImageTiltDisplacement::defaultValue();
-}
-
-const PropertyValue<float>& LocationIndicatorLayer::getImageTiltDisplacement() const {
-    return impl().layout.get<ImageTiltDisplacement>();
-}
-
-void LocationIndicatorLayer::setImageTiltDisplacement(const PropertyValue<float>& value) {
-    if (value == getImageTiltDisplacement()) return;
-    auto impl_ = mutableImpl();
-    impl_->layout.get<ImageTiltDisplacement>() = value;
-    baseImpl = std::move(impl_);
-    observer->onLayerChanged(*this);
-}
-PropertyValue<float> LocationIndicatorLayer::getDefaultPerspectiveCompensation() {
-    return PerspectiveCompensation::defaultValue();
-}
-
-const PropertyValue<float>& LocationIndicatorLayer::getPerspectiveCompensation() const {
-    return impl().layout.get<PerspectiveCompensation>();
-}
-
-void LocationIndicatorLayer::setPerspectiveCompensation(const PropertyValue<float>& value) {
-    if (value == getPerspectiveCompensation()) return;
-    auto impl_ = mutableImpl();
-    impl_->layout.get<PerspectiveCompensation>() = value;
-    baseImpl = std::move(impl_);
-    observer->onLayerChanged(*this);
-}
 PropertyValue<expression::Image> LocationIndicatorLayer::getDefaultShadowImage() {
     return ShadowImage::defaultValue();
 }
@@ -250,7 +220,7 @@ TransitionOptions LocationIndicatorLayer::getBearingTransition() const {
 }
 
 PropertyValue<float> LocationIndicatorLayer::getDefaultBearingImageSize() {
-    return {0};
+    return {1};
 }
 
 const PropertyValue<float>& LocationIndicatorLayer::getBearingImageSize() const {
@@ -274,6 +244,33 @@ void LocationIndicatorLayer::setBearingImageSizeTransition(const TransitionOptio
 
 TransitionOptions LocationIndicatorLayer::getBearingImageSizeTransition() const {
     return impl().paint.template get<BearingImageSize>().options;
+}
+
+PropertyValue<float> LocationIndicatorLayer::getDefaultImageTiltDisplacement() {
+    return {0};
+}
+
+const PropertyValue<float>& LocationIndicatorLayer::getImageTiltDisplacement() const {
+    return impl().paint.template get<ImageTiltDisplacement>().value;
+}
+
+void LocationIndicatorLayer::setImageTiltDisplacement(const PropertyValue<float>& value) {
+    if (value == getImageTiltDisplacement())
+        return;
+    auto impl_ = mutableImpl();
+    impl_->paint.template get<ImageTiltDisplacement>().value = value;
+    baseImpl = std::move(impl_);
+    observer->onLayerChanged(*this);
+}
+
+void LocationIndicatorLayer::setImageTiltDisplacementTransition(const TransitionOptions& options) {
+    auto impl_ = mutableImpl();
+    impl_->paint.template get<ImageTiltDisplacement>().options = options;
+    baseImpl = std::move(impl_);
+}
+
+TransitionOptions LocationIndicatorLayer::getImageTiltDisplacementTransition() const {
+    return impl().paint.template get<ImageTiltDisplacement>().options;
 }
 
 PropertyValue<std::array<double, 3>> LocationIndicatorLayer::getDefaultLocation() {
@@ -303,8 +300,35 @@ TransitionOptions LocationIndicatorLayer::getLocationTransition() const {
     return impl().paint.template get<Location>().options;
 }
 
+PropertyValue<float> LocationIndicatorLayer::getDefaultPerspectiveCompensation() {
+    return {0.85};
+}
+
+const PropertyValue<float>& LocationIndicatorLayer::getPerspectiveCompensation() const {
+    return impl().paint.template get<PerspectiveCompensation>().value;
+}
+
+void LocationIndicatorLayer::setPerspectiveCompensation(const PropertyValue<float>& value) {
+    if (value == getPerspectiveCompensation())
+        return;
+    auto impl_ = mutableImpl();
+    impl_->paint.template get<PerspectiveCompensation>().value = value;
+    baseImpl = std::move(impl_);
+    observer->onLayerChanged(*this);
+}
+
+void LocationIndicatorLayer::setPerspectiveCompensationTransition(const TransitionOptions& options) {
+    auto impl_ = mutableImpl();
+    impl_->paint.template get<PerspectiveCompensation>().options = options;
+    baseImpl = std::move(impl_);
+}
+
+TransitionOptions LocationIndicatorLayer::getPerspectiveCompensationTransition() const {
+    return impl().paint.template get<PerspectiveCompensation>().options;
+}
+
 PropertyValue<float> LocationIndicatorLayer::getDefaultShadowImageSize() {
-    return {0};
+    return {1};
 }
 
 const PropertyValue<float>& LocationIndicatorLayer::getShadowImageSize() const {
@@ -331,7 +355,7 @@ TransitionOptions LocationIndicatorLayer::getShadowImageSizeTransition() const {
 }
 
 PropertyValue<float> LocationIndicatorLayer::getDefaultTopImageSize() {
-    return {0};
+    return {1};
 }
 
 const PropertyValue<float>& LocationIndicatorLayer::getTopImageSize() const {
@@ -361,7 +385,7 @@ using namespace conversion;
 
 namespace {
 
-constexpr uint8_t kPaintPropertyCount = 16u;
+constexpr uint8_t kPaintPropertyCount = 20u;
 
 enum class Property : uint8_t {
     AccuracyRadius,
@@ -369,7 +393,9 @@ enum class Property : uint8_t {
     AccuracyRadiusColor,
     Bearing,
     BearingImageSize,
+    ImageTiltDisplacement,
     Location,
+    PerspectiveCompensation,
     ShadowImageSize,
     TopImageSize,
     AccuracyRadiusTransition,
@@ -377,12 +403,12 @@ enum class Property : uint8_t {
     AccuracyRadiusColorTransition,
     BearingTransition,
     BearingImageSizeTransition,
+    ImageTiltDisplacementTransition,
     LocationTransition,
+    PerspectiveCompensationTransition,
     ShadowImageSizeTransition,
     TopImageSizeTransition,
     BearingImage = kPaintPropertyCount,
-    ImageTiltDisplacement,
-    PerspectiveCompensation,
     ShadowImage,
     TopImage,
 };
@@ -398,7 +424,9 @@ MAPBOX_ETERNAL_CONSTEXPR const auto layerProperties = mapbox::eternal::hash_map<
      {"accuracy-radius-color", toUint8(Property::AccuracyRadiusColor)},
      {"bearing", toUint8(Property::Bearing)},
      {"bearing-image-size", toUint8(Property::BearingImageSize)},
+     {"image-tilt-displacement", toUint8(Property::ImageTiltDisplacement)},
      {"location", toUint8(Property::Location)},
+     {"perspective-compensation", toUint8(Property::PerspectiveCompensation)},
      {"shadow-image-size", toUint8(Property::ShadowImageSize)},
      {"top-image-size", toUint8(Property::TopImageSize)},
      {"accuracy-radius-transition", toUint8(Property::AccuracyRadiusTransition)},
@@ -406,12 +434,12 @@ MAPBOX_ETERNAL_CONSTEXPR const auto layerProperties = mapbox::eternal::hash_map<
      {"accuracy-radius-color-transition", toUint8(Property::AccuracyRadiusColorTransition)},
      {"bearing-transition", toUint8(Property::BearingTransition)},
      {"bearing-image-size-transition", toUint8(Property::BearingImageSizeTransition)},
+     {"image-tilt-displacement-transition", toUint8(Property::ImageTiltDisplacementTransition)},
      {"location-transition", toUint8(Property::LocationTransition)},
+     {"perspective-compensation-transition", toUint8(Property::PerspectiveCompensationTransition)},
      {"shadow-image-size-transition", toUint8(Property::ShadowImageSizeTransition)},
      {"top-image-size-transition", toUint8(Property::TopImageSizeTransition)},
      {"bearing-image", toUint8(Property::BearingImage)},
-     {"image-tilt-displacement", toUint8(Property::ImageTiltDisplacement)},
-     {"perspective-compensation", toUint8(Property::PerspectiveCompensation)},
      {"shadow-image", toUint8(Property::ShadowImage)},
      {"top-image", toUint8(Property::TopImage)}});
 
@@ -427,8 +455,12 @@ StyleProperty getLayerProperty(const LocationIndicatorLayer& layer, Property pro
             return makeStyleProperty(layer.getBearing());
         case Property::BearingImageSize:
             return makeStyleProperty(layer.getBearingImageSize());
+        case Property::ImageTiltDisplacement:
+            return makeStyleProperty(layer.getImageTiltDisplacement());
         case Property::Location:
             return makeStyleProperty(layer.getLocation());
+        case Property::PerspectiveCompensation:
+            return makeStyleProperty(layer.getPerspectiveCompensation());
         case Property::ShadowImageSize:
             return makeStyleProperty(layer.getShadowImageSize());
         case Property::TopImageSize:
@@ -443,18 +475,18 @@ StyleProperty getLayerProperty(const LocationIndicatorLayer& layer, Property pro
             return makeStyleProperty(layer.getBearingTransition());
         case Property::BearingImageSizeTransition:
             return makeStyleProperty(layer.getBearingImageSizeTransition());
+        case Property::ImageTiltDisplacementTransition:
+            return makeStyleProperty(layer.getImageTiltDisplacementTransition());
         case Property::LocationTransition:
             return makeStyleProperty(layer.getLocationTransition());
+        case Property::PerspectiveCompensationTransition:
+            return makeStyleProperty(layer.getPerspectiveCompensationTransition());
         case Property::ShadowImageSizeTransition:
             return makeStyleProperty(layer.getShadowImageSizeTransition());
         case Property::TopImageSizeTransition:
             return makeStyleProperty(layer.getTopImageSizeTransition());
         case Property::BearingImage:
             return makeStyleProperty(layer.getBearingImage());
-        case Property::ImageTiltDisplacement:
-            return makeStyleProperty(layer.getImageTiltDisplacement());
-        case Property::PerspectiveCompensation:
-            return makeStyleProperty(layer.getPerspectiveCompensation());
         case Property::ShadowImage:
             return makeStyleProperty(layer.getShadowImage());
         case Property::TopImage:
@@ -491,8 +523,8 @@ optional<Error> LocationIndicatorLayer::setPropertyInternal(const std::string& n
     auto property = static_cast<Property>(it->second);
 
     if (property == Property::AccuracyRadius || property == Property::BearingImageSize ||
-        property == Property::ShadowImageSize || property == Property::TopImageSize ||
-        property == Property::ImageTiltDisplacement || property == Property::PerspectiveCompensation) {
+        property == Property::ImageTiltDisplacement || property == Property::PerspectiveCompensation ||
+        property == Property::ShadowImageSize || property == Property::TopImageSize) {
         Error error;
         const auto& typedValue = convert<PropertyValue<float>>(value, error, false, false);
         if (!typedValue) {
@@ -509,16 +541,6 @@ optional<Error> LocationIndicatorLayer::setPropertyInternal(const std::string& n
             return nullopt;
         }
 
-        if (property == Property::ShadowImageSize) {
-            setShadowImageSize(*typedValue);
-            return nullopt;
-        }
-
-        if (property == Property::TopImageSize) {
-            setTopImageSize(*typedValue);
-            return nullopt;
-        }
-
         if (property == Property::ImageTiltDisplacement) {
             setImageTiltDisplacement(*typedValue);
             return nullopt;
@@ -526,6 +548,16 @@ optional<Error> LocationIndicatorLayer::setPropertyInternal(const std::string& n
 
         if (property == Property::PerspectiveCompensation) {
             setPerspectiveCompensation(*typedValue);
+            return nullopt;
+        }
+
+        if (property == Property::ShadowImageSize) {
+            setShadowImageSize(*typedValue);
+            return nullopt;
+        }
+
+        if (property == Property::TopImageSize) {
+            setTopImageSize(*typedValue);
             return nullopt;
         }
     }
@@ -620,8 +652,18 @@ optional<Error> LocationIndicatorLayer::setPropertyInternal(const std::string& n
         return nullopt;
     }
 
+    if (property == Property::ImageTiltDisplacementTransition) {
+        setImageTiltDisplacementTransition(*transition);
+        return nullopt;
+    }
+
     if (property == Property::LocationTransition) {
         setLocationTransition(*transition);
+        return nullopt;
+    }
+
+    if (property == Property::PerspectiveCompensationTransition) {
+        setPerspectiveCompensationTransition(*transition);
         return nullopt;
     }
 
