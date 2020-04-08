@@ -1406,6 +1406,7 @@ void TilePlacement::placeSymbolBucket(const BucketPlacementData& params, std::se
         variableAnchor,
         pitchTextWithMap = ctx.pitchTextWithMap,
         rotateTextWithMap = ctx.rotateTextWithMap,
+        variableIconPlacement = ctx.hasIconTextFit && !ctx.iconAllowOverlap,
         bearing = ctx.getTransformState().getBearing()
     ](const SymbolInstance& symbol) noexcept->IntersectStatus {
         IntersectStatus result;
@@ -1430,7 +1431,20 @@ void TilePlacement::placeSymbolBucket(const BucketPlacementData& params, std::se
 
         if (!symbol.iconCollisionFeature.boxes.empty()) {
             const auto& iconCollisionBox = symbol.iconCollisionFeature.boxes.front();
-            auto iconIntersects = collisionBoxIntersectsTileEdges(iconCollisionBox, {});
+            Point<float> offset{};
+            if (variableAnchor && variableIconPlacement) {
+                float width = iconCollisionBox.x2 - iconCollisionBox.x1;
+                float height = iconCollisionBox.y2 - iconCollisionBox.y1;
+                offset = calculateVariableLayoutOffset(*variableAnchor,
+                                                       width,
+                                                       height,
+                                                       symbol.variableTextOffset,
+                                                       symbol.textBoxScale,
+                                                       rotateTextWithMap,
+                                                       pitchTextWithMap,
+                                                       bearing);
+            }
+            auto iconIntersects = collisionBoxIntersectsTileEdges(iconCollisionBox, offset);
             result.flags |= iconIntersects.flags;
             result.minSectionLength = std::max(result.minSectionLength, iconIntersects.minSectionLength);
         }
