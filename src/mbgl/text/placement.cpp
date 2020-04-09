@@ -608,7 +608,7 @@ void Placement::placeSymbol(const SymbolInstance& symbolInstance,
         JointPlacement(
             placeText || ctx.alwaysShowText, placeIcon || ctx.alwaysShowIcon, offscreen || bucket.justReloaded));
     assert(pair.second);
-    newSymbolPlaced(symbolInstance, pair.first->second, ctx.placementType, textBoxes, iconBoxes);
+    newSymbolPlaced(symbolInstance, ctx, pair.first->second, ctx.placementType, textBoxes, iconBoxes);
     seenCrossTileIDs.insert(symbolInstance.crossTileID);
 }
 
@@ -1268,6 +1268,7 @@ private:
                                   const mat4& posMatrix,
                                   float textPixelRatio) override;
     void newSymbolPlaced(const SymbolInstance&,
+                         const PlacementContext&,
                          const JointPlacement&,
                          style::SymbolPlacementType,
                          const std::vector<ProjectedCollisionBox>&,
@@ -1476,6 +1477,7 @@ bool TilePlacement::canPlaceAtVariableAnchor(const CollisionBox& box,
 }
 
 void TilePlacement::newSymbolPlaced(const SymbolInstance& symbol,
+                                    const PlacementContext& ctx,
                                     const JointPlacement& placement,
                                     style::SymbolPlacementType placementType,
                                     const std::vector<ProjectedCollisionBox>& textCollisionBoxes,
@@ -1502,7 +1504,8 @@ void TilePlacement::newSymbolPlaced(const SymbolInstance& symbol,
                                 placement.text,
                                 placement.icon,
                                 !placement.skipFade && populateIntersections,
-                                collisionIndex.getViewportPadding()};
+                                collisionIndex.getViewportPadding(),
+                                ctx.getBucket().bucketLeaderID};
     placedSymbolsData.emplace_back(std::move(symbolData));
 }
 

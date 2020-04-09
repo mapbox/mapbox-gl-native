@@ -814,8 +814,8 @@ void TestRunner::run(TestMetadata& metadata) {
                         ss << std::endl
                            << ++metadata.duplicationsCount << ". \"" << cv.to_bytes(placedSymbol.key) << "\" "
                            << (isIcon ? "icon" : "text") << " ((" << box.min.x << ", " << box.min.y << "), ("
-                           << box.max.x << ", " << box.max.y << ")) "
-                           << "at " << util::toString(tileId);
+                           << box.max.x << ", " << box.max.y << ")) from layer: " << placedSymbol.layer << " at "
+                           << util::toString(tileId);
                         duplicationsReport += ss.str();
                         return;
                     }
@@ -824,7 +824,7 @@ void TestRunner::run(TestMetadata& metadata) {
                         ss << std::endl
                            << ++metadata.labelCutOffFound << ". \"" << cv.to_bytes(placedSymbol.key) << "\" "
                            << (isIcon ? "icon" : "text") << " ((" << box.min.x << ", " << box.min.y << "), ("
-                           << box.max.x << ", " << box.max.y << "))"
+                           << box.max.x << ", " << box.max.y << ")) from layer: " << placedSymbol.layer
                            << (placed ? " is placed at " : " is not placed at ") << util::toString(tileId) << " and"
                            << (it->placed ? " placed at " : " not placed at ") << util::toString(it->tileId);
                         cutOffLabelsReport += ss.str();

@@ -148,6 +148,7 @@ protected:
     void placeLayer(const RenderLayer&, std::set<uint32_t>&);
     virtual void commit();
     virtual void newSymbolPlaced(const SymbolInstance&,
+                                 const PlacementContext&,
                                  const JointPlacement&,
                                  style::SymbolPlacementType,
                                  const std::vector<ProjectedCollisionBox>& /*textBoxes*/,

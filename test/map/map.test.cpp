@@ -1431,7 +1431,18 @@ TEST(Map, PlacedSymbolData) {
 
     int placedTotal = 0;
 
+    const std::set<std::string> symbolLayers{"place-city-lg-s",
+                                             "place-neighbourhood",
+                                             "place-suburb",
+                                             "poi-scalerank2",
+                                             "poi-scalerank3",
+                                             "poi-parks-scalerank1",
+                                             "poi-parks-scalerank2",
+                                             "poi-parks-scalerank3",
+                                             "rail-label"};
+
     for (const auto& placedSymbol : placedSymbols) {
+        EXPECT_NE(0u, symbolLayers.count(placedSymbol.layer));
         if (placedSymbol.textPlaced && placedSymbol.textCollisionBox) {
             if (isInsideTile(*placedSymbol.textCollisionBox, placedSymbol.viewportPadding, viewportSize)) {
                 EXPECT_FALSE(placedSymbol.intersectsTileBorder);

@@ -36,6 +36,8 @@ struct PlacedSymbolData {
     bool intersectsTileBorder;
     // Viewport padding ({viewportPadding, viewportPadding} is a coordinate of the tile's top-left corner)
     float viewportPadding;
+    // Layer id (leader of the symbol layout group)
+    std::string layer;
 };
 
 class Renderer {
