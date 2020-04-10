@@ -76,6 +76,10 @@ public:
         rendererObserver->onDidFinishRenderingFrame(mode, repaintNeeded, placementChanged);
     }
 
+    void onStyleImageMissing(const std::string& id, StyleImageMissingCallback done) override {
+        rendererObserver->onStyleImageMissing(id, done);
+    }
+
     void setObserver(std::shared_ptr<RendererObserver> observer) {
         assert(observer);
         rendererObserver = std::move(observer);
