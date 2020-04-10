@@ -293,7 +293,7 @@ void Style::Impl::removeImage(const std::string& id) {
     auto newImages = makeMutable<ImageImpls>(*images);
     auto found =
         std::find_if(newImages->begin(), newImages->end(), [&id](const auto& image) { return image->id == id; });
-    if (found == images->end()) {
+    if (found == newImages->end()) {
         Log::Warning(Event::General, "Image '%s' is not present in style, cannot remove", id.c_str());
         return;
     }
