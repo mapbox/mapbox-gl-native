@@ -141,3 +141,21 @@ TEST(Style, AddRemoveImage) {
     EXPECT_FALSE(!!style.getImage("two"));
     EXPECT_FALSE(!!style.getImage("four"));
 }
+
+TEST(Style, AddRemoveRemoveImage) {
+    // regression test for https://github.com/mapbox/mapbox-gl-native/pull/16391
+    util::RunLoop loop;
+    auto fileSource = std::make_shared<StubFileSource>();
+    Style::Impl style{fileSource, 1.0};
+    style.addImage(std::make_unique<style::Image>("one", PremultipliedImage({16, 16}), 2));
+    style.addImage(std::make_unique<style::Image>("two", PremultipliedImage({16, 16}), 2));
+    style.addImage(std::make_unique<style::Image>("three", PremultipliedImage({16, 16}), 2));
+
+    style.removeImage("one");
+    style.removeImage("two");
+    style.removeImage("two");
+
+    EXPECT_TRUE(!!style.getImage("three"));
+    EXPECT_FALSE(!!style.getImage("two"));
+    EXPECT_FALSE(!!style.getImage("four"));
+}
