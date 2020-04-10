@@ -34,6 +34,8 @@
 
   The `symbolIntersectsTileEdges()` util in `mbgl::TilePlacement` now considers icon shift for the variable symbols with enabled icon-text-fit setting, thus providing more accurate results.
 
+- [core] Correctly log a warning instead of crashing when a non-existent image is attempted to be removed. ([#16391](https://github.com/mapbox/mapbox-gl-native/pull/16391))
+
 ## maps-v1.5.1
 
 ### 🐞 Bug fixes
