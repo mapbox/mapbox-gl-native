@@ -272,12 +272,11 @@ public:
             Assign can be called any time. Conversely, upload must be called with a bound gl context.
         */
         void assign(const Immutable<style::Image::Impl>* img) {
-            if ((img && &img->get()->image == image) || (!img && !image)) return;
             imageDirty = true;
-            image = (img) ? &img->get()->image : nullptr;
+            image = (img) ? &(img->get()->image) : nullptr;
             width = height = 0;
             pixelRatio = 1.0f;
-            if (img) {
+            if (image) {
                 sharedImage = *img; // keep reference until uploaded
                 width = image->size.width;
                 height = image->size.height;
@@ -293,7 +292,7 @@ public:
             initialize();
 
             MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, texId));
-            if (!image || !image->valid()) {
+            if (!sharedImage || !image || !image->valid()) {
                 MBGL_CHECK_ERROR(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 0, 0, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr));
             } else {
                 MBGL_CHECK_ERROR(glTexImage2D(GL_TEXTURE_2D,
@@ -399,9 +398,9 @@ public:
                    params.puckShadowScale != oldParams.puckShadowScale)
             bearingChanged = true; // changes puck geometry but not necessarily the location
         if (params.errorRadiusMeters != oldParams.errorRadiusMeters) radiusChanged = true;
-        setTextureFromImageID(params.puckImagePath, texPuck, params);
-        setTextureFromImageID(params.puckShadowImagePath, texShadow, params);
-        setTextureFromImageID(params.puckHatImagePath, texPuckHat, params);
+        bearingChanged |= setTextureFromImageID(params.puckImagePath, texPuck, params);
+        bearingChanged |= setTextureFromImageID(params.puckShadowImagePath, texShadow, params);
+        bearingChanged |= setTextureFromImageID(params.puckHatImagePath, texPuckHat, params);
 
         projectionCircle = params.projectionMatrix;
         const Point<double> positionMercator = project(params.puckPosition, *params.state);
@@ -514,7 +513,10 @@ protected:
         return vec2(posScreenDelta - posScreen).normalized();
     }
 
-    void updatePuck(const mbgl::LocationIndicatorRenderParameters& params) { return updatePuckPerspective(params); }
+    void updatePuck(const mbgl::LocationIndicatorRenderParameters& params) {
+        updatePuckPerspective(params);
+        bearingChanged = false;
+    }
 
     void updatePuckPerspective(const mbgl::LocationIndicatorRenderParameters& params) {
         const TransformState& s = *params.state;
@@ -572,8 +574,6 @@ protected:
             hatGeometry[i] =
                 vec2(hatOffset + (verticalShift * (tilt * params.puckLayersDisplacement * horizontalScaleFactor)));
         }
-
-        bearingChanged = false;
     }
 
     void drawRadius(const mbgl::LocationIndicatorRenderParameters& params) {
@@ -636,23 +636,31 @@ protected:
         return s.screenCoordinateToLatLng(flippedPoint, wrapMode);
     }
 
-    void setTextureFromImageID(const std::string& imagePath,
-                               std::shared_ptr<Texture>& tex,
+    bool setTextureFromImageID(const std::string& imagePath,
+                               std::shared_ptr<Texture>& texture,
                                const mbgl::LocationIndicatorRenderParameters& params) {
+        bool updated = false;
         if (textures.find(imagePath) == textures.end()) {
             std::shared_ptr<Texture> tx = std::make_shared<Texture>();
-            if (!imagePath.empty() && params.imageManager)
+            if (!imagePath.empty() && params.imageManager) {
                 tx->assign(params.imageManager->getSharedImage(imagePath));
-            else
+                updated = true;
+            } else {
                 tx->assign(nullptr);
+            }
             textures[imagePath] = tx;
+            texture = tx;
         } else {
-            const Immutable<style::Image::Impl>* ima = params.imageManager->getSharedImage(imagePath);
-            const mbgl::PremultipliedImage* img = (ima) ? &ima->get()->image : nullptr;
-            if (textures.at(imagePath)->image != img) // image for the ID might have changed.
-                textures.at(imagePath)->assign(ima);
+            const Immutable<style::Image::Impl>* sharedImage = params.imageManager->getSharedImage(imagePath);
+            const mbgl::PremultipliedImage* img = (sharedImage) ? &sharedImage->get()->image : nullptr;
+            std::shared_ptr<Texture>& tex = textures.at(imagePath);
+            if (tex->image != img) { // image for the ID might have changed.
+                tex->assign(sharedImage);
+                updated = true;
+            }
+            texture = tex;
         }
-        tex = textures.at(imagePath);
+        return updated;
     }
 
     std::map<std::string, std::shared_ptr<Texture>> textures;
