@@ -291,6 +291,7 @@ commands:
           command: |
             brew install cmake ccache glfw ninja pkgconfig qt chargepoint/xcparse/xcparse
             brew cask install google-cloud-sdk
+            pip install ansi2html scipy
   config:
     parameters:
       config_params:
@@ -559,6 +560,11 @@ jobs:
               cd ../.. && mkdir -p /tmp/tests/benchmark
               if ls benchmark-app/TestLogs/*.json 1> /dev/null 2>&1; then cp benchmark-app/TestLogs/*.json /tmp/tests/benchmark/results.json; fi
             fi
+      - run:
+          name: Compare result to baseline
+          when: always
+          command: |
+            scripts/check_benchmark_results.sh metrics/benchmark/ios/results.json /tmp/tests/benchmark/results.json /tmp/tests/benchmark/results_comparison.txt /tmp/tests/benchmark/results_comparison.html
       - save
   android-benchmark-runner:
     executor: ubuntu-disco
@@ -589,6 +595,15 @@ jobs:
             testResult=$(gsutil ls gs://test-lab-186672a0qp5bq-ycr70axads3nc/benchmark-${CIRCLE_BUILD_NUM}/**/results/results.json)
             mkdir -p /tmp/tests/benchmark
             gsutil cp $testResult /tmp/tests/benchmark
+      - run:
+          name: Install extra packages for result comparison
+          command: |
+            apt install -y colorized-logs python-scipy
+      - run:
+          name: Compare result to baseline
+          when: always
+          command: |
+            scripts/check_benchmark_results.sh metrics/benchmark/android/results.json /tmp/tests/benchmark/results.json /tmp/tests/benchmark/results_comparison.txt /tmp/tests/benchmark/results_comparison.html
       - save
   android-api-breakage:
     executor: ubuntu-disco
