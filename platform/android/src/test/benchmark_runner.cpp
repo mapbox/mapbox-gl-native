@@ -13,7 +13,7 @@ ALooper* looper = NULL;
 
 void runner() {
     std::vector<std::string> arguments = {"mbgl-benchmark-runner",
-                                          "--benchmark_repetitions=3",
+                                          "--benchmark_repetitions=10",
                                           "--benchmark_format=json",
                                           "--benchmark_out=/sdcard/benchmark/results/results.json"};
     std::vector<char*> argv;

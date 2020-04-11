@@ -12,7 +12,7 @@
 EXPORT
 bool TestRunner::startTest(const std::string& basePath) {
     std::vector<std::string> arguments = {"mbgl-benchmark-runner",
-                                          "--benchmark_repetitions=3",
+                                          "--benchmark_repetitions=10",
                                           "--benchmark_format=json",
                                           "--benchmark_out=" + basePath + "/benchmark/results.json"};
     std::vector<char*> argv;
