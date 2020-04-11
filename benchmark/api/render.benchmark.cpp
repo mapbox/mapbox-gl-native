@@ -151,9 +151,9 @@ static void API_renderStill_multiple_sources(::benchmark::State& state) {
     }
 }
 
-BENCHMARK(API_renderStill_reuse_map)->Unit(benchmark::kMillisecond);
-BENCHMARK(API_renderStill_reuse_map_formatted_labels)->Unit(benchmark::kMillisecond);
-BENCHMARK(API_renderStill_reuse_map_switch_styles)->Unit(benchmark::kMillisecond);
-BENCHMARK(API_renderStill_recreate_map)->Unit(benchmark::kMillisecond);
-BENCHMARK(API_renderStill_recreate_map_2)->Unit(benchmark::kMillisecond);
-BENCHMARK(API_renderStill_multiple_sources)->Unit(benchmark::kMillisecond);
+BENCHMARK(API_renderStill_reuse_map)->Unit(benchmark::kMillisecond)->Iterations(50);
+BENCHMARK(API_renderStill_reuse_map_formatted_labels)->Unit(benchmark::kMillisecond)->Iterations(50);
+BENCHMARK(API_renderStill_reuse_map_switch_styles)->Unit(benchmark::kMillisecond)->Iterations(50);
+BENCHMARK(API_renderStill_recreate_map)->Unit(benchmark::kMillisecond)->Iterations(50);
+BENCHMARK(API_renderStill_recreate_map_2)->Unit(benchmark::kMillisecond)->Iterations(50);
+BENCHMARK(API_renderStill_multiple_sources)->Unit(benchmark::kMillisecond)->Iterations(50);

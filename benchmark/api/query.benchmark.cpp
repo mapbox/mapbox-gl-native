@@ -87,6 +87,6 @@ static void API_queryRenderedFeaturesLayerFromHighDensity(::benchmark::State& st
 }
 BENCHMARK(API_queryPixelsForLatLngs);
 BENCHMARK(API_queryLatLngsForPixels);
-BENCHMARK(API_queryRenderedFeaturesAll);
+BENCHMARK(API_queryRenderedFeaturesAll)->Iterations(50);
 BENCHMARK(API_queryRenderedFeaturesLayerFromLowDensity);
 BENCHMARK(API_queryRenderedFeaturesLayerFromHighDensity);
