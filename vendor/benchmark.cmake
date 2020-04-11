@@ -5,7 +5,10 @@ endif()
 add_library(
     mbgl-vendor-benchmark STATIC EXCLUDE_FROM_ALL
     ${CMAKE_CURRENT_LIST_DIR}/benchmark/src/benchmark.cc
+    ${CMAKE_CURRENT_LIST_DIR}/benchmark/src/benchmark_api_internal.cc
+    ${CMAKE_CURRENT_LIST_DIR}/benchmark/src/benchmark_name.cc
     ${CMAKE_CURRENT_LIST_DIR}/benchmark/src/benchmark_register.cc
+    ${CMAKE_CURRENT_LIST_DIR}/benchmark/src/benchmark_runner.cc
     ${CMAKE_CURRENT_LIST_DIR}/benchmark/src/colorprint.cc
     ${CMAKE_CURRENT_LIST_DIR}/benchmark/src/commandlineflags.cc
     ${CMAKE_CURRENT_LIST_DIR}/benchmark/src/complexity.cc
