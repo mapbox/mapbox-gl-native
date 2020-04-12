@@ -19,9 +19,6 @@
 [submodule "vendor/wagyu"]
 	path = vendor/wagyu
 	url = https://github.com/mapbox/wagyu.git
-[submodule "vendor/expected-lite"]
-	path = vendor/expected
-	url = https://github.com/martinmoene/expected-lite.git
 [submodule "vendor/unique_resource"]
 	path = vendor/unique_resource
 	url = https://github.com/okdshin/unique_resource.git
@@ -40,15 +37,6 @@
 [submodule "vendor/eternal"]
 	path = vendor/eternal
 	url = https://github.com/mapbox/eternal.git
-[submodule "platform/android/vendor/mapbox-gestures-android"]
-	path = platform/android/vendor/mapbox-gestures-android
-	url = https://github.com/mapbox/mapbox-gestures-android.git
-[submodule "platform/android/vendor/mapbox-java"]
-	path = platform/android/vendor/mapbox-java
-	url = https://github.com/mapbox/mapbox-java.git
-[submodule "platform/android/vendor/mapbox-events-android"]
-	path = platform/android/vendor/mapbox-events-android
-	url = https://github.com/mapbox/mapbox-events-android.git
 [submodule "vendor/mapbox-base"]
 	path = vendor/mapbox-base
 	url = https://github.com/mapbox/mapbox-base.git
