@@ -144,5 +144,8 @@ set_property(TARGET mbgl-benchmark-runner PROPERTY FOLDER Executables)
 set_property(TARGET mbgl-test-runner PROPERTY FOLDER Executables)
 set_property(TARGET mbgl-render-test-runner PROPERTY FOLDER Executables)
 
-add_test(NAME mbgl-benchmark-runner COMMAND mbgl-benchmark-runner WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+# MacOS CI tests run with SW rendering and it causes benchmark to timeout for debug builds
+if(NOT DEFINED ENV{CI} OR CMAKE_BUILD_TYPE STREQUAL Release)
+    add_test(NAME mbgl-benchmark-runner COMMAND mbgl-benchmark-runner WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+endif()
 add_test(NAME mbgl-test-runner COMMAND mbgl-test-runner WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
