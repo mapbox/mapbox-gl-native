@@ -19,6 +19,12 @@
   - `getPlacedSymbolsData()`
     if collecting of the placed symbols data is enabled, returns the reference to the `PlacedSymbolData` vector holding the collected data.
 
+- [core] Enable circle-sort-key property [#15875](https://github.com/mapbox/mapbox-gl-native/pull/15875/)
+
+  Adds support for `circle-sort-key` property, consistent with `symbol-sort-key`.
+
+  Sorts drawing order by sort key both within-tile and cross-tile.
+
 ### 🐞 Bug fixes
 
 - [core][tile mode] Reduce cut-off labels (part 2) ([#16369](https://github.com/mapbox/mapbox-gl-native/pull/16369))
