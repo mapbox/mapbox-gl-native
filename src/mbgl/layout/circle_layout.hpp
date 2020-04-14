@@ -8,28 +8,17 @@
 
 namespace mbgl {
 
-class CircleFeature {
-public:
-    friend bool operator<(const CircleFeature& lhs, const CircleFeature& rhs) { return lhs.sortKey < rhs.sortKey; }
-
-    size_t i;
-    std::unique_ptr<GeometryTileFeature> feature;
-    float sortKey;
-};
-
-class CircleLayout : public Layout {
+class CircleLayout final : public Layout {
 public:
     CircleLayout(const BucketParameters& parameters,
                  const std::vector<Immutable<style::LayerProperties>>& group,
                  std::unique_ptr<GeometryTileLayer> sourceLayer_)
-        : sourceLayer(std::move(sourceLayer_)),
-          zoom(parameters.tileID.overscaledZ),
-          mode(parameters.mode),
-          hasPattern(false) {
+        : sourceLayer(std::move(sourceLayer_)), zoom(parameters.tileID.overscaledZ), mode(parameters.mode) {
         assert(!group.empty());
         auto leaderLayerProperties = staticImmutableCast<style::CircleLayerProperties>(group.front());
-        unevaluatedLayout = leaderLayerProperties->layerImpl().layout;
-        layout = unevaluatedLayout.evaluate(PropertyEvaluationParameters(zoom));
+        const auto& unevaluatedLayout = leaderLayerProperties->layerImpl().layout;
+        const bool sortFeaturesByKey = !unevaluatedLayout.get<style::CircleSortKey>().isUndefined();
+        const auto& layout = unevaluatedLayout.evaluate(PropertyEvaluationParameters(zoom));
         sourceLayerID = leaderLayerProperties->layerImpl().sourceLayer;
         bucketLeaderID = leaderLayerProperties->layerImpl().id;
 
@@ -41,21 +30,25 @@ public:
         const size_t featureCount = sourceLayer->featureCount();
         for (size_t i = 0; i < featureCount; ++i) {
             auto feature = sourceLayer->getFeature(i);
-            if (!leaderLayerProperties->layerImpl().filter(
-                    style::expression::EvaluationContext{this->zoom, feature.get()}))
+            if (!leaderLayerProperties->layerImpl().filter(style::expression::EvaluationContext(zoom, feature.get())
+                                                               .withCanonicalTileID(&parameters.tileID.canonical))) {
                 continue;
+            }
 
-            auto sortKey = evaluateSortKey(*feature);
+            if (!sortFeaturesByKey) {
+                features.push_back({i, std::move(feature), style::CircleSortKey::defaultValue()});
+                continue;
+            }
 
+            const auto& sortKeyProperty = layout.template get<style::CircleSortKey>();
+            float sortKey = sortKeyProperty.evaluate(*feature, zoom, style::CircleSortKey::defaultValue());
             CircleFeature circleFeature{i, std::move(feature), sortKey};
             const auto sortPosition = std::lower_bound(features.cbegin(), features.cend(), circleFeature);
             features.insert(sortPosition, std::move(circleFeature));
         }
-    };
+    }
 
-    ~CircleLayout() final = default;
-
-    bool hasDependencies() const override { return hasPattern; }
+    bool hasDependencies() const override { return false; }
 
     void createBucket(const ImagePositions&,
                       std::unique_ptr<FeatureIndex>& featureIndex,
@@ -67,20 +60,31 @@ public:
 
         for (auto& circleFeature : features) {
             const auto i = circleFeature.i;
-            std::unique_ptr<GeometryTileFeature> feature = std::move(circleFeature.feature);
+            const std::unique_ptr<GeometryTileFeature>& feature = circleFeature.feature;
             const GeometryCollection& geometries = feature->getGeometries();
 
             addCircle(*bucket, *feature, geometries, i, circleFeature.sortKey, canonical);
+
+            bucket->addFeature(*feature, geometries, {}, PatternLayerMap(), i, canonical);
             featureIndex->insert(geometries, i, sourceLayerID, bucketLeaderID);
         }
-        if (bucket->hasData()) {
-            for (const auto& pair : layerPropertiesMap) {
-                renderData.emplace(pair.first, LayerRenderData{bucket, pair.second});
-            }
+
+        if (!bucket->hasData()) return;
+
+        for (const auto& pair : layerPropertiesMap) {
+            renderData.emplace(pair.first, LayerRenderData{bucket, pair.second});
         }
-    };
+    }
 
 private:
+    struct CircleFeature {
+        friend bool operator<(const CircleFeature& lhs, const CircleFeature& rhs) { return lhs.sortKey < rhs.sortKey; }
+
+        size_t i;
+        std::unique_ptr<GeometryTileFeature> feature;
+        float sortKey;
+    };
+
     void addCircle(CircleBucket& bucket,
                    const GeometryTileFeature& feature,
                    const GeometryCollection& geometry,
@@ -143,23 +147,15 @@ private:
         }
     }
 
-    float evaluateSortKey(const GeometryTileFeature& sourceFeature) {
-        const auto sortKeyProperty = layout.template get<style::CircleSortKey>();
-        return sortKeyProperty.evaluate(sourceFeature, zoom, style::CircleSortKey::defaultValue());
-    }
-
     std::map<std::string, Immutable<style::LayerProperties>> layerPropertiesMap;
     std::string bucketLeaderID;
 
     const std::unique_ptr<GeometryTileLayer> sourceLayer;
     std::list<CircleFeature> features;
-    typename style::CircleLayoutProperties::Unevaluated unevaluatedLayout;
-    typename style::CircleLayoutProperties::PossiblyEvaluated layout;
 
     const float zoom;
     const MapMode mode;
     std::string sourceLayerID;
-    bool hasPattern;
 };
 
 } // namespace mbgl
