@@ -15,8 +15,7 @@ using namespace mbgl;
 
 
 TEST(API, RenderWithoutCallback) {
-    auto log = new FixtureLogObserver();
-    Log::setObserver(std::unique_ptr<Log::Observer>(log));
+    FixtureLog log;
 
     util::RunLoop loop;
 
@@ -37,5 +36,5 @@ TEST(API, RenderWithoutCallback) {
         "StillImageCallback not set",
     };
 
-    EXPECT_EQ(log->count(logMessage), 1u);
+    EXPECT_EQ(log.count(logMessage), 1u);
 }
