@@ -294,6 +294,11 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
         case GLFW_KEY_Q: {
             auto result = view->rendererFrontend->getRenderer()->queryPointAnnotations({ {}, { double(view->getSize().width), double(view->getSize().height) } });
             printf("visible point annotations: %lu\n", result.size());
+            auto features = view->rendererFrontend->getRenderer()->queryRenderedFeatures(
+                mbgl::ScreenBox{{double(view->getSize().width * 0.5), double(view->getSize().height * 0.5)},
+                                {double(view->getSize().width * 0.5 + 1), double(view->getSize().height * 0.5 + 1)}},
+                {});
+            printf("Rendered features at the center of the screen: %lu\n", features.size());
         } break;
         case GLFW_KEY_P:
             view->pauseResumeCallback();

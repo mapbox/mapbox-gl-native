@@ -22,5 +22,8 @@
     "location_indicator/tilted_texture_shift_top_right": "Would need a different baseline when ran on llvmpipe not supporting anisotropic filtering",
     "location_indicator/two_textures": "Would need a different baseline when ran on llvmpipe not supporting anisotropic filtering",
     "location_indicator/image_pixel_ratio": "Would need a different baseline when ran on llvmpipe not supporting anisotropic filtering",
-    "location_indicator/change_image": "Would need a different baseline when ran on llvmpipe not supporting anisotropic filtering"
+    "location_indicator/change_image": "Would need a different baseline when ran on llvmpipe not supporting anisotropic filtering",
+    "location_indicator/query_test": "Would need a different baseline when ran on llvmpipe not supporting anisotropic filtering",
+    "location_indicator/query_test_no_image": "Would need a different baseline when ran on llvmpipe not supporting anisotropic filtering",
+    "location_indicator/query_test_miss": "Would need a different baseline when ran on llvmpipe not supporting anisotropic filtering"
 }

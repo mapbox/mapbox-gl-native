@@ -8,12 +8,28 @@
 #include <mbgl/text/collision_index.hpp>
 #include <mbgl/tile/tile_id.hpp>
 #include <mbgl/util/constants.hpp>
+#include <mbgl/util/geometry_within.hpp>
 #include <mbgl/util/math.hpp>
+#include <mbgl/util/projection.hpp>
 
 #include <mapbox/geometry/envelope.hpp>
 
 #include <cassert>
 #include <string>
+
+namespace {
+mbgl::LatLng screenCoordinateToLatLng(mbgl::ScreenCoordinate point,
+                                      const mbgl::TransformState& state,
+                                      mbgl::LatLng::WrapMode wrapMode = mbgl::LatLng::Wrapped) {
+    point.y = state.getSize().height - point.y;
+    return state.screenCoordinateToLatLng(point, wrapMode);
+}
+mbgl::Point<double> project(const mbgl::LatLng& coordinate, const mbgl::TransformState& state) {
+    mbgl::LatLng unwrappedLatLng = coordinate.wrapped();
+    unwrappedLatLng.unwrapForShortestPath(state.getLatLng(mbgl::LatLng::Wrapped));
+    return mbgl::Projection::project(unwrappedLatLng, state.getScale());
+}
+} // namespace
 
 namespace mbgl {
 
@@ -192,6 +208,37 @@ optional<GeometryCoordinates> FeatureIndex::translateQueryGeometry(
 
 void FeatureIndex::setBucketLayerIDs(const std::string& bucketLeaderID, const std::vector<std::string>& layerIDs) {
     bucketLayerIDs[bucketLeaderID] = layerIDs;
+}
+
+DynamicFeatureIndex::~DynamicFeatureIndex() = default;
+
+void DynamicFeatureIndex::query(std::unordered_map<std::string, std::vector<Feature>>& result,
+                                const mbgl::ScreenLineString& queryGeometry,
+                                const TransformState& state) const {
+    if (features.empty()) return;
+    mbgl::WithinBBox queryBox = DefaultBBox;
+    for (const auto& p : queryGeometry) {
+        const LatLng c = screenCoordinateToLatLng(p, state);
+        const Point<double> pm = project(c, state);
+        const Point<int64_t> coord = {int64_t(pm.x), int64_t(pm.y)};
+        mbgl::updateBBox(queryBox, coord);
+    }
+    for (const auto& f : features) {
+        // hit testing
+        mbgl::WithinBBox featureBox = DefaultBBox;
+        for (const auto& p : f.envelope->front()) mbgl::updateBBox(featureBox, p);
+
+        const bool hit = mbgl::boxWithinBox(featureBox, queryBox) || mbgl::boxWithinBox(queryBox, featureBox);
+        if (hit) {
+            assert(f.feature);
+            result[f.feature->sourceLayer].push_back(*f.feature);
+        }
+    }
+}
+
+void DynamicFeatureIndex::insert(std::shared_ptr<Feature> feature,
+                                 std::shared_ptr<mapbox::geometry::polygon<int64_t>> envelope) {
+    features.push_back({std::move(feature), std::move(envelope)});
 }
 
 } // namespace mbgl

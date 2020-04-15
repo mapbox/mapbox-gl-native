@@ -3,8 +3,9 @@
 #include <mbgl/style/types.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/tile/tile_id.hpp>
-#include <mbgl/util/grid_index.hpp>
 #include <mbgl/util/feature.hpp>
+#include <mbgl/util/geo.hpp>
+#include <mbgl/util/grid_index.hpp>
 #include <mbgl/util/mat4.hpp>
 
 #include <vector>
@@ -52,6 +53,24 @@ public:
 };
 
 using FeatureSortOrder = std::shared_ptr<const std::vector<size_t>>;
+
+class DynamicFeatureIndex {
+public:
+    ~DynamicFeatureIndex();
+    void query(std::unordered_map<std::string, std::vector<Feature>>& result,
+               const mbgl::ScreenLineString& queryGeometry,
+               const TransformState& state) const;
+
+    void insert(std::shared_ptr<Feature> feature, std::shared_ptr<mapbox::geometry::polygon<int64_t>> envelope);
+
+protected:
+    struct FeatureRecord {
+        std::shared_ptr<Feature> feature;
+        std::shared_ptr<mapbox::geometry::polygon<int64_t>> envelope;
+    };
+
+    std::vector<FeatureRecord> features;
+};
 
 class FeatureIndex {
 public:
