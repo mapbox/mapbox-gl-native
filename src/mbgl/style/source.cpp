@@ -27,6 +27,18 @@ optional<std::string> Source::getAttribution() const {
     return baseImpl->getAttribution();
 }
 
+bool Source::isVolatile() const noexcept {
+    return baseImpl->isVolatile();
+}
+
+void Source::setVolatile(bool set) noexcept {
+    if (isVolatile() == set) return;
+    auto newImpl = createMutable();
+    newImpl->setVolatile(set);
+    baseImpl = std::move(newImpl);
+    observer->onSourceChanged(*this);
+}
+
 void Source::setObserver(SourceObserver* observer_) {
     observer = observer_ ? observer_ : &nullObserver;
 }

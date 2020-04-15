@@ -66,11 +66,13 @@ public:
     std::string getID() const;
     optional<std::string> getAttribution() const;
 
+    // The data from the volatile sources are not stored in a persistent storage.
+    bool isVolatile() const noexcept;
+    void setVolatile(bool) noexcept;
+
     // Private implementation
     class Impl;
     Immutable<Impl> baseImpl;
-
-    Source(Immutable<Impl>);
 
     void setObserver(SourceObserver*);
     SourceObserver* observer = nullptr;
@@ -114,6 +116,7 @@ public:
     virtual mapbox::base::WeakPtr<Source> makeWeakPtr() = 0;
 
 protected:
+    explicit Source(Immutable<Impl>);
     virtual Mutable<Impl> createMutable() const noexcept = 0;
 };
 
