@@ -21,6 +21,7 @@ class TransformState;
 class PatternAtlas;
 class LineAtlas;
 class SymbolBucket;
+class DynamicFeatureIndex;
 
 class LayerRenderData {
 public:
@@ -105,6 +106,8 @@ public:
                                         const TransformState&, const float, const mat4&, const FeatureState&) const {
         return false;
     };
+
+    virtual void populateDynamicRenderFeatureIndex(DynamicFeatureIndex&) const {}
 
     virtual void prepare(const LayerPrepareParameters&);
 

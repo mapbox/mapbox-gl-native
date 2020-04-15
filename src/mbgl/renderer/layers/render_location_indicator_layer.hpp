@@ -21,6 +21,7 @@ private:
     void prepare(const LayerPrepareParameters &) override;
 
     void render(PaintParameters &) override;
+    void populateDynamicRenderFeatureIndex(DynamicFeatureIndex &) const override;
 
     bool contextDestroyed = false;
     std::unique_ptr<RenderLocationIndicatorImpl> renderImpl;
