@@ -12,7 +12,7 @@
 #import "CFHandle.hpp"
 
 /// Enables local glyph rasterization for all writing systems, not just CJK.
-#define MBGL_DARWIN_NO_REMOTE_FONTS 0
+#define MBGL_DARWIN_NO_REMOTE_FONTS 1
 
 namespace mbgl {
 
@@ -265,7 +265,15 @@ PremultipliedImage drawGlyphBitmap(GlyphID glyphID, CTFontRef font, GlyphMetrics
     CTRunGetTypographicBounds(glyphRun, wholeRunRange, NULL, &descent, NULL);
     CGContextSetTextPosition(*context, 0.0, descent);
     
-    CTLineDraw(*line, *context);
+//    CTLineDraw(*line, *context);
+    
+    CTFontRef glyphFont = (CTFontRef)CFDictionaryGetValue(CTRunGetAttributes(glyphRun), kCTFontAttributeName);
+    
+    CGGlyph glyphs[wholeRunRange.length];
+    CTRunGetGlyphs(glyphRun, wholeRunRange, glyphs);
+    CGPoint positions[wholeRunRange.length];
+    CTRunGetPositions(glyphRun, wholeRunRange, positions);
+    CTFontDrawGlyphs(glyphFont, glyphs, positions, wholeRunRange.length, *context);
     
     return rgbaBitmap;
 }
