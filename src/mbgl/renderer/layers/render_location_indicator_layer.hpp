@@ -23,7 +23,7 @@ private:
     void render(PaintParameters &) override;
 
     bool contextDestroyed = false;
-    RenderLocationIndicatorImpl *renderImpl = nullptr;
+    std::unique_ptr<RenderLocationIndicatorImpl> renderImpl;
     style::LocationIndicatorPaintProperties::Unevaluated unevaluated;
 };
 
