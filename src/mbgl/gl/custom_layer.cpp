@@ -7,7 +7,7 @@ namespace mbgl {
 namespace style {
 
 namespace {
-const LayerTypeInfo typeInfoCustom{"",
+const LayerTypeInfo typeInfoCustom{"custom",
                                    LayerTypeInfo::Source::NotRequired,
                                    LayerTypeInfo::Pass3D::NotRequired,
                                    LayerTypeInfo::Layout::NotRequired,
