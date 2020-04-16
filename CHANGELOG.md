@@ -25,6 +25,8 @@
 
   Sorts drawing order by sort key both within-tile and cross-tile.
 
+- Add generic setter for Layer's 'source' property ([#16406](https://github.com/mapbox/mapbox-gl-native/pull/16406)
+
 ### 🐞 Bug fixes
 
 - [core][tile mode] Reduce cut-off labels (part 2) ([#16369](https://github.com/mapbox/mapbox-gl-native/pull/16369))
