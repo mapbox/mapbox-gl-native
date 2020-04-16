@@ -1,4 +1,4 @@
-FROM ubuntu:disco-20190718
+FROM ubuntu:eoan-20200313
 
 ENV DEBIAN_FRONTEND="noninteractive"
 ENV ANDROID_HOME="/opt/android"
@@ -20,6 +20,8 @@ RUN set -eu && apt-get install -y \
       gzip \
       ssh \
       tar \
+      colorized-logs \
+      python-scipy \
     && apt-get autoremove --purge -y && apt-get clean
 
 # Base dependencies
@@ -118,6 +120,13 @@ RUN set -eu \
     && curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg add - \
     && apt-get update -y \
     && apt-get install google-cloud-sdk -y \
+    && apt-get autoremove --purge -y && apt-get clean
+
+# FIXME: This package should not be needed
+# bug looks like run-clang-tidy-8 is broken.
+# Remove when Ubuntu Eoan fixes the dependency.
+RUN set -eu && apt-get install -y \
+      python-yaml \
     && apt-get autoremove --purge -y && apt-get clean
 
 # Configure ccache
