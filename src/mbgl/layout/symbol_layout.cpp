@@ -695,8 +695,11 @@ void SymbolLayout::addFeature(const std::size_t layoutFeatureIndex,
         }
     } else if (type == FeatureType::LineString) {
         for (const auto& line : feature.geometry) {
-            Anchor anchor(line[0].x, line[0].y, 0, minScale);
-            addSymbolInstance(anchor, createSymbolInstanceSharedData(line));
+            // Skip invalid LineStrings.
+            if (line.size() > 0) {
+              Anchor anchor(line[0].x, line[0].y, 0, minScale);
+              addSymbolInstance(anchor, createSymbolInstanceSharedData(line));
+            }
         }
     } else if (type == FeatureType::Point) {
         for (const auto& points : feature.geometry) {
