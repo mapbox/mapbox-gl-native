@@ -1,5 +1,7 @@
 #include <mbgl/gl/custom_layer.hpp>
 #include <mbgl/gl/custom_layer_impl.hpp>
+#include <mbgl/style/conversion/filter.hpp>
+#include <mbgl/style/conversion/json.hpp>
 #include <mbgl/style/expression/dsl.hpp>
 #include <mbgl/style/expression/format_expression.hpp>
 #include <mbgl/style/expression/image.hpp>
@@ -28,6 +30,7 @@
 
 using namespace mbgl;
 using namespace mbgl::style;
+using namespace mbgl::style::conversion;
 using namespace expression;
 using namespace expression::dsl;
 using namespace std::literals::string_literals;
@@ -59,6 +62,11 @@ const auto duration = 1.0f;
 class MockLayoutProperties : public Properties<TextField> {};
 class MockPaintProperties : public Properties<TextColor> {};
 using MockOverrides = FormatSectionOverrides<MockPaintProperties::OverridableProperties>;
+
+mbgl::style::Filter parseFilter(const std::string& expression) {
+    Error error;
+    return *convertJSON<mbgl::style::Filter>(expression, error);
+}
 
 } // namespace
 
@@ -221,7 +229,7 @@ TEST(Layer, Observer) {
         EXPECT_EQ(layer.get(), &layer_);
         filterChanged = true;
     };
-    layer->setFilter(Filter());
+    layer->setFilter(parseFilter(R"(["==", "foo", "bar"])"));
     EXPECT_TRUE(filterChanged);
 
     // Notifies observer on visibility change.
