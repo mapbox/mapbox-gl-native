@@ -148,4 +148,20 @@ TEST(StyleConversion, SetGenericProperties) {
     EXPECT_EQ(12.0f, layer->getMinZoom());
     EXPECT_EQ(18.0f, layer->getMaxZoom());
     EXPECT_EQ("landmarks", layer->getSourceLayer());
+
+    const JSValue newComposite("composite_2");
+    layer->setProperty("source", Convertible(&newComposite));
+    EXPECT_EQ("composite_2", layer->getSourceID());
+
+    const JSValue newSourceLayer("poi");
+    layer->setProperty("source-layer", Convertible(&newSourceLayer));
+    EXPECT_EQ("poi", layer->getSourceLayer());
+
+    const JSValue newMinZoom(1.0f);
+    layer->setProperty("minzoom", Convertible(&newMinZoom));
+    EXPECT_EQ(1.0f, layer->getMinZoom());
+
+    const JSValue newMaxZoom(22.0f);
+    layer->setProperty("maxzoom", Convertible(&newMaxZoom));
+    EXPECT_EQ(22.0f, layer->getMaxZoom());
 }

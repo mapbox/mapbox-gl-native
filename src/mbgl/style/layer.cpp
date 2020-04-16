@@ -41,16 +41,25 @@ std::string Layer::getSourceLayer() const {
 }
 
 void Layer::setSourceLayer(const std::string& sourceLayer) {
+    if (getSourceLayer() == sourceLayer) return;
     auto impl_ = mutableBaseImpl();
     impl_->sourceLayer = sourceLayer;
     baseImpl = std::move(impl_);
 }
+
+void Layer::setSourceID(const std::string& sourceID) {
+    if (getSourceID() == sourceID) return;
+    auto impl_ = mutableBaseImpl();
+    impl_->source = sourceID;
+    baseImpl = std::move(impl_);
+};
 
 const Filter& Layer::getFilter() const {
     return baseImpl->filter;
 }
 
 void Layer::setFilter(const Filter& filter) {
+    if (getFilter() == filter) return;
     auto impl_ = mutableBaseImpl();
     impl_->filter = filter;
     baseImpl = std::move(impl_);
@@ -79,6 +88,7 @@ float Layer::getMaxZoom() const {
 }
 
 void Layer::setMinZoom(float minZoom) {
+    if (getMinZoom() == minZoom) return;
     auto impl_ = mutableBaseImpl();
     impl_->minZoom = minZoom;
     baseImpl = std::move(impl_);
@@ -86,6 +96,7 @@ void Layer::setMinZoom(float minZoom) {
 }
 
 void Layer::setMaxZoom(float maxZoom) {
+    if (getMaxZoom() == maxZoom) return;
     auto impl_ = mutableBaseImpl();
     impl_->maxZoom = maxZoom;
     baseImpl = std::move(impl_);
@@ -168,12 +179,24 @@ optional<conversion::Error> Layer::setProperty(const std::string& name, const co
         if (auto sourceLayer = convert<std::string>(value, *error)) {
             if (getTypeInfo()->source != LayerTypeInfo::Source::Required) {
                 Log::Warning(mbgl::Event::General,
-                             "source-layer property cannot be applied to"
+                             "'source-layer' property cannot be set to"
                              "the layer %s",
                              baseImpl->id.c_str());
                 return nullopt;
             }
             setSourceLayer(*sourceLayer);
+            return nullopt;
+        }
+    } else if (name == "source") {
+        if (auto sourceID = convert<std::string>(value, *error)) {
+            if (getTypeInfo()->source != LayerTypeInfo::Source::Required) {
+                Log::Warning(mbgl::Event::General,
+                             "'source' property cannot be set to"
+                             "the layer %s",
+                             baseImpl->id.c_str());
+                return nullopt;
+            }
+            setSourceID(*sourceID);
             return nullopt;
         }
     }

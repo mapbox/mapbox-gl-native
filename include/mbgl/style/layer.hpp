@@ -94,6 +94,7 @@ public:
     std::string getSourceID() const;
     std::string getSourceLayer() const;
     void setSourceLayer(const std::string& sourceLayer);
+    void setSourceID(const std::string& sourceID);
 
     // Filter
     const Filter& getFilter() const;
