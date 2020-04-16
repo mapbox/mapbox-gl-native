@@ -426,7 +426,7 @@ commands:
     steps:
       - run:
           name: Run iOS Test App on Firebase
-          no_output_timeout: 20m
+          no_output_timeout: 30m
           command: |
             if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON_IOS}" ]]; then
               # arrange files in a way Firebase expects it, and package them in a zip file
@@ -437,7 +437,7 @@ commands:
               gcloud firebase test ios models list
               gcloud firebase test ios run \
                 --test testapp.zip \
-                --device model=iphone11,version=13.3,locale=en,orientation=portrait --xcode-version=11.3.1 --timeout 20m \
+                --device model=iphone11,version=13.3,locale=en,orientation=portrait --xcode-version=11.3.1 --timeout 30m \
                 --verbosity=debug --no-record-video --results-dir ios-test-app-${CIRCLE_BUILD_NUM}
             fi
   upload-coverage-results:
@@ -579,13 +579,13 @@ jobs:
       - login-google-cloud-platform
       - run:
           name: Run BenchmarkRunner on Firebase
-          no_output_timeout: 20m
+          no_output_timeout: 30m
           command: |
             gcloud firebase test android models list
             gcloud firebase test android run --type instrumentation \
               --app benchmark/android/app/build/outputs/apk/release/app-release.apk \
               --test benchmark/android/app/build/outputs/apk/androidTest/release/app-release-androidTest.apk \
-              --device-ids flame --os-version-ids 29 --locales en --orientations portrait --timeout 20m \
+              --device-ids flame --os-version-ids 29 --locales en --orientations portrait --timeout 30m \
               --directories-to-pull /sdcard/benchmark/results --results-dir benchmark-${CIRCLE_BUILD_NUM} \
               --no-record-video --no-performance-metrics
       - run:
