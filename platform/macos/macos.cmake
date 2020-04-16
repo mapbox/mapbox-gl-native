@@ -34,6 +34,7 @@ target_sources(
         ${PROJECT_SOURCE_DIR}/platform/darwin/src/nsthread.mm
         ${PROJECT_SOURCE_DIR}/platform/darwin/src/number_format.mm
         ${PROJECT_SOURCE_DIR}/platform/darwin/src/run_loop.cpp
+        ${PROJECT_SOURCE_DIR}/platform/darwin/src/shaping.mm
         ${PROJECT_SOURCE_DIR}/platform/darwin/src/string_nsstring.mm
         ${PROJECT_SOURCE_DIR}/platform/darwin/src/timer.cpp
         ${PROJECT_SOURCE_DIR}/platform/default/src/mbgl/gfx/headless_backend.cpp

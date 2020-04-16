@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mbgl/text/glyph.hpp>
+#include <mbgl/util/font_stack.hpp>
 
 namespace mbgl {
 
@@ -42,5 +43,7 @@ private:
     class Impl;
     std::unique_ptr<Impl> impl;
 };
+
+GlyphDependencies getGlyphDependencies(const FontStack& fontStack, const std::string& text, bool isVertical);
 
 } // namespace mbgl

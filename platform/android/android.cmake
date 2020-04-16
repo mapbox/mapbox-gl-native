@@ -186,6 +186,7 @@ add_library(
     ${PROJECT_SOURCE_DIR}/platform/android/src/test/benchmark_runner.cpp
     ${PROJECT_SOURCE_DIR}/platform/android/src/test/test_runner_common.cpp
     ${PROJECT_SOURCE_DIR}/platform/default/src/mbgl/text/local_glyph_rasterizer.cpp
+    ${PROJECT_SOURCE_DIR}/platform/default/src/mbgl/text/shaping.cpp
     ${PROJECT_SOURCE_DIR}/platform/android/src/test/collator_test_stub.cpp
     ${PROJECT_SOURCE_DIR}/platform/android/src/test/number_format_test_stub.cpp
     ${PROJECT_SOURCE_DIR}/platform/android/src/test/http_file_source_test_stub.cpp

@@ -6,6 +6,7 @@
 #include <mbgl/renderer/image_atlas.hpp>
 #include <mbgl/text/get_anchors.hpp>
 #include <mbgl/text/shaping.hpp>
+#include <mbgl/text/local_glyph_rasterizer.hpp>
 #include <mbgl/util/utf.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/string.hpp>
@@ -156,36 +157,40 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
                         u8string = platform::lowercase(u8string);
                     }
 
+                    const auto& sectionFontStack = section.fontStack ? *section.fontStack : baseFontStack;
                     ft.formattedText->addTextSection(applyArabicShaping(util::convertUTF8ToUTF16(u8string)),
                                                      section.fontScale ? *section.fontScale : 1.0,
-                                                     section.fontStack ? *section.fontStack : baseFontStack,
+                                                     sectionFontStack,
                                                      section.textColor);
+
+                    const auto& dependencies = mbgl::getGlyphDependencies(sectionFontStack, u8string, allowVerticalPlacement);
+                    layoutParameters.glyphDependencies.insert(dependencies.begin(), dependencies.end());
                 } else {
                     layoutParameters.imageDependencies.emplace(section.image->id(), ImageType::Icon);
                     ft.formattedText->addImageSection(section.image->id());
                 }
             }
 
-            const bool canVerticalizeText = layout->get<TextRotationAlignment>() == AlignmentType::Map
-                                         && layout->get<SymbolPlacement>() != SymbolPlacementType::Point
-                                         && ft.formattedText->allowsVerticalWritingMode();
-
-            // Loop through all characters of this text and collect unique codepoints.
-            for (std::size_t j = 0; j < ft.formattedText->length(); j++) {
-                const auto& section = formatted.sections[ft.formattedText->getSectionIndex(j)];
-                if (section.image) continue;
-
-                const auto& sectionFontStack = section.fontStack;
-                GlyphIDs& dependencies =
-                    layoutParameters.glyphDependencies[sectionFontStack ? *sectionFontStack : baseFontStack];
-                char16_t codePoint = ft.formattedText->getCharCodeAt(j);
-                dependencies.insert(codePoint);
-                if (canVerticalizeText || (allowVerticalPlacement && ft.formattedText->allowsVerticalWritingMode())) {
-                    if (char16_t verticalChr = util::i18n::verticalizePunctuation(codePoint)) {
-                        dependencies.insert(verticalChr);
-                    }
-                }
-            }
+//            const bool canVerticalizeText = layout->get<TextRotationAlignment>() == AlignmentType::Map
+//                                         && layout->get<SymbolPlacement>() != SymbolPlacementType::Point
+//                                         && ft.formattedText->allowsVerticalWritingMode();
+//
+//            // Loop through all characters of this text and collect unique codepoints.
+//            for (std::size_t j = 0; j < ft.formattedText->length(); j++) {
+//                const auto& section = formatted.sections[ft.formattedText->getSectionIndex(j)];
+//                if (section.image) continue;
+//
+//                const auto& sectionFontStack = section.fontStack;
+//                GlyphIDs& dependencies =
+//                    layoutParameters.glyphDependencies[sectionFontStack ? *sectionFontStack : baseFontStack];
+//                char16_t codePoint = ft.formattedText->getCharCodeAt(j);
+//                dependencies.insert(codePoint);
+//                if (canVerticalizeText || (allowVerticalPlacement && ft.formattedText->allowsVerticalWritingMode())) {
+//                    if (char16_t verticalChr = util::i18n::verticalizePunctuation(codePoint)) {
+//                        dependencies.insert(verticalChr);
+//                    }
+//                }
+//            }
         }
 
         if (hasIcon) {

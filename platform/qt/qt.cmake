@@ -56,6 +56,7 @@ target_sources(
         ${PROJECT_SOURCE_DIR}/platform/qt/src/http_request.cpp
         ${PROJECT_SOURCE_DIR}/platform/qt/src/http_request.hpp
         ${PROJECT_SOURCE_DIR}/platform/qt/src/local_glyph_rasterizer.cpp
+        ${PROJECT_SOURCE_DIR}/platform/qt/src/shaping.cpp
         ${PROJECT_SOURCE_DIR}/platform/qt/src/qt_image.cpp
         ${PROJECT_SOURCE_DIR}/platform/qt/src/qt_logging.cpp
         ${PROJECT_SOURCE_DIR}/platform/qt/src/run_loop.cpp

@@ -712,7 +712,6 @@ add_library(
     ${PROJECT_SOURCE_DIR}/src/mbgl/text/placement.hpp
     ${PROJECT_SOURCE_DIR}/src/mbgl/text/quads.cpp
     ${PROJECT_SOURCE_DIR}/src/mbgl/text/quads.hpp
-    ${PROJECT_SOURCE_DIR}/src/mbgl/text/shaping.cpp
     ${PROJECT_SOURCE_DIR}/src/mbgl/text/shaping.hpp
     ${PROJECT_SOURCE_DIR}/src/mbgl/text/tagged_string.cpp
     ${PROJECT_SOURCE_DIR}/src/mbgl/text/tagged_string.hpp
