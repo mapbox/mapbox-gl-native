@@ -709,7 +709,7 @@ inline const LocationIndicatorLayer::Impl& impl(const Immutable<style::Layer::Im
 
 RenderLocationIndicatorLayer::RenderLocationIndicatorLayer(Immutable<style::LocationIndicatorLayer::Impl> _impl)
     : RenderLayer(makeMutable<LocationIndicatorLayerProperties>(std::move(_impl))),
-      renderImpl(new RenderLocationIndicatorImpl()),
+      renderImpl(std::make_unique<RenderLocationIndicatorImpl>()),
       unevaluated(impl(baseImpl).paint.untransitioned()) {
     assert(gfx::BackendScope::exists());
 }
