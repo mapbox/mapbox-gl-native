@@ -17,7 +17,7 @@ workflows:
       - sanity-checks
       - build-template:
           name: android-armeabi-v7a-release
-          executor_name: ubuntu-disco
+          executor_name: ubuntu-eoan
           target_is_android: true
           requires:
             - sanity-checks
@@ -25,7 +25,7 @@ workflows:
           install: true
       - build-template:
           name: android-arm64-v8a-release
-          executor_name: ubuntu-disco
+          executor_name: ubuntu-eoan
           target_is_android: true
           requires:
             - sanity-checks
@@ -34,7 +34,7 @@ workflows:
           install: true
       - build-template:
           name: android-x86-release
-          executor_name: ubuntu-disco
+          executor_name: ubuntu-eoan
           target_is_android: true
           requires:
             - sanity-checks
@@ -43,7 +43,7 @@ workflows:
           install: true
       - build-template:
           name: android-x86_64-release
-          executor_name: ubuntu-disco
+          executor_name: ubuntu-eoan
           target_is_android: true
           requires:
             - sanity-checks
@@ -52,7 +52,7 @@ workflows:
           install: true
       - build-template:
           name: linux-gcc8-release
-          executor_name: ubuntu-disco
+          executor_name: ubuntu-eoan
           target_is_linux: true
           requires:
             - sanity-checks
@@ -62,7 +62,7 @@ workflows:
           style_tests: true
       - build-template:
           name: linux-gcc5-release
-          executor_name: ubuntu-disco
+          executor_name: ubuntu-eoan
           target_is_linux: true
           requires:
             - linux-gcc8-release
@@ -71,7 +71,7 @@ workflows:
           test_params: '-N -Q'
       - build-template:
           name: linux-gcc8-debug-coverage
-          executor_name: ubuntu-disco
+          executor_name: ubuntu-eoan
           target_is_linux: true
           requires:
             - linux-gcc8-release
@@ -80,7 +80,7 @@ workflows:
           upload_coverage: true
       - build-template:
           name: linux-clang8-release
-          executor_name: ubuntu-disco
+          executor_name: ubuntu-eoan
           target_is_linux: true
           requires:
             - sanity-checks
@@ -90,7 +90,7 @@ workflows:
           style_tests: true
       - build-template:
           name: FIXME-linux-asan
-          executor_name: ubuntu-disco
+          executor_name: ubuntu-eoan
           target_is_linux: true
           requires:
             - sanity-checks
@@ -99,7 +99,7 @@ workflows:
           style_tests: true
       - build-template:
           name: linux-tsan
-          executor_name: ubuntu-disco
+          executor_name: ubuntu-eoan
           target_is_linux: true
           requires:
             - sanity-checks
@@ -107,7 +107,7 @@ workflows:
           style_tests: true
       - build-template:
           name: FIXME-linux-valgrind
-          executor_name: ubuntu-disco
+          executor_name: ubuntu-eoan
           target_is_linux: true
           requires:
             - sanity-checks
@@ -115,7 +115,7 @@ workflows:
           test_params: '-j 4 -E "mbgl-node|gl-benchmark" -D ExperimentalMemCheck || true'
       - build-template:
           name: linux-ubsan
-          executor_name: ubuntu-disco
+          executor_name: ubuntu-eoan
           target_is_linux: true
           requires:
             - sanity-checks
@@ -123,7 +123,7 @@ workflows:
           style_tests: true
       - build-template:
           name: qt5-linux-gcc5-release
-          executor_name: ubuntu-disco
+          executor_name: ubuntu-eoan
           target_is_linux: true
           requires:
             - sanity-checks
@@ -210,7 +210,7 @@ workflows:
     jobs:
       - build-template:
           name: linux-gcc8-debug-coverage-nightly
-          executor_name: ubuntu-disco
+          executor_name: ubuntu-eoan
           target_is_linux: true
           config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=gcc-8 -DCMAKE_CXX_COMPILER=g++-8 -DCMAKE_BUILD_TYPE=Debug -DMBGL_WITH_COVERAGE=ON'
           style_tests: true
@@ -235,10 +235,10 @@ workflows:
 # bots might differ if in meantime the macOS image gets updated. :-(
 #
 executors:
-  ubuntu-disco:
+  ubuntu-eoan:
     docker:
       # FIXME: Move the image to mbgl/
-      - image: tmpsantos/mbgl_ci:1.8
+      - image: tmpsantos/mbgl_ci:1.9
     resource_class: xlarge
     working_directory: /src
     environment:
@@ -567,7 +567,7 @@ jobs:
             scripts/check_benchmark_results.sh metrics/benchmark/ios/results.json /tmp/tests/benchmark/results.json /tmp/tests/benchmark/results_comparison.txt /tmp/tests/benchmark/results_comparison.html
       - save
   android-benchmark-runner:
-    executor: ubuntu-disco
+    executor: ubuntu-eoan
     steps:
       - checkout
       - prepare
@@ -596,17 +596,13 @@ jobs:
             mkdir -p /tmp/tests/benchmark
             gsutil cp $testResult /tmp/tests/benchmark
       - run:
-          name: Install extra packages for result comparison
-          command: |
-            apt install -y colorized-logs python-scipy
-      - run:
           name: Compare result to baseline
           when: always
           command: |
             scripts/check_benchmark_results.sh metrics/benchmark/android/results.json /tmp/tests/benchmark/results.json /tmp/tests/benchmark/results_comparison.txt /tmp/tests/benchmark/results_comparison.html
       - save
   android-api-breakage:
-    executor: ubuntu-disco
+    executor: ubuntu-eoan
     steps:
       - run:
           name: Clone mapbox-gl-native-android in working directory
@@ -620,7 +616,7 @@ jobs:
           command: BUILDTYPE=Release make android-arm-v8
       - save
   android-unit-test-runner:
-    executor: ubuntu-disco
+    executor: ubuntu-eoan
     steps:
       - checkout
       - prepare
@@ -650,7 +646,7 @@ jobs:
             gsutil cp $testResult /tmp/tests/unit-test
       - save
   android-render-test-runner:
-    executor: ubuntu-disco
+    executor: ubuntu-eoan
     steps:
       - checkout
       - prepare
@@ -687,7 +683,7 @@ jobs:
             gsutil -m cp -r $metricsResult /tmp/tests/render-test-app/rebaselined_metrics || true
       - save
   trigger-pipeline:
-    executor: ubuntu-disco
+    executor: ubuntu-eoan
     parameters:
       slug:
         type: string
@@ -698,7 +694,7 @@ jobs:
           command: |
               scripts/ci-circleci-start-pipeline.py --target-slug << parameters.slug >>
   sanity-checks:
-    executor: ubuntu-disco
+    executor: ubuntu-eoan
     steps:
       - checkout
       - prepare
@@ -734,7 +730,7 @@ jobs:
             run-clang-tidy-8 -quiet -j $(nproc) -p build $PWD/src/.*cpp $PWD/platform/.*cpp
       - save
   baselines:
-    executor: ubuntu-disco
+    executor: ubuntu-eoan
     steps:
       - checkout
       - prepare
