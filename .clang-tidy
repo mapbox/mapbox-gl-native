@@ -1,6 +1,14 @@
 Checks: >
     -*,
+    android-*,
+    boost-*,
     bugprone-*,
+    clang-analyzer-core*
+    clang-analyzer-cplusplus*,
+    clang-analyzer-deadcode*,
+    clang-analyzer-optin.cplusplus*,
+    clang-analyzer-optin.performance.Padding,
+    clang-analyzer-security*,
     clang-diagnostic-*,
     google-*,
     misc-*,
