@@ -504,9 +504,9 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
 }
 
 mbgl::Color GLFWView::makeRandomColor() const {
-    const float r = 1.0f * (float(std::rand()) / RAND_MAX);
-    const float g = 1.0f * (float(std::rand()) / RAND_MAX);
-    const float b = 1.0f * (float(std::rand()) / RAND_MAX);
+    const float r = 1.0f * float(std::rand()) / float(RAND_MAX);
+    const float g = 1.0f * float(std::rand()) / float(RAND_MAX);
+    const float b = 1.0f * float(std::rand()) / float(RAND_MAX);
     return { r, g, b, 1.0f };
 }
 
