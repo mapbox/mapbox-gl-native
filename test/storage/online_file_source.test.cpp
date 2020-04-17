@@ -217,6 +217,25 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RespectPriorExpires)) {
     loop.run();
 }
 
+TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RespectMinimumUpdateInterval)) {
+    util::RunLoop loop;
+    std::unique_ptr<FileSource> fs = std::make_unique<OnlineFileSource>();
+
+    auto start = util::now();
+    Resource resource{Resource::Unknown, "http://127.0.0.1:3000/test"};
+    resource.priorExpires = start + std::chrono::duration_cast<Seconds>(Milliseconds(100));
+    resource.minimumUpdateInterval = Seconds(1);
+
+    std::unique_ptr<AsyncRequest> req = fs->request(resource, [&](Response) {
+        auto wait = util::now() - start;
+        EXPECT_GE(wait, resource.minimumUpdateInterval);
+        EXPECT_LT(wait, resource.minimumUpdateInterval + Milliseconds(10));
+        loop.stop();
+    });
+
+    loop.run();
+}
+
 TEST(OnlineFileSource, TEST_REQUIRES_SERVER(Load)) {
     util::RunLoop loop;
     std::unique_ptr<FileSource> fs = std::make_unique<OnlineFileSource>();
