@@ -23,7 +23,8 @@ public:
     ~RasterTile() override;
 
     std::unique_ptr<TileRenderData> createRenderData() override;
-    void setNecessity(TileNecessity) final;
+    void setNecessity(TileNecessity) override;
+    void setMinimumUpdateInterval(Duration) override;
 
     void setError(std::exception_ptr);
     void setMetadata(optional<Timestamp> modified, optional<Timestamp> expires);

@@ -57,6 +57,30 @@ template <typename T>
 TileLoader<T>::~TileLoader() = default;
 
 template <typename T>
+void TileLoader<T>::setNecessity(TileNecessity newNecessity) {
+    if (newNecessity != necessity) {
+        necessity = newNecessity;
+        if (necessity == TileNecessity::Required) {
+            makeRequired();
+        } else {
+            makeOptional();
+        }
+    }
+}
+
+template <typename T>
+void TileLoader<T>::setMinimumUpdateInterval(Duration interval) {
+    if (minimumUpdateInterval != interval) {
+        minimumUpdateInterval = interval;
+        if (hasPendingNetworkRequest()) {
+            // Update the pending request.
+            request.reset();
+            loadFromNetwork();
+        }
+    }
+}
+
+template <typename T>
 void TileLoader<T>::loadFromCache() {
     assert(!request);
     if (!fileSource) {
@@ -99,7 +123,7 @@ void TileLoader<T>::makeRequired() {
 
 template <typename T>
 void TileLoader<T>::makeOptional() {
-    if (resource.loadingMethod == Resource::LoadingMethod::NetworkOnly && request) {
+    if (hasPendingNetworkRequest()) {
         // Abort the current request, but only when we know that we're specifically querying for a
         // network resource only.
         request.reset();
@@ -135,6 +159,7 @@ void TileLoader<T>::loadFromNetwork() {
     // Instead of using Resource::LoadingMethod::All, we're first doing a CacheOnly, and then a
     // NetworkOnly request.
     resource.loadingMethod = Resource::LoadingMethod::NetworkOnly;
+    resource.minimumUpdateInterval = minimumUpdateInterval;
     request = fileSource->request(resource, [this](const Response& res) { loadedData(res); });
 }
 

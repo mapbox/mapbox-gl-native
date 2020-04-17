@@ -78,4 +78,8 @@ void RasterTile::setNecessity(TileNecessity necessity) {
     loader.setNecessity(necessity);
 }
 
+void RasterTile::setMinimumUpdateInterval(Duration interval) {
+    loader.setMinimumUpdateInterval(interval);
+}
+
 } // namespace mbgl
