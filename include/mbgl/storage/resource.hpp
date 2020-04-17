@@ -95,6 +95,7 @@ public:
     optional<Timestamp> priorExpires = {};
     optional<std::string> priorEtag = {};
     std::shared_ptr<const std::string> priorData;
+    Duration minimumUpdateInterval{Duration::zero()};
 };
 
 inline bool Resource::hasLoadingMethod(Resource::LoadingMethod method) const {

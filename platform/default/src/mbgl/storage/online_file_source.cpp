@@ -40,14 +40,15 @@ struct OnlineFileRequest {
     ~OnlineFileRequest();
 
     void networkIsReachableAgain();
-    void schedule();
-    void schedule(optional<Timestamp> expires);
+    void activate();
+    void schedule(Duration timeout);
     void completed(Response);
 
     void setTransformedURL(const std::string& url);
     ActorRef<OnlineFileRequest> actor();
     void onCancel(std::function<void()>);
 
+    Duration getUpdateInterval(optional<Timestamp> expires) const;
     OnlineFileSourceThread& impl;
     Resource resource;
     std::unique_ptr<AsyncRequest> request;
@@ -100,7 +101,7 @@ public:
                     ref.invoke(&OnlineFileRequest::setTransformedURL, url);
                 });
         } else {
-            req->schedule();
+            req->activate();
         }
     }
 
@@ -176,11 +177,11 @@ public:
         maximumConcurrentRequests = maximumConcurrentRequests_;
     }
 
-    void setAPIBaseURL(const std::string& t) { apiBaseURL = t; }
-    std::string getAPIBaseURL() const { return apiBaseURL; }
+    void setAPIBaseURL(std::string t) { apiBaseURL = std::move(t); }
+    const std::string& getAPIBaseURL() const { return apiBaseURL; }
 
-    void setAccessToken(const std::string& t) { accessToken = t; }
-    std::string getAccessToken() const { return accessToken; }
+    void setAccessToken(std::string t) { accessToken = std::move(t); }
+    const std::string& getAccessToken() const { return accessToken; }
 
 private:
     friend struct OnlineFileRequest;
@@ -383,15 +384,6 @@ OnlineFileRequest::OnlineFileRequest(Resource resource_, Callback callback_, Onl
     impl.add(this);
 }
 
-void OnlineFileRequest::schedule() {
-    // Force an immediate first request if we don't have an expiration time.
-    if (resource.priorExpires) {
-        schedule(resource.priorExpires);
-    } else {
-        schedule(util::now());
-    }
-}
-
 OnlineFileRequest::~OnlineFileRequest() {
     if (mailbox) {
         mailbox->close();
@@ -431,16 +423,20 @@ Timestamp interpolateExpiration(const Timestamp& current, optional<Timestamp> pr
     return now + std::max<Seconds>(delta, util::CLOCK_SKEW_RETRY_TIMEOUT);
 }
 
-void OnlineFileRequest::schedule(optional<Timestamp> expires) {
+void OnlineFileRequest::activate() {
+    // Force an immediate first request if we don't have an expiration time.
+    Duration timeout = Duration::zero();
+    if (resource.priorExpires) {
+        timeout = getUpdateInterval(resource.priorExpires);
+    }
+    schedule(timeout);
+}
+
+void OnlineFileRequest::schedule(Duration timeout) {
     if (impl.isPending(this) || impl.isActive(this)) {
         // There's already a request in progress; don't start another one.
         return;
     }
-
-    // If we're not being asked for a forced refresh, calculate a timeout that depends on how many
-    // consecutive errors we've encountered, and on the expiration time, if present.
-    Duration timeout = std::min(http::errorRetryTimeout(failedRequestReason, failedRequests, retryAfter),
-                                http::expirationTimeout(std::move(expires), expiredRequests));
 
     if (timeout == Duration::max()) {
         return;
@@ -458,6 +454,15 @@ void OnlineFileRequest::schedule(optional<Timestamp> expires) {
     timer.start(timeout, Duration::zero(), [&] {
         impl.activateOrQueueRequest(this);
     });
+}
+
+Duration OnlineFileRequest::getUpdateInterval(optional<Timestamp> expires) const {
+    // Calculate a timeout that depends on how many
+    // consecutive errors we've encountered, and on the expiration time, if present.
+    Duration errorRetryTimeout = http::errorRetryTimeout(failedRequestReason, failedRequests, retryAfter);
+    Duration expirationTimeout =
+        std::max(http::expirationTimeout(std::move(expires), expiredRequests), resource.minimumUpdateInterval);
+    return std::min(errorRetryTimeout, expirationTimeout);
 }
 
 namespace {
@@ -519,7 +524,7 @@ void OnlineFileRequest::completed(Response response) {
         failedRequestReason = Response::Error::Reason::Success;
     }
 
-    schedule(response.expires);
+    schedule(getUpdateInterval(response.expires));
 
     // Calling the callback may result in `this` being deleted. It needs to be done last,
     // and needs to make a local copy of the callback to ensure that it remains valid for
@@ -532,13 +537,13 @@ void OnlineFileRequest::networkIsReachableAgain() {
     // We need all requests to fail at least once before we are going to start retrying
     // them, and we only immediately restart request that failed due to connection issues.
     if (failedRequestReason == Response::Error::Reason::Connection) {
-        schedule(util::now());
+        schedule(Duration::zero());
     }
 }
 
 void OnlineFileRequest::setTransformedURL(const std::string& url) {
     resource.url = url;
-    schedule();
+    activate();
 }
 
 ActorRef<OnlineFileRequest> OnlineFileRequest::actor() {
