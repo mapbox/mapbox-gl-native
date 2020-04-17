@@ -9,6 +9,7 @@
     "render-tests/regressions/mapbox-gl-js#5911a": "Needs to be investigated and fixed.",
     "render-tests/text-field/formatted-images": "Needs to be investigated and fixed.",
     "render-tests/symbol-visibility/visible": "Needs to be investigated and fixed.",
+    "location_indicator/change_image": "https://github.com/mapbox/mapbox-gl-native/issues/16401",
     "location_indicator/dateline": "https://github.com/mapbox/mapbox-gl-native/issues/16401",
     "location_indicator/default": "https://github.com/mapbox/mapbox-gl-native/issues/16401",
     "location_indicator/image_pixel_ratio": "Renders a black square when loading from spritesheet. Needs to be investigated and fixed.",
