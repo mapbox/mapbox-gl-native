@@ -15,7 +15,7 @@ IOException::IOException(int err, const std::string& msg)
 }
 
 void write_file(const std::string &filename, const std::string &data) {
-    FILE *fd = fopen(filename.c_str(), "wb");
+    FILE *fd = fopen(filename.c_str(), "wbe");
     if (fd) {
         fwrite(data.data(), sizeof(std::string::value_type), data.size(), fd);
         fclose(fd);
