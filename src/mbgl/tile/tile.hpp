@@ -52,6 +52,7 @@ public:
     void setObserver(TileObserver* observer);
 
     virtual void setNecessity(TileNecessity) {}
+    virtual void setMinimumUpdateInterval(Duration) {}
 
     // Mark this tile as no longer needed and cancel any pending work.
     virtual void cancel();

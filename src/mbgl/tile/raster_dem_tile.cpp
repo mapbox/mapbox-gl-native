@@ -122,4 +122,8 @@ void RasterDEMTile::setNecessity(TileNecessity necessity) {
     loader.setNecessity(necessity);
 }
 
+void RasterDEMTile::setMinimumUpdateInterval(Duration interval) {
+    loader.setMinimumUpdateInterval(interval);
+}
+
 } // namespace mbgl

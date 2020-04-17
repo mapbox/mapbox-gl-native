@@ -22,16 +22,8 @@ public:
                const Tileset&);
     ~TileLoader();
 
-    void setNecessity(TileNecessity newNecessity) {
-        if (newNecessity != necessity) {
-            necessity = newNecessity;
-            if (necessity == TileNecessity::Required) {
-                makeRequired();
-            } else {
-                makeOptional();
-            }
-        }
-    }
+    void setNecessity(TileNecessity newNecessity);
+    void setMinimumUpdateInterval(Duration);
 
 private:
     // called when the tile is one of the ideal tiles that we want to show definitely. the tile source
@@ -48,11 +40,16 @@ private:
     void loadedData(const Response&);
     void loadFromNetwork();
 
+    bool hasPendingNetworkRequest() const {
+        return resource.loadingMethod == Resource::LoadingMethod::NetworkOnly && request;
+    }
+
     T& tile;
     TileNecessity necessity;
     Resource resource;
     std::shared_ptr<FileSource> fileSource;
     std::unique_ptr<AsyncRequest> request;
+    Duration minimumUpdateInterval{Duration::zero()};
 };
 
 } // namespace mbgl

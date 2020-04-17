@@ -16,6 +16,7 @@ public:
                const Tileset&);
 
     void setNecessity(TileNecessity) final;
+    void setMinimumUpdateInterval(Duration interval) final;
     void setMetadata(optional<Timestamp> modified, optional<Timestamp> expires);
     void setData(const std::shared_ptr<const std::string>& data);
 
