@@ -1,6 +1,8 @@
 # Changelog
 
-## master
+## maps-v1.5.2
+
+- [macos] Restored support for macOS 10.11–10.14 ([#16412](https://github.com/mapbox/mapbox-gl-native/pull/16412))
 
 ## maps-v1.5.1
 
