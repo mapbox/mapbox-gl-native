@@ -72,9 +72,7 @@ public:
                 (programs::gl::shaderSource() + programs::gl::fragmentPreludeOffset),
                 (programs::gl::shaderSource() + fragmentOffset)
             };
-            auto result = std::make_unique<Instance>(context, vertexSource, fragmentSource);
-
-            return std::move(result);
+            return std::make_unique<Instance>(context, vertexSource, fragmentSource);
         }
 
         UniqueProgram program;

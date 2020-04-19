@@ -175,7 +175,7 @@ DatabaseFileSource::~DatabaseFileSource() = default;
 std::unique_ptr<AsyncRequest> DatabaseFileSource::request(const Resource& resource, Callback callback) {
     auto req = std::make_unique<FileSourceRequest>(std::move(callback));
     impl->actor().invoke(&DatabaseFileSourceThread::request, resource, req->actor());
-    return std::move(req);
+    return req;
 }
 
 void DatabaseFileSource::forward(const Resource& res, const Response& response, std::function<void()> callback) {

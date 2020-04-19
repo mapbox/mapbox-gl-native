@@ -302,7 +302,7 @@ public:
         req->onCancel(
             [actorRef = thread->actor(), req = req.get()]() { actorRef.invoke(&OnlineFileSourceThread::cancel, req); });
         thread->actor().invoke(&OnlineFileSourceThread::request, req.get(), std::move(res), req->actor());
-        return std::move(req);
+        return req;
     }
 
     void pause() { thread->pause(); }
