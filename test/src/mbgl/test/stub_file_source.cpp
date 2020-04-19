@@ -60,7 +60,7 @@ std::unique_ptr<AsyncRequest> StubFileSource::request(const Resource& resource, 
     } else {
         pending.emplace(req.get(), std::make_tuple(resource, response, callback));
     }
-    return std::move(req);
+    return req;
 }
 
 void StubFileSource::remove(AsyncRequest* req) {

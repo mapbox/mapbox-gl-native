@@ -73,7 +73,7 @@ inline Immutable<style::SymbolLayoutProperties::PossiblyEvaluated> createLayout(
         layout->get<IconPitchAlignment>() = layout->get<IconRotationAlignment>();
     }
 
-    return std::move(layout);
+    return layout;
 }
 
 } // namespace

@@ -51,7 +51,7 @@ std::unique_ptr<AsyncRequest> AssetFileSource::request(const Resource& resource,
 
     impl->actor().invoke(&Impl::request, resource.url, req->actor());
 
-    return std::move(req);
+    return req;
 }
 
 bool AssetFileSource::canRequest(const Resource& resource) const {

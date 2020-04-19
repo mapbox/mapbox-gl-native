@@ -151,7 +151,7 @@ public:
             actorRef.invoke(&MainResourceLoaderThread::cancel, req);
         });
         thread->actor().invoke(&MainResourceLoaderThread::request, req.get(), resource, req->actor());
-        return std::move(req);
+        return req;
     }
 
     bool canRequest(const Resource& resource) const {
