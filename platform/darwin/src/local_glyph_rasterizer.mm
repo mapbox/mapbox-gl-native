@@ -153,10 +153,16 @@ PremultipliedImage drawGlyphBitmap(GlyphID glyphID, CTFontRef font, Size size) {
         throw std::runtime_error("CGBitmapContextCreate failed");
     }
     
-    // Move the text upward to avoid clipping off descenders.
+    CGContextSetShouldSubpixelPositionFonts(*context, false);
+    CGContextSetShouldSubpixelQuantizeFonts(*context, false);
+    
     CGPoint positions[1];
-    positions[0] = CGPointMake(0.0, 5.0);
+    positions[0] = CGPointMake(0.0, 0.0);
     CTFontDrawGlyphs(font, glyphs, positions, 1, *context);
+    
+    const CGFloat *black = CGColorGetComponents(CGColorGetConstantColor(kCGColorBlack));
+    CGContextSetFillColor(*context, black);
+    CGContextFillRect(*context, CGRectMake(0, 0, size.width, size.height));
     
     return rgbaBitmap;
 }
@@ -187,17 +193,17 @@ Glyph LocalGlyphRasterizer::rasterizeGlyph(const FontStack& fontStack, GlyphID g
     if (CGRectIsNull(boundingRect)) {
         throw std::runtime_error("CTFontGetBoundingRectsForGlyphs failed");
     }
+    manufacturedGlyph.metrics.left = std::round(CGRectGetMinX(boundingRects[0]));
+    manufacturedGlyph.metrics.top = std::round(CGRectGetMinY(boundingRects[0]));
     // Mimic glyph PBF metrics.
-    manufacturedGlyph.metrics.left = 3;
-    manufacturedGlyph.metrics.top = -1;
     manufacturedGlyph.metrics.width = 35;
     manufacturedGlyph.metrics.height = 35;
     
     CGSize advances[1];
     CTFontGetAdvancesForGlyphs(*font, orientation, glyphs, advances, 1);
-    manufacturedGlyph.metrics.advance = 24;
+    manufacturedGlyph.metrics.advance = std::ceil(advances[0].width);
     
-    Size size(manufacturedGlyph.metrics.width, manufacturedGlyph.metrics.height);
+    Size size(MAX(manufacturedGlyph.metrics.width, 1), MAX(manufacturedGlyph.metrics.height, 1));
     PremultipliedImage rgbaBitmap = drawGlyphBitmap(glyphID, *font, size);
    
     // Copy alpha values from RGBA bitmap into the AlphaImage output

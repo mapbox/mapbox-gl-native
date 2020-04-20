@@ -160,8 +160,9 @@ Shaping getShaping(const TaggedString& formattedString,
                    float layoutTextSize,
                    float layoutTextSizeAtBucketZoomLevel,
                    bool allowVerticalPlacement) {
-//    const float maxHeight = 200; // TODO: What’s a big enough height to not constrain any label?
-    const bool vertical = writingMode != WritingModeType::Horizontal && allowVerticalPlacement;
+    // TODO: Vertical text.
+//    const bool vertical = writingMode != WritingModeType::Horizontal && allowVerticalPlacement;
+    const bool vertical = false;
     CTFontOrientation orientation = vertical ? kCTFontOrientationVertical : kCTFontOrientationHorizontal;
     
     CTTextAlignment textAlignment;
@@ -179,9 +180,10 @@ Shaping getShaping(const TaggedString& formattedString,
             textAlignment = kCTTextAlignmentRight;
             break;
     }
+    CGFloat lineHeightInEms = lineHeight / util::ONE_EM;
     CTParagraphStyleSetting paragraphSettings[] = {
         { kCTParagraphStyleSpecifierAlignment, sizeof(CTTextAlignment), &textAlignment },
-        { kCTParagraphStyleSpecifierLineHeightMultiple, sizeof(float), &lineHeight },
+        { kCTParagraphStyleSpecifierLineHeightMultiple, sizeof(float), &lineHeightInEms },
     };
     CTParagraphStyleRefHandle paragraphStyle(CTParagraphStyleCreate(paragraphSettings, sizeof(paragraphSettings) / sizeof(paragraphSettings[0])));
     
@@ -207,11 +209,18 @@ Shaping getShaping(const TaggedString& formattedString,
     }
     
     Shaping shaping(translate[0], translate[1], writingMode);
+    shaping.verticalizable = true;
     
     CTFramesetterRefHandle framesetter(CTFramesetterCreateWithAttributedString(*mutableAttrString));
-//    CFRange wholeStringRange = CFRangeMake(0, CFAttributedStringGetLength(*mutableAttrString));
-    CGPathRefHandle path(CGPathCreateWithRect(CGRectMake(0, 0, maxWidth, CGFLOAT_MAX), NULL));
-    CTFrameRefHandle frame(CTFramesetterCreateFrame(*framesetter, CFRangeMake(0, 0), *path, NULL));
+    CFRange fittingRange;
+    CGSize suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(*framesetter, CFRangeMake(0, 0), NULL, CGSizeMake(maxWidth, CGFLOAT_MAX), &fittingRange);
+    shaping.top = 0;
+    shaping.left = 0;
+    shaping.bottom = shaping.top + suggestedSize.height;
+    shaping.right = shaping.left + suggestedSize.width;
+    
+    CGPathRefHandle path(CGPathCreateWithRect(CGRectMake(0, 0, suggestedSize.width, suggestedSize.height), NULL));
+    CTFrameRefHandle frame(CTFramesetterCreateFrame(*framesetter, fittingRange, *path, NULL));
     CFArrayRef lines = CTFrameGetLines(*frame);
     for (CFIndex i = 0; i < CFArrayGetCount(lines); i++) {
         CTLineRef line = (CTLineRef)CFArrayGetValueAtIndex(lines, i);
@@ -248,14 +257,14 @@ Shaping getShaping(const TaggedString& formattedString,
                 
                 Rect<uint16_t> rect = {
                     static_cast<unsigned short>(CGRectGetMinX(boundingRects[k])),
-                    static_cast<unsigned short>(CGFLOAT_MAX - CGRectGetMinY(boundingRects[k])),
+                    static_cast<unsigned short>(CGRectGetMinY(boundingRects[k])),
                     static_cast<unsigned short>(CGRectGetWidth(boundingRects[k])),
                     static_cast<unsigned short>(CGRectGetHeight(boundingRects[k])),
                 };
                 
                 GlyphMetrics metrics;
                 metrics.left = CGRectGetMinX(boundingRects[k]);
-                metrics.top = CGFLOAT_MAX - CGRectGetMinY(boundingRects[k]);
+                metrics.top = CGRectGetMinY(boundingRects[k]);
                 metrics.width = CGRectGetWidth(boundingRects[k]);
                 metrics.height = CGRectGetHeight(boundingRects[k]);
                 metrics.advance = advances[k].width;
