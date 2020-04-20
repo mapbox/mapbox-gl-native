@@ -1,9 +1,9 @@
 #pragma once
 
+#include <mbgl/actor/actor_ref.hpp>
 #include <mbgl/style/sources/custom_geometry_source.hpp>
 #include <mbgl/tile/tile_id.hpp>
 #include <mbgl/util/geojson.hpp>
-#include <mbgl/actor/actor_ref.hpp>
 
 #include <map>
 #include <mutex>
@@ -14,8 +14,10 @@ class CustomGeometryTile;
 
 namespace style {
 
-class CustomTileLoader : private util::noncopyable {
+class CustomTileLoader {
 public:
+    CustomTileLoader(const CustomTileLoader&) = delete;
+    CustomTileLoader& operator=(const CustomTileLoader&) = delete;
 
     using OverscaledIDFunctionTuple = std::tuple<uint8_t, int16_t, ActorRef<CustomGeometryTile>>;
 

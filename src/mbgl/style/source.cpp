@@ -43,6 +43,18 @@ optional<uint8_t> Source::getPrefetchZoomDelta() const noexcept {
     return baseImpl->getPrefetchZoomDelta();
 }
 
+void Source::setMinimumTileUpdateInterval(Duration interval) noexcept {
+    if (getMinimumTileUpdateInterval() == interval) return;
+    auto newImpl = createMutable();
+    newImpl->setMinimumTileUpdateInterval(interval);
+    baseImpl = std::move(newImpl);
+    observer->onSourceChanged(*this);
+}
+
+Duration Source::getMinimumTileUpdateInterval() const noexcept {
+    return baseImpl->getMinimumTileUpdateInterval();
+}
+
 void Source::setMaxOverscaleFactorForParentTiles(optional<uint8_t> overscaleFactor) noexcept {
     if (getMaxOverscaleFactorForParentTiles() == overscaleFactor) return;
     auto newImpl = createMutable();
