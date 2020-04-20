@@ -25,6 +25,10 @@
 
   Sorts drawing order by sort key both within-tile and cross-tile.
 
+- [core] Add LocationIndicator layer ([#16340](https://github.com/mapbox/mapbox-gl-native/pull/16340))
+
+  Adds a new layer type, `location-indicator`, that can be used to add a source-less indicator to the map, comprising raster images and a precision radius in meters.
+
 - Add generic setter for Layer's 'source' property ([#16406](https://github.com/mapbox/mapbox-gl-native/pull/16406)
 
 ### 🐞 Bug fixes
