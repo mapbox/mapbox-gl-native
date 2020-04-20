@@ -749,6 +749,7 @@ public:
         renderable = true;
     }
     void setNecessity(TileNecessity necessity) override;
+    void setMinimumUpdateInterval(Duration) override;
     bool layerPropertiesUpdated(const Immutable<style::LayerProperties>&) override { return true; }
 
     std::unique_ptr<TileRenderData> createRenderData() override { return nullptr; }
@@ -760,6 +761,7 @@ private:
 class FakeTileSource : public RenderTileSetSource {
 public:
     MOCK_METHOD1(tileSetNecessity, void(TileNecessity));
+    MOCK_METHOD1(tileSetMinimumUpdateInterval, void(Duration));
 
     explicit FakeTileSource(Immutable<style::Source::Impl> impl_) : RenderTileSetSource(std::move(impl_)) {}
     void updateInternal(const Tileset& tileset,
@@ -787,6 +789,10 @@ void FakeTile::setNecessity(TileNecessity necessity) {
     source.tileSetNecessity(necessity);
 }
 
+void FakeTile::setMinimumUpdateInterval(Duration interval) {
+    source.tileSetMinimumUpdateInterval(interval);
+}
+
 } // namespace
 
 TEST(Source, InvisibleSourcesTileNecessity) {
@@ -809,6 +815,49 @@ TEST(Source, InvisibleSourcesTileNecessity) {
 
     // Necessity is again `required` once tiles get back visible.
     EXPECT_CALL(renderTilesetSource, tileSetNecessity(TileNecessity::Required)).Times(1);
+    renderSource->update(initialized.baseImpl, layers, true, false, test.tileParameters());
+}
+
+TEST(Source, SourceMinimumUpdateInterval) {
+    SourceTest test;
+    VectorSource initialized("source", Tileset{{"tiles"}});
+    initialized.loadDescription(*test.fileSource);
+
+    FakeTileSource renderTilesetSource{initialized.baseImpl};
+    RenderSource* renderSource = &renderTilesetSource;
+    LineLayer layer("id", "source");
+    Immutable<LayerProperties> layerProperties =
+        makeMutable<LineLayerProperties>(staticImmutableCast<LineLayer::Impl>(layer.baseImpl));
+    std::vector<Immutable<LayerProperties>> layers{layerProperties};
+
+    Duration minimumTileUpdateInterval = initialized.getMinimumTileUpdateInterval();
+    auto baseImpl = initialized.baseImpl;
+    EXPECT_EQ(Duration::zero(), minimumTileUpdateInterval);
+    EXPECT_CALL(renderTilesetSource, tileSetMinimumUpdateInterval(minimumTileUpdateInterval)).Times(1);
+    renderSource->update(baseImpl, layers, true, false, test.tileParameters());
+
+    initialized.setMinimumTileUpdateInterval(Seconds(1));
+    EXPECT_NE(baseImpl, initialized.baseImpl) << "Source impl was updated";
+    baseImpl = initialized.baseImpl;
+
+    initialized.setMinimumTileUpdateInterval(Seconds(1)); // Set the same interval again.
+    EXPECT_EQ(baseImpl, initialized.baseImpl) << "Source impl was not updated";
+
+    minimumTileUpdateInterval = initialized.getMinimumTileUpdateInterval();
+    EXPECT_EQ(Seconds(1), minimumTileUpdateInterval);
+    EXPECT_CALL(renderTilesetSource, tileSetMinimumUpdateInterval(minimumTileUpdateInterval)).Times(1);
+    renderSource->update(baseImpl, layers, true, false, test.tileParameters());
+
+    initialized.setMinimumTileUpdateInterval(Seconds(2));
+    minimumTileUpdateInterval = initialized.getMinimumTileUpdateInterval();
+    EXPECT_EQ(Seconds(2), minimumTileUpdateInterval);
+
+    // No network activity for invisible tiles, and no reason to set the update interval.
+    EXPECT_CALL(renderTilesetSource, tileSetMinimumUpdateInterval(minimumTileUpdateInterval)).Times(0);
+    renderSource->update(initialized.baseImpl, layers, false, false, test.tileParameters());
+
+    // Tiles got visible, set the update interval now.
+    EXPECT_CALL(renderTilesetSource, tileSetMinimumUpdateInterval(minimumTileUpdateInterval)).Times(1);
     renderSource->update(initialized.baseImpl, layers, true, false, test.tileParameters());
 }
 
