@@ -40,21 +40,18 @@ void RenderCustomGeometrySource::update(Immutable<style::Source::Impl> baseImpl_
         return;
     }
 
-    tilePyramid.update(
-        layers,
-        needsRendering,
-        needsRelayout,
-        parameters,
-        SourceType::CustomVector,
-        util::tileSize,
-        impl().getZoomRange(),
-        {},
-        [&](const OverscaledTileID& tileID) {
-            return std::make_unique<CustomGeometryTile>(
-                tileID, impl().id, parameters, impl().getTileOptions(), *tileLoader);
-        },
-        baseImpl->getPrefetchZoomDelta(),
-        baseImpl->getMaxOverscaleFactorForParentTiles());
+    tilePyramid.update(layers,
+                       needsRendering,
+                       needsRelayout,
+                       parameters,
+                       *baseImpl,
+                       util::tileSize,
+                       impl().getZoomRange(),
+                       {},
+                       [&](const OverscaledTileID& tileID) {
+                           return std::make_unique<CustomGeometryTile>(
+                               tileID, impl().id, parameters, impl().getTileOptions(), *tileLoader);
+                       });
 }
 
 } // namespace mbgl

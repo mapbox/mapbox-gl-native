@@ -53,13 +53,11 @@ void TilePyramid::update(const std::vector<Immutable<style::LayerProperties>>& l
                          const bool needsRendering,
                          const bool needsRelayout,
                          const TileParameters& parameters,
-                         const SourceType type,
+                         const style::Source::Impl& sourceImpl,
                          const uint16_t tileSize,
                          const Range<uint8_t> zoomRange,
                          optional<LatLngBounds> bounds,
-                         std::function<std::unique_ptr<Tile>(const OverscaledTileID&)> createTile,
-                         const optional<uint8_t>& sourcePrefetchZoomDelta,
-                         const optional<uint8_t>& maxParentTileOverscaleFactor) {
+                         std::function<std::unique_ptr<Tile>(const OverscaledTileID&)> createTile) {
     // If we need a relayout, abandon any cached tiles; they're now stale.
     if (needsRelayout) {
         cache.clear();
@@ -86,10 +84,14 @@ void TilePyramid::update(const std::vector<Immutable<style::LayerProperties>>& l
 
     handleWrapJump(parameters.transformState.getLatLng().longitude());
 
+    const auto type = sourceImpl.type;
     // Determine the overzooming/underzooming amounts and required tiles.
     int32_t overscaledZoom = util::coveringZoomLevel(parameters.transformState.getZoom(), type, tileSize);
     int32_t tileZoom = overscaledZoom;
     int32_t panZoom = zoomRange.max;
+
+    const optional<uint8_t>& sourcePrefetchZoomDelta = sourceImpl.getPrefetchZoomDelta();
+    const optional<uint8_t>& maxParentTileOverscaleFactor = sourceImpl.getMaxOverscaleFactorForParentTiles();
 
     std::vector<OverscaledTileID> idealTiles;
     std::vector<OverscaledTileID> panTiles;
