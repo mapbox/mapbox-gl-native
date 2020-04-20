@@ -2,6 +2,8 @@
 
 ## master
 
+## maps-v1.6.0-rc.1
+
 ### ✨ New features
 
 - [core] Move logging off the main thread ([#16325](https://github.com/mapbox/mapbox-gl-native/pull/16325))
@@ -19,7 +21,7 @@
   - `getPlacedSymbolsData()`
     if collecting of the placed symbols data is enabled, returns the reference to the `PlacedSymbolData` vector holding the collected data.
 
-- [core] Enable circle-sort-key property [#15875](https://github.com/mapbox/mapbox-gl-native/pull/15875/)
+- [core] Enable circle-sort-key property ([#15875](https://github.com/mapbox/mapbox-gl-native/pull/15875/))
 
   Adds support for `circle-sort-key` property, consistent with `symbol-sort-key`.
 
@@ -29,7 +31,7 @@
 
   Adds a new layer type, `location-indicator`, that can be used to add a source-less indicator to the map, comprising raster images and a precision radius in meters.
 
-- Add generic setter for Layer's 'source' property ([#16406](https://github.com/mapbox/mapbox-gl-native/pull/16406)
+- Add generic setter for Layer's 'source' property ([#16406](https://github.com/mapbox/mapbox-gl-native/pull/16406))
 
 ### 🐞 Bug fixes
 
@@ -47,6 +49,8 @@
   The `symbolIntersectsTileEdges()` util in `mbgl::TilePlacement` now considers icon shift for the variable symbols with enabled icon-text-fit setting, thus providing more accurate results.
 
 - [core] Correctly log a warning instead of crashing when a non-existent image is attempted to be removed. ([#16391](https://github.com/mapbox/mapbox-gl-native/pull/16391))
+
+- [core] Fix segfault resulting from an invalid geometry ([#16409](https://github.com/mapbox/mapbox-gl-native/pull/16409))
 
 ## maps-v1.5.1
 
@@ -128,9 +132,9 @@
 - [default] Fix possible crash at RunLoop::wake() ([#16255](https://github.com/mapbox/mapbox-gl-native/pull/16255))
 
 - [android] Update toGeoJSON in android_conversion.hpp ([#16243](https://github.com/mapbox/mapbox-gl-native/pull/16243))
-  
-  Before this chage, `toGeoJSON` method in `android_conversion.hpp` could not convert an Object (Map in android) to GeoJSON object. 
-  
+
+  Before this chage, `toGeoJSON` method in `android_conversion.hpp` could not convert an Object (Map in android) to GeoJSON object.
+
   But `within` expression needs to accept an Object and then convert it to the GeoJSON object, now `toGeoJSON` method can convert both string and Object to GeoJSON.
 
 - [core] Fix `within` expression algorithm so that `false` value will be returned when point is on the boundary.  Allow using different GeoJSON formats as arguments of `within` expression.([#16232](https://github.com/mapbox/mapbox-gl-native/pull/16232))
@@ -166,7 +170,7 @@
 - Signature of a `MapSnapshotter`'s constructor has been changed
 - Signature for a `MapSnapshotter::snapshot` method has been changed
 - Size of an offline regions do not affect ambient cache size ([#15622](https://github.com/mapbox/mapbox-gl-native/pull/15622))
-  
+
 ##### 📌 Known issues
 
 - When feature is exactly on the geometry boundary, `within` expression returns inconsistent values for different zoom levels  ([#16301](https://github.com/mapbox/mapbox-gl-native/issues/16301))
@@ -204,7 +208,7 @@
 
   Breaking code example:
   `auto fs = FileSourceManager::getFileSource(); fs->..`
-  
+
   Posible fix:
   `std::shared_ptr<FileSource> fs = `;
 
@@ -247,19 +251,19 @@
   The new `Source::setPrefetchZoomDelta(optional<uint8_t>)` method allows overriding default tile prefetch setting that is defined by the Map instance.
 
 - [core] Add support for `within expression`. Implement the use of `within expression` with paint propery and filter expression. ([#16157](https://github.com/mapbox/mapbox-gl-native/pull/16157))
-   
+
   The `within expression` enables checking whether a feature is inside a pre-defined geometry set/boundary or not. This `within expression` returns a boolean value, `true` indicates that the feature being evaluated is inside the geometry set. The returned value can be then consumed as input by another expression or used directly by a paint/layer property.
- 
+
   Support for using `within expression` with layout property will be implemented separately.
 
 - [core] Add support for using `within expression` with layout property. ([#16194](https://github.com/mapbox/mapbox-gl-native/pull/16194))
 
 - [core] Add support for `in expression`. ([#16162](https://github.com/mapbox/mapbox-gl-native/pull/16162))
-   
+
   The `in expression` enables checking whether a Number/String/Boolean type item is in a String/Array and returns a boolean value.
 
 - [core] Add support for using `within expression` with features having `'LineString'` geometry type. ([#16220](https://github.com/mapbox/mapbox-gl-native/pull/16220))
-  
+
   `within expression` now supports features with geometry types: `'Point'` or `'LineString'`.
 
 ### 🐞 Bug fixes
@@ -439,7 +443,7 @@
 
   Introduces public [mblg::Renderer::render](https://github.com/mapbox/mapbox-gl-native/pull/16127/files#diff-5a977e0401792825d7fcf522d48df11fR34) API break.
 
-- [core] Refactor DefaultFileSource codebase ([#15768](https://github.com/mapbox/mapbox-gl-native/pull/15768)) 
+- [core] Refactor DefaultFileSource codebase ([#15768](https://github.com/mapbox/mapbox-gl-native/pull/15768))
   - Adds `FileSourceManager` interface that provides access to `FileSource` instances and means of registering / unregistering `FileSource` factories
   - Splits `DefaultFileSource` into smaller parts
   - Adds `DatabaseFileSource` interface and it's default implementation
