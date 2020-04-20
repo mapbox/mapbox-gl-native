@@ -8,7 +8,7 @@
 #include <mbgl/text/collision_index.hpp>
 #include <mbgl/tile/tile_id.hpp>
 #include <mbgl/util/constants.hpp>
-#include <mbgl/util/geometry_within.hpp>
+#include <mbgl/util/geometry_util.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/projection.hpp>
 
@@ -216,7 +216,7 @@ void DynamicFeatureIndex::query(std::unordered_map<std::string, std::vector<Feat
                                 const mbgl::ScreenLineString& queryGeometry,
                                 const TransformState& state) const {
     if (features.empty()) return;
-    mbgl::WithinBBox queryBox = DefaultBBox;
+    mbgl::GeometryBBox<int64_t> queryBox = DefaultWithinBBox;
     for (const auto& p : queryGeometry) {
         const LatLng c = screenCoordinateToLatLng(p, state);
         const Point<double> pm = project(c, state);
@@ -225,7 +225,7 @@ void DynamicFeatureIndex::query(std::unordered_map<std::string, std::vector<Feat
     }
     for (const auto& f : features) {
         // hit testing
-        mbgl::WithinBBox featureBox = DefaultBBox;
+        mbgl::GeometryBBox<int64_t> featureBox = DefaultWithinBBox;
         for (const auto& p : f.envelope->front()) mbgl::updateBBox(featureBox, p);
 
         const bool hit = mbgl::boxWithinBox(featureBox, queryBox) || mbgl::boxWithinBox(queryBox, featureBox);
