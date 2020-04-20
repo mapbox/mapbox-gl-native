@@ -1,5 +1,7 @@
 #pragma once
 
+#include <mbgl/platform/time.hpp>
+
 #include <chrono>
 #include <string>
 
@@ -19,7 +21,7 @@ using Timestamp = std::chrono::time_point<std::chrono::system_clock, Seconds>;
 namespace util {
 
 inline Timestamp now() {
-    return std::chrono::time_point_cast<Seconds>(std::chrono::system_clock::now());
+    return platform::now();
 }
 
 // Returns the RFC1123 formatted date. E.g. "Tue, 04 Nov 2014 02:13:24 GMT"
