@@ -1349,6 +1349,63 @@ TEST(Map, TEST_REQUIRES_SERVER(ExpiredSpriteSheet)) {
     test.runLoop.run();
 }
 
+TEST(Map, SourceMinimumUpdateIntervalOverride) {
+    MapTest<> test{1, MapMode::Continuous};
+
+    test.map.getStyle().loadJSON(
+        R"STYLE({
+                "layers": [{
+                    "id": "a",
+                    "type": "fill",
+                    "source": "source-a",
+                    "minzoom": 0,
+                    "maxzoom": 24
+                },
+                {
+                    "id": "b",
+                    "type": "fill",
+                    "source": "source-b",
+                    "minzoom": 0,
+                    "maxzoom": 24
+                }]
+                })STYLE");
+
+    // Vector source
+    auto vectorSourceA = std::make_unique<VectorSource>("source-a", Tileset{{"a/{z}/{x}/{y}"}});
+    vectorSourceA->setMinimumTileUpdateInterval(Seconds(1));
+    test.map.getStyle().addSource(std::move(vectorSourceA));
+
+    auto vectorSourceB = std::make_unique<VectorSource>("source-b", Tileset{{"b/{z}/{x}/{y}"}});
+    test.map.getStyle().addSource(std::move(vectorSourceB));
+
+    std::atomic_int requestedTilesA(0);
+    std::atomic_int requestedTilesB(0);
+    test.fileSource->tileResponse = [&](const Resource& resource) -> Response {
+        assert(!resource.url.empty());
+        char firstSymbol = resource.url[0];
+        if (firstSymbol == 'a') {
+            EXPECT_EQ(Seconds(1), resource.minimumUpdateInterval);
+            ++requestedTilesA;
+        } else if (firstSymbol == 'b') {
+            EXPECT_EQ(Duration::zero(), resource.minimumUpdateInterval);
+            ++requestedTilesB;
+        } else {
+            EXPECT_FALSE(true) << "Never reached";
+        }
+
+        Response res;
+        res.noContent = true;
+        return res;
+    };
+
+    test.map.jumpTo(CameraOptions().withZoom(double(16)));
+    test.observer.didFinishLoadingMapCallback = [&] { test.runLoop.stop(); };
+    test.runLoop.run();
+
+    EXPECT_EQ(8, requestedTilesA);
+    EXPECT_EQ(8, requestedTilesB);
+}
+
 namespace {
 
 int requestsCount = 0;
