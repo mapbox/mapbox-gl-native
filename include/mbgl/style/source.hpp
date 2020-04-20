@@ -1,9 +1,9 @@
 #pragma once
 
-#include <mbgl/util/noncopyable.hpp>
-#include <mbgl/util/optional.hpp>
-#include <mbgl/util/immutable.hpp>
 #include <mbgl/style/types.hpp>
+#include <mbgl/util/chrono.hpp>
+#include <mbgl/util/immutable.hpp>
+#include <mbgl/util/optional.hpp>
 
 #include <mapbox/std/weak.hpp>
 #include <mapbox/util/type_wrapper.hpp>
@@ -40,8 +40,11 @@ struct LayerTypeInfo;
  *
  *     auto vectorSource = std::make_unique<VectorSource>("my-vector-source");
  */
-class Source : public mbgl::util::noncopyable {
+class Source {
 public:
+    Source(const Source&) = delete;
+    Source& operator=(const Source&) = delete;
+
     virtual ~Source();
 
     // Check whether this source is of the given subtype.
@@ -75,6 +78,14 @@ public:
     virtual void loadDescription(FileSource&) = 0;
     void setPrefetchZoomDelta(optional<uint8_t> delta) noexcept;
     optional<uint8_t> getPrefetchZoomDelta() const noexcept;
+
+    // If the given source supports loading tiles from a server,
+    // sets the minimum tile update interval, which is used to
+    // throttle the tile update network requests.
+    //
+    // Default value is `Duration::zero()`.
+    void setMinimumTileUpdateInterval(Duration) noexcept;
+    Duration getMinimumTileUpdateInterval() const noexcept;
 
     // Sets a limit for how much a parent tile can be overscaled.
     //
