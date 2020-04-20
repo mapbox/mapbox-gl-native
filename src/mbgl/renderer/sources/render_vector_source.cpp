@@ -21,20 +21,17 @@ void RenderVectorSource::updateInternal(const Tileset& tileset,
                                         const bool needsRendering,
                                         const bool needsRelayout,
                                         const TileParameters& parameters) {
-    tilePyramid.update(
-        layers,
-        needsRendering,
-        needsRelayout,
-        parameters,
-        SourceType::Vector,
-        util::tileSize,
-        tileset.zoomRange,
-        tileset.bounds,
-        [&](const OverscaledTileID& tileID) {
-            return std::make_unique<VectorTile>(tileID, baseImpl->id, parameters, tileset);
-        },
-        baseImpl->getPrefetchZoomDelta(),
-        baseImpl->getMaxOverscaleFactorForParentTiles());
+    tilePyramid.update(layers,
+                       needsRendering,
+                       needsRelayout,
+                       parameters,
+                       *baseImpl,
+                       util::tileSize,
+                       tileset.zoomRange,
+                       tileset.bounds,
+                       [&](const OverscaledTileID& tileID) {
+                           return std::make_unique<VectorTile>(tileID, baseImpl->id, parameters, tileset);
+                       });
 }
 
 } // namespace mbgl
