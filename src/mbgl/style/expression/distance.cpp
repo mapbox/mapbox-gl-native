@@ -21,8 +21,8 @@
 namespace mbgl {
 namespace {
 
-const std::size_t MinPointsSize = 500;
-const std::size_t MinLinePointsSize = 200;
+const std::size_t MinPointsSize = 100;
+const std::size_t MinLinePointsSize = 50;
 
 using BBox = std::array<double, 4>;
 const BBox DefaultBBox = BBox{std::numeric_limits<double>::infinity(),
@@ -414,9 +414,9 @@ optional<Arguments> parseValue(const style::conversion::Convertible& value, styl
             } else if (*input == "NauticalMiles") {
                 unit = mapbox::cheap_ruler::CheapRuler::Unit::NauticalMiles;
             } else if (*input == "Yards") {
-                unit = mapbox::cheap_ruler::CheapRuler::Unit::Kilometers;
+                unit = mapbox::cheap_ruler::CheapRuler::Unit::Yards;
             } else if (*input == "Feet") {
-                unit = mapbox::cheap_ruler::CheapRuler::Unit::Miles;
+                unit = mapbox::cheap_ruler::CheapRuler::Unit::Feet;
             } else if (*input == "Inches") {
                 unit = mapbox::cheap_ruler::CheapRuler::Unit::Inches;
             } else {

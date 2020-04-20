@@ -7,6 +7,9 @@
 #include <mbgl/style/expression/dsl.hpp>
 #include <mbgl/style/expression/format_section_override.hpp>
 
+#include <mbgl/util/geojson.hpp>
+#include <mbgl/util/io.hpp>
+
 #include <sstream>
 
 using namespace mbgl;
@@ -395,7 +398,7 @@ TEST(PropertyExpression, WithinExpressionAntiMeridian) {
 
     // evaluation test with line geometries
     {
-        static const std::string polygon1 = R"data(
+        const std::string polygon1 = R"data(
        {
          "type": "Polygon",
          "coordinates": [[[-190, 0], [-178, 0], [-178, 10], [-190, 10], [-190, 0]]]
@@ -459,5 +462,370 @@ TEST(PropertyExpression, WithinExpressionAntiMeridian) {
         pointFeature = getPointFeature(Point<double>(-190, 62.5));
         evaluatedResult = propExpr.evaluate(EvaluationContext(&pointFeature).withCanonicalTileID(&canonicalTileID));
         EXPECT_FALSE(evaluatedResult);
+    }
+}
+
+TEST(PropertyExpression, DistanceExpression) {
+    static const double invalidResult = std::numeric_limits<double>::quiet_NaN();
+    static const CanonicalTileID canonicalTileID(15, 18653, 9484);
+    // Parsing error with invalid geojson source
+    {
+        // geoJSON source must be Point or LineString.
+        const std::string invalidGeoSource = R"({
+            "type": "Polygon",
+            "coordinates": [[[0, 0], [0, 5], [5, 5], [5, 0], [0, 0]]]
+            })";
+        std::stringstream ss;
+        ss << std::string(R"(["distance", )") << invalidGeoSource << std::string(R"( ])");
+        auto expression = createExpression(ss.str().c_str());
+        ASSERT_FALSE(expression);
+    }
+
+    // Parsing error with invalid unit
+    {
+        const std::string invalidGeoSource = R"({
+            "type": "Point",
+            "coordinates": [0, 0],
+            })";
+        std::stringstream ss;
+        ss << std::string(R"(["distance", )") << invalidGeoSource << std::string(R"(, "InvalidUnits"])");
+        auto expression = createExpression(ss.str().c_str());
+        ASSERT_FALSE(expression);
+    }
+
+    // Evaluation test with non-supported geometry type
+    {
+        const std::string pointGeoSource = R"({
+                "type": "Point",
+                "coordinates":
+                    [
+                        24.938492774963375,
+                        60.16980226227959
+                    ]
+                    })";
+        std::stringstream ss;
+        ss << std::string(R"(["distance", )") << pointGeoSource << std::string(R"( ])");
+        auto expression = createExpression(ss.str().c_str());
+        ASSERT_TRUE(expression);
+        PropertyExpression<double> propExpr(std::move(expression));
+
+        Polygon<double> testRing{{{24.937505722045895, 60.16815846879986},
+                                  {24.940595626831055, 60.16815846879986},
+                                  {24.940595626831055, 60.169268572114106},
+                                  {24.937505722045895, 60.169268572114106},
+                                  {24.937505722045895, 60.16815846879986}}};
+        auto geoPoly = convertGeometry(testRing, canonicalTileID);
+        StubGeometryTileFeature polyFeature(FeatureType::Polygon, geoPoly);
+
+        // return evaluation error
+        auto evaluatedResult =
+            propExpr.evaluate(EvaluationContext(&polyFeature).withCanonicalTileID(&canonicalTileID), invalidResult);
+        EXPECT_TRUE(std::isnan(evaluatedResult));
+    }
+
+    // Evaluation test with Point to Point distance by using different units
+    {
+        const std::string pointGeoSource = R"({
+             "type": "Point",
+             "coordinates":
+               [
+                   24.938492774963375,
+                   60.16980226227959
+               ]
+              })";
+
+        Point<double> featurePoint{24.931159615516663, 60.16733387258923};
+        auto geoPoint = convertGeometry(featurePoint, canonicalTileID);
+        StubGeometryTileFeature pointFeature(FeatureType::Point, geoPoint);
+
+        std::stringstream ss;
+
+        // Default Unit: Meters
+        ss << std::string(R"(["distance", )") << pointGeoSource << std::string(R"( ])");
+        auto expression = createExpression(ss.str().c_str());
+        ASSERT_TRUE(expression);
+        PropertyExpression<double> propExpr(std::move(expression));
+
+        auto evaluatedResult =
+            propExpr.evaluate(EvaluationContext(&pointFeature).withCanonicalTileID(&canonicalTileID), invalidResult);
+        EXPECT_NEAR(491.307, evaluatedResult, 0.01);
+
+        // Unit: Meters
+        ss.str(std::string());
+        ss << std::string(R"(["distance", )") << pointGeoSource << std::string(R"(, "Meters" ])");
+        expression = createExpression(ss.str().c_str());
+        ASSERT_TRUE(expression);
+        propExpr = std::move(expression);
+
+        evaluatedResult =
+            propExpr.evaluate(EvaluationContext(&pointFeature).withCanonicalTileID(&canonicalTileID), invalidResult);
+        EXPECT_NEAR(491.307, evaluatedResult, 0.01);
+
+        // Unit: Kilometers
+        ss.str(std::string());
+        ss << std::string(R"(["distance", )") << pointGeoSource << std::string(R"(, "Kilometers" ])");
+        expression = createExpression(ss.str().c_str());
+        ASSERT_TRUE(expression);
+        propExpr = std::move(expression);
+
+        evaluatedResult =
+            propExpr.evaluate(EvaluationContext(&pointFeature).withCanonicalTileID(&canonicalTileID), invalidResult);
+        EXPECT_NEAR(0.491307, evaluatedResult, 0.00001);
+
+        // Unit: Miles
+        ss.str(std::string());
+        ss << std::string(R"(["distance", )") << pointGeoSource << std::string(R"(, "Miles" ])");
+        expression = createExpression(ss.str().c_str());
+        ASSERT_TRUE(expression);
+        propExpr = std::move(expression);
+
+        evaluatedResult =
+            propExpr.evaluate(EvaluationContext(&pointFeature).withCanonicalTileID(&canonicalTileID), invalidResult);
+        EXPECT_NEAR(0.305284, evaluatedResult, 0.00001);
+
+        // Unit: NauticalMiles
+        ss.str(std::string());
+        ss << std::string(R"(["distance", )") << pointGeoSource << std::string(R"(, "NauticalMiles" ])");
+        expression = createExpression(ss.str().c_str());
+        ASSERT_TRUE(expression);
+        propExpr = std::move(expression);
+
+        evaluatedResult =
+            propExpr.evaluate(EvaluationContext(&pointFeature).withCanonicalTileID(&canonicalTileID), invalidResult);
+        EXPECT_NEAR(0.265284, evaluatedResult, 0.00001);
+
+        // Unit: Yards
+        ss.str(std::string());
+        ss << std::string(R"(["distance", )") << pointGeoSource << std::string(R"(, "Yards" ])");
+        expression = createExpression(ss.str().c_str());
+        ASSERT_TRUE(expression);
+        propExpr = std::move(expression);
+
+        evaluatedResult =
+            propExpr.evaluate(EvaluationContext(&pointFeature).withCanonicalTileID(&canonicalTileID), invalidResult);
+        EXPECT_NEAR(537.299, evaluatedResult, 0.01);
+
+        // Unit: Feet
+        ss.str(std::string());
+        ss << std::string(R"(["distance", )") << pointGeoSource << std::string(R"(, "Feet" ])");
+        expression = createExpression(ss.str().c_str());
+        ASSERT_TRUE(expression);
+        propExpr = std::move(expression);
+
+        evaluatedResult =
+            propExpr.evaluate(EvaluationContext(&pointFeature).withCanonicalTileID(&canonicalTileID), invalidResult);
+        EXPECT_NEAR(1611.898, evaluatedResult, 0.01);
+
+        // Unit: Inches
+        ss.str(std::string());
+        ss << std::string(R"(["distance", )") << pointGeoSource << std::string(R"(, "Inches" ])");
+        expression = createExpression(ss.str().c_str());
+        ASSERT_TRUE(expression);
+        propExpr = std::move(expression);
+
+        evaluatedResult =
+            propExpr.evaluate(EvaluationContext(&pointFeature).withCanonicalTileID(&canonicalTileID), invalidResult);
+        EXPECT_NEAR(19342.781, evaluatedResult, 0.01);
+    }
+
+    // Evaluation test with Point to MultiPoint distance
+    {
+        const std::string pointGeoSource = R"({
+              "type": "Point",
+              "coordinates":
+                [
+                    24.938492774963375,
+                    60.16980226227959
+                ]
+               })";
+        std::stringstream ss;
+        ss << std::string(R"(["distance", )") << pointGeoSource << std::string(R"( ])");
+        auto expression = createExpression(ss.str().c_str());
+        ASSERT_TRUE(expression);
+        PropertyExpression<double> propExpr(std::move(expression));
+
+        MultiPoint<double> featurePoint{{24.931159615516663, 60.16733387258923},
+                                        {24.936089515686035, 60.169033745694826}};
+        auto geoPoint = convertGeometry(featurePoint, canonicalTileID);
+        StubGeometryTileFeature feature(FeatureType::Point, geoPoint);
+
+        auto evaluatedResult =
+            propExpr.evaluate(EvaluationContext(&feature).withCanonicalTileID(&canonicalTileID), invalidResult);
+        EXPECT_NEAR(158.541, evaluatedResult, 0.01);
+    }
+
+    // Evaluation test with Point to LineString distance
+    {
+        const std::string pointGeoSource = R"({
+             "type": "Point",
+             "coordinates":
+               [
+                   24.938492774963375,
+                   60.16980226227959
+               ]
+              })";
+        std::stringstream ss;
+        ss << std::string(R"(["distance", )") << pointGeoSource << std::string(R"( ])");
+        auto expression = createExpression(ss.str().c_str());
+        ASSERT_TRUE(expression);
+        PropertyExpression<double> propExpr(std::move(expression));
+
+        LineString<double> line{{24.93621826171875, 60.17131789507754},
+                                {24.941453933715817, 60.170229208170014},
+                                {24.941110610961914, 60.16850004304534}};
+        auto geoLine = convertGeometry(line, canonicalTileID);
+        StubGeometryTileFeature lineFeature(FeatureType::LineString, geoLine);
+
+        auto evaluatedResult =
+            propExpr.evaluate(EvaluationContext(&lineFeature).withCanonicalTileID(&canonicalTileID), invalidResult);
+        EXPECT_NEAR(107.211, evaluatedResult, 0.01);
+    }
+
+    // Evaluation test with Point to MultiLineString distance
+    {
+        const std::string pointGeoSource = R"({
+             "type": "Point",
+             "coordinates":
+               [
+                   24.938492774963375,
+                   60.16980226227959
+               ]
+              })";
+        std::stringstream ss;
+        ss << std::string(R"(["distance", )") << pointGeoSource << std::string(R"( ])");
+        auto expression = createExpression(ss.str().c_str());
+        ASSERT_TRUE(expression);
+        PropertyExpression<double> propExpr(std::move(expression));
+
+        MultiLineString<double> lines{
+            {{24.93621826171875, 60.17131789507754},
+             {24.941453933715817, 60.170229208170014},
+             {24.941110610961914, 60.16850004304534}},
+            {{24.937773942947388, 60.16940199546824}, {24.933900833129883, 60.17007977773949}}};
+        auto geoLine = convertGeometry(lines, canonicalTileID);
+        StubGeometryTileFeature lineFeature(FeatureType::LineString, geoLine);
+
+        auto evaluatedResult =
+            propExpr.evaluate(EvaluationContext(&lineFeature).withCanonicalTileID(&canonicalTileID), invalidResult);
+        EXPECT_NEAR(59.845, evaluatedResult, 0.01);
+    }
+
+    const auto getFeature = [](const std::string &name, FeatureType type, const CanonicalTileID &canonical) {
+        const auto geometryInput = mbgl::util::read_file(std::string("test/fixtures/geometry_data/" + name));
+        mapbox::geojson::geojson geojson{mapbox::geojson::parse(geometryInput)};
+        const auto &geometry = geojson.match(
+            [](const mapbox::geometry::geometry<double> &geometrySet) { return mbgl::Feature(geometrySet).geometry; },
+            [](const mapbox::feature::feature<double> &feature) { return mbgl::Feature(feature).geometry; },
+            [](const mapbox::feature::feature_collection<double> &features) {
+                return mbgl::Feature(features.front()).geometry;
+            },
+            [](const auto &) { return mapbox::geometry::empty(); });
+        return StubGeometryTileFeature(type, convertGeometry(geometry, canonical));
+    };
+
+    // Evaluation test with MultiPoint to MultiPoint distance
+    {
+        const auto multiPoints1 = mbgl::util::read_file("test/fixtures/geometry_data/multi_point_1.geojson");
+        const auto multiPointsFeature = getFeature("multi_point_2.geojson", FeatureType::Point, canonicalTileID);
+        std::stringstream ss;
+        ss << std::string(R"(["distance", )") << multiPoints1 << std::string(R"( ])");
+        auto expression = createExpression(ss.str().c_str());
+        ASSERT_TRUE(expression);
+        PropertyExpression<double> propExpr(std::move(expression));
+
+        auto evaluatedResult = propExpr.evaluate(
+            EvaluationContext(&multiPointsFeature).withCanonicalTileID(&canonicalTileID), invalidResult);
+        EXPECT_NEAR(283.60, evaluatedResult, 0.1);
+    }
+
+    // Evaluation test with MultiPoint to LineString distance
+    {
+        const auto multiPoints1 = mbgl::util::read_file("test/fixtures/geometry_data/multi_point_1.geojson");
+        const auto multiLineFeature = getFeature("line_string_2.geojson", FeatureType::LineString, canonicalTileID);
+        std::stringstream ss;
+        ss << std::string(R"(["distance", )") << multiPoints1 << std::string(R"( ])");
+        auto expression = createExpression(ss.str().c_str());
+        ASSERT_TRUE(expression);
+        PropertyExpression<double> propExpr(std::move(expression));
+
+        auto evaluatedResult = propExpr.evaluate(
+            EvaluationContext(&multiLineFeature).withCanonicalTileID(&canonicalTileID), invalidResult);
+        EXPECT_NEAR(258.691, evaluatedResult, 0.01);
+
+        // ----------------- switch feature and argument -----------------
+        const auto multiLine2 = mbgl::util::read_file("test/fixtures/geometry_data/line_string_2.geojson");
+        const auto multiPointsFeature = getFeature("multi_point_1.geojson", FeatureType::Point, canonicalTileID);
+        std::stringstream ss1;
+        ss1 << std::string(R"(["distance", )") << multiLine2 << std::string(R"( ])");
+        auto expression1 = createExpression(ss1.str().c_str());
+        ASSERT_TRUE(expression1);
+        PropertyExpression<double> propExpr1(std::move(expression1));
+
+        auto evaluatedResult1 = propExpr1.evaluate(
+            EvaluationContext(&multiPointsFeature).withCanonicalTileID(&canonicalTileID), invalidResult);
+        EXPECT_NEAR(258.691, evaluatedResult1, 0.01);
+    }
+
+    // Evaluation test with LineString to LineString distance
+    {
+        const auto lineString1 = mbgl::util::read_file("test/fixtures/geometry_data/line_string_1.geojson");
+        const auto lineFeature = getFeature("line_string_2.geojson", FeatureType::LineString, canonicalTileID);
+        std::stringstream ss;
+        ss << std::string(R"(["distance", )") << lineString1 << std::string(R"( ])");
+        auto expression = createExpression(ss.str().c_str());
+        ASSERT_TRUE(expression);
+        PropertyExpression<double> propExpr(std::move(expression));
+
+        auto evaluatedResult =
+            propExpr.evaluate(EvaluationContext(&lineFeature).withCanonicalTileID(&canonicalTileID), invalidResult);
+        EXPECT_NEAR(180.408, evaluatedResult, 0.01);
+    }
+
+    // Evaluation test with MultiPoints to MutltiLineString distance
+    {
+        const auto multiPoints = mbgl::util::read_file("test/fixtures/geometry_data/multi_point_2.geojson");
+        const auto multiLineFeature =
+            getFeature("multi_line_string_1.geojson", FeatureType::LineString, canonicalTileID);
+        std::stringstream ss;
+        ss << std::string(R"(["distance", )") << multiPoints << std::string(R"( ])");
+        auto expression = createExpression(ss.str().c_str());
+        ASSERT_TRUE(expression);
+        PropertyExpression<double> propExpr(std::move(expression));
+
+        auto evaluatedResult = propExpr.evaluate(
+            EvaluationContext(&multiLineFeature).withCanonicalTileID(&canonicalTileID), invalidResult);
+        EXPECT_NEAR(937.632, evaluatedResult, 0.01);
+    }
+
+    // Evaluation test with LineString to MutltiLineString distance
+    {
+        const auto LineString1 = mbgl::util::read_file("test/fixtures/geometry_data/line_string_1.geojson");
+        const auto multiLineFeature =
+            getFeature("multi_line_string_2.geojson", FeatureType::LineString, canonicalTileID);
+        std::stringstream ss;
+        ss << std::string(R"(["distance", )") << LineString1 << std::string(R"( ])");
+        auto expression = createExpression(ss.str().c_str());
+        ASSERT_TRUE(expression);
+        PropertyExpression<double> propExpr(std::move(expression));
+
+        auto evaluatedResult = propExpr.evaluate(
+            EvaluationContext(&multiLineFeature).withCanonicalTileID(&canonicalTileID), invalidResult);
+        EXPECT_NEAR(17.511, evaluatedResult, 0.01);
+    }
+
+    // Evaluation test with MultiLineString to MutltiLineString distance
+    {
+        const auto multiLineString1 = mbgl::util::read_file("test/fixtures/geometry_data/multi_line_string_1.geojson");
+        const auto multiLineFeature =
+            getFeature("multi_line_string_2.geojson", FeatureType::LineString, canonicalTileID);
+        std::stringstream ss;
+        ss << std::string(R"(["distance", )") << multiLineString1 << std::string(R"( ])");
+        auto expression = createExpression(ss.str().c_str());
+        ASSERT_TRUE(expression);
+        PropertyExpression<double> propExpr(std::move(expression));
+
+        auto evaluatedResult = propExpr.evaluate(
+            EvaluationContext(&multiLineFeature).withCanonicalTileID(&canonicalTileID), invalidResult);
+        EXPECT_NEAR(384.109, evaluatedResult, 0.01);
     }
 }
