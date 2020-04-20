@@ -2,6 +2,16 @@
 
 ## master
 
+### ✨ New features
+
+- [core] Introduce Source::setMinimumTileUpdateInterval API ([#16416](https://github.com/mapbox/mapbox-gl-native/pull/16416))
+
+  The `Source::setMinimumTileUpdateInterval(Duration)` method sets the minimum tile update interval, which is used to throttle the tile update network requests.
+
+  The corresponding `Source::getMinimumTileUpdateInterval()` getter is added too.
+
+  Default minimum tile update interval value is `Duration::zero()`.
+
 ## maps-v1.6.0-rc.1
 
 ### ✨ New features
