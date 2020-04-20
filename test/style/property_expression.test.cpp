@@ -540,7 +540,7 @@ TEST(PropertyExpression, DistanceExpression) {
 
         std::stringstream ss;
 
-        // Default Unit: Meters
+        // Default Unit: meters
         ss << std::string(R"(["distance", )") << pointGeoSource << std::string(R"( ])");
         auto expression = createExpression(ss.str().c_str());
         ASSERT_TRUE(expression);
@@ -550,9 +550,9 @@ TEST(PropertyExpression, DistanceExpression) {
             propExpr.evaluate(EvaluationContext(&pointFeature).withCanonicalTileID(&canonicalTileID), invalidResult);
         EXPECT_NEAR(491.307, evaluatedResult, 0.01);
 
-        // Unit: Meters
+        // Unit: meters
         ss.str(std::string());
-        ss << std::string(R"(["distance", )") << pointGeoSource << std::string(R"(, "Meters" ])");
+        ss << std::string(R"(["distance", )") << pointGeoSource << std::string(R"(, "meters" ])");
         expression = createExpression(ss.str().c_str());
         ASSERT_TRUE(expression);
         propExpr = std::move(expression);
@@ -561,9 +561,9 @@ TEST(PropertyExpression, DistanceExpression) {
             propExpr.evaluate(EvaluationContext(&pointFeature).withCanonicalTileID(&canonicalTileID), invalidResult);
         EXPECT_NEAR(491.307, evaluatedResult, 0.01);
 
-        // Unit: Kilometers
+        // Unit: kilometers
         ss.str(std::string());
-        ss << std::string(R"(["distance", )") << pointGeoSource << std::string(R"(, "Kilometers" ])");
+        ss << std::string(R"(["distance", )") << pointGeoSource << std::string(R"(, "kilometers" ])");
         expression = createExpression(ss.str().c_str());
         ASSERT_TRUE(expression);
         propExpr = std::move(expression);
@@ -572,9 +572,9 @@ TEST(PropertyExpression, DistanceExpression) {
             propExpr.evaluate(EvaluationContext(&pointFeature).withCanonicalTileID(&canonicalTileID), invalidResult);
         EXPECT_NEAR(0.491307, evaluatedResult, 0.00001);
 
-        // Unit: Miles
+        // Unit: miles
         ss.str(std::string());
-        ss << std::string(R"(["distance", )") << pointGeoSource << std::string(R"(, "Miles" ])");
+        ss << std::string(R"(["distance", )") << pointGeoSource << std::string(R"(, "miles" ])");
         expression = createExpression(ss.str().c_str());
         ASSERT_TRUE(expression);
         propExpr = std::move(expression);
@@ -583,9 +583,9 @@ TEST(PropertyExpression, DistanceExpression) {
             propExpr.evaluate(EvaluationContext(&pointFeature).withCanonicalTileID(&canonicalTileID), invalidResult);
         EXPECT_NEAR(0.305284, evaluatedResult, 0.00001);
 
-        // Unit: NauticalMiles
+        // Unit: nauticalmiles
         ss.str(std::string());
-        ss << std::string(R"(["distance", )") << pointGeoSource << std::string(R"(, "NauticalMiles" ])");
+        ss << std::string(R"(["distance", )") << pointGeoSource << std::string(R"(, "nauticalmiles" ])");
         expression = createExpression(ss.str().c_str());
         ASSERT_TRUE(expression);
         propExpr = std::move(expression);
@@ -594,9 +594,9 @@ TEST(PropertyExpression, DistanceExpression) {
             propExpr.evaluate(EvaluationContext(&pointFeature).withCanonicalTileID(&canonicalTileID), invalidResult);
         EXPECT_NEAR(0.265284, evaluatedResult, 0.00001);
 
-        // Unit: Yards
+        // Unit: yards
         ss.str(std::string());
-        ss << std::string(R"(["distance", )") << pointGeoSource << std::string(R"(, "Yards" ])");
+        ss << std::string(R"(["distance", )") << pointGeoSource << std::string(R"(, "yards" ])");
         expression = createExpression(ss.str().c_str());
         ASSERT_TRUE(expression);
         propExpr = std::move(expression);
@@ -605,9 +605,9 @@ TEST(PropertyExpression, DistanceExpression) {
             propExpr.evaluate(EvaluationContext(&pointFeature).withCanonicalTileID(&canonicalTileID), invalidResult);
         EXPECT_NEAR(537.299, evaluatedResult, 0.01);
 
-        // Unit: Feet
+        // Unit: feet
         ss.str(std::string());
-        ss << std::string(R"(["distance", )") << pointGeoSource << std::string(R"(, "Feet" ])");
+        ss << std::string(R"(["distance", )") << pointGeoSource << std::string(R"(, "feet" ])");
         expression = createExpression(ss.str().c_str());
         ASSERT_TRUE(expression);
         propExpr = std::move(expression);
@@ -616,9 +616,9 @@ TEST(PropertyExpression, DistanceExpression) {
             propExpr.evaluate(EvaluationContext(&pointFeature).withCanonicalTileID(&canonicalTileID), invalidResult);
         EXPECT_NEAR(1611.898, evaluatedResult, 0.01);
 
-        // Unit: Inches
+        // Unit: inches
         ss.str(std::string());
-        ss << std::string(R"(["distance", )") << pointGeoSource << std::string(R"(, "Inches" ])");
+        ss << std::string(R"(["distance", )") << pointGeoSource << std::string(R"(, "inches" ])");
         expression = createExpression(ss.str().c_str());
         ASSERT_TRUE(expression);
         propExpr = std::move(expression);

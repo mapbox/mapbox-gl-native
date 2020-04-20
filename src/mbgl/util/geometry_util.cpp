@@ -5,13 +5,31 @@
 namespace mbgl {
 
 template <typename T>
-bool GeometryUtil<T>::rayIntersect(const Point<T>& p, const Point<T>& p1, const Point<T>& p2) {
+void updateBBox(GeometryBBox<T>& bbox, const Point<T>& p) {
+    bbox[0] = std::min(p.x, bbox[0]);
+    bbox[1] = std::min(p.y, bbox[1]);
+    bbox[2] = std::max(p.x, bbox[2]);
+    bbox[3] = std::max(p.y, bbox[3]);
+}
+
+// check if bbox1 is within bbox2
+template <typename T>
+bool boxWithinBox(const GeometryBBox<T>& bbox1, const GeometryBBox<T>& bbox2) {
+    if (bbox1[0] <= bbox2[0]) return false;
+    if (bbox1[2] >= bbox2[2]) return false;
+    if (bbox1[1] <= bbox2[1]) return false;
+    if (bbox1[3] >= bbox2[3]) return false;
+    return true;
+}
+
+template <typename T>
+bool rayIntersect(const Point<T>& p, const Point<T>& p1, const Point<T>& p2) {
     return ((p1.y > p.y) != (p2.y > p.y)) && (p.x < (p2.x - p1.x) * (p.y - p1.y) / (p2.y - p1.y) + p1.x);
 }
 
 // check if point p is on line segment with end points p1 and p2
 template <typename T>
-bool GeometryUtil<T>::pointOnBoundary(const Point<T>& p, const Point<T>& p1, const Point<T>& p2) {
+bool pointOnBoundary(const Point<T>& p, const Point<T>& p1, const Point<T>& p2) {
     // requirements of point p on line segment:
     // 1. colinear: cross product of vector p->p1(x1, y1) and vector p->p2(x2, y2) equals to 0
     // 2. p is between p1 and p2
@@ -23,10 +41,7 @@ bool GeometryUtil<T>::pointOnBoundary(const Point<T>& p, const Point<T>& p1, con
 }
 
 template <typename T>
-bool GeometryUtil<T>::segmentIntersectSegment(const Point<T>& a,
-                                              const Point<T>& b,
-                                              const Point<T>& c,
-                                              const Point<T>& d) {
+bool segmentIntersectSegment(const Point<T>& a, const Point<T>& b, const Point<T>& c, const Point<T>& d) {
     // a, b are end points for line segment1, c and d are end points for line segment2
     const auto perp = [](const Point<T>& v1, const Point<T>& v2) { return (v1.x * v2.y - v1.y * v2.x); };
 
@@ -58,7 +73,7 @@ bool GeometryUtil<T>::segmentIntersectSegment(const Point<T>& a,
 }
 
 template <typename T>
-bool GeometryUtil<T>::lineIntersectPolygon(const Point<T>& p1, const Point<T>& p2, const Polygon<T>& polygon) {
+bool lineIntersectPolygon(const Point<T>& p1, const Point<T>& p2, const Polygon<T>& polygon) {
     for (auto ring : polygon) {
         auto length = ring.size();
         // loop through every edge of the ring
@@ -73,7 +88,7 @@ bool GeometryUtil<T>::lineIntersectPolygon(const Point<T>& p1, const Point<T>& p
 
 // ray casting algorithm for detecting if point is in polygon
 template <typename T>
-bool GeometryUtil<T>::pointWithinPolygon(const Point<T>& point, const Polygon<T>& polygon, bool trueOnBoundary) {
+bool pointWithinPolygon(const Point<T>& point, const Polygon<T>& polygon, bool trueOnBoundary) {
     bool within = false;
     for (const auto& ring : polygon) {
         const auto length = ring.size();
@@ -89,7 +104,7 @@ bool GeometryUtil<T>::pointWithinPolygon(const Point<T>& point, const Polygon<T>
 }
 
 template <typename T>
-bool GeometryUtil<T>::pointWithinPolygons(const Point<T>& point, const MultiPolygon<T>& polygons, bool trueOnBoundary) {
+bool pointWithinPolygons(const Point<T>& point, const MultiPolygon<T>& polygons, bool trueOnBoundary) {
     for (const auto& polygon : polygons) {
         if (pointWithinPolygon(point, polygon, trueOnBoundary)) return true;
     }
@@ -97,7 +112,7 @@ bool GeometryUtil<T>::pointWithinPolygons(const Point<T>& point, const MultiPoly
 }
 
 template <typename T>
-bool GeometryUtil<T>::lineStringWithinPolygon(const LineString<T>& line, const Polygon<T>& polygon) {
+bool lineStringWithinPolygon(const LineString<T>& line, const Polygon<T>& polygon) {
     const auto length = line.size();
     // First, check if geometry points of line segments are all inside polygon
     for (std::size_t i = 0; i < length; ++i) {
@@ -116,14 +131,35 @@ bool GeometryUtil<T>::lineStringWithinPolygon(const LineString<T>& line, const P
 }
 
 template <typename T>
-bool GeometryUtil<T>::lineStringWithinPolygons(const LineString<T>& line, const MultiPolygon<T>& polygons) {
+bool lineStringWithinPolygons(const LineString<T>& line, const MultiPolygon<T>& polygons) {
     for (const auto& polygon : polygons) {
         if (lineStringWithinPolygon(line, polygon)) return true;
     }
     return false;
 }
 
-template struct GeometryUtil<double>;
-template struct GeometryUtil<int64_t>;
+template void updateBBox(GeometryBBox<int64_t>& bbox, const Point<int64_t>& p);
+template bool boxWithinBox(const GeometryBBox<int64_t>& bbox1, const GeometryBBox<int64_t>& bbox2);
+template bool segmentIntersectSegment(const Point<int64_t>& a,
+                                      const Point<int64_t>& b,
+                                      const Point<int64_t>& c,
+                                      const Point<int64_t>& d);
+template bool rayIntersect(const Point<int64_t>& p, const Point<int64_t>& p1, const Point<int64_t>& p2);
+template bool pointOnBoundary(const Point<int64_t>& p, const Point<int64_t>& p1, const Point<int64_t>& p2);
+template bool lineIntersectPolygon(const Point<int64_t>& p1, const Point<int64_t>& p2, const Polygon<int64_t>& polygon);
+template bool pointWithinPolygon(const Point<int64_t>& point,
+                                 const Polygon<int64_t>& polygon,
+                                 bool trueOnBoundary = false);
+template bool pointWithinPolygons(const Point<int64_t>& point,
+                                  const MultiPolygon<int64_t>& polygons,
+                                  bool trueOnBoundary = false);
+template bool lineStringWithinPolygon(const LineString<int64_t>& line, const Polygon<int64_t>& polygon);
+template bool lineStringWithinPolygons(const LineString<int64_t>& line, const MultiPolygon<int64_t>& polygons);
+
+template void updateBBox(GeometryBBox<double>& bbox, const Point<double>& p);
+template bool segmentIntersectSegment(const Point<double>& a,
+                                      const Point<double>& b,
+                                      const Point<double>& c,
+                                      const Point<double>& d);
 
 } // namespace mbgl
