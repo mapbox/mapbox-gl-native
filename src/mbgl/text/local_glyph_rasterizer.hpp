@@ -45,5 +45,6 @@ private:
 };
 
 GlyphDependencies getGlyphDependencies(const FontStack& fontStack, const std::string& text, bool isVertical);
+std::vector<GlyphID> getGlyphIDs(const FontStack& fontStack, const std::string& text, bool isVertical);
 
 } // namespace mbgl

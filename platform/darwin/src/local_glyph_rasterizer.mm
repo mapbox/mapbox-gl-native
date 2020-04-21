@@ -10,6 +10,12 @@
 #import <CoreText/CoreText.h>
 #import <ImageIO/ImageIO.h>
 
+#if TARGET_OS_IPHONE
+    #import <UIKit/UIKit.h>
+#else
+    #import <AppKit/AppKit.h>
+#endif
+
 #import "CFHandle.hpp"
 
 /// Enables local glyph rasterization for all writing systems, not just CJK.
@@ -160,10 +166,18 @@ PremultipliedImage drawGlyphBitmap(GlyphID glyphID, CTFontRef font, Size size) {
     positions[0] = CGPointMake(0.0, 0.0);
     CTFontDrawGlyphs(font, glyphs, positions, 1, *context);
     
-    const CGFloat *black = CGColorGetComponents(CGColorGetConstantColor(kCGColorBlack));
-    CGContextSetFillColor(*context, black);
-    CGContextFillRect(*context, CGRectMake(0, 0, size.width, size.height));
+//    const CGFloat *black = CGColorGetComponents(CGColorGetConstantColor(kCGColorBlack));
+//    CGContextSetFillColor(*context, black);
+//    CGContextFillRect(*context, CGRectMake(0, 0, size.width, size.height));
     
+    constexpr const size_t bitsPerPixel = bitsPerComponent * bytesPerPixel;
+    CGDataProviderRef provider = CGDataProviderCreateWithData(NULL, rgbaBitmap.data.get(), bytesPerPixel * size.width * size.height, [](void*, const void*, size_t) {});
+    CGImageRef image = CGImageCreate(size.width, size.height, bitsPerComponent, bitsPerPixel,
+                                     bytesPerRow, *colorSpace,
+                                     kCGBitmapByteOrderDefault | kCGImageAlphaPremultipliedLast, provider,
+                                     NULL, false, kCGRenderingIntentDefault);
+    CGDataProviderRelease(provider);
+    CGImageRelease(image);
     return rgbaBitmap;
 }
 
@@ -195,17 +209,22 @@ Glyph LocalGlyphRasterizer::rasterizeGlyph(const FontStack& fontStack, GlyphID g
     }
     manufacturedGlyph.metrics.left = std::round(CGRectGetMinX(boundingRects[0]));
     manufacturedGlyph.metrics.top = std::round(CGRectGetMinY(boundingRects[0]));
-    // Mimic glyph PBF metrics.
-    manufacturedGlyph.metrics.width = 35;
-    manufacturedGlyph.metrics.height = 35;
+    manufacturedGlyph.metrics.width = std::ceil(CGRectGetWidth(boundingRects[0]));
+    manufacturedGlyph.metrics.height = std::ceil(CGRectGetHeight(boundingRects[0]));
     
     CGSize advances[1];
     CTFontGetAdvancesForGlyphs(*font, orientation, glyphs, advances, 1);
     manufacturedGlyph.metrics.advance = std::ceil(advances[0].width);
     
-    Size size(MAX(manufacturedGlyph.metrics.width, 1), MAX(manufacturedGlyph.metrics.height, 1));
+#if TARGET_OS_IPHONE
+    CGFloat scaleFactor = UIScreen.mainScreen.scale;
+#else
+    CGFloat scaleFactor = NSScreen.mainScreen.backingScaleFactor;
+#endif
+    Size size(MAX(manufacturedGlyph.metrics.width, 1) * scaleFactor,
+              MAX(manufacturedGlyph.metrics.height, 1) * scaleFactor);
     PremultipliedImage rgbaBitmap = drawGlyphBitmap(glyphID, *font, size);
-   
+    
     // Copy alpha values from RGBA bitmap into the AlphaImage output
     manufacturedGlyph.bitmap = AlphaImage(size);
     for (uint32_t i = 0; i < size.width * size.height; i++) {
@@ -336,6 +355,43 @@ GlyphDependencies getGlyphDependencies(const FontStack& fontStack, const std::st
         glyphIDs.insert(glyphs, glyphs + wholeRunRange.length);
     }
     return dependencies;
+}
+
+std::vector<GlyphID> getGlyphIDs(const FontStack& fontStack, const std::string& text, bool isVertical) {
+    // TODO: Implement global fallback fonts.
+    CTFontDescriptorRefHandle descriptor(createFontDescriptor(fontStack, @[], isVertical));
+    CTFontRefHandle font(CTFontCreateWithFontDescriptor(*descriptor, 0.0, NULL));
+
+    CFStringRef keys[] = { kCTFontAttributeName };
+    CFTypeRef values[] = { *font };
+
+    CFDictionaryRefHandle attributes(
+        CFDictionaryCreate(kCFAllocatorDefault, (const void**)&keys,
+            (const void**)&values, sizeof(keys) / sizeof(keys[0]),
+            &kCFTypeDictionaryKeyCallBacks,
+            &kCFTypeDictionaryValueCallBacks));
+
+    CFStringRef string = (__bridge CFStringRef)@(text.c_str());
+    CFAttributedStringRefHandle attrString(CFAttributedStringCreate(kCFAllocatorDefault, string, *attributes));
+    CTLineRefHandle line(CTLineCreateWithAttributedString(*attrString));
+    
+    CFArrayRef glyphRuns = CTLineGetGlyphRuns(*line);
+    std::vector<GlyphID> glyphIDs;
+    for (CFIndex i = 0; i < CFArrayGetCount(glyphRuns); i++) {
+        CTRunRef glyphRun = (CTRunRef)CFArrayGetValueAtIndex(glyphRuns, 0);
+        CFRange wholeRunRange = CFRangeMake(0, CTRunGetGlyphCount(glyphRun));
+        
+        CTFontRef glyphFont = (CTFontRef)CFDictionaryGetValue(CTRunGetAttributes(glyphRun), kCTFontAttributeName);
+        CFStringRefHandle glyphFontName(CTFontCopyName(glyphFont, kCTFontPostScriptNameKey));
+        FontStack glyphFontStack = {{ [(__bridge NSString *)*glyphFontName UTF8String] }};
+        
+        // Use CTRunGetGlyphsPtr() if available.
+        CGGlyph glyphs[wholeRunRange.length];
+        CTRunGetGlyphs(glyphRun, wholeRunRange, glyphs);
+        
+        glyphIDs.insert(glyphIDs.end(), glyphs, glyphs + wholeRunRange.length);
+    }
+    return glyphIDs;
 }
 
 } // namespace mbgl

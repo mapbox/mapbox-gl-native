@@ -145,58 +145,19 @@ void PositionedIcon::fitIconToText(const Shaping& shapedText,
 // Defined in local_glyph_rasterizer.mm
 CTFontDescriptorRef createFontDescriptor(const FontStack& fontStack, NSArray<NSString *>* fallbackFontNames, bool isVertical);
 
-Shaping getShaping(const TaggedString& formattedString,
-                   const float maxWidth,
-                   const float lineHeight,
-                   const style::SymbolAnchorType textAnchor,
-                   const style::TextJustifyType textJustify,
-                   const float spacing,
-                   const std::array<float, 2>& translate,
-                   const WritingModeType writingMode,
-                   BiDi& bidi,
-                   const GlyphMap& glyphMap,
-                   const GlyphPositions& glyphPositions,
-                   const ImagePositions& imagePositions,
-                   float layoutTextSize,
-                   float layoutTextSizeAtBucketZoomLevel,
-                   bool allowVerticalPlacement) {
+void shapeLines(const TaggedString& formattedString,
+                CFDictionaryRef attributes,
+                const float maxWidth,
+                bool allowVerticalPlacement,
+                Shaping& shaping,
+                std::vector<GlyphID>& glyphIDs) {
     // TODO: Vertical text.
 //    const bool vertical = writingMode != WritingModeType::Horizontal && allowVerticalPlacement;
     const bool vertical = false;
     CTFontOrientation orientation = vertical ? kCTFontOrientationVertical : kCTFontOrientationHorizontal;
     
-    CTTextAlignment textAlignment;
-    switch (textJustify) {
-        case style::TextJustifyType::Auto:
-            textAlignment = kCTTextAlignmentNatural;
-            break;
-        case style::TextJustifyType::Center:
-            textAlignment = kCTTextAlignmentCenter;
-            break;
-        case style::TextJustifyType::Left:
-            textAlignment = kCTTextAlignmentLeft;
-            break;
-        case style::TextJustifyType::Right:
-            textAlignment = kCTTextAlignmentRight;
-            break;
-    }
-    CGFloat lineHeightInEms = lineHeight / util::ONE_EM;
-    CTParagraphStyleSetting paragraphSettings[] = {
-        { kCTParagraphStyleSpecifierAlignment, sizeof(CTTextAlignment), &textAlignment },
-        { kCTParagraphStyleSpecifierLineHeightMultiple, sizeof(float), &lineHeightInEms },
-    };
-    CTParagraphStyleRefHandle paragraphStyle(CTParagraphStyleCreate(paragraphSettings, sizeof(paragraphSettings) / sizeof(paragraphSettings[0])));
-    
-    CFStringRef keys[] = { kCTParagraphStyleAttributeName };
-    CFTypeRef values[] = { *paragraphStyle };
-    
-    CFDictionaryRefHandle attributes(
-         CFDictionaryCreate(kCFAllocatorDefault, (const void**)&keys,
-                            (const void**)&values, sizeof(keys) / sizeof(keys[0]),
-                            &kCFTypeDictionaryKeyCallBacks,
-                            &kCFTypeDictionaryValueCallBacks));
     const auto& string = util::convertUTF16ToUTF8(formattedString.rawText());
-    CFAttributedStringRefHandle attrString(CFAttributedStringCreate(kCFAllocatorDefault, (CFStringRef)@(string.c_str()), *attributes));
+    CFAttributedStringRefHandle attrString(CFAttributedStringCreate(kCFAllocatorDefault, (CFStringRef)@(string.c_str()), attributes));
     CFMutableAttributedStringRefHandle mutableAttrString(CFAttributedStringCreateMutableCopy(kCFAllocatorDefault, 0, *attrString));
     for (std::size_t i = 0; i < formattedString.length(); i++) {
         const auto& section = formattedString.getSection(i);
@@ -207,9 +168,6 @@ Shaping getShaping(const TaggedString& formattedString,
         CTFontRefHandle font(CTFontCreateWithFontDescriptor(*descriptor, 0.0, NULL));
         CFAttributedStringSetAttribute(*mutableAttrString, CFRangeMake(i, 1), kCTFontAttributeName, *font);
     }
-    
-    Shaping shaping(translate[0], translate[1], writingMode);
-    shaping.verticalizable = true;
     
     CTFramesetterRefHandle framesetter(CTFramesetterCreateWithAttributedString(*mutableAttrString));
     CFRange fittingRange;
@@ -237,6 +195,7 @@ Shaping getShaping(const TaggedString& formattedString,
             
             CGGlyph glyphs[wholeRunRange.length];
             CTRunGetGlyphs(run, wholeRunRange, glyphs);
+            glyphIDs.insert(glyphIDs.end(), glyphs, glyphs + wholeRunRange.length);
             
             CGPoint positions[wholeRunRange.length];
             CTRunGetPositions(run, wholeRunRange, positions);
@@ -273,8 +232,68 @@ Shaping getShaping(const TaggedString& formattedString,
             }
         }
     }
+}
 
+Shaping getShaping(const TaggedString& formattedString,
+                   const float maxWidth,
+                   const float lineHeight,
+                   const style::SymbolAnchorType textAnchor,
+                   const style::TextJustifyType textJustify,
+                   const float spacing,
+                   const std::array<float, 2>& translate,
+                   const WritingModeType writingMode,
+                   BiDi& bidi,
+                   const GlyphMap& glyphMap,
+                   const GlyphPositions& glyphPositions,
+                   const ImagePositions& imagePositions,
+                   float layoutTextSize,
+                   float layoutTextSizeAtBucketZoomLevel,
+                   bool allowVerticalPlacement) {
+    CTTextAlignment textAlignment;
+    switch (textJustify) {
+        case style::TextJustifyType::Auto:
+            textAlignment = kCTTextAlignmentNatural;
+            break;
+        case style::TextJustifyType::Center:
+            textAlignment = kCTTextAlignmentCenter;
+            break;
+        case style::TextJustifyType::Left:
+            textAlignment = kCTTextAlignmentLeft;
+            break;
+        case style::TextJustifyType::Right:
+            textAlignment = kCTTextAlignmentRight;
+            break;
+    }
+    CGFloat lineHeightInEms = lineHeight / util::ONE_EM;
+    CTParagraphStyleSetting paragraphSettings[] = {
+        { kCTParagraphStyleSpecifierAlignment, sizeof(CTTextAlignment), &textAlignment },
+        { kCTParagraphStyleSpecifierLineHeightMultiple, sizeof(float), &lineHeightInEms },
+    };
+    CTParagraphStyleRefHandle paragraphStyle(CTParagraphStyleCreate(paragraphSettings, sizeof(paragraphSettings) / sizeof(paragraphSettings[0])));
+    
+    CFStringRef keys[] = { kCTParagraphStyleAttributeName };
+    CFTypeRef values[] = { *paragraphStyle };
+    
+    CFDictionaryRefHandle attributes(
+         CFDictionaryCreate(kCFAllocatorDefault, (const void**)&keys,
+                            (const void**)&values, sizeof(keys) / sizeof(keys[0]),
+                            &kCFTypeDictionaryKeyCallBacks,
+                            &kCFTypeDictionaryValueCallBacks));
+    
+    Shaping shaping(translate[0], translate[1], writingMode);
+    shaping.verticalizable = true;
+    std::vector<GlyphID> glyphIDs;
+    shapeLines(formattedString, *attributes, maxWidth, allowVerticalPlacement, shaping, glyphIDs);
     return shaping;
+}
+
+std::vector<GlyphID> getShapedGlyphs(const TaggedString& formattedString, const float maxWidth, const WritingModeType writingMode, bool allowVerticalPlacement) {
+    CFDictionaryRefHandle attributes(CFDictionaryCreate(kCFAllocatorDefault, NULL, NULL, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks));
+    
+    std::vector<GlyphID> glyphIDs;
+    Shaping shaping(0, 0, writingMode);
+    shapeLines(formattedString, *attributes, maxWidth, allowVerticalPlacement, shaping, glyphIDs);
+    return glyphIDs;
 }
 
 } // namespace mbgl

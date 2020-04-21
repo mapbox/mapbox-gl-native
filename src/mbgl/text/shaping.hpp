@@ -96,5 +96,9 @@ Shaping getShaping(const TaggedString& string,
                    float layoutTextSize,
                    float layoutTextSizeAtBucketZoomLevel,
                    bool allowVerticalPlacement);
+std::vector<GlyphID> getShapedGlyphs(const TaggedString& formattedString,
+                                     const float maxWidth,
+                                     const WritingModeType writingMode,
+                                     bool allowVerticalPlacement);
 
 } // namespace mbgl

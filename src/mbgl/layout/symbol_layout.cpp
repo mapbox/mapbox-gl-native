@@ -158,13 +158,15 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
                     }
 
                     const auto& sectionFontStack = section.fontStack ? *section.fontStack : baseFontStack;
+                    const auto& dependencies = mbgl::getGlyphDependencies(sectionFontStack, u8string, allowVerticalPlacement);
+                    layoutParameters.glyphDependencies.insert(dependencies.begin(), dependencies.end());
+                    
+//                    auto glyphIDs = mbgl::getGlyphIDs(sectionFontStack, u8string, allowVerticalPlacement);
+//                    auto glyphString = std::u16string(glyphIDs.begin(), glyphIDs.end());
                     ft.formattedText->addTextSection(applyArabicShaping(util::convertUTF8ToUTF16(u8string)),
                                                      section.fontScale ? *section.fontScale : 1.0,
                                                      sectionFontStack,
                                                      section.textColor);
-
-                    const auto& dependencies = mbgl::getGlyphDependencies(sectionFontStack, u8string, allowVerticalPlacement);
-                    layoutParameters.glyphDependencies.insert(dependencies.begin(), dependencies.end());
                 } else {
                     layoutParameters.imageDependencies.emplace(section.image->id(), ImageType::Icon);
                     ft.formattedText->addImageSection(section.image->id());
@@ -372,14 +374,15 @@ void SymbolLayout::prepareSymbols(const GlyphMap& glyphMap,
                                       ? layout->evaluate<TextLetterSpacing>(zoom, feature, canonicalID) * util::ONE_EM
                                       : 0.0f;
 
+            /// Maximum line width in ems.
+            auto maxWidth = isPointPlacement ? layout->evaluate<TextMaxWidth>(zoom, feature, canonicalID) * util::ONE_EM : 0.0f;
             auto applyShaping = [&](const TaggedString& formattedText,
                                     WritingModeType writingMode,
                                     SymbolAnchorType textAnchor,
                                     TextJustifyType textJustify) {
                 Shaping result = getShaping(
                     /* string */ formattedText,
-                    /* maxWidth: ems */
-                    isPointPlacement ? layout->evaluate<TextMaxWidth>(zoom, feature, canonicalID) * util::ONE_EM : 0.0f,
+                    maxWidth,
                     /* ems */ lineHeight,
                     textAnchor,
                     textJustify,
@@ -475,6 +478,13 @@ void SymbolLayout::prepareSymbols(const GlyphMap& glyphMap,
                     shapedTextOrientations.vertical = applyShaping(*feature.formattedText, WritingModeType::Vertical, textAnchor, textJustify);
                 }
             }
+            
+            auto glyphIDs = getShapedGlyphs(*feature.formattedText, maxWidth, WritingModeType::None, allowVerticalPlacement);
+            auto styledText = feature.formattedText->getStyledText();
+            std::vector<SectionOptions> sections = feature.formattedText->getSections();
+            auto glyphString = std::u16string(glyphIDs.begin(), glyphIDs.end());
+            StyledText styledGlyphIDs(glyphString, styledText.second);
+            feature.formattedText = TaggedString(styledGlyphIDs, sections);
         }
 
         // if feature has icon, get sprite atlas position
