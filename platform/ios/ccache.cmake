@@ -3,8 +3,8 @@ if(CCACHE_PROGRAM)
     # Set up wrapper scripts
     set(C_LAUNCHER "${CCACHE_PROGRAM}")
     set(CXX_LAUNCHER "${CCACHE_PROGRAM}")
-    configure_file(${PROJECT_SOURCE_DIR}/platform/ios/ccache-c.in ccache-c)
-    configure_file(${PROJECT_SOURCE_DIR}/platform/ios/ccache-cxx.in ccache-cxx)
+    configure_file(${PROJECT_SOURCE_DIR}/platform/ios/ccache-c.in ${CMAKE_BINARY_DIR}/ccache-c)
+    configure_file(${PROJECT_SOURCE_DIR}/platform/ios/ccache-cxx.in ${CMAKE_BINARY_DIR}/ccache-cxx)
     execute_process(
         COMMAND
             chmod
