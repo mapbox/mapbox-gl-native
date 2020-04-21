@@ -52,6 +52,33 @@ TEST(MainResourceLoader, TEST_REQUIRES_SERVER(CacheResponse)) {
     loop.run();
 }
 
+TEST(MainResourceLoader, TEST_REQUIRES_SERVER(VolatileStoragePolicy)) {
+    util::RunLoop loop;
+    MainResourceLoader fs(ResourceOptions{});
+
+    Resource resource{Resource::Unknown, "http://127.0.0.1:3000/cache"};
+    resource.storagePolicy = Resource::StoragePolicy::Volatile;
+
+    std::unique_ptr<AsyncRequest> req;
+    req = fs.request(resource, [&](Response res1) {
+        EXPECT_EQ(nullptr, res1.error);
+        ASSERT_TRUE(res1.data);
+        std::string firstData = *res1.data;
+
+        // Volatile resources are not stored in cache,
+        // so we always get new data from the server ("Response N+1").
+        req = fs.request(resource, [&](Response res2) {
+            req.reset();
+            EXPECT_EQ(nullptr, res2.error);
+            ASSERT_TRUE(res2.data);
+            EXPECT_NE(firstData, *res2.data);
+            loop.stop();
+        });
+    });
+
+    loop.run();
+}
+
 TEST(MainResourceLoader, TEST_REQUIRES_SERVER(CacheRevalidateSame)) {
     util::RunLoop loop;
     MainResourceLoader fs(ResourceOptions{});

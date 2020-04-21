@@ -179,6 +179,8 @@ std::unique_ptr<AsyncRequest> DatabaseFileSource::request(const Resource& resour
 }
 
 void DatabaseFileSource::forward(const Resource& res, const Response& response, std::function<void()> callback) {
+    if (res.storagePolicy == Resource::StoragePolicy::Volatile) return;
+
     std::function<void()> wrapper;
     if (callback) {
         wrapper = Scheduler::GetCurrent()->bindOnce(std::move(callback));
