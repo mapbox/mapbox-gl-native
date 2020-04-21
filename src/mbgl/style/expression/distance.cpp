@@ -535,8 +535,10 @@ ParseResult Distance::parse(const Convertible& value, ParsingContext& ctx) {
     return ParseResult();
 }
 
-Value convertValue(const mapbox::geojson::rapidjson_value& v) {
-    if (v.IsDouble() || v.IsInt() || v.IsUint() || v.IsInt64() || v.IsUint64()) {
+mbgl::Value convertValue(const mapbox::geojson::rapidjson_value& v) {
+    if (v.IsNumber()) {
+        if (v.IsInt64()) return std::int64_t(v.GetInt64());
+        if (v.IsUint64()) return std::uint64_t(v.GetUint64());
         return v.GetDouble();
     }
     if (v.IsBool()) {
@@ -546,7 +548,7 @@ Value convertValue(const mapbox::geojson::rapidjson_value& v) {
         return std::string(v.GetString());
     }
     if (v.IsArray()) {
-        std::vector<Value> result;
+        std::vector<mbgl::Value> result;
         result.reserve(v.Size());
         for (const auto& m : v.GetArray()) {
             result.push_back(convertValue(m));
@@ -554,7 +556,7 @@ Value convertValue(const mapbox::geojson::rapidjson_value& v) {
         return result;
     }
     if (v.IsObject()) {
-        std::unordered_map<std::string, Value> result;
+        std::unordered_map<std::string, mbgl::Value> result;
         for (const auto& m : v.GetObject()) {
             result.emplace(m.name.GetString(), convertValue(m.value));
         }
@@ -586,7 +588,7 @@ std::string getUnits(const mapbox::cheap_ruler::CheapRuler::Unit& unit) {
 }
 
 mbgl::Value Distance::serialize() const {
-    std::unordered_map<std::string, Value> serialized;
+    std::unordered_map<std::string, mbgl::Value> serialized;
     rapidjson::CrtAllocator allocator;
     const mapbox::geojson::rapidjson_value value = mapbox::geojson::convert(geoJSONSource, allocator);
     if (value.IsObject()) {
@@ -597,7 +599,7 @@ mbgl::Value Distance::serialize() const {
         mbgl::Log::Error(mbgl::Event::General,
                          "Failed to serialize 'distance' expression, converted rapidJSON is not an object");
     }
-    return std::vector<mbgl::Value>{{getOperator(), *fromExpressionValue<mbgl::Value>(serialized), getUnits(unit)}};
+    return std::vector<mbgl::Value>{{getOperator(), serialized, getUnits(unit)}};
 }
 
 bool Distance::operator==(const Expression& e) const {
