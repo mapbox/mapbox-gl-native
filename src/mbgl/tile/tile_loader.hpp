@@ -49,7 +49,7 @@ private:
     Resource resource;
     std::shared_ptr<FileSource> fileSource;
     std::unique_ptr<AsyncRequest> request;
-    TileUpdateParameters updateParameters{{Duration::zero()}};
+    TileUpdateParameters updateParameters{Duration::zero(), false};
 };
 
 } // namespace mbgl

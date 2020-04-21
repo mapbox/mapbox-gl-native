@@ -36,10 +36,11 @@ class UploadPass;
 
 struct TileUpdateParameters {
     Duration minimumUpdateInterval;
+    bool isVolatile;
 };
 
 inline bool operator==(const TileUpdateParameters& a, const TileUpdateParameters& b) {
-    return a.minimumUpdateInterval == b.minimumUpdateInterval;
+    return a.minimumUpdateInterval == b.minimumUpdateInterval && a.isVolatile == b.isVolatile;
 }
 
 inline bool operator!=(const TileUpdateParameters& a, const TileUpdateParameters& b) {
