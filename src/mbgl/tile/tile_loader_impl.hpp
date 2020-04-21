@@ -69,9 +69,9 @@ void TileLoader<T>::setNecessity(TileNecessity newNecessity) {
 }
 
 template <typename T>
-void TileLoader<T>::setMinimumUpdateInterval(Duration interval) {
-    if (minimumUpdateInterval != interval) {
-        minimumUpdateInterval = interval;
+void TileLoader<T>::setUpdateParameters(const TileUpdateParameters& params) {
+    if (updateParameters != params) {
+        updateParameters = params;
         if (hasPendingNetworkRequest()) {
             // Update the pending request.
             request.reset();
@@ -159,7 +159,7 @@ void TileLoader<T>::loadFromNetwork() {
     // Instead of using Resource::LoadingMethod::All, we're first doing a CacheOnly, and then a
     // NetworkOnly request.
     resource.loadingMethod = Resource::LoadingMethod::NetworkOnly;
-    resource.minimumUpdateInterval = minimumUpdateInterval;
+    resource.minimumUpdateInterval = updateParameters.minimumUpdateInterval;
     request = fileSource->request(resource, [this](const Response& res) { loadedData(res); });
 }
 

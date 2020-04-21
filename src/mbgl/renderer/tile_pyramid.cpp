@@ -132,7 +132,7 @@ void TilePyramid::update(const std::vector<Immutable<style::LayerProperties>>& l
 
     auto retainTileFn = [&](Tile& tile, TileNecessity necessity) -> void {
         if (retain.emplace(tile.id).second) {
-            tile.setMinimumUpdateInterval(minimumUpdateInterval);
+            tile.setUpdateParameters({minimumUpdateInterval});
             tile.setNecessity(necessity);
         }
 

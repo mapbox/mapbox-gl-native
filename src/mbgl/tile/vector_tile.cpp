@@ -16,8 +16,8 @@ void VectorTile::setNecessity(TileNecessity necessity) {
     loader.setNecessity(necessity);
 }
 
-void VectorTile::setMinimumUpdateInterval(Duration interval) {
-    loader.setMinimumUpdateInterval(interval);
+void VectorTile::setUpdateParameters(const TileUpdateParameters& params) {
+    loader.setUpdateParameters(params);
 }
 
 void VectorTile::setMetadata(optional<Timestamp> modified_, optional<Timestamp> expires_) {
