@@ -26,7 +26,7 @@ target_sources(
     PRIVATE
         ${PROJECT_SOURCE_DIR}/platform/darwin/src/async_task.cpp
         ${PROJECT_SOURCE_DIR}/platform/darwin/src/collator.mm
-        ${PROJECT_SOURCE_DIR}/platform/darwin/src/http_file_source.mm
+        $<$<BOOL:${MBGL_PUBLIC_BUILD}>:${PROJECT_SOURCE_DIR}/platform/darwin/src/http_file_source.mm>
         ${PROJECT_SOURCE_DIR}/platform/darwin/src/image.mm
         ${PROJECT_SOURCE_DIR}/platform/darwin/src/local_glyph_rasterizer.mm
         ${PROJECT_SOURCE_DIR}/platform/darwin/src/logging_nslog.mm

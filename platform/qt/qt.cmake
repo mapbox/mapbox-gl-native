@@ -51,10 +51,10 @@ target_sources(
         ${PROJECT_SOURCE_DIR}/platform/qt/src/number_format.cpp
         ${PROJECT_SOURCE_DIR}/platform/qt/src/gl_functions.cpp
         ${PROJECT_SOURCE_DIR}/platform/qt/src/headless_backend_qt.cpp
-        ${PROJECT_SOURCE_DIR}/platform/qt/src/http_file_source.cpp
-        ${PROJECT_SOURCE_DIR}/platform/qt/src/http_file_source.hpp
-        ${PROJECT_SOURCE_DIR}/platform/qt/src/http_request.cpp
-        ${PROJECT_SOURCE_DIR}/platform/qt/src/http_request.hpp
+        $<$<BOOL:${MBGL_PUBLIC_BUILD}>:${PROJECT_SOURCE_DIR}/platform/qt/src/http_file_source.cpp>
+        $<$<BOOL:${MBGL_PUBLIC_BUILD}>:${PROJECT_SOURCE_DIR}/platform/qt/src/http_file_source.hpp>
+        $<$<BOOL:${MBGL_PUBLIC_BUILD}>:${PROJECT_SOURCE_DIR}/platform/qt/src/http_request.cpp>
+        $<$<BOOL:${MBGL_PUBLIC_BUILD}>:${PROJECT_SOURCE_DIR}/platform/qt/src/http_request.hpp>
         ${PROJECT_SOURCE_DIR}/platform/qt/src/local_glyph_rasterizer.cpp
         ${PROJECT_SOURCE_DIR}/platform/qt/src/qt_image.cpp
         ${PROJECT_SOURCE_DIR}/platform/qt/src/qt_logging.cpp

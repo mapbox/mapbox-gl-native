@@ -1023,6 +1023,10 @@ endif()
 
 include(${PROJECT_SOURCE_DIR}/scripts/license.cmake)
 
+if(NOT EXISTS ${PROJECT_SOURCE_DIR}/internal/internal.cmake)
+    set(MBGL_PUBLIC_BUILD TRUE)
+endif()
+
 if(MBGL_WITH_QT)
     include(${PROJECT_SOURCE_DIR}/platform/qt/qt.cmake)
 elseif(CMAKE_SYSTEM_NAME STREQUAL Android)
