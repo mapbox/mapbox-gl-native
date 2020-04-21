@@ -23,6 +23,7 @@ namespace {
 
 const std::size_t MinPointsSize = 100;
 const std::size_t MinLinePointsSize = 50;
+const double InvalidDistance = std::numeric_limits<double>::quiet_NaN();
 
 // Inclusive index range for multipoint or linestring container
 using IndexRange = std::pair<std::size_t, std::size_t>;
@@ -90,8 +91,12 @@ double lineToLineDistance(const mapbox::geometry::line_string<double>& line1,
                           const mapbox::geometry::line_string<double>& line2,
                           IndexRange& range2,
                           mapbox::cheap_ruler::CheapRuler& ruler) {
-    assert(range1.second >= range1.first && range1.second < line1.size());
-    assert(range2.second >= range2.first && range2.second < line2.size());
+    bool rangeSafe = (range1.second >= range1.first && range1.second < line1.size()) &&
+                     (range2.second >= range2.first && range2.second < line2.size());
+    if (!rangeSafe) {
+        mbgl::Log::Error(mbgl::Event::General, "index is out of range");
+        return InvalidDistance;
+    }
     double dist = std::numeric_limits<double>::infinity();
     for (std::size_t i = range1.first; i < range1.second; ++i) {
         const auto& p1 = line1[i];
@@ -115,8 +120,12 @@ double pointsToPointsDistance(const mapbox::geometry::multi_point<double>& point
                               const mapbox::geometry::multi_point<double>& points2,
                               IndexRange& range2,
                               mapbox::cheap_ruler::CheapRuler& ruler) {
-    assert(range1.second >= range1.first && range1.second < points1.size());
-    assert(range2.second >= range2.first && range2.second < points2.size());
+    bool rangeSafe = (range1.second >= range1.first && range1.second < points1.size()) &&
+                     (range2.second >= range2.first && range2.second < points2.size());
+    if (!rangeSafe) {
+        mbgl::Log::Error(mbgl::Event::General, "index is out of range");
+        return InvalidDistance;
+    }
     double dist = std::numeric_limits<double>::infinity();
     for (std::size_t i = range1.first; i <= range1.second; ++i) {
         for (std::size_t j = range2.first; j <= range2.second; ++j) {
@@ -174,7 +183,9 @@ double lineToLineDistance(const mapbox::geometry::line_string<double>& line1,
 
         // In case the set size are relatively small, we could use brute-force directly
         if (getRangeSize(rangeA) <= MinLinePointsSize && getRangeSize(rangeB) <= MinLinePointsSize) {
-            miniDist = std::min(miniDist, lineToLineDistance(line1, rangeA, line2, rangeB, ruler));
+            auto tempDist = lineToLineDistance(line1, rangeA, line2, rangeB, ruler);
+            if (std::isnan(tempDist)) return tempDist;
+            miniDist = std::min(miniDist, tempDist);
             if (miniDist == 0.0) return 0.0;
         } else {
             auto newRangesA = splitRange(rangeA, true /*isLine*/);
@@ -217,7 +228,9 @@ double pointsToPointsDistance(const mapbox::geometry::multi_point<double>& point
 
         // In case the set size are relatively small, we could use brute-force directly
         if (getRangeSize(rangeA) <= MinPointsSize && getRangeSize(rangeB) <= MinPointsSize) {
-            miniDist = std::min(miniDist, pointsToPointsDistance(pointSet1, rangeA, pointSet2, rangeB, ruler));
+            auto tempDist = pointsToPointsDistance(pointSet1, rangeA, pointSet2, rangeB, ruler);
+            if (std::isnan(tempDist)) return tempDist;
+            miniDist = std::min(miniDist, tempDist);
             if (miniDist == 0.0) return 0.0;
         } else {
             auto newRangesA = splitRange(rangeA, false /*isLine*/);
@@ -258,8 +271,12 @@ double pointsToLineDistance(const mapbox::geometry::multi_point<double>& points,
 
         // In case the set size are relatively small, we could use brute-force directly
         if (getRangeSize(rangeA) <= MinPointsSize && getRangeSize(rangeB) <= MinLinePointsSize) {
-            assert(rangeA.second >= rangeA.first && rangeA.second < points.size());
-            assert(rangeB.second >= rangeB.first && rangeB.second < line.size());
+            bool rangeSafe = (rangeA.second >= rangeA.first && rangeA.second < points.size()) &&
+                             (rangeB.second >= rangeB.first && rangeB.second < line.size());
+            if (!rangeSafe) {
+                mbgl::Log::Error(mbgl::Event::General, "index is out of range");
+                return InvalidDistance;
+            }
             auto subLine =
                 mapbox::geometry::multi_point<double>(line.begin() + rangeB.first, line.begin() + rangeB.second + 1);
             for (std::size_t i = rangeA.first; i <= rangeA.second; ++i) {
@@ -326,7 +343,7 @@ double pointsToGeometryDistance(const mapbox::geometry::multi_point<double>& poi
         [&points, &ruler](const mapbox::geometry::multi_line_string<double>& lines) {
             return pointsToLinesDistance(points, lines, ruler);
         },
-        [](const auto&) { return std::numeric_limits<double>::quiet_NaN(); });
+        [](const auto&) { return InvalidDistance; });
 }
 
 double lineToGeometryDistance(const mapbox::geometry::line_string<double>& line,
@@ -347,7 +364,7 @@ double lineToGeometryDistance(const mapbox::geometry::line_string<double>& line,
         [&line, &ruler](const mapbox::geometry::multi_line_string<double>& lines) {
             return lineToLinesDistance(line, lines, ruler);
         },
-        [](const auto&) { return std::numeric_limits<double>::quiet_NaN(); });
+        [](const auto&) { return InvalidDistance; });
 }
 
 double calculateDistance(const GeometryTileFeature& feature,
@@ -368,12 +385,14 @@ double calculateDistance(const GeometryTileFeature& feature,
             [&geoSet, &unit](const mapbox::geometry::multi_line_string<double>& lines) -> double {
                 double dist = std::numeric_limits<double>::infinity();
                 for (const auto& line : lines) {
-                    dist = std::min(dist, lineToGeometryDistance(line, geoSet, unit));
-                    if (dist == 0.0) return dist;
+                    auto tempDist = lineToGeometryDistance(line, geoSet, unit);
+                    if (std::isnan(tempDist)) return tempDist;
+                    dist = std::min(dist, tempDist);
+                    if (dist == 0.0 || std::isnan(dist)) return dist;
                 }
                 return dist;
             },
-            [](const auto&) -> double { return std::numeric_limits<double>::quiet_NaN(); });
+            [](const auto&) -> double { return InvalidDistance; });
 }
 
 struct Arguments {
@@ -517,8 +536,11 @@ ParseResult Distance::parse(const Convertible& value, ParsingContext& ctx) {
 }
 
 Value convertValue(const mapbox::geojson::rapidjson_value& v) {
-    if (v.IsDouble()) {
+    if (v.IsDouble() || v.IsInt() || v.IsUint() || v.IsInt64() || v.IsUint64()) {
         return v.GetDouble();
+    }
+    if (v.IsBool()) {
+        return v.GetBool();
     }
     if (v.IsString()) {
         return std::string(v.GetString());

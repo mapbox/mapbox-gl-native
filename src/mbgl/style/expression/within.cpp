@@ -265,8 +265,11 @@ ParseResult Within::parse(const Convertible& value, ParsingContext& ctx) {
 }
 
 Value valueConverter(const mapbox::geojson::rapidjson_value& v) {
-    if (v.IsDouble()) {
+    if (v.IsDouble() || v.IsInt() || v.IsUint() || v.IsInt64() || v.IsUint64()) {
         return v.GetDouble();
+    }
+    if (v.IsBool()) {
+        return v.GetBool();
     }
     if (v.IsString()) {
         return std::string(v.GetString());
