@@ -749,7 +749,7 @@ public:
         renderable = true;
     }
     void setNecessity(TileNecessity necessity) override;
-    void setMinimumUpdateInterval(Duration) override;
+    void setUpdateParameters(const TileUpdateParameters&) override;
     bool layerPropertiesUpdated(const Immutable<style::LayerProperties>&) override { return true; }
 
     std::unique_ptr<TileRenderData> createRenderData() override { return nullptr; }
@@ -789,8 +789,8 @@ void FakeTile::setNecessity(TileNecessity necessity) {
     source.tileSetNecessity(necessity);
 }
 
-void FakeTile::setMinimumUpdateInterval(Duration interval) {
-    source.tileSetMinimumUpdateInterval(interval);
+void FakeTile::setUpdateParameters(const TileUpdateParameters& params) {
+    source.tileSetMinimumUpdateInterval(params.minimumUpdateInterval);
 }
 
 } // namespace

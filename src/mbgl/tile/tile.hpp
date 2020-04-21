@@ -34,6 +34,17 @@ namespace gfx {
 class UploadPass;
 } // namespace gfx
 
+struct TileUpdateParameters {
+    Duration minimumUpdateInterval;
+};
+
+inline bool operator==(const TileUpdateParameters& a, const TileUpdateParameters& b) {
+    return a.minimumUpdateInterval == b.minimumUpdateInterval;
+}
+
+inline bool operator!=(const TileUpdateParameters& a, const TileUpdateParameters& b) {
+    return !(a == b);
+}
 class Tile {
 public:
     enum class Kind : uint8_t {
@@ -52,7 +63,8 @@ public:
     void setObserver(TileObserver* observer);
 
     virtual void setNecessity(TileNecessity) {}
-    virtual void setMinimumUpdateInterval(Duration) {}
+
+    virtual void setUpdateParameters(const TileUpdateParameters&) {}
 
     // Mark this tile as no longer needed and cancel any pending work.
     virtual void cancel();

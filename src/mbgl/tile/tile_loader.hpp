@@ -23,7 +23,7 @@ public:
     ~TileLoader();
 
     void setNecessity(TileNecessity newNecessity);
-    void setMinimumUpdateInterval(Duration);
+    void setUpdateParameters(const TileUpdateParameters&);
 
 private:
     // called when the tile is one of the ideal tiles that we want to show definitely. the tile source
@@ -49,7 +49,7 @@ private:
     Resource resource;
     std::shared_ptr<FileSource> fileSource;
     std::unique_ptr<AsyncRequest> request;
-    Duration minimumUpdateInterval{Duration::zero()};
+    TileUpdateParameters updateParameters{{Duration::zero()}};
 };
 
 } // namespace mbgl
