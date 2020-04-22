@@ -5,6 +5,7 @@
 #include <unicode/ushape.h>
 
 #include <memory>
+#include <stdexcept>
 #include <utility>
 
 namespace mbgl {
