@@ -229,7 +229,6 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RespectMinimumUpdateInterval)) {
     std::unique_ptr<AsyncRequest> req = fs->request(resource, [&](Response) {
         auto wait = util::now() - start;
         EXPECT_GE(wait, resource.minimumUpdateInterval);
-        EXPECT_LT(wait, resource.minimumUpdateInterval + Milliseconds(10));
         loop.stop();
     });
 
