@@ -21,7 +21,8 @@ public:
         : db(std::make_unique<OfflineDatabase>(cachePath)), onlineFileSource(std::move(onlineFileSource_)) {}
 
     void request(const Resource& resource, const ActorRef<FileSourceRequest>& req) {
-        auto offlineResponse = db->get(resource);
+        optional<Response> offlineResponse =
+            (resource.storagePolicy != Resource::StoragePolicy::Volatile) ? db->get(resource) : nullopt;
         if (!offlineResponse) {
             offlineResponse.emplace();
             offlineResponse->noContent = true;
