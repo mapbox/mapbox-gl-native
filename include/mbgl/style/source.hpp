@@ -82,8 +82,9 @@ public:
     optional<uint8_t> getPrefetchZoomDelta() const noexcept;
 
     // If the given source supports loading tiles from a server,
-    // sets the minimum tile update interval, which is used to
-    // throttle the tile update network requests.
+    // sets the minimum tile update interval.
+    // Update network requests that are more frequent than the
+    // minimum tile update interval are suppressed.
     //
     // Default value is `Duration::zero()`.
     void setMinimumTileUpdateInterval(Duration) noexcept;
