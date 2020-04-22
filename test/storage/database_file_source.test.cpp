@@ -24,3 +24,34 @@ TEST(DatabaseFileSource, PauseResume) {
 
     loop.run();
 }
+
+TEST(DatabaseFileSource, VolatileResource) {
+    util::RunLoop loop;
+
+    std::shared_ptr<FileSource> dbfs =
+        FileSourceManager::get()->getFileSource(FileSourceType::Database, ResourceOptions{});
+
+    Resource resource{Resource::Unknown, "http://127.0.0.1:3000/test", {}, Resource::LoadingMethod::CacheOnly};
+    Response response{};
+    response.data = std::make_shared<std::string>("Cached value");
+    std::unique_ptr<mbgl::AsyncRequest> req;
+
+    dbfs->forward(resource, response, [&] {
+        req = dbfs->request(resource, [&](Response res1) {
+            EXPECT_EQ(nullptr, res1.error);
+            ASSERT_TRUE(res1.data.get());
+            EXPECT_FALSE(res1.noContent);
+            EXPECT_EQ("Cached value", *res1.data);
+            resource.storagePolicy = Resource::StoragePolicy::Volatile;
+            req = dbfs->request(resource, [&](Response res2) {
+                req.reset();
+                ASSERT_TRUE(res2.error.get());
+                EXPECT_TRUE(res2.noContent);
+                EXPECT_EQ(Response::Error::Reason::NotFound, res2.error->reason);
+                EXPECT_EQ("Not found in offline database", res2.error->message);
+                loop.stop();
+            });
+        });
+    });
+    loop.run();
+}
