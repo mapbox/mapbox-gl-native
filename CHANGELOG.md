@@ -18,6 +18,14 @@
 
   Currently, the `distance` expression supports `Point`, `MultiPoint`, `LineString`, `MultiLineString` geometry types.
 
+- [core] Introduce style::Source::setVolatile()/isVolatile() API ([#16422](https://github.com/mapbox/mapbox-gl-native/pull/16422))
+
+  The `Source::setVolatile(bool)` method sets a flag defining whether or not the fetched tiles for the given source should be stored in the local cache.
+
+  The corresponding `Source::isVolatile()` getter is added too.
+
+  By default, the source is not volatile.
+
 ## maps-v1.6.0-rc.1
 
 ### ✨ New features
