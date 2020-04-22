@@ -11,36 +11,10 @@
 
 #import "CFHandle.hpp"
 
-namespace mbgl {
+/// Enables local glyph rasterization for all writing systems, not just CJK.
+#define MBGL_DARWIN_NO_REMOTE_FONTS 0
 
-/*
-    Darwin implementation of LocalGlyphRasterizer:
-     Draws CJK glyphs using locally available fonts.
- 
-    Mirrors GL JS implementation in that:
-     - Only CJK glyphs are drawn locally (because we can guess their metrics effectively)
-        * Render size/metrics determined experimentally by rendering a few different fonts
-     - Configuration is done at map creation time by setting a "font family"
-        * JS uses a CSS font-family, this uses kCTFontFamilyNameAttribute which has
-          somewhat different behavior.
- 
-    Further improvements are possible:
-     - GL JS heuristically determines a font weight based on the strings included in
-        the FontStack. Android follows a simpler heuristic that just picks up the
-        "Bold" property from the FontStack. Although both should be possible with CoreText,
-        our initial implementation couldn't reliably control the font-weight, so we're
-        skipping that functionality on darwin.
-        (See commit history for attempted implementation)
-     - If we could reliably extract glyph metrics, we wouldn't be limited to CJK glyphs
-     - We could push the font configuration down to individual style layers, which would
-        allow any current style to be reproducible using local fonts.
-     - Instead of just exposing "font family" as a configuration, we could expose a richer
-        CTFontDescriptor configuration option (although we'd have to override font size to
-        make sure it stayed at 24pt).
-     - Because Apple exposes glyph paths via `CTFontCreatePathForGlyph` we could potentially
-        render directly to SDF instead of going through TinySDF -- although it's not clear
-        how much of an improvement it would be.
-*/
+namespace mbgl {
 
 using CGColorSpaceHandle = CFHandle<CGColorSpaceRef, CGColorSpaceRef, CGColorSpaceRelease>;
 using CGContextHandle = CFHandle<CGContextRef, CGContextRef, CGContextRelease>;
@@ -52,13 +26,60 @@ using CTFontRefHandle = CFHandle<CTFontRef, CFTypeRef, CFRelease>;
 using CTFontDescriptorRefHandle = CFHandle<CTFontDescriptorRef, CFTypeRef, CFRelease>;
 using CTLineRefHandle = CFHandle<CTLineRef, CFTypeRef, CFRelease>;
 
+/**
+ Draws glyphs applying fonts that are installed on the system or bundled with
+ the application. This is a more flexible and performant alternative to
+ typesetting text using glyph sheets downloaded from a server.
+ 
+ This implementation is similar to the local glyph rasterization in GL JS:
+  - Only CJK glyphs are drawn locally, because it’s much more noticeable when a
+    non-CJK font mismatches the style than when a CJK font mismatches the style.
+    (Unlike GL JS, this implementation does respect the font’s metrics, so it
+    does work with variable-width fonts.)
+  - Fallback fonts can be specified globally, similar to the seldom-used
+    advanced font preferences in most Web browsers.
+ 
+ This is a first step toward fully local font rendering:
+ <https://github.com/mapbox/mapbox-gl-native/issues/7862>. Further improvements:
+  - Make sure the font size is 24 points (`util::ONE_EM`) at all times, not the
+    system default of 12 points, to avoid blobbiness after rasterization.
+  - Sniff an appropriate font weight and style from the font stack’s font names,
+    as GL JS and the Android map SDK do.
+  - Enable local glyph rasterization for all writing systems, not just CJK. This
+    would require providing a more attractive default Latin font than Helvetica
+    or Arial Unicode MS.
+  - Allow the developer to specify a `CTFontDescriptor` or
+    `NSFontDescriptor`/`UIFontDescriptor` to customize more attributes besides
+    the font (but not the font size).
+  - Render glyphs directly to SDF using Core Text’s `CTFontCreatePathForGlyph()`
+    instead of going through TinySDF.
+  - Typeset an entire text label in one shot using `CTFramesetter` to take
+    advantage of Core Text’s superior complex text shaping capabilities and
+    support for astral plane characters. mbgl would need to stop conflating
+    codepoints with glyph IDs.
+*/
 class LocalGlyphRasterizer::Impl {
 public:
-    Impl(const optional<std::string> fontFamily_)
+    /**
+     Creates a new rasterizer with the given font names as a fallback.
+     
+     The fallback font names can also be specified in the style as a font stack
+     or in the `MGLIdeographicFontFamilyName` key of
+     `NSUserDefaults.standardUserDefaults`. The font stack takes precedence,
+     followed by the `MGLIdeographicFontFamilyName` user default, then finally
+     the `fallbackFontNames_` parameter as a last resort.
+     
+     @param fallbackFontNames_ A list of font names, one per line. Each font
+        name can be the PostScript name or display name of a specific font face
+        or a font family name. Set this parameter to `nullptr` to disable local
+        glyph rasterization globally. The system font is a good default value to
+        pass into this constructor.
+     */
+    Impl(const optional<std::string> fallbackFontNames_)
     {
         fallbackFontNames = [[NSUserDefaults standardUserDefaults] stringArrayForKey:@"MGLIdeographicFontFamilyName"];
-        if (fontFamily_) {
-            fallbackFontNames = [fallbackFontNames ?: @[] arrayByAddingObjectsFromArray:[@(fontFamily_->c_str()) componentsSeparatedByString:@"\n"]];
+        if (fallbackFontNames_) {
+            fallbackFontNames = [fallbackFontNames ?: @[] arrayByAddingObjectsFromArray:[@(fallbackFontNames_->c_str()) componentsSeparatedByString:@"\n"]];
         }
     }
     
@@ -70,6 +91,17 @@ public:
      */
     bool isEnabled() { return fallbackFontNames; }
     
+    /**
+     Creates a font descriptor representing the given font stack and any global
+     fallback fonts.
+     
+     @param fontStack The font stack that takes precedence.
+     @returns A font descriptor representing the first font in the font stack
+        with a cascade list representing the rest of the fonts in the font stack
+        and any fallback fonts. The font descriptor is not cached.
+     
+     @post The caller is responsible for releasing the font descriptor.
+     */
     CTFontDescriptorRef createFontDescriptor(const FontStack& fontStack) {
         NSMutableArray *fontNames = [NSMutableArray arrayWithCapacity:fontStack.size() + fallbackFontNames.count];
         for (auto& fontName : fontStack) {
@@ -127,11 +159,6 @@ public:
                 &kCFTypeDictionaryValueCallBacks));
         return CTFontDescriptorCreateWithAttributes(*attributes);
     }
-
-    CTFontRef createFont(const FontStack& fontStack) {
-        CTFontDescriptorRefHandle descriptor(createFontDescriptor(fontStack));
-        return CTFontCreateWithFontDescriptor(*descriptor, 0.0, NULL);
-    }
     
 private:
     NSArray<NSString *> *fallbackFontNames;
@@ -144,10 +171,30 @@ LocalGlyphRasterizer::LocalGlyphRasterizer(const optional<std::string>& fontFami
 LocalGlyphRasterizer::~LocalGlyphRasterizer()
 {}
 
+/**
+ Returns whether the rasterizer can rasterize a glyph for the given codepoint.
+ 
+ @param glyphID A font-agnostic Unicode codepoint, not a glyph index.
+ @returns Whether a glyph for the codepoint can be rasterized.
+ */
 bool LocalGlyphRasterizer::canRasterizeGlyph(const FontStack&, GlyphID glyphID) {
+#if MBGL_DARWIN_NO_REMOTE_FONTS
+    return impl->isEnabled();
+#else
     return util::i18n::allowsFixedWidthGlyphGeneration(glyphID) && impl->isEnabled();
+#endif
 }
 
+/**
+ Draws the given codepoint into an image, gathers metrics about the glyph, and
+ returns the image.
+ 
+ @param glyphID A font-agnostic Unicode codepoint, not a glyph index.
+ @param font The font to apply to the codepoint.
+ @param metrics Upon return, the metrics match the font’s metrics for the glyph
+    representing the codepoint.
+ @returns An image containing the glyph.
+ */
 PremultipliedImage drawGlyphBitmap(GlyphID glyphID, CTFontRef font, GlyphMetrics& metrics) {
     CFStringRefHandle string(CFStringCreateWithCharacters(NULL, reinterpret_cast<UniChar*>(&glyphID), 1));
     if (!string) {
@@ -223,9 +270,20 @@ PremultipliedImage drawGlyphBitmap(GlyphID glyphID, CTFontRef font, GlyphMetrics
     return rgbaBitmap;
 }
 
+/**
+ Returns all the information mbgl needs about a glyph representation of the
+ given codepoint.
+ 
+ @param fontStack The best matching font in this font stack is applied to the
+    codepoint.
+ @param glyphID A font-agnostic Unicode codepoint, not a glyph index.
+ @returns A glyph representation of the given codepoint with its bitmap data and
+    metrics set.
+ */
 Glyph LocalGlyphRasterizer::rasterizeGlyph(const FontStack& fontStack, GlyphID glyphID) {
     Glyph manufacturedGlyph;
-    CTFontRefHandle font(impl->createFont(fontStack));
+    CTFontDescriptorRefHandle descriptor(impl->createFontDescriptor(fontStack));
+    CTFontRefHandle font(CTFontCreateWithFontDescriptor(*descriptor, 0.0, NULL));
     if (!font) {
         return manufacturedGlyph;
     }
