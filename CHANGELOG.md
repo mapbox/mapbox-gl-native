@@ -12,6 +12,12 @@
 
   Default minimum tile update interval value is `Duration::zero()`.
 
+- [core] Indroduce `distance` expression. ([#16397](https://github.com/mapbox/mapbox-gl-native/pull/16397))
+   
+  The `distance` expression returns the shortest distance between two geometries. The returned value can be consumed as an input into another expression for changing a paint or layout property or filtering features by distance.
+
+  Currently, the `distance` expression supports `Point`, `MultiPoint`, `LineString`, `MultiLineString` geometry types.
+
 ## maps-v1.6.0-rc.1
 
 ### ✨ New features
