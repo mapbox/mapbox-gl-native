@@ -1,5 +1,7 @@
 #include <mbgl/util/convert.hpp>
 
+#include <cstdint>
+
 namespace mbgl {
 namespace util {
 
