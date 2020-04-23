@@ -62,47 +62,70 @@ public:
         }
     }
     
-    ~Impl() {
-    }
-    
+    /**
+     Returns whether local glyph rasterization is enabled globally.
+     
+     The developer can disable local glyph rasterization by specifying no
+     fallback font names.
+     */
     bool isEnabled() { return fallbackFontNames; }
     
     CTFontDescriptorRef createFontDescriptor(const FontStack& fontStack) {
         NSMutableArray *fontNames = [NSMutableArray arrayWithCapacity:fontStack.size() + fallbackFontNames.count];
         for (auto& fontName : fontStack) {
+            // Per the Mapbox Style Specification, the text-font property comes
+            // with these last resort fonts by default, but they shouldn’t take
+            // precedence over any application or system fallback font that may
+            // be more appropriate to the current device.
             if (fontName != util::LAST_RESORT_ALPHABETIC_FONT && fontName != util::LAST_RESORT_PAN_UNICODE_FONT) {
                 [fontNames addObject:@(fontName.c_str())];
             }
         }
         [fontNames addObjectsFromArray:fallbackFontNames];
         
-        CFMutableArrayRefHandle fontDescriptors(CFArrayCreateMutable(kCFAllocatorDefault, fontNames.count, &kCFTypeArrayCallBacks));
-        for (NSString *name in fontNames) {
+        if (!fontNames.count) {
             NSDictionary *fontAttributes = @{
                 (NSString *)kCTFontSizeAttribute: @(util::ONE_EM),
+            };
+            return CTFontDescriptorCreateWithAttributes((CFDictionaryRef)fontAttributes);
+        }
+        
+        // Apply the first font name to the returned font descriptor; apply the
+        // rest of the font names to the cascade list.
+        CFStringRef mainFontName = (__bridge CFStringRef)fontNames.firstObject;
+        CFMutableArrayRefHandle fallbackDescriptors(CFArrayCreateMutable(kCFAllocatorDefault, fontNames.count, &kCFTypeArrayCallBacks));
+        for (NSString *name in [fontNames subarrayWithRange:NSMakeRange(1, fontNames.count - 1)]) {
+            NSDictionary *fontAttributes = @{
+                (NSString *)kCTFontSizeAttribute: @(util::ONE_EM),
+                // The name could be any of these three attributes of the font.
+                // It’s OK if it doesn’t match all three; Core Text will pick
+                // the font that matches the most attributes.
                 (NSString *)kCTFontNameAttribute: name,
                 (NSString *)kCTFontDisplayNameAttribute: name,
                 (NSString *)kCTFontFamilyNameAttribute: name,
             };
             
             CTFontDescriptorRefHandle descriptor(CTFontDescriptorCreateWithAttributes((CFDictionaryRef)fontAttributes));
-            CFArrayAppendValue(*fontDescriptors, *descriptor);
+            CFArrayAppendValue(*fallbackDescriptors, *descriptor);
         }
-
-        CFStringRef keys[] = { kCTFontSizeAttribute,                  kCTFontCascadeListAttribute };
-        CFTypeRef values[] = { (__bridge CFNumberRef)@(util::ONE_EM), *fontDescriptors };
+        
+        CFStringRef keys[] = {
+            kCTFontSizeAttribute,
+            kCTFontNameAttribute, kCTFontDisplayNameAttribute, kCTFontFamilyNameAttribute,
+            kCTFontCascadeListAttribute,
+        };
+        CFTypeRef values[] = {
+            (__bridge CFNumberRef)@(util::ONE_EM),
+            mainFontName, mainFontName, mainFontName,
+            *fallbackDescriptors,
+        };
 
         CFDictionaryRefHandle attributes(
             CFDictionaryCreate(kCFAllocatorDefault, (const void**)&keys,
                 (const void**)&values, sizeof(keys) / sizeof(keys[0]),
                 &kCFTypeDictionaryKeyCallBacks,
                 &kCFTypeDictionaryValueCallBacks));
-        if (CFArrayGetCount(*fontDescriptors)) {
-            CTFontDescriptorRef firstDescriptor = (CTFontDescriptorRef)CFArrayGetValueAtIndex(*fontDescriptors, 0);
-            return CTFontDescriptorCreateCopyWithAttributes(firstDescriptor, *attributes);
-        } else {
-            return CTFontDescriptorCreateWithAttributes(*attributes);
-        }
+        return CTFontDescriptorCreateWithAttributes(*attributes);
     }
 
     CTFontRef createFont(const FontStack& fontStack) {
