@@ -1242,11 +1242,12 @@ void StaticPlacement::commit() {
 /// Placement for Tile map mode.
 
 struct Intersection {
-    Intersection(const SymbolInstance& symbol_, PlacementContext ctx_, IntersectStatus status_)
-        : symbol(symbol_), ctx(std::move(ctx_)), status(status_) {}
+    Intersection(const SymbolInstance& symbol_, PlacementContext ctx_, IntersectStatus status_, std::size_t priority_)
+        : symbol(symbol_), ctx(std::move(ctx_)), status(status_), priority(priority_) {}
     std::reference_wrapper<const SymbolInstance> symbol;
     PlacementContext ctx;
     IntersectStatus status;
+    std::size_t priority; // less means more important
 };
 
 class TilePlacement : public StaticPlacement {
@@ -1281,6 +1282,7 @@ private:
     std::vector<PlacedSymbolData> placedSymbolsData;
     std::vector<Intersection> intersections;
     bool populateIntersections = false;
+    std::size_t intersectionPriority{};
     bool collectData = false;
 };
 
@@ -1288,6 +1290,7 @@ void TilePlacement::placeLayers(const RenderLayerReferences& layers) {
     placedSymbolsData.clear();
     seenCrossTileIDs.clear();
     intersections.clear();
+    intersectionPriority = 0u;
     // Populale intersections.
     populateIntersections = true;
     for (auto it = layers.crbegin(); it != layers.crend(); ++it) {
@@ -1295,6 +1298,7 @@ void TilePlacement::placeLayers(const RenderLayerReferences& layers) {
     }
 
     std::stable_sort(intersections.begin(), intersections.end(), [](const Intersection& a, const Intersection& b) {
+        if (a.priority != b.priority) return a.priority < b.priority;
         uint8_t flagsA = a.status.flags;
         uint8_t flagsB = b.status.flags;
         // Items arranged as: VerticalBorders & HorizontalBorders (3) ->
@@ -1456,8 +1460,10 @@ void TilePlacement::placeSymbolBucket(const BucketPlacementData& params, std::se
     for (const SymbolInstance& symbol : symbolInstances) {
         auto intersectStatus = symbolIntersectsTileEdges(symbol);
         if (intersectStatus.flags == IntersectStatus::None) continue;
-        intersections.emplace_back(symbol, ctx, intersectStatus);
+        intersections.emplace_back(symbol, ctx, intersectStatus, intersectionPriority);
     }
+
+    ++intersectionPriority;
 }
 
 bool TilePlacement::canPlaceAtVariableAnchor(const CollisionBox& box,
