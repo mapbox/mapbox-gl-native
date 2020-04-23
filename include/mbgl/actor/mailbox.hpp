@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mbgl/util/optional.hpp>
+#include <mapbox/std/weak.hpp>
 
 #include <memory>
 #include <mutex>
@@ -36,7 +36,7 @@ public:
     static void maybeReceive(std::weak_ptr<Mailbox>);
 
 private:
-    optional<Scheduler*> scheduler;
+    mapbox::base::WeakPtr<Scheduler> weakScheduler;
 
     std::recursive_mutex receivingMutex;
     std::mutex pushingMutex;
