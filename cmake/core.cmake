@@ -2,12 +2,20 @@
 load_sources_list(MBGL_CORE_FILES cmake/core-files.txt)
 add_library(mbgl-core STATIC ${MBGL_CORE_FILES})
 
+include(${PROJECT_SOURCE_DIR}/vendor/mapbox-base.cmake)
+
 target_include_directories(mbgl-core
     PUBLIC include
     PRIVATE src
 )
 
-target_link_libraries(mbgl-core PRIVATE codecvt)
+target_link_libraries(
+    mbgl-core
+    PUBLIC
+        Mapbox::Base
+    PRIVATE
+        codecvt
+)
 
 target_add_mason_package(mbgl-core PUBLIC geometry)
 target_add_mason_package(mbgl-core PUBLIC variant)
