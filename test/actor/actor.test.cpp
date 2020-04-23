@@ -94,6 +94,7 @@ TEST(Actor, DestructionBlocksOnSend) {
         std::promise<void> promise;
         std::future<void> future;
         std::atomic<bool> waited;
+        mapbox::base::WeakPtrFactory<Scheduler> weakFactory{this};
 
         TestScheduler(std::promise<void> promise_, std::future<void> future_)
             : promise(std::move(promise_)),
@@ -111,6 +112,8 @@ TEST(Actor, DestructionBlocksOnSend) {
             std::this_thread::sleep_for(1ms);
             waited = true;
         }
+
+        mapbox::base::WeakPtr<Scheduler> makeWeakPtr() override { return weakFactory.makeWeakPtr(); }
     };
 
     struct Test {

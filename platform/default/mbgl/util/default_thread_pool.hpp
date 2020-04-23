@@ -15,6 +15,7 @@ public:
     ~ThreadPool() override;
 
     void schedule(std::weak_ptr<Mailbox>) override;
+    mapbox::base::WeakPtr<Scheduler> makeWeakPtr() override { return weakFactory.makeWeakPtr(); }
 
 private:
     std::vector<std::thread> threads;
@@ -22,6 +23,7 @@ private:
     std::mutex mutex;
     std::condition_variable cv;
     bool terminate { false };
+    mapbox::base::WeakPtrFactory<Scheduler> weakFactory{this};
 };
 
 } // namespace mbgl

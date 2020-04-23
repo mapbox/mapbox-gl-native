@@ -1,5 +1,7 @@
 #pragma once
 
+#include <mapbox/std/weak.hpp>
+
 #include <memory>
 
 namespace mbgl {
@@ -41,6 +43,8 @@ public:
     // Set/Get the current Scheduler for this thread
     static Scheduler* GetCurrent();
     static void SetCurrent(Scheduler*);
+
+    virtual mapbox::base::WeakPtr<Scheduler> makeWeakPtr() = 0;
 };
 
 } // namespace mbgl
