@@ -4,3 +4,6 @@
 [submodule "platform/ios/vendor/mapbox-events-ios"]
 	path = platform/ios/vendor/mapbox-events-ios
 	url = https://github.com/mapbox/mapbox-events-ios.git
+[submodule "vendor/mapbox-base"]
+	path = vendor/mapbox-base
+	url = https://github.com/mapbox/mapbox-base.git
