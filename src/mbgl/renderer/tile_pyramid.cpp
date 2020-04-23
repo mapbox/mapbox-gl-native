@@ -123,6 +123,14 @@ void TilePyramid::update(const std::vector<Immutable<style::LayerProperties>>& l
         }
 
         idealTiles = util::tileCover(parameters.transformState, idealZoom, tileZoom);
+        if (parameters.mode == MapMode::Tile && type != SourceType::Raster && type != SourceType::RasterDEM &&
+            idealTiles.size() > 1) {
+            mbgl::Log::Warning(mbgl::Event::General,
+                               "Provided camera options returned %zu tiles, only %s is taken in Tile mode.",
+                               idealTiles.size(),
+                               util::toString(idealTiles[0]).c_str());
+            idealTiles = {idealTiles[0]};
+        }
     }
 
     // Stores a list of all the tiles that we're definitely going to retain. There are two
