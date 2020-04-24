@@ -173,11 +173,7 @@ target_compile_definitions(
 
 target_include_directories(
     mbgl-test
-    PRIVATE
-        ${PROJECT_SOURCE_DIR}/platform/default/include
-        ${PROJECT_SOURCE_DIR}/platform/gfx/gl/src
-        ${PROJECT_SOURCE_DIR}/src
-        ${PROJECT_SOURCE_DIR}/test/src
+    PRIVATE ${PROJECT_SOURCE_DIR}/platform/default/include ${PROJECT_SOURCE_DIR}/src ${PROJECT_SOURCE_DIR}/test/src
 )
 
 target_include_directories(
