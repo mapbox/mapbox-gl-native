@@ -142,9 +142,7 @@ public:
 protected:
     friend SymbolBucket;
     virtual void placeSymbolBucket(const BucketPlacementData&, std::set<uint32_t>& seenCrossTileIDs);
-    void placeSymbol(const SymbolInstance& symbolInstance,
-                     const PlacementContext&,
-                     std::set<uint32_t>& seenCrossTileIDs);
+    JointPlacement placeSymbol(const SymbolInstance& symbolInstance, const PlacementContext&);
     void placeLayer(const RenderLayer&, std::set<uint32_t>&);
     virtual void commit();
     virtual void newSymbolPlaced(const SymbolInstance&,
