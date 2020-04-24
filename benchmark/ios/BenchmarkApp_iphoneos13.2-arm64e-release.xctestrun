@@ -15,8 +15,8 @@
 		<array/>
 		<key>DependentProductPaths</key>
 		<array>
-			<string>__TESTROOT__/Release-iphoneos/BenchmarkApp.app</string>
-			<string>__TESTROOT__/Release-iphoneos/BenchmarkApp.app/PlugIns/BenchmarkAppTests.xctest</string>
+			<string>__TESTROOT__/Release/BenchmarkApp.app</string>
+			<string>__TESTROOT__/Release/BenchmarkApp.app/PlugIns/BenchmarkAppTests.xctest</string>
 		</array>
 		<key>EnvironmentVariables</key>
 		<dict>
@@ -38,7 +38,7 @@
 		<key>TestHostBundleIdentifier</key>
 		<string>com.mapbox.BenchmarkApp</string>
 		<key>TestHostPath</key>
-		<string>__TESTROOT__/Release-iphoneos/BenchmarkApp.app</string>
+		<string>__TESTROOT__/Release/BenchmarkApp.app</string>
 		<key>TestLanguage</key>
 		<string></string>
 		<key>TestRegion</key>

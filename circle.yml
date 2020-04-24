@@ -418,7 +418,7 @@ commands:
             cd build
             ./codesigning/generate-entitlements.swift
             ./codesigning/codesign_all.sh
-            codesign -dv --verbose=4 Release-iphoneos/*.app # for debugging that app is signed or not
+            codesign -dv --verbose=4 Release/*.app # for debugging that app is signed or not
   run-ios-test-app:
     parameters:
       directory:
@@ -432,7 +432,7 @@ commands:
               # arrange files in a way Firebase expects it, and package them in a zip file
               cp << parameters.directory >>/*_iphoneos13.2-arm64e-release.xctestrun build
               cd build
-              zip testapp.zip -r Release-iphoneos/*.app --quiet
+              zip testapp.zip -r Release/*.app --quiet
               zip testapp.zip *_iphoneos13.2-arm64e-release.xctestrun
               gcloud firebase test ios models list
               gcloud firebase test ios run \
