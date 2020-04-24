@@ -26,6 +26,10 @@
 
   By default, the source is not volatile.
 
+### Bug fixes
+
+- [ios, macos] Fixed error receiving local file URL response ([#16428](https://github.com/mapbox/mapbox-gl-native/pull/16428))
+
 ## maps-v1.6.0-rc.1
 
 ### ✨ New features

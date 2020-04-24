@@ -371,6 +371,8 @@ std::unique_ptr<AsyncRequest> HTTPFileSource::request(const Resource& resource, 
                             std::make_unique<Error>(Error::Reason::Other, std::string{ "HTTP status code " } +
                                                                               std::to_string(responseCode));
                     }
+                } else if ([url isFileURL]) {
+                    response.data = std::make_shared<std::string>((const char *)[data bytes], [data length]);
                 } else {
                     // This should never happen.
                     response.error = std::make_unique<Error>(Error::Reason::Other,
