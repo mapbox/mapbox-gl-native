@@ -65,7 +65,7 @@ TEST(LocalGlyphRasterizer, PingFang) {
     };
     test.map.getStyle().loadJSON(util::read_file("test/fixtures/local_glyphs/mixed.json"));
 #if defined(__APPLE__) && !defined(__QT__)
-    test.checkRendering("ping_fang");
+    test.checkRendering("ping_fang", 0.0161);
 #elif defined(__QT__)
     test.checkRendering("ping_fang_qt");
 #endif // defined(__APPLE__)
