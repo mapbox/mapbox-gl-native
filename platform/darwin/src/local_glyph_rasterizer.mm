@@ -129,12 +129,10 @@ public:
         for (NSString *name in [fontNames subarrayWithRange:NSMakeRange(1, fontNames.count - 1)]) {
             NSDictionary *fontAttributes = @{
                 (NSString *)kCTFontSizeAttribute: @(util::ONE_EM),
-                // The name could be any of these three attributes of the font.
-                // It’s OK if it doesn’t match all three; Core Text will pick
-                // the font that matches the most attributes.
+                // This attribute is technically supposed to be a font’s
+                // PostScript name, but Core Text will fall back to matching
+                // font display names and font family names.
                 (NSString *)kCTFontNameAttribute: name,
-                (NSString *)kCTFontDisplayNameAttribute: name,
-                (NSString *)kCTFontFamilyNameAttribute: name,
             };
             
             CTFontDescriptorRefHandle descriptor(CTFontDescriptorCreateWithAttributes((CFDictionaryRef)fontAttributes));
@@ -143,12 +141,12 @@ public:
         
         CFStringRef keys[] = {
             kCTFontSizeAttribute,
-            kCTFontNameAttribute, kCTFontDisplayNameAttribute, kCTFontFamilyNameAttribute,
+            kCTFontNameAttribute,
             kCTFontCascadeListAttribute,
         };
         CFTypeRef values[] = {
             (__bridge CFNumberRef)@(util::ONE_EM),
-            mainFontName, mainFontName, mainFontName,
+            mainFontName,
             *fallbackDescriptors,
         };
 
