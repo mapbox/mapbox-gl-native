@@ -1,6 +1,6 @@
 # Changelog
 
-## master
+## maps-v1.6.0-rc.2
 
 ### ✨ New features
 
