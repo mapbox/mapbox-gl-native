@@ -24,6 +24,7 @@ namespace {
 const std::size_t MinPointsSize = 100;
 const std::size_t MinLinePointsSize = 50;
 const double InvalidDistance = std::numeric_limits<double>::quiet_NaN();
+const mapbox::cheap_ruler::CheapRuler::Unit UnitInMeters = mapbox::cheap_ruler::CheapRuler::Unit::Meters;
 
 // Inclusive index range for multipoint or linestring container
 using IndexRange = std::pair<std::size_t, std::size_t>;
@@ -327,9 +328,8 @@ double lineToLinesDistance(const mapbox::geometry::line_string<double>& line,
 }
 
 double pointsToGeometryDistance(const mapbox::geometry::multi_point<double>& points,
-                                const Feature::geometry_type& geoSet,
-                                mapbox::cheap_ruler::CheapRuler::Unit unit) {
-    mapbox::cheap_ruler::CheapRuler ruler(points.front().y, unit);
+                                const Feature::geometry_type& geoSet) {
+    mapbox::cheap_ruler::CheapRuler ruler(points.front().y, UnitInMeters);
     return geoSet.match(
         [&points, &ruler](const mapbox::geometry::point<double>& p) {
             return pointsToPointsDistance(mapbox::geometry::multi_point<double>{p}, points, ruler);
@@ -346,11 +346,9 @@ double pointsToGeometryDistance(const mapbox::geometry::multi_point<double>& poi
         [](const auto&) { return InvalidDistance; });
 }
 
-double lineToGeometryDistance(const mapbox::geometry::line_string<double>& line,
-                              const Feature::geometry_type& geoSet,
-                              mapbox::cheap_ruler::CheapRuler::Unit unit) {
+double lineToGeometryDistance(const mapbox::geometry::line_string<double>& line, const Feature::geometry_type& geoSet) {
     assert(!line.empty());
-    mapbox::cheap_ruler::CheapRuler ruler(line.front().y, unit);
+    mapbox::cheap_ruler::CheapRuler ruler(line.front().y, UnitInMeters);
     return geoSet.match(
         [&line, &ruler](const mapbox::geometry::point<double>& p) {
             return pointsToLineDistance(mapbox::geometry::multi_point<double>{p}, line, ruler);
@@ -369,23 +367,22 @@ double lineToGeometryDistance(const mapbox::geometry::line_string<double>& line,
 
 double calculateDistance(const GeometryTileFeature& feature,
                          const CanonicalTileID& canonical,
-                         const Feature::geometry_type& geoSet,
-                         mapbox::cheap_ruler::CheapRuler::Unit unit) {
+                         const Feature::geometry_type& geoSet) {
     return convertGeometry(feature, canonical)
         .match(
-            [&geoSet, &unit](const mapbox::geometry::point<double>& point) -> double {
-                return pointsToGeometryDistance(mapbox::geometry::multi_point<double>{point}, geoSet, unit);
+            [&geoSet](const mapbox::geometry::point<double>& point) -> double {
+                return pointsToGeometryDistance(mapbox::geometry::multi_point<double>{point}, geoSet);
             },
-            [&geoSet, &unit](const mapbox::geometry::multi_point<double>& points) -> double {
-                return pointsToGeometryDistance(points, geoSet, unit);
+            [&geoSet](const mapbox::geometry::multi_point<double>& points) -> double {
+                return pointsToGeometryDistance(points, geoSet);
             },
-            [&geoSet, &unit](const mapbox::geometry::line_string<double>& line) -> double {
-                return lineToGeometryDistance(line, geoSet, unit);
+            [&geoSet](const mapbox::geometry::line_string<double>& line) -> double {
+                return lineToGeometryDistance(line, geoSet);
             },
-            [&geoSet, &unit](const mapbox::geometry::multi_line_string<double>& lines) -> double {
+            [&geoSet](const mapbox::geometry::multi_line_string<double>& lines) -> double {
                 double dist = std::numeric_limits<double>::infinity();
                 for (const auto& line : lines) {
-                    auto tempDist = lineToGeometryDistance(line, geoSet, unit);
+                    auto tempDist = lineToGeometryDistance(line, geoSet);
                     if (std::isnan(tempDist)) return tempDist;
                     dist = std::min(dist, tempDist);
                     if (dist == 0.0 || std::isnan(dist)) return dist;
@@ -395,15 +392,7 @@ double calculateDistance(const GeometryTileFeature& feature,
             [](const auto&) -> double { return InvalidDistance; });
 }
 
-struct Arguments {
-    Arguments(GeoJSON& geojson_, mapbox::cheap_ruler::CheapRuler::Unit unit_)
-        : geojson(std::move(geojson_)), unit(unit_) {}
-
-    GeoJSON geojson;
-    mapbox::cheap_ruler::CheapRuler::Unit unit;
-};
-
-optional<Arguments> parseValue(const style::conversion::Convertible& value, style::expression::ParsingContext& ctx) {
+optional<GeoJSON> parseValue(const style::conversion::Convertible& value, style::expression::ParsingContext& ctx) {
     if (isArray(value)) {
         // object value, quoted with ["Distance", GeoJSONObj, "unit(optional)"]
         auto length = arrayLength(value);
@@ -413,42 +402,13 @@ optional<Arguments> parseValue(const style::conversion::Convertible& value, styl
             return nullopt;
         }
 
-        // Parse Unit info for distance calculation, "Meters" by default
-        mapbox::cheap_ruler::CheapRuler::Unit unit = mapbox::cheap_ruler::CheapRuler::Unit::Meters;
-        if (length == 3) {
-            auto input = toString(arrayMember(value, 2));
-            if (input == nullopt) {
-                ctx.error("Failed to parse unit argument from 'distance' expression");
-                return nullopt;
-            }
-            if (*input == "meters" || *input == "metres") {
-                unit = mapbox::cheap_ruler::CheapRuler::Unit::Meters;
-            } else if (*input == "kilometers") {
-                unit = mapbox::cheap_ruler::CheapRuler::Unit::Kilometers;
-            } else if (*input == "miles") {
-                unit = mapbox::cheap_ruler::CheapRuler::Unit::Miles;
-            } else if (*input == "nauticalmiles") {
-                unit = mapbox::cheap_ruler::CheapRuler::Unit::NauticalMiles;
-            } else if (*input == "yards") {
-                unit = mapbox::cheap_ruler::CheapRuler::Unit::Yards;
-            } else if (*input == "feet") {
-                unit = mapbox::cheap_ruler::CheapRuler::Unit::Feet;
-            } else if (*input == "inches") {
-                unit = mapbox::cheap_ruler::CheapRuler::Unit::Inches;
-            } else {
-                ctx.error(
-                    "'distance' expression only accepts following units: kilometers, miles, nauticalmiles, "
-                    "meters, metres, yards, feet, inches.");
-                return nullopt;
-            }
-        }
         // Parse geometry info
         const auto& argument1 = arrayMember(value, 1);
         if (isObject(argument1)) {
             style::conversion::Error error;
             auto geojson = toGeoJSON(argument1, error);
             if (geojson && error.message.empty()) {
-                return Arguments(*geojson, unit);
+                return *geojson;
             }
             ctx.error(error.message);
         }
@@ -472,11 +432,8 @@ optional<Feature::geometry_type> getGeometry(const Feature& feature, mbgl::style
 namespace style {
 namespace expression {
 
-Distance::Distance(GeoJSON geojson, Feature::geometry_type geometries_, mapbox::cheap_ruler::CheapRuler::Unit unit_)
-    : Expression(Kind::Distance, type::Number),
-      geoJSONSource(std::move(geojson)),
-      geometries(std::move(geometries_)),
-      unit(unit_) {}
+Distance::Distance(GeoJSON geojson, Feature::geometry_type geometries_)
+    : Expression(Kind::Distance, type::Number), geoJSONSource(std::move(geojson)), geometries(std::move(geometries_)) {}
 
 Distance::~Distance() = default;
 
@@ -488,7 +445,7 @@ EvaluationResult Distance::evaluate(const EvaluationContext& params) const {
     }
     auto geometryType = params.feature->getType();
     if (geometryType == FeatureType::Point || geometryType == FeatureType::LineString) {
-        auto distance = calculateDistance(*params.feature, *params.canonical, geometries, unit);
+        auto distance = calculateDistance(*params.feature, *params.canonical, geometries);
         if (!std::isnan(distance)) {
             assert(distance >= 0.0);
             return distance;
@@ -503,26 +460,23 @@ ParseResult Distance::parse(const Convertible& value, ParsingContext& ctx) {
         return ParseResult();
     }
 
-    return parsedValue->geojson.match(
+    return parsedValue->match(
         [&parsedValue, &ctx](const mapbox::geometry::geometry<double>& geometrySet) {
             if (auto ret = getGeometry(mbgl::Feature(geometrySet), ctx)) {
-                return ParseResult(
-                    std::make_unique<Distance>(parsedValue->geojson, std::move(*ret), parsedValue->unit));
+                return ParseResult(std::make_unique<Distance>(*parsedValue, std::move(*ret)));
             }
             return ParseResult();
         },
         [&parsedValue, &ctx](const mapbox::feature::feature<double>& feature) {
             if (auto ret = getGeometry(mbgl::Feature(feature), ctx)) {
-                return ParseResult(
-                    std::make_unique<Distance>(parsedValue->geojson, std::move(*ret), parsedValue->unit));
+                return ParseResult(std::make_unique<Distance>(*parsedValue, std::move(*ret)));
             }
             return ParseResult();
         },
         [&parsedValue, &ctx](const mapbox::feature::feature_collection<double>& features) {
             for (const auto& feature : features) {
                 if (auto ret = getGeometry(mbgl::Feature(feature), ctx)) {
-                    return ParseResult(
-                        std::make_unique<Distance>(parsedValue->geojson, std::move(*ret), parsedValue->unit));
+                    return ParseResult(std::make_unique<Distance>(*parsedValue, std::move(*ret)));
                 }
             }
             return ParseResult();
@@ -566,27 +520,6 @@ mbgl::Value convertValue(const mapbox::geojson::rapidjson_value& v) {
     return Null;
 }
 
-std::string getUnits(const mapbox::cheap_ruler::CheapRuler::Unit& unit) {
-    switch (unit) {
-        case mapbox::cheap_ruler::CheapRuler::Kilometers:
-            return "kilometers";
-        case mapbox::cheap_ruler::CheapRuler::Miles:
-            return "miles";
-        case mapbox::cheap_ruler::CheapRuler::NauticalMiles:
-            return "nauticalmiles";
-        case mapbox::cheap_ruler::CheapRuler::Meters:
-            return "meters";
-        case mapbox::cheap_ruler::CheapRuler::Yards:
-            return "yards";
-        case mapbox::cheap_ruler::CheapRuler::Feet:
-            return "feet";
-        case mapbox::cheap_ruler::CheapRuler::Inches:
-            return "inches";
-        default:
-            return "error";
-    }
-}
-
 mbgl::Value Distance::serialize() const {
     std::unordered_map<std::string, mbgl::Value> serialized;
     rapidjson::CrtAllocator allocator;
@@ -599,13 +532,13 @@ mbgl::Value Distance::serialize() const {
         mbgl::Log::Error(mbgl::Event::General,
                          "Failed to serialize 'distance' expression, converted rapidJSON is not an object");
     }
-    return std::vector<mbgl::Value>{{getOperator(), serialized, getUnits(unit)}};
+    return std::vector<mbgl::Value>{{getOperator(), serialized}};
 }
 
 bool Distance::operator==(const Expression& e) const {
     if (e.getKind() == Kind::Distance) {
         auto rhs = static_cast<const Distance*>(&e);
-        return geoJSONSource == rhs->geoJSONSource && geometries == rhs->geometries && unit == rhs->unit;
+        return geoJSONSource == rhs->geoJSONSource && geometries == rhs->geometries;
     }
     return false;
 }

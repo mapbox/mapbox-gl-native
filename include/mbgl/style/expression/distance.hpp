@@ -10,7 +10,7 @@ namespace expression {
 
 class Distance final : public Expression {
 public:
-    Distance(GeoJSON geoJSONSource_, Feature::geometry_type geometries_, mapbox::cheap_ruler::CheapRuler::Unit unit_);
+    Distance(GeoJSON geoJSONSource_, Feature::geometry_type geometries_);
 
     ~Distance() override;
 
@@ -30,7 +30,6 @@ public:
 private:
     GeoJSON geoJSONSource;
     Feature::geometry_type geometries;
-    mapbox::cheap_ruler::CheapRuler::Unit unit;
 };
 
 } // namespace expression
