@@ -94,6 +94,16 @@ void HTTPRequest::handleNetworkReply(QNetworkReply *reply, const QByteArray& dat
         }
     }
 
+    if (reply->url().scheme() == QStringLiteral("data")) {
+        if (data.isEmpty()) {
+            response.data = std::make_shared<std::string>();
+        } else {
+            response.data = std::make_shared<std::string>(data.constData(), data.size());
+        }
+        callback(response);
+        return;
+    }
+
     int responseCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
 
     switch(responseCode) {
