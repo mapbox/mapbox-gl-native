@@ -426,6 +426,7 @@ commands:
     steps:
       - run:
           name: Run iOS Test App on Firebase
+          when: on_success
           no_output_timeout: 30m
           command: |
             if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON_IOS}" ]]; then
@@ -440,6 +441,41 @@ commands:
                 --device model=iphone11,version=13.3,locale=en,orientation=portrait --xcode-version=11.3.1 --timeout 30m \
                 --verbosity=debug --no-record-video --results-dir ios-test-app-${CIRCLE_BUILD_NUM}
             fi
+  get-ios-benchmark-results:
+    steps:
+      - run:
+          name: Retrieve Test Result from gcloud
+          when: on_success
+          command: |
+            if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON_IOS}" ]]; then
+              testResult=$(gsutil ls -d gs://test-lab-hn7kwqcz3108z-hjm4qtbqqkymk/ios-test-app-${CIRCLE_BUILD_NUM}/iphone11-13.3-en-portrait/TestLogs/)
+              mkdir -p benchmark-app
+              gsutil -m cp -r $testResult benchmark-app
+              cd benchmark-app/TestLogs
+              xcparse attachments *.xcresult && ls
+              cd ../.. && mkdir -p /tmp/tests/benchmark
+              if ls benchmark-app/TestLogs/*.json 1> /dev/null 2>&1; then cp benchmark-app/TestLogs/*.json /tmp/tests/benchmark/results.json; fi
+            fi
+  check-benchmark-results:
+    steps:
+      - run:
+          name: Compare result to baseline
+          when: on_success
+          command: |
+            scripts/check_benchmark_results.sh metrics/benchmark/ios/results.json /tmp/tests/benchmark/results.json /tmp/tests/benchmark/results_comparison.txt /tmp/tests/benchmark/results_comparison.html
+
+  retry-ios-benchmark:
+    steps:
+      - run:
+          when: on_fail
+          name: Retry iOS benchmark on failure
+          command: |
+              echo "Benchmark failed, retrying"
+      - run-ios-test-app:
+          directory: benchmark/ios
+      - get-ios-benchmark-results
+      - check-benchmark-results
+
   upload-coverage-results:
     steps:
     - run:
@@ -465,6 +501,14 @@ commands:
         name: Collect GitHub statistics
         command: |
             scripts/publish_github_stats.js
+
+ publish-benchmark-statistics:
+   steps:
+   -run:
+      when: on_success
+      name: Publish benchmark statistics
+      command: |
+            python scripts/parse-results-core-benchmark.py --build $CIRCLE_BUILD_NUM --input /tmp/tests/benchmark --git mapbox-gl-native
 
 jobs:
   ios-render-test-runner:
@@ -553,24 +597,9 @@ jobs:
       - login-google-cloud-platform-ios
       - run-ios-test-app:
           directory: benchmark/ios
-      - run:
-          name: Retrieve Test Result from gcloud
-          when: always
-          command: |
-            if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON_IOS}" ]]; then
-              testResult=$(gsutil ls -d gs://test-lab-hn7kwqcz3108z-hjm4qtbqqkymk/ios-test-app-${CIRCLE_BUILD_NUM}/iphone11-13.3-en-portrait/TestLogs/)
-              mkdir -p benchmark-app
-              gsutil -m cp -r $testResult benchmark-app
-              cd benchmark-app/TestLogs
-              xcparse attachments *.xcresult && ls
-              cd ../.. && mkdir -p /tmp/tests/benchmark
-              if ls benchmark-app/TestLogs/*.json 1> /dev/null 2>&1; then cp benchmark-app/TestLogs/*.json /tmp/tests/benchmark/results.json; fi
-            fi
-      - run:
-          name: Compare result to baseline
-          when: always
-          command: |
-            scripts/check_benchmark_results.sh metrics/benchmark/ios/results.json /tmp/tests/benchmark/results.json /tmp/tests/benchmark/results_comparison.txt /tmp/tests/benchmark/results_comparison.html
+      - get-ios-benchmark-results
+      - check-benchmark-results
+      - retry-ios-benchmark
       - save
   android-benchmark-runner:
     executor: ubuntu-eoan
@@ -605,6 +634,19 @@ jobs:
           name: Compare result to baseline
           when: always
           command: |
+            scripts/check_benchmark_results.sh metrics/benchmark/android/results.json /tmp/tests/benchmark/results.json /tmp/tests/benchmark/results_comparison.txt /tmp/tests/benchmark/results_comparison.html
+      - run:
+          name: Re-run benchmark if first attempt failed
+          when: on_fail
+          no_output_timeout: 30m
+          command: |
+            gcloud firebase test android models list
+            gcloud firebase test android run --type instrumentation \
+              --app benchmark/android/app/build/outputs/apk/release/app-release.apk \
+              --test benchmark/android/app/build/outputs/apk/androidTest/release/app-release-androidTest.apk \
+              --device-ids flame --os-version-ids 29 --locales en --orientations portrait --timeout 30m \
+              --directories-to-pull /sdcard/benchmark/results --results-dir benchmark-${CIRCLE_BUILD_NUM} \
+              --no-record-video --no-performance-metrics
             scripts/check_benchmark_results.sh metrics/benchmark/android/results.json /tmp/tests/benchmark/results.json /tmp/tests/benchmark/results_comparison.txt /tmp/tests/benchmark/results_comparison.html
       - save
   android-api-breakage:
