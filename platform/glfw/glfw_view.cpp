@@ -20,6 +20,7 @@
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/geo.hpp>
+#include <mbgl/util/interpolate.hpp>
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/platform.hpp>
@@ -206,6 +207,7 @@ GLFWView::GLFWView(bool fullscreen_, bool benchmark_, const mbgl::ResourceOption
     printf("- Press `U` to toggle pitch bounds\n");
     printf("- Press `H` to take a snapshot of a current map.\n");
     printf("- Press `J` to take a snapshot of a current map with an extrusions overlay.\n");
+    printf("- Press `Y` to start a camera fly-by demo\n");
     printf("\n");
     printf("- Press `1` through `6` to add increasing numbers of point annotations for testing\n");
     printf("- Press `7` through `0` to add increasing numbers of shape annotations for testing\n");
@@ -487,6 +489,11 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
         case GLFW_KEY_G: {
             view->toggleLocationIndicatorLayer();
         } break;
+        case GLFW_KEY_Y: {
+            view->freeCameraDemoPhase = 0;
+            view->freeCameraDemoStartTime = mbgl::Clock::now();
+            view->invalidate();
+        } break;
         }
     }
 
@@ -505,6 +512,52 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
         case GLFW_KEY_0: view->addRandomShapeAnnotations(1000); break;
         case GLFW_KEY_M: view->addAnimatedAnnotation(); break;
         }
+    }
+}
+
+namespace mbgl {
+namespace util {
+
+template <>
+struct Interpolator<mbgl::LatLng> {
+    mbgl::LatLng operator()(const mbgl::LatLng &a, const mbgl::LatLng &b, const double t) {
+        return {
+            interpolate<double>(a.latitude(), b.latitude(), t),
+            interpolate<double>(a.longitude(), b.longitude(), t),
+        };
+    }
+};
+
+} // namespace util
+} // namespace mbgl
+
+void GLFWView::updateFreeCameraDemo() {
+    const mbgl::LatLng trainStartPos = {60.171367, 24.941359};
+    const mbgl::LatLng trainEndPos = {60.185147, 24.936668};
+    const mbgl::LatLng cameraStartPos = {60.167443, 24.927176};
+    const mbgl::LatLng cameraEndPos = {60.185107, 24.933366};
+    const double cameraStartAlt = 1000.0;
+    const double cameraEndAlt = 150.0;
+    const double duration = 8.0;
+
+    // Interpolate between starting and ending points
+    std::chrono::duration<double> deltaTime = mbgl::Clock::now() - freeCameraDemoStartTime;
+    freeCameraDemoPhase = deltaTime.count() / duration;
+
+    auto trainPos = mbgl::util::interpolate(trainStartPos, trainEndPos, freeCameraDemoPhase);
+    auto cameraPos = mbgl::util::interpolate(cameraStartPos, cameraEndPos, freeCameraDemoPhase);
+    auto cameraAlt = mbgl::util::interpolate(cameraStartAlt, cameraEndAlt, freeCameraDemoPhase);
+
+    mbgl::FreeCameraOptions camera;
+
+    // Update camera position and focus point on the map with interpolated values
+    camera.setLocation({cameraPos, cameraAlt});
+    camera.lookAtPoint(trainPos);
+
+    map->setFreeCameraOptions(camera);
+
+    if (freeCameraDemoPhase > 1.0) {
+        freeCameraDemoPhase = -1.0;
     }
 }
 
@@ -860,11 +913,14 @@ void GLFWView::run() {
 
             rendererFrontend->render();
 
+            if (freeCameraDemoPhase >= 0.0) {
+                updateFreeCameraDemo();
+            }
+
             report(1000 * (glfwGetTime() - started));
             if (benchmark) {
                 invalidate();
             }
-
         }
     };
 
