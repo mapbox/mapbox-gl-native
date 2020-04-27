@@ -25,7 +25,7 @@ def TriggerPiperline(slug, token, branch, params):
 
     r = requests.post(url, auth=(token, ""), headers=headers, json=data)
 
-    if r.status_code != 201:
+    if r.status_code != 201 and r.status_code != 200:
         print("Error triggering the CircleCI: %s." % r.json()["message"])
         sys.exit(1)
 
