@@ -1,6 +1,7 @@
 #include <mbgl/renderer/sources/render_vector_source.hpp>
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/renderer/paint_parameters.hpp>
+#include <mbgl/tile/tile_loader_impl.hpp>
 #include <mbgl/tile/vector_tile.hpp>
 
 #include <mbgl/algorithm/generate_clip_ids.hpp>
