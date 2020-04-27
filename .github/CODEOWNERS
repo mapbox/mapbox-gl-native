@@ -1,12 +1,6 @@
-# iOS
+* @mapbox/gl-native
+
+# Apple
 /platform/ios/ @mapbox/maps-ios-reviewers
-/platform/ios/docs/ @mapbox/docs
-
-# macOS
-/platform/macos/ @1ec5 @mapbox/maps-ios-reviewers
-/platform/macos/docs @mapbox/docs
-
-
-# Darwin
-/platform/darwin/ @1ec5 @mapbox/maps-ios-reviewers
-
+/platform/macos/ @mapbox/maps-ios-reviewers
+/platform/darwin/ @mapbox/maps-ios-reviewers
