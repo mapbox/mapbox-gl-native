@@ -82,6 +82,7 @@ add_library(
     ${PROJECT_SOURCE_DIR}/test/tile/vector_tile.test.cpp
     ${PROJECT_SOURCE_DIR}/test/util/async_task.test.cpp
     ${PROJECT_SOURCE_DIR}/test/util/bounding_volumes.test.cpp
+    ${PROJECT_SOURCE_DIR}/test/util/camera.test.cpp
     ${PROJECT_SOURCE_DIR}/test/util/dtoa.test.cpp
     ${PROJECT_SOURCE_DIR}/test/util/geo.test.cpp
     ${PROJECT_SOURCE_DIR}/test/util/grid_index.test.cpp
