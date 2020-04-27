@@ -1279,7 +1279,7 @@ private:
     std::vector<PlacedSymbolData> placedSymbolsData;
     std::vector<Intersection> intersections;
     bool populateIntersections = false;
-    std::size_t intersectionPriority{};
+    std::size_t currentIntersectionPriority{};
     bool collectData = false;
 };
 
@@ -1287,7 +1287,7 @@ void TilePlacement::placeLayers(const RenderLayerReferences& layers) {
     placedSymbolsData.clear();
     seenCrossTileIDs.clear();
     intersections.clear();
-    intersectionPriority = 0u;
+    currentIntersectionPriority = 0u;
     // Populale intersections.
     populateIntersections = true;
     for (auto it = layers.crbegin(); it != layers.crend(); ++it) {
@@ -1319,11 +1319,10 @@ void TilePlacement::placeLayers(const RenderLayerReferences& layers) {
     for (const auto& intersection : intersections) {
         const SymbolInstance& symbol = intersection.symbol;
         const PlacementContext& ctx = intersection.ctx;
+        currentIntersectionPriority = intersection.priority;
         if (seenCrossTileIDs.count(symbol.crossTileID) != 0u) continue;
         JointPlacement placement = placeSymbol(symbol, ctx);
-        if (shouldRetryPlacement(placement, ctx)) {
-            continue;
-        }
+        if (shouldRetryPlacement(placement, ctx)) continue;
         seenCrossTileIDs.insert(symbol.crossTileID);
     }
     // Place the rest labels.
@@ -1464,10 +1463,10 @@ void TilePlacement::placeSymbolBucket(const BucketPlacementData& params, std::se
     for (const SymbolInstance& symbol : symbolInstances) {
         auto intersectStatus = symbolIntersectsTileEdges(symbol);
         if (intersectStatus.flags == IntersectStatus::None) continue;
-        intersections.emplace_back(symbol, ctx, intersectStatus, intersectionPriority);
+        intersections.emplace_back(symbol, ctx, intersectStatus, currentIntersectionPriority);
     }
 
-    ++intersectionPriority;
+    ++currentIntersectionPriority;
 }
 
 bool TilePlacement::canPlaceAtVariableAnchor(const CollisionBox& box,
@@ -1479,11 +1478,16 @@ bool TilePlacement::canPlaceAtVariableAnchor(const CollisionBox& box,
     assert(tileBorders);
     if (populateIntersections) {
         // A variable label is only allowed to intersect tile border with the first anchor.
-        if (anchor != anchors.front()) return false;
-        // Check, that the label would intersect the tile borders even without shift, otherwise intersection
-        // is not allowed (preventing cut-offs in case the shift is lager than the buffer size).
-        auto status = collisionIndex.intersectsTileEdges(box, {}, posMatrix, textPixelRatio, *tileBorders);
-        return status.flags != IntersectStatus::None;
+        if (anchor == anchors.front()) {
+            // Check, that the label would intersect the tile borders even without shift, otherwise intersection
+            // is not allowed (preventing cut-offs in case the shift is lager than the buffer size).
+            auto status = collisionIndex.intersectsTileEdges(box, {}, posMatrix, textPixelRatio, *tileBorders);
+            if (status.flags != IntersectStatus::None) return true;
+        }
+        // The most important labels shall be placed first anyway, so we continue trying
+        // the following variable anchors for them; less priority labels
+        // will wait for the second round (when `populateIntersections` is `false`).
+        if (currentIntersectionPriority > 0u) return false;
     }
     // Can be placed, if it does not intersect tile borders.
     auto status = collisionIndex.intersectsTileEdges(box, shift, posMatrix, textPixelRatio, *tileBorders);
