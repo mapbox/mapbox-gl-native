@@ -89,6 +89,7 @@ private:
     void addRandomShapeAnnotations(int count);
     void addRandomCustomPointAnnotations(int count);
     void addAnimatedAnnotation();
+    void updateFreeCameraDemo();
     void updateAnimatedAnnotations();
     void toggleCustomSource();
     void toggleLocationIndicatorLayer();
@@ -114,6 +115,8 @@ private:
 
     std::string testDirectory = ".";
 
+    double freeCameraDemoPhase = -1;
+    mbgl::TimePoint freeCameraDemoStartTime;
     bool fullscreen = false;
     const bool benchmark = false;
     bool tracking = false;
