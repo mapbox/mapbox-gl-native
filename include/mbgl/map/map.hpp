@@ -135,6 +135,14 @@ public:
     bool isFullyLoaded() const;
     void dumpDebugLogs() const;
 
+    // FreeCameraOptions provides more direct access to the underlying camera entity.
+    // For backwards compatibility the state set using this API must be representable with
+    // `CameraOptions` as well. Parameters are clamped to a valid range or discarded as invalid
+    // if the conversion to the pitch and bearing presentation is ambiguous. For example orientation
+    // can be invalid if it leads to the camera being upside down or the quaternion has zero length.
+    void setFreeCameraOptions(const FreeCameraOptions& camera);
+    FreeCameraOptions getFreeCameraOptions() const;
+
 protected:
     class Impl;
     const std::unique_ptr<Impl> impl;

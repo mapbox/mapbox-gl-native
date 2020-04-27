@@ -1,9 +1,10 @@
 #pragma once
 
-#include <mbgl/util/geo.hpp>
 #include <mbgl/util/chrono.hpp>
-#include <mbgl/util/unitbezier.hpp>
+#include <mbgl/util/geo.hpp>
 #include <mbgl/util/optional.hpp>
+#include <mbgl/util/unitbezier.hpp>
+#include <mbgl/util/vectors.hpp>
 
 #include <functional>
 
@@ -94,6 +95,47 @@ struct AnimationOptions {
     /** Creates an animation with the specified duration. */
     AnimationOptions(Duration d)
         : duration(d) {}
+};
+
+/** Various options for accessing physical properties of the underlying camera entity.
+    A direct access to these properties allows more flexible and precise controlling of the camera
+    while also being fully compatible and interchangeable with CameraOptions. All fields are optional. */
+struct FreeCameraOptions {
+    /** Position of the camera in slightly modified web mercator coordinates
+        - The size of 1 unit is the width of the projected world instead of the "mercator meter".
+          Coordinate [0, 0, 0] is the north-west corner and [1, 1, 0] is the south-east corner.
+        - Z coordinate is conformal and must respect minimum and maximum zoom values.
+        - Zoom is automatically computed from the altitude (z)
+    */
+    optional<vec3> position = nullopt;
+
+    /** Orientation of the camera represented as a unit quaternion [x, y, z, w].
+        The default pose of the camera is such that the forward vector is looking up the -Z axis and
+        the up vector is aligned with north orientation of the map:
+          forward: [0, 0, -1]
+          up:      [0, -1, 0]
+          right    [1, 0, 0]
+
+        Orientation can be set freely but certain constraints still apply
+         - Orientation must be representable with only pitch and bearing.
+         - Pitch has an upper limit */
+    optional<vec4> orientation = nullopt;
+
+    /** Helper function for setting the mercator position as Lat&Lng and altitude in meters */
+    void setLocation(const LatLngAltitude& location);
+
+    /** Helper function for converting mercator position into Lat&Lng and altitude in meters.
+        This function fails to return a value if `position` is invalid or is not set */
+    optional<LatLngAltitude> getLocation() const;
+
+    /** Helper function for setting orientation of the camera by defining a focus point
+        on the map. Up vector is required in certain scenarios where bearing can't be deduced
+        from the viewing direction */
+    void lookAtPoint(const LatLng& location, const optional<vec3>& upVector = nullopt);
+
+    /** Helper function for setting the orientation of the camera as a pitch and a bearing.
+        Both values are in degrees */
+    void setPitchBearing(double pitch, double bearing);
 };
 
 } // namespace mbgl

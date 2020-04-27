@@ -212,4 +212,51 @@ optional<Quaternion> Camera::orientationFromFrame(const vec3& forward, const vec
     return util::orientationFromPitchBearing(pitch, bearing);
 }
 } // namespace util
+
+void FreeCameraOptions::setLocation(const LatLngAltitude& location) {
+    position = util::toMercator(location.location, location.altitude);
+}
+
+optional<LatLngAltitude> FreeCameraOptions::getLocation() const {
+    if (!position) {
+        return nullopt;
+    }
+
+    const vec3 positionValue = position.value();
+    if (positionValue[1] < 0.0 || positionValue[1] > 1.0) {
+        return nullopt;
+    }
+
+    const LatLng location = {util::latFromMercatorY(positionValue[1]), util::lngFromMercatorX(positionValue[0])};
+
+    const double metersPerPixel = Projection::getMetersPerPixelAtLatitude(location.latitude(), 0.0);
+    const double worldSize = Projection::worldSize(std::pow(2.0, 0.0));
+    const double altitude = positionValue[2] * worldSize * metersPerPixel;
+
+    return LatLngAltitude{location, altitude};
+}
+
+void FreeCameraOptions::lookAtPoint(const LatLng& location, const optional<vec3>& upVector) {
+    orientation = nullopt;
+    if (!position) {
+        return;
+    }
+
+    const vec3 target = util::toMercator(location, 0.0);
+    const vec3 forward = vec3Sub(target, position.value());
+    vec3 up = upVector ? upVector.value() : vec3{{0.0, 0.0, 1.0}};
+
+    // Flip z-component of the up vector if it's pointing downwards
+    up[2] = std::abs(up[2]);
+
+    const auto newOrientation = util::Camera::orientationFromFrame(forward, up);
+    if (newOrientation) {
+        orientation = newOrientation.value().m;
+    }
+}
+
+void FreeCameraOptions::setPitchBearing(double pitch, double bearing) {
+    orientation = util::orientationFromPitchBearing(pitch * util::DEG2RAD, bearing * util::DEG2RAD).m;
+}
+
 } // namespace mbgl

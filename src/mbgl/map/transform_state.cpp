@@ -177,8 +177,8 @@ void TransformState::updateCameraState() const {
 
     // x & y tracks the center of the map in pixels. However as rendering is done in pixel coordinates the rendering
     // origo is actually in the middle of the map (0.5 * worldSize). x&y positions have to be negated because it defines
-    // position of the map, not the camera. Moving map 10 units left has the same effect as moving camera 10 units to the
-    // right.
+    // position of the map, not the camera. Moving map 10 units left has the same effect as moving camera 10 units to
+    // the right.
     const double dx = 0.5 * worldSize - x;
     const double dy = 0.5 * worldSize - y;
 
@@ -226,6 +226,83 @@ void TransformState::updateStateFromCamera() {
     setBearing(newBearing);
     setPitch(newPitch);
 }
+
+FreeCameraOptions TransformState::getFreeCameraOptions() const {
+    updateCameraState();
+
+    FreeCameraOptions options;
+    options.position = camera.getPosition();
+    options.orientation = camera.getOrientation().m;
+
+    return options;
+}
+
+bool TransformState::setCameraPosition(const vec3& position) {
+    if (std::isnan(position[0]) || std::isnan(position[1]) || std::isnan(position[2])) return false;
+
+    const double maxWorldSize = Projection::worldSize(std::pow(2.0, getMaxZoom()));
+    const double minWorldSize = Projection::worldSize(std::pow(2.0, getMinZoom()));
+    const double distToCenter = getCameraToCenterDistance();
+
+    const vec3 updatedPos = vec3{
+        {position[0], position[1], util::clamp(position[2], distToCenter / maxWorldSize, distToCenter / minWorldSize)}};
+
+    camera.setPosition(updatedPos);
+    return true;
+}
+
+bool TransformState::setCameraOrientation(const Quaternion& orientation_) {
+    const vec4& c = orientation_.m;
+    if (std::isnan(c[0]) || std::isnan(c[1]) || std::isnan(c[2]) || std::isnan(c[3])) {
+        return false;
+    }
+
+    // Zero-length quaternions are not valid
+    if (orientation_.length() == 0.0) {
+        return false;
+    }
+
+    Quaternion unitQuat = orientation_.normalized();
+    const vec3 forward = unitQuat.transform({{0.0, 0.0, -1.0}});
+    const vec3 up = unitQuat.transform({{0.0, -1.0, 0.0}});
+
+    if (up[2] < 0.0) {
+        // Camera is upside down and not recoverable
+        return false;
+    }
+
+    const optional<Quaternion> updatedOrientation = util::Camera::orientationFromFrame(forward, up);
+    if (!updatedOrientation) return false;
+
+    camera.setOrientation(updatedOrientation.value());
+    return true;
+}
+
+void TransformState::setFreeCameraOptions(const FreeCameraOptions& options) {
+    if (!valid()) {
+        return;
+    }
+
+    if (!options.position && !options.orientation) return;
+
+    // Check if the state is dirty and camera needs to be synchronized
+    updateMatricesIfNeeded();
+
+    bool changed = false;
+    if (options.orientation && options.orientation.value() != camera.getOrientation().m) {
+        changed |= setCameraOrientation(options.orientation.value());
+    }
+
+    if (options.position && options.position.value() != camera.getPosition()) {
+        changed |= setCameraPosition(options.position.value());
+    }
+
+    if (changed) {
+        updateStateFromCamera();
+        requestMatricesUpdate = true;
+    }
+}
+
 void TransformState::updateMatricesIfNeeded() const {
     if (!needsMatricesUpdate() || size.isEmpty()) return;
 

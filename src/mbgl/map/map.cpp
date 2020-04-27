@@ -500,4 +500,14 @@ void Map::dumpDebugLogs() const {
     Log::Info(Event::General, "--------------------------------------------------------------------------------");
 }
 
+void Map::setFreeCameraOptions(const FreeCameraOptions& camera) {
+    impl->transform.setFreeCameraOptions(camera);
+    impl->cameraMutated = true;
+    impl->onUpdate();
+}
+
+FreeCameraOptions Map::getFreeCameraOptions() const {
+    return impl->transform.getFreeCameraOptions();
+}
+
 } // namespace mbgl

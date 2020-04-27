@@ -650,4 +650,13 @@ double Transform::getMaxPitchForEdgeInsets(const EdgeInsets& insets) const {
     // e.g. Maximum pitch of 60 degrees is when perspective center's offset from the top is 84% of screen height.
 }
 
+FreeCameraOptions Transform::getFreeCameraOptions() const {
+    return state.getFreeCameraOptions();
+}
+
+void Transform::setFreeCameraOptions(const FreeCameraOptions& options) {
+    cancelTransitions();
+    state.setFreeCameraOptions(options);
+}
+
 } // namespace mbgl
