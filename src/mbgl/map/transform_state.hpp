@@ -1,13 +1,14 @@
 #pragma once
 
-#include <mbgl/map/mode.hpp>
 #include <mbgl/map/camera.hpp>
+#include <mbgl/map/mode.hpp>
+#include <mbgl/util/camera.hpp>
+#include <mbgl/util/constants.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/geometry.hpp>
-#include <mbgl/util/constants.hpp>
+#include <mbgl/util/mat4.hpp>
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/projection.hpp>
-#include <mbgl/util/mat4.hpp>
 #include <mbgl/util/size.hpp>
 
 #include <cstdint>
@@ -248,6 +249,9 @@ private:
     void updateMatricesIfNeeded() const;
     bool needsMatricesUpdate() const { return requestMatricesUpdate; }
 
+    void updateCameraState() const;
+    void updateStateFromCamera();
+
     const mat4& getCoordMatrix() const;
     const mat4& getInvertedMatrix() const;
 
@@ -276,6 +280,7 @@ private:
     bool axonometric = false;
 
     EdgeInsets edgeInsets;
+    mutable util::Camera camera;
 
     // cache values for spherical mercator math
     double Bc = Projection::worldSize(scale) / util::DEGREES_MAX;
