@@ -219,6 +219,9 @@ public:
     const mat4& getProjectionMatrix() const;
     const mat4& getInvProjectionMatrix() const;
 
+    FreeCameraOptions getFreeCameraOptions() const;
+    void setFreeCameraOptions(const FreeCameraOptions& options);
+
 private:
     bool rotatedNorth() const;
 
@@ -249,6 +252,8 @@ private:
     void updateMatricesIfNeeded() const;
     bool needsMatricesUpdate() const { return requestMatricesUpdate; }
 
+    bool setCameraPosition(const vec3& position);
+    bool setCameraOrientation(const Quaternion& orientation);
     void updateCameraState() const;
     void updateStateFromCamera();
 

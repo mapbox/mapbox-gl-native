@@ -241,4 +241,9 @@ public:
     }
 };
 
+struct LatLngAltitude {
+    LatLng location = {0.0, 0.0};
+    double altitude = 0.0;
+};
+
 } // namespace mbgl
