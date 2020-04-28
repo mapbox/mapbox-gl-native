@@ -1,5 +1,17 @@
 # Changelog
 
+## master
+
+### 🐞 Bug fixes
+
+- [core][tile mode] Labels priority fixes ([#16432](https://github.com/mapbox/mapbox-gl-native/pull/16432))
+
+  This change does the following:
+
+  - strictly arranges all the intersecting labels accordingly to the style-defined priorities
+  - fixes placement order of the variable labels.
+    Before this change, all variable labels that could potentially intersect tile borders were placed first, breaking the style label placement priority order. Now, all the variable labels, which do not actually intersect the tile borders, are placed accordingly to the style-defined priorities
+
 ## maps-v1.6.0-rc.2
 
 ### ✨ New features
