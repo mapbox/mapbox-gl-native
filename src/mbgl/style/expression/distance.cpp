@@ -24,6 +24,7 @@ namespace {
 const std::size_t MinPointsSize = 100;
 const std::size_t MinLinePointsSize = 50;
 const double InvalidDistance = std::numeric_limits<double>::quiet_NaN();
+const double InfiniteDistance = std::numeric_limits<double>::infinity();
 const mapbox::cheap_ruler::CheapRuler::Unit UnitInMeters = mapbox::cheap_ruler::CheapRuler::Unit::Meters;
 
 // Inclusive index range for multipoint or linestring container
@@ -31,6 +32,27 @@ using IndexRange = std::pair<std::size_t, std::size_t>;
 
 std::size_t getRangeSize(const IndexRange& range) {
     return range.second - range.first + 1;
+}
+
+std::pair<mbgl::optional<IndexRange>, mbgl::optional<IndexRange>> splitRange(const IndexRange& range, bool isLine) {
+    auto size = getRangeSize(range);
+    if (isLine) {
+        if (size == 2) {
+            return std::make_pair(range, nullopt);
+        }
+        auto size1 = size / 2;
+        IndexRange range1(range.first, range.first + size1);
+        IndexRange range2(range.first + size1, range.second);
+        return std::make_pair(std::move(range1), std::move(range2));
+    } else {
+        if (size == 1) {
+            return std::make_pair(range, nullopt);
+        }
+        auto size1 = size / 2 - 1;
+        IndexRange range1(range.first, range.first + size1);
+        IndexRange range2(range.first + size1 + 1, range.second);
+        return std::make_pair(std::move(range1), std::move(range2));
+    }
 }
 
 using DistanceBBox = GeometryBBox<double>;
@@ -49,6 +71,16 @@ DistanceBBox getBBox(const mapbox::geometry::line_string<double>& line, const In
     DistanceBBox bbox = DefaultDistanceBBox;
     for (std::size_t i = range.first; i <= range.second; ++i) {
         updateBBox(bbox, line[i]);
+    }
+    return bbox;
+}
+
+DistanceBBox getBBox(const mapbox::geometry::polygon<double>& polygon) {
+    DistanceBBox bbox = DefaultDistanceBBox;
+    for (const auto& ring : polygon) {
+        for (const auto& p : ring) {
+            updateBBox(bbox, p);
+        }
     }
     return bbox;
 }
@@ -87,6 +119,20 @@ double pointToLineDistance(const mapbox::geometry::point<double>& point,
     return ruler.distance(point, nearestPoint);
 }
 
+// precondition is two segments are not intersecting with each other
+double segmentToSegmentDistance(const mapbox::geometry::point<double>& p1,
+                                const mapbox::geometry::point<double>& p2,
+                                const mapbox::geometry::point<double>& q1,
+                                const mapbox::geometry::point<double>& q2,
+                                mapbox::cheap_ruler::CheapRuler& ruler) {
+    auto dist1 = std::min(pointToLineDistance(p1, mapbox::geometry::line_string<double>{q1, q2}, ruler),
+                          pointToLineDistance(p2, mapbox::geometry::line_string<double>{q1, q2}, ruler));
+    auto dist2 = std::min(pointToLineDistance(q1, mapbox::geometry::line_string<double>{p1, p2}, ruler),
+                          pointToLineDistance(q2, mapbox::geometry::line_string<double>{p1, p2}, ruler));
+    auto dist = std::min(dist1, dist2);
+    return dist;
+}
+
 double lineToLineDistance(const mapbox::geometry::line_string<double>& line1,
                           IndexRange& range1,
                           const mapbox::geometry::line_string<double>& line2,
@@ -98,7 +144,7 @@ double lineToLineDistance(const mapbox::geometry::line_string<double>& line1,
         mbgl::Log::Error(mbgl::Event::General, "index is out of range");
         return InvalidDistance;
     }
-    double dist = std::numeric_limits<double>::infinity();
+    double dist = InfiniteDistance;
     for (std::size_t i = range1.first; i < range1.second; ++i) {
         const auto& p1 = line1[i];
         const auto& p2 = line1[i + 1];
@@ -106,11 +152,7 @@ double lineToLineDistance(const mapbox::geometry::line_string<double>& line1,
             const auto& q1 = line2[j];
             const auto& q2 = line2[j + 1];
             if (segmentIntersectSegment(p1, p2, q1, q2)) return 0.0;
-            auto dist1 = std::min(pointToLineDistance(p1, mapbox::geometry::line_string<double>{q1, q2}, ruler),
-                                  pointToLineDistance(p2, mapbox::geometry::line_string<double>{q1, q2}, ruler));
-            auto dist2 = std::min(pointToLineDistance(q1, mapbox::geometry::line_string<double>{p1, p2}, ruler),
-                                  pointToLineDistance(q2, mapbox::geometry::line_string<double>{p1, p2}, ruler));
-            dist = std::min(dist, std::min(dist1, dist2));
+            dist = std::min(dist, segmentToSegmentDistance(p1, p2, q1, q2, ruler));
         }
     }
     return dist;
@@ -127,7 +169,7 @@ double pointsToPointsDistance(const mapbox::geometry::multi_point<double>& point
         mbgl::Log::Error(mbgl::Event::General, "index is out of range");
         return InvalidDistance;
     }
-    double dist = std::numeric_limits<double>::infinity();
+    double dist = InfiniteDistance;
     for (std::size_t i = range1.first; i <= range1.second; ++i) {
         for (std::size_t j = range2.first; j <= range2.second; ++j) {
             dist = std::min(dist, ruler.distance(points1[i], points2[j]));
@@ -137,25 +179,87 @@ double pointsToPointsDistance(const mapbox::geometry::multi_point<double>& point
     return dist;
 }
 
-std::pair<mbgl::optional<IndexRange>, mbgl::optional<IndexRange>> splitRange(const IndexRange& range, bool isLine) {
-    auto size = getRangeSize(range);
-    if (isLine) {
-        if (size == 2) {
-            return std::make_pair(range, nullopt);
-        }
-        auto size1 = size / 2;
-        IndexRange range1(range.first, range.first + size1);
-        IndexRange range2(range.first + size1, range.second);
-        return std::make_pair(std::move(range1), std::move(range2));
-    } else {
-        if (size == 1) {
-            return std::make_pair(range, nullopt);
-        }
-        auto size1 = size / 2 - 1;
-        IndexRange range1(range.first, range.first + size1);
-        IndexRange range2(range.first + size1 + 1, range.second);
-        return std::make_pair(std::move(range1), std::move(range2));
+double pointToPolygonDistance(const mapbox::geometry::point<double>& point,
+                              const mapbox::geometry::polygon<double>& polygon,
+                              mapbox::cheap_ruler::CheapRuler& ruler) {
+    if (pointWithinPolygon(point, polygon, true)) return 0.0;
+    double dist = InfiniteDistance;
+    for (const auto& ring : polygon) {
+        const auto nearestPoint = std::get<0>(ruler.pointOnLine(ring, point));
+        dist = std::min(dist, ruler.distance(point, nearestPoint));
+        if (dist == 0.0) return dist;
     }
+    return dist;
+}
+
+double lineToPolygonDistance(const mapbox::geometry::line_string<double>& line,
+                             const IndexRange& range,
+                             const mapbox::geometry::polygon<double>& polygon,
+                             mapbox::cheap_ruler::CheapRuler& ruler) {
+    bool rangeSafe = (range.second >= range.first && range.second < line.size());
+    if (!rangeSafe) {
+        mbgl::Log::Error(mbgl::Event::General, "index is out of range");
+        return InvalidDistance;
+    }
+    for (std::size_t i = range.first; i <= range.second; ++i) {
+        if (pointWithinPolygon(line[i], polygon, true)) return 0.0;
+    }
+
+    double dist = InfiniteDistance;
+    for (std::size_t i = range.first; i < range.second; ++i) {
+        const auto& p1 = line[i];
+        const auto& p2 = line[i + 1];
+        for (const auto& ring : polygon) {
+            for (std::size_t j = 0; j < ring.size() - 2; ++j) {
+                const auto& q1 = ring[j];
+                const auto& q2 = ring[j + 1];
+                if (segmentIntersectSegment(p1, p2, q1, q2)) return 0.0;
+                dist = std::min(dist, segmentToSegmentDistance(p1, p2, q1, q2, ruler));
+            }
+        }
+    }
+    return dist;
+}
+
+double polygonToPolygonDistance(const mapbox::geometry::polygon<double>& polygon1,
+                                const mapbox::geometry::polygon<double>& polygon2,
+                                mapbox::cheap_ruler::CheapRuler& ruler,
+                                double currentMiniDist = InfiniteDistance) {
+    const auto bbox1 = getBBox(polygon1);
+    const auto bbox2 = getBBox(polygon2);
+    if (currentMiniDist != InfiniteDistance && bboxToBBoxDistance(bbox1, bbox2, ruler) >= currentMiniDist)
+        return currentMiniDist;
+
+    const auto polygonIntersect = [](const mapbox::geometry::polygon<double>& poly1,
+                                     const mapbox::geometry::polygon<double>& poly2) {
+        for (const auto& ring : poly1) {
+            for (std::size_t i = 0; i <= ring.size() - 2; ++i) {
+                if (pointWithinPolygon(ring[i], poly2, true)) return true;
+            }
+        }
+        return false;
+    };
+    if (boxWithinBox(bbox1, bbox2)) {
+        if (polygonIntersect(polygon1, polygon2)) return 0.0;
+    } else if (polygonIntersect(polygon2, polygon1))
+        return 0.0;
+
+    double dist = InfiniteDistance;
+    for (const auto& ring1 : polygon1) {
+        for (std::size_t i = 0; i < ring1.size() - 2; ++i) {
+            const auto& p1 = ring1[i];
+            const auto& p2 = ring1[i + 1];
+            for (const auto& ring2 : polygon2) {
+                for (std::size_t j = 0; j < ring2.size() - 2; ++j) {
+                    const auto& q1 = ring2[j];
+                    const auto& q2 = ring2[j + 1];
+                    if (segmentIntersectSegment(p1, p2, q1, q2)) return 0.0;
+                    dist = std::min(dist, segmentToSegmentDistance(p1, p2, q1, q2, ruler));
+                }
+            }
+        }
+    }
+    return dist;
 }
 
 // <distance, range1, range2>
@@ -166,12 +270,90 @@ struct Comparator {
 // The priority queue will ensure the top element would always be the pair that has the biggest distance
 using DistQueue = std::priority_queue<DistPair, std::deque<DistPair>, Comparator>;
 
+double lineToPolygonDistance(const mapbox::geometry::line_string<double>& line,
+                             const mapbox::geometry::polygon<double>& polygon,
+                             mapbox::cheap_ruler::CheapRuler& ruler,
+                             double currentMiniDist = InfiniteDistance) {
+    auto miniDist = std::min(ruler.distance(line[0], polygon[0][0]), currentMiniDist);
+    DistQueue distQueue;
+    distQueue.push(std::forward_as_tuple(0, IndexRange(0, line.size() - 1), IndexRange(0, 0)));
+
+    while (!distQueue.empty()) {
+        auto distPair = distQueue.top();
+        distQueue.pop();
+        if (std::get<0>(distPair) > miniDist) continue;
+        auto& range = std::get<1>(distPair);
+
+        // In case the set size are relatively small, we could use brute-force directly
+        if (getRangeSize(range) <= MinLinePointsSize) {
+            auto tempDist = lineToPolygonDistance(line, range, polygon, ruler);
+            if (std::isnan(tempDist)) return tempDist;
+            miniDist = std::min(miniDist, tempDist);
+            if (miniDist == 0.0) return 0.0;
+        } else {
+            auto newRangesA = splitRange(range, true /*isLine*/);
+            const auto updateQueue =
+                [&distQueue, &miniDist, &ruler, &line, &polygon](mbgl::optional<IndexRange>& rangeA) {
+                    if (!rangeA) return;
+                    auto tempDist = bboxToBBoxDistance(getBBox(line, *rangeA), getBBox(polygon), ruler);
+                    // Insert new pair to the queue if the bbox distance is less or equal to miniDist,
+                    // The pair with biggest distance will be at the top
+                    if (tempDist <= miniDist)
+                        distQueue.push(std::make_tuple(tempDist, std::move(*rangeA), IndexRange(0, 0)));
+                };
+            updateQueue(newRangesA.first);
+            updateQueue(newRangesA.second);
+        }
+    }
+    return miniDist;
+}
+
+double pointsToPolygonDistance(const mapbox::geometry::multi_point<double>& points,
+                               const mapbox::geometry::polygon<double>& polygon,
+                               mapbox::cheap_ruler::CheapRuler& ruler,
+                               double currentMiniDist = InfiniteDistance) {
+    auto miniDist = std::min(ruler.distance(points[0], polygon[0][0]), currentMiniDist);
+    DistQueue distQueue;
+    distQueue.push(std::forward_as_tuple(0, IndexRange(0, points.size() - 1), IndexRange(0, 0)));
+
+    while (!distQueue.empty()) {
+        auto distPair = distQueue.top();
+        distQueue.pop();
+        if (std::get<0>(distPair) > miniDist) continue;
+        auto& range = std::get<1>(distPair);
+
+        // In case the set size are relatively small, we could use brute-force directly
+        if (getRangeSize(range) <= MinLinePointsSize) {
+            for (std::size_t i = range.first; i <= range.second; ++i) {
+                auto tempDist = pointToPolygonDistance(points[i], polygon, ruler);
+                miniDist = std::min(miniDist, tempDist);
+                if (miniDist == 0.0) return 0.0;
+            }
+        } else {
+            auto newRangesA = splitRange(range, true /*isLine*/);
+            const auto updateQueue =
+                [&distQueue, &miniDist, &ruler, &points, &polygon](mbgl::optional<IndexRange>& rangeA) {
+                    if (!rangeA) return;
+                    auto tempDist = bboxToBBoxDistance(getBBox(points, *rangeA), getBBox(polygon), ruler);
+                    // Insert new pair to the queue if the bbox distance is less or equal to miniDist,
+                    // The pair with biggest distance will be at the top
+                    if (tempDist <= miniDist)
+                        distQueue.push(std::make_tuple(tempDist, std::move(*rangeA), IndexRange(0, 0)));
+                };
+            updateQueue(newRangesA.first);
+            updateQueue(newRangesA.second);
+        }
+    }
+    return miniDist;
+}
+
 // Divide and conqure, the time complexity is O(n*lgn), faster than Brute force O(n*n)
 // Use index for in-place processing.
 double lineToLineDistance(const mapbox::geometry::line_string<double>& line1,
                           const mapbox::geometry::multi_point<double>& line2,
-                          mapbox::cheap_ruler::CheapRuler& ruler) {
-    auto miniDist = ruler.distance(line1[0], line2[0]);
+                          mapbox::cheap_ruler::CheapRuler& ruler,
+                          double currentMiniDist = InfiniteDistance) {
+    auto miniDist = std::min(ruler.distance(line1[0], line2[0]), currentMiniDist);
     DistQueue distQueue;
     distQueue.push(std::forward_as_tuple(0, IndexRange(0, line1.size() - 1), IndexRange(0, line2.size() - 1)));
 
@@ -308,7 +490,7 @@ double pointsToLineDistance(const mapbox::geometry::multi_point<double>& points,
 double pointsToLinesDistance(const mapbox::geometry::multi_point<double>& points,
                              const mapbox::geometry::multi_line_string<double>& lines,
                              mapbox::cheap_ruler::CheapRuler& ruler) {
-    double dist = std::numeric_limits<double>::infinity();
+    double dist = InfiniteDistance;
     for (const auto& line : lines) {
         dist = std::min(dist, pointsToLineDistance(points, line, ruler));
         if (dist == 0.0) return 0.0;
@@ -319,9 +501,9 @@ double pointsToLinesDistance(const mapbox::geometry::multi_point<double>& points
 double lineToLinesDistance(const mapbox::geometry::line_string<double>& line,
                            const mapbox::geometry::multi_line_string<double>& lines,
                            mapbox::cheap_ruler::CheapRuler& ruler) {
-    double dist = std::numeric_limits<double>::infinity();
+    double dist = InfiniteDistance;
     for (const auto& l : lines) {
-        dist = std::min(dist, lineToLineDistance(line, l, ruler));
+        dist = std::min(dist, lineToLineDistance(line, l, ruler, dist));
         if (dist == 0.0) return 0.0;
     }
     return dist;
@@ -343,6 +525,19 @@ double pointsToGeometryDistance(const mapbox::geometry::multi_point<double>& poi
         [&points, &ruler](const mapbox::geometry::multi_line_string<double>& lines) {
             return pointsToLinesDistance(points, lines, ruler);
         },
+        [&points, &ruler](const mapbox::geometry::polygon<double>& polygon) -> double {
+            return pointsToPolygonDistance(points, polygon, ruler);
+        },
+        [&points, &ruler](const mapbox::geometry::multi_polygon<double>& polygons) -> double {
+            double dist = InfiniteDistance;
+            for (const auto& polygon : polygons) {
+                auto tempDist = pointsToPolygonDistance(points, polygon, ruler, dist);
+                if (std::isnan(tempDist)) return tempDist;
+                dist = std::min(dist, tempDist);
+                if (dist == 0.0 || std::isnan(dist)) return dist;
+            }
+            return dist;
+        },
         [](const auto&) { return InvalidDistance; });
 }
 
@@ -362,6 +557,57 @@ double lineToGeometryDistance(const mapbox::geometry::line_string<double>& line,
         [&line, &ruler](const mapbox::geometry::multi_line_string<double>& lines) {
             return lineToLinesDistance(line, lines, ruler);
         },
+        [&line, &ruler](const mapbox::geometry::polygon<double>& polygon) -> double {
+            return lineToPolygonDistance(line, polygon, ruler);
+        },
+        [&line, &ruler](const mapbox::geometry::multi_polygon<double>& polygons) -> double {
+            double dist = InfiniteDistance;
+            for (const auto& polygon : polygons) {
+                auto tempDist = lineToPolygonDistance(line, polygon, ruler, dist);
+                if (std::isnan(tempDist)) return tempDist;
+                dist = std::min(dist, tempDist);
+                if (dist == 0.0 || std::isnan(dist)) return dist;
+            }
+            return dist;
+        },
+        [](const auto&) { return InvalidDistance; });
+}
+
+double polygonToGeometryDistance(const mapbox::geometry::polygon<double>& polygon,
+                                 const Feature::geometry_type& geoSet) {
+    assert(!polygon.empty());
+    mapbox::cheap_ruler::CheapRuler ruler(polygon.front().front().y, UnitInMeters);
+    return geoSet.match(
+        [&polygon, &ruler](const mapbox::geometry::point<double>& p) {
+            return pointToPolygonDistance(p, polygon, ruler);
+        },
+        [&polygon, &ruler](const mapbox::geometry::multi_point<double>& points) {
+            return pointsToPolygonDistance(points, polygon, ruler);
+        },
+        [&polygon, &ruler](const mapbox::geometry::line_string<double>& line) {
+            return lineToPolygonDistance(line, polygon, ruler);
+        },
+        [&polygon, &ruler](const mapbox::geometry::multi_line_string<double>& lines) {
+            double dist = InfiniteDistance;
+            for (const auto& line : lines) {
+                auto tempDist = lineToPolygonDistance(line, polygon, ruler);
+                dist = std::min(dist, tempDist);
+                if (dist == 0.0 || std::isnan(dist)) return dist;
+            }
+            return dist;
+        },
+        [&polygon, &ruler](const mapbox::geometry::polygon<double>& polygon1) {
+            return polygonToPolygonDistance(polygon, polygon1, ruler);
+        },
+        [&polygon, &ruler](const mapbox::geometry::multi_polygon<double>& polygons) {
+            double dist = InfiniteDistance;
+            for (const auto& polygon1 : polygons) {
+                auto tempDist = polygonToPolygonDistance(polygon, polygon1, ruler, dist);
+                dist = std::min(dist, tempDist);
+                if (dist == 0.0 || std::isnan(dist)) return dist;
+            }
+            return dist;
+        },
         [](const auto&) { return InvalidDistance; });
 }
 
@@ -380,9 +626,22 @@ double calculateDistance(const GeometryTileFeature& feature,
                 return lineToGeometryDistance(line, geoSet);
             },
             [&geoSet](const mapbox::geometry::multi_line_string<double>& lines) -> double {
-                double dist = std::numeric_limits<double>::infinity();
+                double dist = InfiniteDistance;
                 for (const auto& line : lines) {
                     auto tempDist = lineToGeometryDistance(line, geoSet);
+                    if (std::isnan(tempDist)) return tempDist;
+                    dist = std::min(dist, tempDist);
+                    if (dist == 0.0 || std::isnan(dist)) return dist;
+                }
+                return dist;
+            },
+            [&geoSet](const mapbox::geometry::polygon<double>& polygon) -> double {
+                return polygonToGeometryDistance(polygon, geoSet);
+            },
+            [&geoSet](const mapbox::geometry::multi_polygon<double>& polygons) -> double {
+                double dist = InfiniteDistance;
+                for (const auto& polygon : polygons) {
+                    auto tempDist = polygonToGeometryDistance(polygon, geoSet);
                     if (std::isnan(tempDist)) return tempDist;
                     dist = std::min(dist, tempDist);
                     if (dist == 0.0 || std::isnan(dist)) return dist;
@@ -419,10 +678,11 @@ optional<GeoJSON> parseValue(const style::conversion::Convertible& value, style:
 
 optional<Feature::geometry_type> getGeometry(const Feature& feature, mbgl::style::expression::ParsingContext& ctx) {
     const auto type = apply_visitor(ToFeatureType(), feature.geometry);
-    if (type == FeatureType::Point || type == FeatureType::LineString) {
+    if (type != FeatureType::Unknown) {
         return feature.geometry;
     }
-    ctx.error("'distance' expression requires valid geojson object with valid geometry type: Point/LineString.");
+    ctx.error(
+        "'distance' expression requires valid geojson object with valid geometry type: Point, LineString or Polygon.");
     return nullopt;
 }
 } // namespace
@@ -442,14 +702,14 @@ EvaluationResult Distance::evaluate(const EvaluationContext& params) const {
         return EvaluationError{"distance expression requirs valid feature and canonical information."};
     }
     auto geometryType = params.feature->getType();
-    if (geometryType == FeatureType::Point || geometryType == FeatureType::LineString) {
+    if (geometryType != FeatureType::Unknown) {
         auto distance = calculateDistance(*params.feature, *params.canonical, geometries);
         if (!std::isnan(distance)) {
             assert(distance >= 0.0);
             return distance;
         }
     }
-    return EvaluationError{"distance expression currently only evaluates Point/LineString geometries."};
+    return EvaluationError{"distance expression currently only evaluates Point/LineString/Polygon geometries."};
 }
 
 ParseResult Distance::parse(const Convertible& value, ParsingContext& ctx) {

@@ -157,9 +157,13 @@ template bool lineStringWithinPolygon(const LineString<int64_t>& line, const Pol
 template bool lineStringWithinPolygons(const LineString<int64_t>& line, const MultiPolygon<int64_t>& polygons);
 
 template void updateBBox(GeometryBBox<double>& bbox, const Point<double>& p);
+template bool boxWithinBox(const GeometryBBox<double>& bbox1, const GeometryBBox<double>& bbox2);
 template bool segmentIntersectSegment(const Point<double>& a,
                                       const Point<double>& b,
                                       const Point<double>& c,
                                       const Point<double>& d);
+template bool pointWithinPolygon(const Point<double>& point,
+                                 const Polygon<double>& polygon,
+                                 bool trueOnBoundary = false);
 
 } // namespace mbgl
