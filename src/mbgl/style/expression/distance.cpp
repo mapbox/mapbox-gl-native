@@ -394,28 +394,26 @@ double calculateDistance(const GeometryTileFeature& feature,
 
 optional<GeoJSON> parseValue(const style::conversion::Convertible& value, style::expression::ParsingContext& ctx) {
     if (isArray(value)) {
-        // object value, quoted with ["Distance", GeoJSONObj, "unit(optional)"]
+        // object value, quoted with ["Distance", GeoJSONObj]
         auto length = arrayLength(value);
-        if (length != 2 && length != 3) {
-            ctx.error("'distance' expression requires either one argument or two arguments, but found " +
+        if (length != 2) {
+            ctx.error("'distance' expression requires one argument, but found " +
                       util::toString(arrayLength(value) - 1) + " instead.");
             return nullopt;
         }
 
         // Parse geometry info
-        const auto& argument1 = arrayMember(value, 1);
-        if (isObject(argument1)) {
+        const auto& argument = arrayMember(value, 1);
+        if (isObject(argument)) {
             style::conversion::Error error;
-            auto geojson = toGeoJSON(argument1, error);
+            auto geojson = toGeoJSON(argument, error);
             if (geojson && error.message.empty()) {
                 return *geojson;
             }
             ctx.error(error.message);
         }
     }
-    ctx.error(
-        "'distance' expression needs to be an array with format [\"Distance\", GeoJSONObj, \"units\"(\"units\" is an "
-        "optional argument, 'meters' will be used by default)].");
+    ctx.error("'distance' expression needs to be an array with format [\"Distance\", GeoJSONObj].");
     return nullopt;
 }
 
