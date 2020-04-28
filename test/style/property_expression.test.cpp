@@ -468,11 +468,12 @@ TEST(PropertyExpression, WithinExpressionAntiMeridian) {
 TEST(PropertyExpression, DistanceExpression) {
     static const double invalidResult = std::numeric_limits<double>::quiet_NaN();
     static const CanonicalTileID canonicalTileID(15, 18653, 9484);
+
     // Parsing error with invalid geojson source
     {
         // geoJSON source must be Point or LineString.
         const std::string invalidGeoSource = R"({
-            "type": "Polygon",
+            "type": "Unknown",
             "coordinates": [[[0, 0], [0, 5], [5, 5], [5, 0], [0, 0]]]
             })";
         std::stringstream ss;
@@ -481,46 +482,16 @@ TEST(PropertyExpression, DistanceExpression) {
         ASSERT_FALSE(expression);
     }
 
-    // Parsing error with invalid unit
+    // Parsing error with extra arguments
     {
         const std::string invalidGeoSource = R"({
             "type": "Point",
             "coordinates": [0, 0],
             })";
         std::stringstream ss;
-        ss << std::string(R"(["distance", )") << invalidGeoSource << std::string(R"(, "InvalidUnits"])");
+        ss << std::string(R"(["distance", )") << invalidGeoSource << std::string(R"(, "ExtraArgument"])");
         auto expression = createExpression(ss.str().c_str());
         ASSERT_FALSE(expression);
-    }
-
-    // Evaluation test with non-supported geometry type
-    {
-        const std::string pointGeoSource = R"({
-                "type": "Point",
-                "coordinates":
-                    [
-                        24.938492774963375,
-                        60.16980226227959
-                    ]
-                    })";
-        std::stringstream ss;
-        ss << std::string(R"(["distance", )") << pointGeoSource << std::string(R"( ])");
-        auto expression = createExpression(ss.str().c_str());
-        ASSERT_TRUE(expression);
-        PropertyExpression<double> propExpr(std::move(expression));
-
-        Polygon<double> testRing{{{24.937505722045895, 60.16815846879986},
-                                  {24.940595626831055, 60.16815846879986},
-                                  {24.940595626831055, 60.169268572114106},
-                                  {24.937505722045895, 60.169268572114106},
-                                  {24.937505722045895, 60.16815846879986}}};
-        auto geoPoly = convertGeometry(testRing, canonicalTileID);
-        StubGeometryTileFeature polyFeature(FeatureType::Polygon, geoPoly);
-
-        // return evaluation error
-        auto evaluatedResult =
-            propExpr.evaluate(EvaluationContext(&polyFeature).withCanonicalTileID(&canonicalTileID), invalidResult);
-        EXPECT_TRUE(std::isnan(evaluatedResult));
     }
 
     // Evaluation test with Point to Point distance by using different units
@@ -751,5 +722,157 @@ TEST(PropertyExpression, DistanceExpression) {
         auto evaluatedResult = propExpr.evaluate(
             EvaluationContext(&multiLineFeature).withCanonicalTileID(&canonicalTileID), invalidResult);
         EXPECT_NEAR(384.109, evaluatedResult, 0.01);
+    }
+
+    // Evaluation test with MultiPoint to MultiPolygon distance
+    {
+        const auto multiPolygon = mbgl::util::read_file("test/fixtures/geometry_data/multi_polygon_1.geojson");
+        std::stringstream ss;
+        ss << std::string(R"(["distance", )") << multiPolygon << std::string(R"( ])");
+        auto expression = createExpression(ss.str().c_str());
+        ASSERT_TRUE(expression);
+        PropertyExpression<double> propExpr(std::move(expression));
+
+        const auto multiPointFeature1 = getFeature("multi_point_3.geojson", FeatureType::Point, canonicalTileID);
+        auto evaluatedResult = propExpr.evaluate(
+            EvaluationContext(&multiPointFeature1).withCanonicalTileID(&canonicalTileID), invalidResult);
+        EXPECT_NEAR(27.917, evaluatedResult, 0.01);
+
+        const auto multiPointFeature2 = getFeature("multi_point_2.geojson", FeatureType::Point, canonicalTileID);
+        evaluatedResult = propExpr.evaluate(
+            EvaluationContext(&multiPointFeature2).withCanonicalTileID(&canonicalTileID), invalidResult);
+        EXPECT_NEAR(0.0, evaluatedResult, 0.01);
+    }
+
+    // Evaluation test with MultiLine to MultiPolygon distance
+    {
+        const auto multiPolygon = mbgl::util::read_file("test/fixtures/geometry_data/multi_polygon_1.geojson");
+        std::stringstream ss;
+        ss << std::string(R"(["distance", )") << multiPolygon << std::string(R"( ])");
+        auto expression = createExpression(ss.str().c_str());
+        ASSERT_TRUE(expression);
+        PropertyExpression<double> propExpr(std::move(expression));
+
+        const auto multiLineFeature1 =
+            getFeature("multi_line_string_1.geojson", FeatureType::LineString, canonicalTileID);
+        auto evaluatedResult = propExpr.evaluate(
+            EvaluationContext(&multiLineFeature1).withCanonicalTileID(&canonicalTileID), invalidResult);
+        EXPECT_NEAR(193.450, evaluatedResult, 0.01);
+
+        const auto multiLineFeature2 =
+            getFeature("multi_line_string_2.geojson", FeatureType::LineString, canonicalTileID);
+        evaluatedResult = propExpr.evaluate(EvaluationContext(&multiLineFeature2).withCanonicalTileID(&canonicalTileID),
+                                            invalidResult);
+        EXPECT_NEAR(0.0, evaluatedResult, 0.01);
+    }
+
+    // Evaluation test with Polygon to MultiPolygon distance
+    {
+        const auto multiPolygon = mbgl::util::read_file("test/fixtures/geometry_data/multi_polygon_1.geojson");
+        std::stringstream ss;
+        ss << std::string(R"(["distance", )") << multiPolygon << std::string(R"( ])");
+        auto expression = createExpression(ss.str().c_str());
+        ASSERT_TRUE(expression);
+        PropertyExpression<double> propExpr(std::move(expression));
+
+        Polygon<double> polygon{{{24.94171142578125, 60.16777419352904},
+                                 {24.948577880859375, 60.16777419352904},
+                                 {24.948577880859375, 60.170122472217564},
+                                 {24.94171142578125, 60.170122472217564},
+                                 {24.94171142578125, 60.16777419352904}}};
+        auto geoPolygon = convertGeometry(polygon, canonicalTileID);
+        StubGeometryTileFeature polygonFeature(FeatureType::Polygon, geoPolygon);
+
+        auto evaluatedResult =
+            propExpr.evaluate(EvaluationContext(&polygonFeature).withCanonicalTileID(&canonicalTileID), invalidResult);
+        EXPECT_NEAR(203.876, evaluatedResult, 0.01);
+    }
+
+    // Evaluation test with MultiPolygon to MultiPolygon distance
+    {
+        const auto multiPolygon = mbgl::util::read_file("test/fixtures/geometry_data/multi_polygon_1.geojson");
+        std::stringstream ss;
+        ss << std::string(R"(["distance", )") << multiPolygon << std::string(R"( ])");
+        auto expression = createExpression(ss.str().c_str());
+        ASSERT_TRUE(expression);
+        PropertyExpression<double> propExpr(std::move(expression));
+
+        const auto multiPolygonFeature = getFeature("multi_polygon_2.geojson", FeatureType::Polygon, canonicalTileID);
+        auto evaluatedResult = propExpr.evaluate(
+            EvaluationContext(&multiPolygonFeature).withCanonicalTileID(&canonicalTileID), invalidResult);
+        EXPECT_NEAR(41.632, evaluatedResult, 0.01);
+    }
+
+    // Evaluation test with LineString/Polygon to Polygon distance with special cases
+    {
+        const std::string multiPolygon = R"({
+                    "type": "Polygon",
+                          "coordinates": [[[24.937891960144043, 60.16730451765011],
+                                           [24.94892120361328, 60.16730451765011],
+                                           [24.94892120361328, 60.17010112498546],
+                                           [24.937891960144043, 60.17010112498546],
+                                           [24.937891960144043, 60.16730451765011]]]})";
+        std::stringstream ss;
+        ss << std::string(R"(["distance", )") << multiPolygon << std::string(R"( ])");
+        auto expression = createExpression(ss.str().c_str());
+        ASSERT_TRUE(expression);
+        PropertyExpression<double> propExpr(std::move(expression));
+
+        // polygon1 is fully inside polygon
+        Polygon<double> polygon1{{{24.941797256469727, 60.16850004304534},
+                                  {24.94235515594482, 60.16850004304534},
+                                  {24.94235515594482, 60.169439353910285},
+                                  {24.941797256469727, 60.169439353910285},
+                                  {24.941797256469727, 60.16850004304534}}};
+        auto geoPolygon1 = convertGeometry(polygon1, canonicalTileID);
+        StubGeometryTileFeature polygonFeature1(FeatureType::Polygon, geoPolygon1);
+
+        auto evaluatedResult =
+            propExpr.evaluate(EvaluationContext(&polygonFeature1).withCanonicalTileID(&canonicalTileID), invalidResult);
+        EXPECT_NEAR(0.0, evaluatedResult, 0.01);
+
+        // polygon2's line is intersecting polygon, but no point is inside polygon
+        Polygon<double> polygon2{{{24.943385124206543, 60.166066249059554},
+                                  {24.94596004486084, 60.166066249059554},
+                                  {24.94596004486084, 60.1714246271462},
+                                  {24.943385124206543, 60.1714246271462},
+                                  {24.943385124206543, 60.166066249059554}}};
+        auto geoPolygon2 = convertGeometry(polygon2, canonicalTileID);
+        StubGeometryTileFeature polygonFeature2(FeatureType::Polygon, geoPolygon2);
+
+        evaluatedResult =
+            propExpr.evaluate(EvaluationContext(&polygonFeature2).withCanonicalTileID(&canonicalTileID), invalidResult);
+        EXPECT_NEAR(0.0, evaluatedResult, 0.01);
+
+        // one of polygon3's point is inside polygon
+        Polygon<double> polygon3{{{24.94797706604004, 60.1694607015724},
+                                  {24.952354431152344, 60.1694607015724},
+                                  {24.952354431152344, 60.17082692309542},
+                                  {24.94797706604004, 60.17082692309542},
+                                  {24.94797706604004, 60.1694607015724}}};
+        auto geoPolygon3 = convertGeometry(polygon3, canonicalTileID);
+        StubGeometryTileFeature polygonFeature3(FeatureType::Polygon, geoPolygon3);
+
+        evaluatedResult =
+            propExpr.evaluate(EvaluationContext(&polygonFeature3).withCanonicalTileID(&canonicalTileID), invalidResult);
+        EXPECT_NEAR(0.0, evaluatedResult, 0.01);
+
+        // lineString1 is within polygon
+        LineString<double> lineString1{{24.947097301483154, 60.16921520262075}, {24.947311878204346, 60.1680197032483}};
+        auto geoLineString1 = convertGeometry(lineString1, canonicalTileID);
+        StubGeometryTileFeature lineFeature1(FeatureType::LineString, geoLineString1);
+
+        evaluatedResult =
+            propExpr.evaluate(EvaluationContext(&lineFeature1).withCanonicalTileID(&canonicalTileID), invalidResult);
+        EXPECT_NEAR(0.0, evaluatedResult, 0.01);
+
+        // lineString2 is intersecting the polygon but its points are outside the polygon
+        LineString<double> lineString2{{24.93999481201172, 60.17116846959888}, {24.940037727355957, 60.16542574699484}};
+        auto geoLineString2 = convertGeometry(lineString2, canonicalTileID);
+        StubGeometryTileFeature lineFeature2(FeatureType::LineString, geoLineString2);
+
+        evaluatedResult =
+            propExpr.evaluate(EvaluationContext(&lineFeature2).withCanonicalTileID(&canonicalTileID), invalidResult);
+        EXPECT_NEAR(0.0, evaluatedResult, 0.01);
     }
 }
