@@ -17,6 +17,8 @@ public:
     void backfillBorder(const DEMData& borderTileData, int8_t dx, int8_t dy);
 
     int32_t get(int32_t x, int32_t y) const;
+    float getFloat(int32_t x, int32_t y) const;
+    float getInterpolated(float x, float y) const;
     const std::array<float, 4>& getUnpackVector() const;
 
     const PremultipliedImage* getImage() const {

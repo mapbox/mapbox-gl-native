@@ -76,6 +76,12 @@ public:
 
     bool layerPropertiesUpdated(const Immutable<style::LayerProperties>& layerProperties) override;
 
+    void queryRenderedFeatures(std::unordered_map<std::string, std::vector<Feature>>& result,
+                               const GeometryCoordinates& queryGeometry, const TransformState&,
+                               const std::unordered_map<std::string, const RenderLayer*>& layers,
+                               const RenderedQueryOptions& options, const mat4& projMatrix,
+                               const SourceFeatureState& featureState) override;
+
     HillshadeBucket* getBucket() const;
     void backfillBorder(const RasterDEMTile& borderTile, DEMTileNeighbors mask);
 

@@ -108,11 +108,17 @@ void RenderRasterDEMSource::onTileChanged(Tile& tile){
 }
 
 std::unordered_map<std::string, std::vector<Feature>>
-RenderRasterDEMSource::queryRenderedFeatures(const ScreenLineString&,
-                                          const TransformState&,
-                                          const std::unordered_map<std::string, const RenderLayer*>&,
-                                          const RenderedQueryOptions&,
-                                          const mat4&) const {
+RenderRasterDEMSource::queryRenderedFeatures(const ScreenLineString& geometry,
+                                             const TransformState& transformState,
+                                             const std::unordered_map<std::string, const RenderLayer*>& layers,
+                                             const RenderedQueryOptions& options,
+                                             const mat4& projMatrix) const {
+    // Only query the first layer for this source.
+    for (const auto& layer : layers) {
+        if (layer.second->baseImpl->source == impl().id) {
+            return tilePyramid.queryRenderedFeatures(geometry, transformState, { layer }, options, projMatrix, {});
+        }
+    }
     return std::unordered_map<std::string, std::vector<Feature>>{};
 }
 

@@ -2,11 +2,13 @@
 
 #include <mbgl/actor/scheduler.hpp>
 #include <mbgl/renderer/buckets/hillshade_bucket.hpp>
+#include <mbgl/renderer/query.hpp>
 #include <mbgl/renderer/tile_parameters.hpp>
 #include <mbgl/renderer/tile_render_data.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/style/source.hpp>
+#include <mbgl/tile/geojson_tile_data.hpp>
 #include <mbgl/tile/raster_dem_tile_worker.hpp>
 #include <mbgl/tile/tile_loader_impl.hpp>
 #include <mbgl/tile/tile_observer.hpp>
@@ -77,6 +79,42 @@ void RasterDEMTile::onError(std::exception_ptr err, const uint64_t resultCorrela
 
 bool RasterDEMTile::layerPropertiesUpdated(const Immutable<style::LayerProperties>&) {
     return bool(bucket);
+}
+
+void RasterDEMTile::queryRenderedFeatures(std::unordered_map<std::string, std::vector<Feature>>& result,
+                                          const GeometryCoordinates& queryGeometry, const TransformState&,
+                                          const std::unordered_map<std::string, const RenderLayer*>& layers,
+                                          const RenderedQueryOptions& options, const mat4&,
+                                          const SourceFeatureState&) {
+    // Only handle point query.
+    if (queryGeometry.size() != 1) {
+        return;
+    }
+
+    if (!bucket || !bucket->hasData()) {
+        return;
+    }
+
+    // Only query the first layer.
+    for (const auto& layer : layers) {
+        if (mbgl::underlying_type(layer.second->baseImpl->getTypeInfo()->tileKind) == mbgl::underlying_type(kind)) {
+            const auto& demData = bucket->getDEMData();
+            const auto& coord = queryGeometry[0];
+            auto x = float(coord.x) / util::EXTENT * demData.dim;
+            auto y = float(coord.y) / util::EXTENT * demData.dim;
+            auto feature = mapbox::feature::feature<int16_t>(coord);
+            feature.properties["ele"] = demData.getInterpolated(x, y);
+            feature.properties["zoom"] = id.canonical.z;
+            auto tileFeature = GeoJSONTileFeature(feature);
+
+            if (options.filter && !(*options.filter)(style::expression::EvaluationContext { static_cast<float>(id.overscaledZ), &tileFeature })) {
+                return;
+            }
+
+            result[layer.first].push_back(convertFeature(tileFeature, id.canonical));
+            return;
+        }
+    }
 }
 
 HillshadeBucket* RasterDEMTile::getBucket() const {
