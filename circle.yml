@@ -459,6 +459,12 @@ commands:
           if [[ $CIRCLE_BRANCH == master ]]; then
               scripts/publish_core_codecoverage.js -p Linux -s Core
           fi
+  publish-github-statistics:
+    steps:
+    - run:
+        name: Collect GitHub statistics
+        command: |
+            scripts/publish_github_stats.js
 
 jobs:
   ios-render-test-runner:
@@ -700,6 +706,7 @@ jobs:
       - prepare
       - config:
           config_params: '-G Ninja -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8'
+      - publish-github-statistics
       - run:
           name: Code Generators
           command: |
@@ -783,6 +790,9 @@ jobs:
       publish_coverage:
         type: boolean
         default: false
+      publish_github_stats:
+        type: boolean
+        default: false
     executor: << parameters.executor_name >>
     steps:
       - checkout
@@ -840,4 +850,8 @@ jobs:
           condition: << parameters.publish_coverage >>
           steps:
             - publish-coverage-metrics
+      - when:
+          condition: << parameters.publish_github_stats >>
+          steps:
+            - publish-github-statistics
       - save
