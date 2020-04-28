@@ -270,6 +270,9 @@ struct Comparator {
 // The priority queue will ensure the top element would always be the pair that has the biggest distance
 using DistQueue = std::priority_queue<DistPair, std::deque<DistPair>, Comparator>;
 
+// Divide and conqure, the time complexity is O(n*lgn), faster than Brute force O(n*n)
+// Most of the time, use index for in-place processing.
+
 double lineToPolygonDistance(const mapbox::geometry::line_string<double>& line,
                              const mapbox::geometry::polygon<double>& polygon,
                              mapbox::cheap_ruler::CheapRuler& ruler,
@@ -278,6 +281,7 @@ double lineToPolygonDistance(const mapbox::geometry::line_string<double>& line,
     DistQueue distQueue;
     distQueue.push(std::forward_as_tuple(0, IndexRange(0, line.size() - 1), IndexRange(0, 0)));
 
+    const auto polyBBox = getBBox(polygon);
     while (!distQueue.empty()) {
         auto distPair = distQueue.top();
         distQueue.pop();
@@ -293,9 +297,9 @@ double lineToPolygonDistance(const mapbox::geometry::line_string<double>& line,
         } else {
             auto newRangesA = splitRange(range, true /*isLine*/);
             const auto updateQueue =
-                [&distQueue, &miniDist, &ruler, &line, &polygon](mbgl::optional<IndexRange>& rangeA) {
+                [&distQueue, &miniDist, &ruler, &line, &polyBBox](mbgl::optional<IndexRange>& rangeA) {
                     if (!rangeA) return;
-                    auto tempDist = bboxToBBoxDistance(getBBox(line, *rangeA), getBBox(polygon), ruler);
+                    auto tempDist = bboxToBBoxDistance(getBBox(line, *rangeA), polyBBox, ruler);
                     // Insert new pair to the queue if the bbox distance is less or equal to miniDist,
                     // The pair with biggest distance will be at the top
                     if (tempDist <= miniDist)
@@ -316,6 +320,7 @@ double pointsToPolygonDistance(const mapbox::geometry::multi_point<double>& poin
     DistQueue distQueue;
     distQueue.push(std::forward_as_tuple(0, IndexRange(0, points.size() - 1), IndexRange(0, 0)));
 
+    const auto polyBBox = getBBox(polygon);
     while (!distQueue.empty()) {
         auto distPair = distQueue.top();
         distQueue.pop();
@@ -330,11 +335,11 @@ double pointsToPolygonDistance(const mapbox::geometry::multi_point<double>& poin
                 if (miniDist == 0.0) return 0.0;
             }
         } else {
-            auto newRangesA = splitRange(range, true /*isLine*/);
+            auto newRangesA = splitRange(range, false /*isLine*/);
             const auto updateQueue =
-                [&distQueue, &miniDist, &ruler, &points, &polygon](mbgl::optional<IndexRange>& rangeA) {
+                [&distQueue, &miniDist, &ruler, &points, &polyBBox](mbgl::optional<IndexRange>& rangeA) {
                     if (!rangeA) return;
-                    auto tempDist = bboxToBBoxDistance(getBBox(points, *rangeA), getBBox(polygon), ruler);
+                    auto tempDist = bboxToBBoxDistance(getBBox(points, *rangeA), polyBBox, ruler);
                     // Insert new pair to the queue if the bbox distance is less or equal to miniDist,
                     // The pair with biggest distance will be at the top
                     if (tempDist <= miniDist)
@@ -347,8 +352,6 @@ double pointsToPolygonDistance(const mapbox::geometry::multi_point<double>& poin
     return miniDist;
 }
 
-// Divide and conqure, the time complexity is O(n*lgn), faster than Brute force O(n*n)
-// Use index for in-place processing.
 double lineToLineDistance(const mapbox::geometry::line_string<double>& line1,
                           const mapbox::geometry::multi_point<double>& line2,
                           mapbox::cheap_ruler::CheapRuler& ruler,
@@ -391,8 +394,6 @@ double lineToLineDistance(const mapbox::geometry::line_string<double>& line1,
     return miniDist;
 }
 
-// Divide and conqure, the time complexity is O(n*lgn), faster than Brute force O(n*n)
-// Use index for in-place processing.
 double pointsToPointsDistance(const mapbox::geometry::multi_point<double>& pointSet1,
                               const mapbox::geometry::multi_point<double>& pointSet2,
                               mapbox::cheap_ruler::CheapRuler& ruler) {
@@ -436,8 +437,6 @@ double pointsToPointsDistance(const mapbox::geometry::multi_point<double>& point
     return miniDist;
 }
 
-// Divide and conqure, the time complexity is O(n*lgn), faster than Brute force O(n*n)
-// Most of the time, use index for in-place processing.
 double pointsToLineDistance(const mapbox::geometry::multi_point<double>& points,
                             const mapbox::geometry::line_string<double>& line,
                             mapbox::cheap_ruler::CheapRuler& ruler) {
@@ -653,7 +652,7 @@ double calculateDistance(const GeometryTileFeature& feature,
 
 optional<GeoJSON> parseValue(const style::conversion::Convertible& value, style::expression::ParsingContext& ctx) {
     if (isArray(value)) {
-        // object value, quoted with ["Distance", GeoJSONObj]
+        // object value, quoted with ["distance", GeoJSONObj]
         auto length = arrayLength(value);
         if (length != 2) {
             ctx.error("'distance' expression requires one argument, but found " +
@@ -672,7 +671,7 @@ optional<GeoJSON> parseValue(const style::conversion::Convertible& value, style:
             ctx.error(error.message);
         }
     }
-    ctx.error("'distance' expression needs to be an array with format [\"Distance\", GeoJSONObj].");
+    ctx.error("'distance' expression needs to be an array with format [\"distance\", GeoJSONObj].");
     return nullopt;
 }
 
