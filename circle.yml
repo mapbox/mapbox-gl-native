@@ -500,15 +500,15 @@ commands:
     - run:
         name: Collect GitHub statistics
         command: |
-            scripts/publish_github_stats.js
+          scripts/publish_github_stats.js
 
- publish-benchmark-statistics:
-   steps:
-   -run:
-      when: on_success
-      name: Publish benchmark statistics
-      command: |
-            python scripts/parse-results-core-benchmark.py --build $CIRCLE_BUILD_NUM --input /tmp/tests/benchmark --git mapbox-gl-native
+  publish-benchmark-statistics:
+    steps:
+    - run:
+        when: on_success
+        name: Publish benchmark statistics
+        command: |
+          python scripts/parse-results-core-benchmark.py --build $CIRCLE_BUILD_NUM --input /tmp/tests/benchmark --git mapbox-gl-native
 
 jobs:
   ios-render-test-runner:
