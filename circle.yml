@@ -481,7 +481,7 @@ jobs:
       - run-ios-test-app:
           directory: benchmark/ios
       - get-ios-benchmark-results
-      - check-benchmark-results
+      - check-benchmark-results:
           directory: ios
       - retry-ios-benchmark
       - publish-benchmark-statistics
@@ -499,7 +499,7 @@ jobs:
       - login-google-cloud-platform
       - run-android-benchmark
       - get-android-benchmark-results
-      - check-benchmark-results
+      - check-benchmark-results:
           directory: android
       - retry-android-benchmark
       - publish-benchmark-statistics
