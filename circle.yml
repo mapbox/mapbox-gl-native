@@ -484,6 +484,7 @@ jobs:
       - check-benchmark-results
           directory: ios
       - retry-ios-benchmark
+      - publish-benchmark-statistics
       - save
   android-benchmark-runner:
     executor: ubuntu-eoan
@@ -501,6 +502,7 @@ jobs:
       - check-benchmark-results
           directory: android
       - retry-android-benchmark
+      - publish-benchmark-statistics
       - save
   android-api-breakage:
     executor: ubuntu-eoan
