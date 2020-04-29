@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <limits>
 #include <mbgl/util/geometry.hpp>
 
 namespace mbgl {
@@ -8,15 +9,15 @@ namespace mbgl {
 // contains minX, minY, maxX, maxY
 template <typename T>
 using GeometryBBox = std::array<T, 4>;
-const GeometryBBox<int64_t> DefaultWithinBBox = std::array<int64_t, 4>{std::numeric_limits<int64_t>::max(),
-                                                                       std::numeric_limits<int64_t>::max(),
-                                                                       std::numeric_limits<int64_t>::min(),
-                                                                       std::numeric_limits<int64_t>::min()};
+const GeometryBBox<int64_t> DefaultWithinBBox = std::array<int64_t, 4>{{std::numeric_limits<int64_t>::max(),
+                                                                        std::numeric_limits<int64_t>::max(),
+                                                                        std::numeric_limits<int64_t>::min(),
+                                                                        std::numeric_limits<int64_t>::min()}};
 
-const GeometryBBox<double> DefaultDistanceBBox = std::array<double, 4>{std::numeric_limits<double>::infinity(),
-                                                                       std::numeric_limits<double>::infinity(),
-                                                                       -std::numeric_limits<double>::infinity(),
-                                                                       -std::numeric_limits<double>::infinity()};
+const GeometryBBox<double> DefaultDistanceBBox = std::array<double, 4>{{std::numeric_limits<double>::infinity(),
+                                                                        std::numeric_limits<double>::infinity(),
+                                                                        -std::numeric_limits<double>::infinity(),
+                                                                        -std::numeric_limits<double>::infinity()}};
 
 template <typename T>
 void updateBBox(GeometryBBox<T>& bbox, const Point<T>& p);
