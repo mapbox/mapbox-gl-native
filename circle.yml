@@ -287,13 +287,32 @@ commands:
     steps:
       - run:
           when: on_fail
+          no_output_timeout: 30m
           name: Retry iOS benchmark on failure
           command: |
-              echo "Benchmark failed, retrying"
-      - run-ios-test-app:
-          directory: benchmark/ios
-      - get-ios-benchmark-results
-      - check-benchmark-results
+            echo "Benchmark failed, retrying"
+            if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON_IOS}" ]]; then
+              # arrange files in a way Firebase expects it, and package them in a zip file
+              cp benchmark/ios/*_iphoneos13.2-arm64e-release.xctestrun build
+              cd build
+              zip testapp.zip -r Release-iphoneos/*.app --quiet
+              zip testapp.zip *_iphoneos13.2-arm64e-release.xctestrun
+              gcloud firebase test ios models list
+              gcloud firebase test ios run \
+                --test testapp.zip \
+                --device model=iphone11,version=13.3,locale=en,orientation=portrait --xcode-version=11.3.1 --timeout 30m \
+                --verbosity=debug --no-record-video --results-dir ios-test-app-${CIRCLE_BUILD_NUM}
+            fi
+            if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON_IOS}" ]]; then
+              testResult=$(gsutil ls -d gs://test-lab-hn7kwqcz3108z-hjm4qtbqqkymk/ios-test-app-${CIRCLE_BUILD_NUM}/iphone11-13.3-en-portrait/TestLogs/)
+              mkdir -p benchmark-app
+              gsutil -m cp -r $testResult benchmark-app
+              cd benchmark-app/TestLogs
+              xcparse attachments *.xcresult && ls
+              cd ../.. && mkdir -p /tmp/tests/benchmark
+              if ls benchmark-app/TestLogs/*.json 1> /dev/null 2>&1; then cp benchmark-app/TestLogs/*.json /tmp/tests/benchmark/results.json; fi
+            fi
+            scripts/check_benchmark_results.sh metrics/benchmark/ios/results.json /tmp/tests/benchmark/results.json /tmp/tests/benchmark/results_comparison.txt /tmp/tests/benchmark/results_comparison.html
 
   upload-coverage-results:
     steps:
