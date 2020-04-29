@@ -94,7 +94,8 @@ const template = {
                     'arn:aws:s3:::mapbox-loading-dock/raw/mobile.codecoverage/*',
                     'arn:aws:s3:::mapbox-loading-dock/raw/mobile_staging.docs_coverage/*',
                     'arn:aws:s3:::mapbox-loading-dock/raw/mobile_staging.codecoverage/*',
-                    'arn:aws:s3:::mapbox-loading-dock/raw/mobile_staging.github_stats/*'
+                    'arn:aws:s3:::mapbox-loading-dock/raw/mobile_staging.github_stats/*',
+                    'arn:aws:s3:::mapbox-loading-dock/raw/mobile_staging.performance/*'
                   ]
                 }
               ]
