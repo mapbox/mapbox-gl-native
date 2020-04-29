@@ -31,10 +31,15 @@ parser = argparse.ArgumentParser(description='Script to parse performance tes re
 parser.add_argument('--build', help= 'Build number of circle-ci job')
 parser.add_argument('--input', help= 'Provide path to instrumentation test output')
 parser.add_argument('--git', help= 'Provide path to retrieve git information from (eg. upstream dependency submodule)')
+parser.add_argument('--project', help= 'Project name')
+parser.add_argument('--platform', help= 'Platform (android or ios)')
+
 args = parser.parse_args()
 buildNumber = args.build
 outputFolder = args.input
 gitInfoPath = args.git
+projectName = args.project
+platformName = args.platform
 
 ###
 ### Create output json template
@@ -75,11 +80,11 @@ with open(outputFolder+"/results.json") as f:
         uniqueTestNames.append(test)
 
         # Create json output template
-        output = json.loads('{"created":"'+created+'","name":"android-core","attributes": [ ], "counters": [ ], "build": { }, "metadata" : { }}')
+        output = json.loads('{"created":"'+created+'","name":"'+platformName+'-core","attributes": [ ], "counters": [ ], "build": { }, "metadata" : { }}')
 
         # Store git information in "build"
         output[tagBuild].update({"build":int(buildNumber)})
-        output[tagBuild].update({"project":splitGitInfoPath[len(splitGitInfoPath)-1]})
+        output[tagBuild].update({"project":projectName})
         output[tagBuild].update({"branch":"master"})
         output[tagBuild].update({"sha":sha})
         output[tagBuild].update({"author":author})

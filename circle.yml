@@ -110,7 +110,7 @@ commands:
           command: |
             brew install cmake ccache glfw ninja pkgconfig qt chargepoint/xcparse/xcparse
             brew cask install google-cloud-sdk
-            pip install ansi2html scipy
+            pip install ansi2html scipy gitpython requests awscli
   config:
     parameters:
       config_params:
@@ -386,12 +386,35 @@ commands:
           scripts/publish_github_stats.js
 
   publish-benchmark-statistics:
+    parameters:
+      platform:
+        type: string
     steps:
     - run:
         when: on_success
         name: Publish benchmark statistics
         command: |
-          python scripts/parse-results-core-benchmark.py --build $CIRCLE_BUILD_NUM --input /tmp/tests/benchmark --git mapbox-gl-native
+          python scripts/parse-results-core-benchmark.py --build $CIRCLE_BUILD_NUM --input /tmp/tests/benchmark --git . --project mapbox-gl-native --platform << parameters.platform >>
+          sh scripts/publish_to_aws.sh mobile_staging.performance /tmp/tests/benchmark/results_${CIRCLE_BUILD_NUM}.json.gz
+
+  test-publish-benchmark-statistics-android:
+    steps:
+    - run:
+        when: on_success
+        name: Publish benchmark statistics
+        command: |
+          python scripts/parse-results-core-benchmark.py --build $CIRCLE_BUILD_NUM --input metrics/benchmark/android --git . --project mapbox-gl-native --platform android
+          sh scripts/publish_to_aws.sh mobile_staging.performance metrics/benchmark/android/results_${CIRCLE_BUILD_NUM}.json.gz
+
+  test-publish-benchmark-statistics-ios:
+    steps:
+    - run:
+        when: on_success
+        name: Publish benchmark statistics
+        command: |
+          python scripts/parse-results-core-benchmark.py --build $CIRCLE_BUILD_NUM --input metrics/benchmark/ios --git . --project mapbox-gl-native --platform ios
+          sh scripts/publish_to_aws.sh mobile_staging.performance metrics/benchmark/ios/results_${CIRCLE_BUILD_NUM}.json.gz
+
 
 jobs:
   ios-render-test-runner:
@@ -469,6 +492,7 @@ jobs:
       - checkout
       - prepare
       - prepare-macos
+      - test-publish-benchmark-statistics-ios
       - prepare-ios-codesign-keychain:
           directory: benchmark/ios
       - config:
@@ -484,13 +508,19 @@ jobs:
       - check-benchmark-results:
           directory: ios
       - retry-ios-benchmark
-      - publish-benchmark-statistics
+      - publish-benchmark-statistics:
+          platform: ios
       - save
   android-benchmark-runner:
     executor: ubuntu-eoan
     steps:
       - checkout
       - prepare
+      - run:
+          name: Install extra packages
+          command: |
+            apt install -y python-git python-requests awscli
+      - test-publish-benchmark-statistics-android
       - run:
           name: Build BenchmarkRunner APK
           command: |
@@ -502,7 +532,8 @@ jobs:
       - check-benchmark-results:
           directory: android
       - retry-android-benchmark
-      - publish-benchmark-statistics
+      - publish-benchmark-statistics:
+          platform: android
       - save
   android-api-breakage:
     executor: ubuntu-eoan
