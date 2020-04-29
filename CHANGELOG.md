@@ -2,6 +2,10 @@
 
 ## master
 
+### ✨ New features
+
+- [core] Add support for `Polygon`, `MultiPolygon` geometry types in `distance` expression. ([#16446](https://github.com/mapbox/mapbox-gl-native/pull/16446))
+
 ### 🐞 Bug fixes
 
 - [core][tile mode] Labels priority fixes ([#16432](https://github.com/mapbox/mapbox-gl-native/pull/16432))
