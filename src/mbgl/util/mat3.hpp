@@ -24,12 +24,10 @@
 
 #include <array>
 #include <cmath>
+#include <mbgl/util/vectors.hpp>
 
 namespace mbgl {
 
-using vec3 = std::array<double, 3>;
-using vec3f = std::array<float, 3>;
-using vec3i = std::array<int, 3>;
 using mat3 = std::array<double, 9>;
 
 inline vec3 vec3Cross(const vec3& a, const vec3& b) {

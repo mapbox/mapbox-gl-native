@@ -275,6 +275,7 @@ add_library(
     ${PROJECT_SOURCE_DIR}/include/mbgl/util/unitbezier.hpp
     ${PROJECT_SOURCE_DIR}/include/mbgl/util/util.hpp
     ${PROJECT_SOURCE_DIR}/include/mbgl/util/variant.hpp
+    ${PROJECT_SOURCE_DIR}/include/mbgl/util/vectors.hpp
     ${PROJECT_SOURCE_DIR}/include/mbgl/util/work_request.hpp
     ${PROJECT_SOURCE_DIR}/include/mbgl/util/work_task.hpp
     ${PROJECT_SOURCE_DIR}/include/mbgl/util/work_task_impl.hpp
