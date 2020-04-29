@@ -23,10 +23,10 @@
 #pragma once
 
 #include <array>
+#include <mbgl/util/vectors.hpp>
 
 namespace mbgl {
 
-using vec4 = std::array<double, 4>;
 using mat4 = std::array<double, 16>;
 
 namespace matrix {
