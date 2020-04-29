@@ -800,7 +800,7 @@ TEST(PropertyExpression, DistanceExpression) {
         const auto multiPolygonFeature = getFeature("multi_polygon_2.geojson", FeatureType::Polygon, canonicalTileID);
         auto evaluatedResult = propExpr.evaluate(
             EvaluationContext(&multiPolygonFeature).withCanonicalTileID(&canonicalTileID), invalidResult);
-        EXPECT_NEAR(41.632, evaluatedResult, 0.01);
+        EXPECT_NEAR(21.446, evaluatedResult, 0.01);
     }
 
     // Evaluation test with LineString/Polygon to Polygon distance with special cases
