@@ -644,7 +644,8 @@ double Transform::getMaxPitchForEdgeInsets(const EdgeInsets& insets) const {
     // We use half of fov, as it is field of view above perspective center.
     // With inset, this angle changes and tangentOfFovAboveCenterAngle = (h/2 + centerOffsetY) / (height * 1.5).
     // 1.03 is a bit extra added to prevent parallel ground to viewport clipping plane.
-    const double tangentOfFovAboveCenterAngle = 1.03 * (height / 2.0 + centerOffsetY) / (1.5 * height);
+    // 2.4 is an arbitrary factor to prevent too much depth when the top offset is important.
+    const double tangentOfFovAboveCenterAngle = 1.03 * (height / 2.0 + centerOffsetY * 2.4) / (1.5 * height);
     const double fovAboveCenter = std::atan(tangentOfFovAboveCenterAngle);
     return M_PI * 0.5 - fovAboveCenter;
     // e.g. Maximum pitch of 60 degrees is when perspective center's offset from the top is 84% of screen height.
