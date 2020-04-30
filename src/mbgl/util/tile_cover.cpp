@@ -171,7 +171,7 @@ std::vector<OverscaledTileID> tileCover(const TransformState& state, uint8_t z, 
     auto centerPoint =
         TileCoordinate::fromScreenCoordinate(state, z, {state.getSize().width / 2.0, state.getSize().height / 2.0}).p;
 
-    vec3 centerCoord = {centerPoint.x, centerPoint.y, 0.0};
+    vec3 centerCoord = {{centerPoint.x, centerPoint.y, 0.0}};
 
     const Frustum frustum = Frustum::fromInvProjMatrix(state.getInvProjectionMatrix(), worldSize, z, flippedY);
 
@@ -179,7 +179,7 @@ std::vector<OverscaledTileID> tileCover(const TransformState& state, uint8_t z, 
     const double radiusOfMaxLvlLodInTiles = 3;
 
     const auto newRootTile = [&](int16_t wrap) -> Node {
-        return {AABB({wrap * numTiles, 0.0, 0.0}, {(wrap + 1) * numTiles, numTiles, 0.0}),
+        return {AABB({{wrap * numTiles, 0.0, 0.0}}, {{(wrap + 1) * numTiles, numTiles, 0.0}}),
                 uint8_t(0),
                 uint16_t(0),
                 uint16_t(0),

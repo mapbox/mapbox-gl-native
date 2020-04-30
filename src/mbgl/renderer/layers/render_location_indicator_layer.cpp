@@ -441,7 +441,7 @@ public:
             mapbox::geometry::point<double>{oldParams.puckPosition.latitude(), oldParams.puckPosition.longitude()};
         mapbox::geometry::linear_ring<int64_t> border;
         for (const auto& v : puckGeometry) {
-            vec4 p{v.x, v.y, 0, 1};
+            vec4 p{{v.x, v.y, 0, 1}};
             matrix::transformMat4(p, p, translation);
             border.push_back(Point<int64_t>{int64_t(p[0]), int64_t(p[1])});
         }
