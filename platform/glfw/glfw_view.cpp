@@ -212,7 +212,8 @@ GLFWView::GLFWView(bool fullscreen_, bool benchmark_, const mbgl::ResourceOption
     printf("- Press `1` through `6` to add increasing numbers of point annotations for testing\n");
     printf("- Press `7` through `0` to add increasing numbers of shape annotations for testing\n");
     printf("\n");
-    printf("- Press `Q` to remove annotations\n");
+    printf("- Press `Q` to query annotations\n");
+    printf("- Press `C` to remove annotations\n");
     printf("- Press `K` to add a random custom runtime imagery annotation\n");
     printf("- Press `L` to add a random line annotation\n");
     printf("- Press `W` to pop the last-added annotation off\n");
