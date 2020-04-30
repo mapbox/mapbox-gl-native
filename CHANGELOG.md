@@ -2,6 +2,8 @@
 
 ## master
 
+## maps-v1.6.0
+
 ### ✨ New features
 
 - [core] Add support for `Polygon`, `MultiPolygon` geometry types in `distance` expression. ([#16446](https://github.com/mapbox/mapbox-gl-native/pull/16446))
