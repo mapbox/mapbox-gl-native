@@ -8,6 +8,10 @@
 
 - [core] Add support for `Polygon`, `MultiPolygon` geometry types in `distance` expression. ([#16446](https://github.com/mapbox/mapbox-gl-native/pull/16446))
 
+- [core] Introduce a new API for controlling the camera ([#16419]https://github.com/mapbox/mapbox-gl-native/pull/16419)
+
+  Functions `Map::getFreeCameraOptions()` and `Map::setFreeCameraOptions(options)` provides an alternative way of accessing and modifying properties of the underlying camera entity. The API allows the user to treat the camera as a more traditional 3D object by modifying its position and orientation directly as opposed to setting the state implicitly by using `CameraOptions`. Both APIs are fully compatible with each other.
+
 ### 🐞 Bug fixes
 
 - [core][tile mode] Labels priority fixes ([#16432](https://github.com/mapbox/mapbox-gl-native/pull/16432))
