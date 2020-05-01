@@ -199,6 +199,7 @@ NSURL *resourceURL(const Resource& resource) {
     
     NSURL *url = [NSURL URLWithString:@(resource.url.c_str())];
 
+#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
     if (isValidMapboxEndpoint(url)) {
         NSURLComponents *components = [NSURLComponents componentsWithURL:url resolvingAgainstBaseURL:NO];
         NSMutableArray *queryItems = [NSMutableArray array];
@@ -217,6 +218,7 @@ NSURL *resourceURL(const Resource& resource) {
         components.queryItems = queryItems;
         url = components.URL;
     }
+#endif
     return url;
 }
     
