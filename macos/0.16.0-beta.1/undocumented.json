@@ -1,0 +1,677 @@
+{
+  "warnings": [
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLCircleStyleLayer.h",
+      "line": 313,
+      "symbol": "MGLCircleStyleLayer.circlePitchScale",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.property",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLCircleStyleLayer.h",
+      "line": 472,
+      "symbol": "MGLCircleStyleLayer.circleTranslate",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.property",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLCircleStyleLayer.h",
+      "line": 504,
+      "symbol": "MGLCircleStyleLayer.circleTranslateAnchor",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.property",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLComputedShapeSource.h",
+      "line": 35,
+      "symbol": "MGLInvalidDatasourceException",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.constant",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLFeature.h",
+      "line": 249,
+      "symbol": "MGLMultiPointFeature",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.unexposed",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLFeature.h",
+      "line": 294,
+      "symbol": "MGLShapeCollectionFeature.shapes",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.property",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLFeature.h",
+      "line": 296,
+      "symbol": "MGLShapeCollectionFeature.+shapeCollectionWithShapes:",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.method.class",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLFillExtrusionStyleLayer.h",
+      "line": 190,
+      "symbol": "MGLFillExtrusionStyleLayer.fillExtrusionVerticalGradient",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.property",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLFillExtrusionStyleLayer.h",
+      "line": 329,
+      "symbol": "MGLFillExtrusionStyleLayer.fillExtrusionTranslate",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.property",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLFillExtrusionStyleLayer.h",
+      "line": 361,
+      "symbol": "MGLFillExtrusionStyleLayer.fillExtrusionTranslateAnchor",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.property",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLFillStyleLayer.h",
+      "line": 122,
+      "symbol": "MGLFillStyleLayer.fillAntialias",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.property",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLFillStyleLayer.h",
+      "line": 329,
+      "symbol": "MGLFillStyleLayer.fillTranslate",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.property",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLFillStyleLayer.h",
+      "line": 361,
+      "symbol": "MGLFillStyleLayer.fillTranslateAnchor",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.property",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLForegroundStyleLayer.h",
+      "line": 25,
+      "symbol": "MGLForegroundStyleLayer.-init",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLGeometry.h",
+      "line": 10,
+      "symbol": "MGLCoordinateSpan",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.typedef",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLGeometry.h",
+      "line": 18,
+      "symbol": "MGLMapPoint",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.struct",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLGeometry.h",
+      "line": 18,
+      "symbol": "MGLMapPoint",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.typedef",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLGeometry.h",
+      "line": 28,
+      "symbol": "MGLMatrix4",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.struct",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLGeometry.h",
+      "line": 28,
+      "symbol": "MGLMatrix4",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.typedef",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLGeometry.h",
+      "line": 70,
+      "symbol": "MGLCoordinateBounds",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.typedef",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLGeometry.h",
+      "line": 83,
+      "symbol": "MGLCoordinateQuad",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.typedef",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLLight.h",
+      "line": 30,
+      "symbol": "MGLSphericalPosition",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.typedef",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLLineStyleLayer.h",
+      "line": 364,
+      "symbol": "MGLLineStyleLayer.lineDasharray",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.property",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLLineStyleLayer.h",
+      "line": 575,
+      "symbol": "MGLLineStyleLayer.lineTranslate",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.property",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLLineStyleLayer.h",
+      "line": 607,
+      "symbol": "MGLLineStyleLayer.lineTranslateAnchor",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.property",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLLoggingConfiguration.h",
+      "line": 45,
+      "symbol": "MGLLoggingLevel.MGLLoggingLevelDebug",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.enumcase",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLMapSnapshotter.h",
+      "line": 229,
+      "symbol": "MGLMapSnapshotter.-init",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLMapSnapshotter.h",
+      "line": 361,
+      "symbol": "MGLMapSnapshotterDelegate.-mapSnapshotter:didFailLoadingImageNamed:",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLNetworkConfiguration.h",
+      "line": 9,
+      "symbol": "MGLNetworkConfigurationDelegate",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.protocol",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLOfflinePack.h",
+      "line": 9,
+      "symbol": "MGLInvalidOfflinePackException",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.constant",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLOfflinePack.h",
+      "line": 60,
+      "symbol": "MGLOfflinePackProgress",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.typedef",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLOfflineStorage.h",
+      "line": 104,
+      "symbol": "MGLUnsupportedRegionTypeException",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.constant",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLOfflineStorage.h",
+      "line": 460,
+      "symbol": "MGLOfflineStorage.-putResourceWithUrl:data:modified:expires:etag:mustRevalidate:",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLOpenGLStyleLayer.h",
+      "line": 15,
+      "symbol": "MGLStyleLayerDrawingContext",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.struct",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLOpenGLStyleLayer.h",
+      "line": 15,
+      "symbol": "MGLStyleLayerDrawingContext",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.typedef",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLOpenGLStyleLayer.h",
+      "line": 26,
+      "symbol": "MGLOpenGLStyleLayer",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.class",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLRasterStyleLayer.h",
+      "line": 120,
+      "symbol": "MGLRasterStyleLayer.rasterBrightnessMax",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.property",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLRasterStyleLayer.h",
+      "line": 153,
+      "symbol": "MGLRasterStyleLayer.rasterBrightnessMin",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.property",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLRasterStyleLayer.h",
+      "line": 234,
+      "symbol": "MGLRasterStyleLayer.rasterHueRotate",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.property",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLRasterStyleLayer.h",
+      "line": 294,
+      "symbol": "MGLRasterStyleLayer.rasterResampling",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.property",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLSDKMetricsManager.h",
+      "line": 17,
+      "symbol": "MGLStringFromMetricType",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.function",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLShapeOfflineRegion.h",
+      "line": 53,
+      "symbol": "MGLShapeOfflineRegion.-init",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLSource.h",
+      "line": 8,
+      "symbol": "MGLInvalidStyleSourceException",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.constant",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLSource.h",
+      "line": 33,
+      "symbol": "MGLSource.-init",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLStyle.h",
+      "line": 34,
+      "symbol": "MGLInvalidStyleURLException",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.constant",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLStyle.h",
+      "line": 35,
+      "symbol": "MGLRedundantLayerException",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.constant",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLStyle.h",
+      "line": 36,
+      "symbol": "MGLRedundantLayerIdentifierException",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.constant",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLStyle.h",
+      "line": 37,
+      "symbol": "MGLRedundantSourceException",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.constant",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLStyle.h",
+      "line": 38,
+      "symbol": "MGLRedundantSourceIdentifierException",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.constant",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLStyleLayer.h",
+      "line": 8,
+      "symbol": "MGLInvalidStyleLayerException",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.constant",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLStyleLayer.h",
+      "line": 32,
+      "symbol": "MGLStyleLayer.-init",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLStyleValue.h",
+      "line": 9,
+      "symbol": "MGLStyleFunctionOption",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.typedef",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLStyleValue.h",
+      "line": 11,
+      "symbol": "MGLStyleFunctionOptionInterpolationBase",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.constant",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLStyleValue.h",
+      "line": 13,
+      "symbol": "MGLStyleFunctionOptionDefaultValue",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.constant",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLStyleValue.h",
+      "line": 15,
+      "symbol": "MGLInterpolationMode",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.enum",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLStyleValue.h",
+      "line": 15,
+      "symbol": "MGLInterpolationMode",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.typedef",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLStyleValue.h",
+      "line": 23,
+      "symbol": "MGLStyleValue",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.class",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLStyleValue.h",
+      "line": 27,
+      "symbol": "MGLConstantStyleValue",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.class",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLStyleValue.h",
+      "line": 30,
+      "symbol": "MGLStyleConstantValue",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.unexposed",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLStyleValue.h",
+      "line": 33,
+      "symbol": "MGLStyleFunction",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.class",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLStyleValue.h",
+      "line": 37,
+      "symbol": "MGLCameraStyleFunction",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.class",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLStyleValue.h",
+      "line": 41,
+      "symbol": "MGLSourceStyleFunction",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.class",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLStyleValue.h",
+      "line": 45,
+      "symbol": "MGLCompositeStyleFunction",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.class",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLSymbolStyleLayer.h",
+      "line": 466,
+      "symbol": "MGLSymbolStyleLayer.iconAllowOverlap",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.property",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLSymbolStyleLayer.h",
+      "line": 530,
+      "symbol": "MGLSymbolStyleLayer.iconIgnorePlacement",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.property",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLSymbolStyleLayer.h",
+      "line": 565,
+      "symbol": "MGLSymbolStyleLayer.iconImage",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.property",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLSymbolStyleLayer.h",
+      "line": 714,
+      "symbol": "MGLSymbolStyleLayer.iconRotate",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.property",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLSymbolStyleLayer.h",
+      "line": 778,
+      "symbol": "MGLSymbolStyleLayer.iconSize",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.property",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLSymbolStyleLayer.h",
+      "line": 899,
+      "symbol": "MGLSymbolStyleLayer.iconKeepUpright",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.property",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLSymbolStyleLayer.h",
+      "line": 933,
+      "symbol": "MGLSymbolStyleLayer.textKeepUpright",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.property",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLSymbolStyleLayer.h",
+      "line": 966,
+      "symbol": "MGLSymbolStyleLayer.textMaxAngle",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.property",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLSymbolStyleLayer.h",
+      "line": 995,
+      "symbol": "MGLSymbolStyleLayer.textMaxWidth",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.property",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLSymbolStyleLayer.h",
+      "line": 1030,
+      "symbol": "MGLSymbolStyleLayer.symbolAvoidEdges",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.property",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLSymbolStyleLayer.h",
+      "line": 1165,
+      "symbol": "MGLSymbolStyleLayer.textField",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.property",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLSymbolStyleLayer.h",
+      "line": 1196,
+      "symbol": "MGLSymbolStyleLayer.textAllowOverlap",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.property",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLSymbolStyleLayer.h",
+      "line": 1265,
+      "symbol": "MGLSymbolStyleLayer.textFont",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.property",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLSymbolStyleLayer.h",
+      "line": 1294,
+      "symbol": "MGLSymbolStyleLayer.textSize",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.property",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLSymbolStyleLayer.h",
+      "line": 1324,
+      "symbol": "MGLSymbolStyleLayer.textIgnorePlacement",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.property",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLSymbolStyleLayer.h",
+      "line": 1356,
+      "symbol": "MGLSymbolStyleLayer.textJustify",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.property",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLSymbolStyleLayer.h",
+      "line": 1579,
+      "symbol": "MGLSymbolStyleLayer.textRotate",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.property",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLSymbolStyleLayer.h",
+      "line": 1715,
+      "symbol": "MGLSymbolStyleLayer.textWritingMode",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.property",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLSymbolStyleLayer.h",
+      "line": 1977,
+      "symbol": "MGLSymbolStyleLayer.iconTranslate",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.property",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLSymbolStyleLayer.h",
+      "line": 2009,
+      "symbol": "MGLSymbolStyleLayer.iconTranslateAnchor",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.property",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLSymbolStyleLayer.h",
+      "line": 2266,
+      "symbol": "MGLSymbolStyleLayer.textTranslate",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.property",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLSymbolStyleLayer.h",
+      "line": 2298,
+      "symbol": "MGLSymbolStyleLayer.textTranslateAnchor",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.property",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLTilePyramidOfflineRegion.h",
+      "line": 55,
+      "symbol": "MGLTilePyramidOfflineRegion.-init",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLTypes.h",
+      "line": 26,
+      "symbol": "MGLExceptionName",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.typedef",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLTypes.h",
+      "line": 94,
+      "symbol": "MGLTransition",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.typedef",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/MGLTypes.h",
+      "line": 106,
+      "symbol": "MGLStringFromMGLTransition",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.function",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/NSExpression+MGLAdditions.h",
+      "line": 14,
+      "symbol": "MGLExpressionInterpolationMode",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.typedef",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/NSExpression+MGLAdditions.h",
+      "line": 101,
+      "symbol": "NSExpression(MGLAdditions).featurePropertiesVariableExpression",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.property",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/darwin/src/NSPredicate+MGLAdditions.h",
+      "line": 5,
+      "symbol": "NSPredicate(MGLAdditions)",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.category",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/macos/src/MGLMapView+IBAdditions.h",
+      "line": 7,
+      "symbol": "MGLMapView(IBAdditions)",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.category",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/macos/src/MGLMapViewDelegate.h",
+      "line": 125,
+      "symbol": "MGLMapViewDelegate.-mapViewWillStartRenderingMap:",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/macos/src/MGLMapViewDelegate.h",
+      "line": 126,
+      "symbol": "MGLMapViewDelegate.-mapViewDidFinishRenderingMap:fullyRendered:",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/mxn/hub/mapbox-gl-native-ios/platform/macos/src/MGLMapViewDelegate.h",
+      "line": 184,
+      "symbol": "MGLMapViewDelegate.-mapView:didFailToLoadImage:",
+      "symbol_kind": "sourcekitten.source.lang.objc.decl.method.instance",
+      "warning": "undocumented"
+    }
+  ],
+  "source_directory": "/Users/mxn/hub/mapbox-gl-native-ios"
+}
