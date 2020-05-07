@@ -9,6 +9,13 @@ macro(initialize_ios_target target)
     set_target_properties(${target} PROPERTIES XCODE_ATTRIBUTE_ENABLE_BITCODE "YES")
     set_target_properties(${target} PROPERTIES XCODE_ATTRIBUTE_BITCODE_GENERATION_MODE bitcode)
     set_target_properties(${target} PROPERTIES XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH $<$<CONFIG:Debug>:YES>)
+
+    # Enable LTO & -Os for Release and RelWithDebInfo (which is currently still used by iOS release packages)
+
+    set_target_properties(${target} PROPERTIES XCODE_ATTRIBUTE_GCC_OPTIMIZATION_LEVEL $<$<CONFIG:RELEASE>:s>)
+    set_target_properties(${target} PROPERTIES XCODE_ATTRIBUTE_GCC_OPTIMIZATION_LEVEL $<$<CONFIG:RELWITHDEBINFO>:s>)
+    set_target_properties(${target} PROPERTIES XCODE_ATTRIBUTE_LLVM_LTO $<$<CONFIG:RELEASE>:YES>)
+    set_target_properties(${target} PROPERTIES XCODE_ATTRIBUTE_LLVM_LTO $<$<CONFIG:RELWITHDEBINFO>:YES>)
 endmacro()
 
 set_target_properties(mbgl-core PROPERTIES XCODE_ATTRIBUTE_CLANG_ENABLE_OBJC_ARC YES)
