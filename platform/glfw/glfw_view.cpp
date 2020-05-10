@@ -1057,6 +1057,11 @@ void GLFWView::toggleLocationIndicatorLayer() {
         puckLayer->setShadowImageSize(0.2);
         puckLayer->setImageTiltDisplacement(7.0f); // set to 0 for a "flat" puck
         puckLayer->setPerspectiveCompensation(0.9);
+        puckLayer->setEmphasisCircleColor(premultiply(mbgl::Color{0.2, 0.2, 0.7, 0.5}));
+        puckLayer->setEmphasisCircleRadiusTransition(
+            mbgl::style::TransitionOptions(mbgl::Duration::zero(), mbgl::Duration::zero()));
+        puckLayer->setEmphasisCircleColorTransition(
+            mbgl::style::TransitionOptions(mbgl::Duration::zero(), mbgl::Duration::zero()));
 
         map->getStyle().addImage(std::make_unique<mbgl::style::Image>(
             "puck.png", mbgl::decodeImage(mbgl::util::read_file(mbglPuckAssetsPath + "puck.png")), 1.0));
@@ -1100,8 +1105,13 @@ void GLFWView::onWillStartRenderingFrame() {
     puck = static_cast<mbgl::style::LocationIndicatorLayer *>(map->getStyle().getLayer("puck"));
     if (puck) {
         uint64_t ns = mbgl::Clock::now().time_since_epoch().count();
-        const double bearing = double(ns % 2000000000) / 2000000000.0 * 360.0;
+        const double alpha = double(ns % 2000000000) / 2000000000.0; // 2 secs loop
+        const double bearing = alpha * 360.0;
         puck->setBearing(mbgl::style::Rotation(bearing));
+        const double emphasisRadius = alpha * 70.0; // 30 px max
+        const mbgl::Color emphasisColor(0.2, 0.2, 0.7, 0.5 * (1.0 - alpha));
+        puck->setEmphasisCircleRadius(emphasisRadius);
+        puck->setEmphasisCircleColor(premultiply(emphasisColor));
     }
 #endif
 }

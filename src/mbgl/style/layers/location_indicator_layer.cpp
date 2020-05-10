@@ -246,6 +246,60 @@ TransitionOptions LocationIndicatorLayer::getBearingImageSizeTransition() const 
     return impl().paint.template get<BearingImageSize>().options;
 }
 
+PropertyValue<Color> LocationIndicatorLayer::getDefaultEmphasisCircleColor() {
+    return {Color::white()};
+}
+
+const PropertyValue<Color>& LocationIndicatorLayer::getEmphasisCircleColor() const {
+    return impl().paint.template get<EmphasisCircleColor>().value;
+}
+
+void LocationIndicatorLayer::setEmphasisCircleColor(const PropertyValue<Color>& value) {
+    if (value == getEmphasisCircleColor())
+        return;
+    auto impl_ = mutableImpl();
+    impl_->paint.template get<EmphasisCircleColor>().value = value;
+    baseImpl = std::move(impl_);
+    observer->onLayerChanged(*this);
+}
+
+void LocationIndicatorLayer::setEmphasisCircleColorTransition(const TransitionOptions& options) {
+    auto impl_ = mutableImpl();
+    impl_->paint.template get<EmphasisCircleColor>().options = options;
+    baseImpl = std::move(impl_);
+}
+
+TransitionOptions LocationIndicatorLayer::getEmphasisCircleColorTransition() const {
+    return impl().paint.template get<EmphasisCircleColor>().options;
+}
+
+PropertyValue<float> LocationIndicatorLayer::getDefaultEmphasisCircleRadius() {
+    return {0};
+}
+
+const PropertyValue<float>& LocationIndicatorLayer::getEmphasisCircleRadius() const {
+    return impl().paint.template get<EmphasisCircleRadius>().value;
+}
+
+void LocationIndicatorLayer::setEmphasisCircleRadius(const PropertyValue<float>& value) {
+    if (value == getEmphasisCircleRadius())
+        return;
+    auto impl_ = mutableImpl();
+    impl_->paint.template get<EmphasisCircleRadius>().value = value;
+    baseImpl = std::move(impl_);
+    observer->onLayerChanged(*this);
+}
+
+void LocationIndicatorLayer::setEmphasisCircleRadiusTransition(const TransitionOptions& options) {
+    auto impl_ = mutableImpl();
+    impl_->paint.template get<EmphasisCircleRadius>().options = options;
+    baseImpl = std::move(impl_);
+}
+
+TransitionOptions LocationIndicatorLayer::getEmphasisCircleRadiusTransition() const {
+    return impl().paint.template get<EmphasisCircleRadius>().options;
+}
+
 PropertyValue<float> LocationIndicatorLayer::getDefaultImageTiltDisplacement() {
     return {0};
 }
@@ -385,7 +439,7 @@ using namespace conversion;
 
 namespace {
 
-constexpr uint8_t kPaintPropertyCount = 20u;
+constexpr uint8_t kPaintPropertyCount = 24u;
 
 enum class Property : uint8_t {
     AccuracyRadius,
@@ -393,6 +447,8 @@ enum class Property : uint8_t {
     AccuracyRadiusColor,
     Bearing,
     BearingImageSize,
+    EmphasisCircleColor,
+    EmphasisCircleRadius,
     ImageTiltDisplacement,
     Location,
     PerspectiveCompensation,
@@ -403,6 +459,8 @@ enum class Property : uint8_t {
     AccuracyRadiusColorTransition,
     BearingTransition,
     BearingImageSizeTransition,
+    EmphasisCircleColorTransition,
+    EmphasisCircleRadiusTransition,
     ImageTiltDisplacementTransition,
     LocationTransition,
     PerspectiveCompensationTransition,
@@ -424,6 +482,8 @@ MAPBOX_ETERNAL_CONSTEXPR const auto layerProperties = mapbox::eternal::hash_map<
      {"accuracy-radius-color", toUint8(Property::AccuracyRadiusColor)},
      {"bearing", toUint8(Property::Bearing)},
      {"bearing-image-size", toUint8(Property::BearingImageSize)},
+     {"emphasis-circle-color", toUint8(Property::EmphasisCircleColor)},
+     {"emphasis-circle-radius", toUint8(Property::EmphasisCircleRadius)},
      {"image-tilt-displacement", toUint8(Property::ImageTiltDisplacement)},
      {"location", toUint8(Property::Location)},
      {"perspective-compensation", toUint8(Property::PerspectiveCompensation)},
@@ -434,6 +494,8 @@ MAPBOX_ETERNAL_CONSTEXPR const auto layerProperties = mapbox::eternal::hash_map<
      {"accuracy-radius-color-transition", toUint8(Property::AccuracyRadiusColorTransition)},
      {"bearing-transition", toUint8(Property::BearingTransition)},
      {"bearing-image-size-transition", toUint8(Property::BearingImageSizeTransition)},
+     {"emphasis-circle-color-transition", toUint8(Property::EmphasisCircleColorTransition)},
+     {"emphasis-circle-radius-transition", toUint8(Property::EmphasisCircleRadiusTransition)},
      {"image-tilt-displacement-transition", toUint8(Property::ImageTiltDisplacementTransition)},
      {"location-transition", toUint8(Property::LocationTransition)},
      {"perspective-compensation-transition", toUint8(Property::PerspectiveCompensationTransition)},
@@ -455,6 +517,10 @@ StyleProperty getLayerProperty(const LocationIndicatorLayer& layer, Property pro
             return makeStyleProperty(layer.getBearing());
         case Property::BearingImageSize:
             return makeStyleProperty(layer.getBearingImageSize());
+        case Property::EmphasisCircleColor:
+            return makeStyleProperty(layer.getEmphasisCircleColor());
+        case Property::EmphasisCircleRadius:
+            return makeStyleProperty(layer.getEmphasisCircleRadius());
         case Property::ImageTiltDisplacement:
             return makeStyleProperty(layer.getImageTiltDisplacement());
         case Property::Location:
@@ -475,6 +541,10 @@ StyleProperty getLayerProperty(const LocationIndicatorLayer& layer, Property pro
             return makeStyleProperty(layer.getBearingTransition());
         case Property::BearingImageSizeTransition:
             return makeStyleProperty(layer.getBearingImageSizeTransition());
+        case Property::EmphasisCircleColorTransition:
+            return makeStyleProperty(layer.getEmphasisCircleColorTransition());
+        case Property::EmphasisCircleRadiusTransition:
+            return makeStyleProperty(layer.getEmphasisCircleRadiusTransition());
         case Property::ImageTiltDisplacementTransition:
             return makeStyleProperty(layer.getImageTiltDisplacementTransition());
         case Property::LocationTransition:
@@ -523,8 +593,9 @@ optional<Error> LocationIndicatorLayer::setPropertyInternal(const std::string& n
     auto property = static_cast<Property>(it->second);
 
     if (property == Property::AccuracyRadius || property == Property::BearingImageSize ||
-        property == Property::ImageTiltDisplacement || property == Property::PerspectiveCompensation ||
-        property == Property::ShadowImageSize || property == Property::TopImageSize) {
+        property == Property::EmphasisCircleRadius || property == Property::ImageTiltDisplacement ||
+        property == Property::PerspectiveCompensation || property == Property::ShadowImageSize ||
+        property == Property::TopImageSize) {
         Error error;
         const auto& typedValue = convert<PropertyValue<float>>(value, error, false, false);
         if (!typedValue) {
@@ -538,6 +609,11 @@ optional<Error> LocationIndicatorLayer::setPropertyInternal(const std::string& n
 
         if (property == Property::BearingImageSize) {
             setBearingImageSize(*typedValue);
+            return nullopt;
+        }
+
+        if (property == Property::EmphasisCircleRadius) {
+            setEmphasisCircleRadius(*typedValue);
             return nullopt;
         }
 
@@ -561,7 +637,8 @@ optional<Error> LocationIndicatorLayer::setPropertyInternal(const std::string& n
             return nullopt;
         }
     }
-    if (property == Property::AccuracyRadiusBorderColor || property == Property::AccuracyRadiusColor) {
+    if (property == Property::AccuracyRadiusBorderColor || property == Property::AccuracyRadiusColor ||
+        property == Property::EmphasisCircleColor) {
         Error error;
         const auto& typedValue = convert<PropertyValue<Color>>(value, error, false, false);
         if (!typedValue) {
@@ -575,6 +652,11 @@ optional<Error> LocationIndicatorLayer::setPropertyInternal(const std::string& n
 
         if (property == Property::AccuracyRadiusColor) {
             setAccuracyRadiusColor(*typedValue);
+            return nullopt;
+        }
+
+        if (property == Property::EmphasisCircleColor) {
+            setEmphasisCircleColor(*typedValue);
             return nullopt;
         }
     }
@@ -649,6 +731,16 @@ optional<Error> LocationIndicatorLayer::setPropertyInternal(const std::string& n
 
     if (property == Property::BearingImageSizeTransition) {
         setBearingImageSizeTransition(*transition);
+        return nullopt;
+    }
+
+    if (property == Property::EmphasisCircleColorTransition) {
+        setEmphasisCircleColorTransition(*transition);
+        return nullopt;
+    }
+
+    if (property == Property::EmphasisCircleRadiusTransition) {
+        setEmphasisCircleRadiusTransition(*transition);
         return nullopt;
     }
 

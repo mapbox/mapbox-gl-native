@@ -177,6 +177,34 @@ referenceSpec["paint_location-indicator"] = {
         "transition": true,
         "doc": "The color for drawing the accuracy radius border. To adjust transparency, set the alpha component of the color accordingly."
     },
+    "emphasis-circle-radius": {
+        "type": "number",
+        "units": "pixels",
+        "default": 0,
+        "property-type": "data-constant",
+        "expression": {
+            "interpolated": true,
+            "parameters": [
+                "zoom"
+            ]
+        },
+        "transition": true,
+        "doc": "The radius, in pixel, of the circle emphasizing the indicator, drawn between the accuracy radius and the indicator shadow."
+    },
+    "emphasis-circle-color": {
+        "type": "color",
+        "property-type": "data-constant",
+        "default": "#ffffff",
+        "expression": {
+            "interpolated": true,
+            "parameters": [
+                "zoom"
+            ]
+        },
+        "transition": true,
+        "doc": "The color of the circle emphasizing the indicator. To adjust transparency, set the alpha component of the color accordingly."
+
+    },
     "bearing": {
         "type": "number",
         "default": "0",

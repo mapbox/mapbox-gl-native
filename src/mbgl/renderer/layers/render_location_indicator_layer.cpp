@@ -46,9 +46,11 @@ struct LocationIndicatorRenderParameters {
     // some testing defaults, for before it gets updated via props
     double puckBearing = 0.0;
     LatLng puckPosition = {0, 0};
-    double errorRadiusMeters;
+    double errorRadiusMeters = 0;
+    double emphasisCircleRadiusMeters = 0;
     mbgl::Color errorRadiusColor{0, 0, 0, 0};
     mbgl::Color errorRadiusBorderColor{0, 0, 0, 0};
+    mbgl::Color emphasisCircleColor{0, 0, 0, 0};
     float puckScale = 0;
     float puckHatScale = 0;
     float puckShadowScale = 0;
@@ -375,6 +377,7 @@ public:
     void render(const mbgl::LocationIndicatorRenderParameters& params) {
         initialize();
         drawRadius(params);
+        drawEmphasisCircle(params);
         drawShadow();
         drawPuck();
         drawHat();
@@ -404,7 +407,9 @@ public:
                    params.puckScale != oldParams.puckScale || params.puckHatScale != oldParams.puckHatScale ||
                    params.puckShadowScale != oldParams.puckShadowScale)
             bearingChanged = true; // changes puck geometry but not necessarily the location
-        if (params.errorRadiusMeters != oldParams.errorRadiusMeters) radiusChanged = true;
+        if (params.errorRadiusMeters != oldParams.errorRadiusMeters ||
+            params.emphasisCircleRadiusMeters != oldParams.emphasisCircleRadiusMeters)
+            radiusChanged = true;
         bearingChanged |= setTextureFromImageID(params.puckImagePath, texPuck, params);
         bearingChanged |= setTextureFromImageID(params.puckShadowImagePath, texShadow, params);
         bearingChanged |= setTextureFromImageID(params.puckHatImagePath, texPuckHat, params);
@@ -471,20 +476,32 @@ protected:
     }
 
     void updateRadius(const mbgl::LocationIndicatorRenderParameters& params) {
+        radiusChanged = false;
+        if (params.errorRadiusMeters <= 0.0 && params.emphasisCircleRadiusMeters <= 0.0)
+            return; // no need to update, as it won't be drawn
+
         const TransformState& s = *params.state;
         const unsigned long numVtxCircumference = circle.size() - 1;
         const float bearingStep = 360.0f / float(numVtxCircumference - 1); // first and last points are the same
         const mapbox::cheap_ruler::point centerPoint(params.puckPosition.longitude(), params.puckPosition.latitude());
         Point<double> center = project(params.puckPosition, s);
-        circle[0] = {0, 0};
+        circle[0] = circleEmphasis[0] = {0, 0};
 
         double mapBearing = util::wrap(util::RAD2DEG * params.bearing, 0.0, util::DEGREES_MAX);
-        for (unsigned long i = 1; i <= numVtxCircumference; ++i) {
-            const float bearing_ = float(i - 1) * bearingStep - mapBearing;
-            Point<double> poc = ruler.destination(centerPoint, params.errorRadiusMeters, bearing_);
-            circle[i] = vec2(project(LatLng(poc.y, poc.x), s) - center);
+        if (params.errorRadiusMeters > 0.0) {
+            for (unsigned long i = 1; i <= numVtxCircumference; ++i) {
+                const float bearing_ = float(i - 1) * bearingStep - mapBearing;
+                Point<double> poc = ruler.destination(centerPoint, params.errorRadiusMeters, bearing_);
+                circle[i] = vec2(project(LatLng(poc.y, poc.x), s) - center);
+            }
         }
-        radiusChanged = false;
+        if (params.emphasisCircleRadiusMeters > 0.0) {
+            for (unsigned long i = 1; i <= numVtxCircumference; ++i) {
+                const float bearing_ = float(i - 1) * bearingStep - mapBearing;
+                Point<double> poc = ruler.destination(centerPoint, params.emphasisCircleRadiusMeters, bearing_);
+                circleEmphasis[i] = vec2(project(LatLng(poc.y, poc.x), s) - center);
+            }
+        }
     }
 
     // Size in "map pixels" for a screen pixel
@@ -602,23 +619,31 @@ protected:
     }
 
     void drawRadius(const mbgl::LocationIndicatorRenderParameters& params) {
-        if (!(params.errorRadiusMeters > 0.0) ||
-            (params.errorRadiusColor.a == 0.0 && params.errorRadiusBorderColor.a == 0.0))
-            return;
+        drawGeoCircle(params.errorRadiusMeters, params.errorRadiusColor, circle, params.errorRadiusBorderColor);
+    }
+    void drawEmphasisCircle(const mbgl::LocationIndicatorRenderParameters& params) {
+        drawGeoCircle(params.emphasisCircleRadiusMeters, params.emphasisCircleColor, circleEmphasis);
+    }
+
+    void drawGeoCircle(const double radiusMeters,
+                       const mbgl::Color& color,
+                       const std::array<vec2, 73>& vertexData,
+                       const mbgl::Color& borderColor = {0, 0, 0, 0}) {
+        if (radiusMeters <= 0.0 || (color.a == 0.0 && borderColor.a == 0.0)) return;
 
         simpleShader.bind();
-        mbgl::gl::bindUniform(simpleShader.u_color, params.errorRadiusColor);
+        mbgl::gl::bindUniform(simpleShader.u_color, color);
         mbgl::gl::bindUniform(simpleShader.u_matrix, projectionCircle);
 
-        circleBuffer.upload(circle);
+        circleBuffer.upload(vertexData);
         MBGL_CHECK_ERROR(glEnableVertexAttribArray(simpleShader.a_pos));
         MBGL_CHECK_ERROR(glVertexAttribPointer(simpleShader.a_pos, 2, GL_FLOAT, GL_FALSE, 0, nullptr));
 
-        MBGL_CHECK_ERROR(glDrawArrays(GL_TRIANGLE_FAN, 0, GLsizei(circle.size())));
-        if (params.errorRadiusBorderColor.a > 0.0f) {
-            mbgl::gl::bindUniform(simpleShader.u_color, params.errorRadiusBorderColor);
+        MBGL_CHECK_ERROR(glDrawArrays(GL_TRIANGLE_FAN, 0, GLsizei(vertexData.size())));
+        if (borderColor.a > 0.0f) {
+            mbgl::gl::bindUniform(simpleShader.u_color, borderColor);
             MBGL_CHECK_ERROR(glLineWidth(1.0f));
-            MBGL_CHECK_ERROR(glDrawArrays(GL_LINE_STRIP, 1, GLsizei(circle.size() - 1)));
+            MBGL_CHECK_ERROR(glDrawArrays(GL_LINE_STRIP, 1, GLsizei(vertexData.size() - 1)));
         }
         MBGL_CHECK_ERROR(glDisableVertexAttribArray(simpleShader.a_pos));
         circleBuffer.detach();
@@ -703,6 +728,7 @@ protected:
     std::shared_ptr<Texture> texPuckHat;
 
     std::array<vec2, 73> circle; // 72 points + position
+    std::array<vec2, 73> circleEmphasis; // 72 points + position
     std::array<vec2, 4> shadowGeometry;
     std::array<vec2, 4> puckGeometry;
     std::array<vec2, 4> hatGeometry;
@@ -764,6 +790,7 @@ void RenderLocationIndicatorLayer::evaluate(const PropertyEvaluationParameters& 
     renderImpl->parameters.errorRadiusColor = evaluated.get<style::AccuracyRadiusColor>();
     renderImpl->parameters.errorRadiusBorderColor = evaluated.get<style::AccuracyRadiusBorderColor>();
     renderImpl->parameters.errorRadiusMeters = evaluated.get<style::AccuracyRadius>();
+    renderImpl->parameters.emphasisCircleColor = evaluated.get<style::EmphasisCircleColor>();
     renderImpl->parameters.puckScale = evaluated.get<style::BearingImageSize>();
     renderImpl->parameters.puckHatScale = evaluated.get<style::TopImageSize>();
     renderImpl->parameters.puckShadowScale = evaluated.get<style::ShadowImageSize>();
@@ -772,7 +799,10 @@ void RenderLocationIndicatorLayer::evaluate(const PropertyEvaluationParameters& 
     renderImpl->parameters.perspectiveCompensation = evaluated.get<style::PerspectiveCompensation>();
 
     const std::array<double, 3> pos = evaluated.get<style::Location>();
-    renderImpl->parameters.puckPosition = LatLng{pos[0], pos[1]};
+    const LatLng puckPosition = LatLng{pos[0], pos[1]};
+    renderImpl->parameters.puckPosition = puckPosition;
+    const double mpp = mbgl::Projection::getMetersPerPixelAtLatitude(puckPosition.latitude(), parameters.z);
+    renderImpl->parameters.emphasisCircleRadiusMeters = mpp * evaluated.get<style::EmphasisCircleRadius>();
 
     // layout
     if (!layout.get<style::BearingImage>().isUndefined())

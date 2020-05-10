@@ -25,5 +25,7 @@
     "location_indicator/change_image": "Would need a different baseline when ran on llvmpipe not supporting anisotropic filtering",
     "location_indicator/query_test": "Would need a different baseline when ran on llvmpipe not supporting anisotropic filtering",
     "location_indicator/query_test_no_image": "Would need a different baseline when ran on llvmpipe not supporting anisotropic filtering",
+    "location_indicator/no_radius_emphasis": "Would need a different baseline when ran on llvmpipe not supporting anisotropic filtering",
+    "location_indicator/radius_emphasis": "Would need a different baseline when ran on llvmpipe not supporting anisotropic filtering",
     "location_indicator/query_test_miss": "Would need a different baseline when ran on llvmpipe not supporting anisotropic filtering"
 }

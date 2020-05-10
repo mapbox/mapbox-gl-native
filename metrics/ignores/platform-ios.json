@@ -24,5 +24,7 @@
     "location_indicator/tilted_texture_shift_bottom_right": "https://github.com/mapbox/mapbox-gl-native/issues/16401",
     "location_indicator/tilted_texture_shift_top_left": "https://github.com/mapbox/mapbox-gl-native/issues/16401",
     "location_indicator/tilted_texture_shift_top_right": "https://github.com/mapbox/mapbox-gl-native/issues/16401",
+    "location_indicator/no_radius_emphasis": "https://github.com/mapbox/mapbox-gl-native/issues/16401",
+    "location_indicator/radius_emphasis": "https://github.com/mapbox/mapbox-gl-native/issues/16401",
     "location_indicator/two_textures": "https://github.com/mapbox/mapbox-gl-native/issues/16401"
 }

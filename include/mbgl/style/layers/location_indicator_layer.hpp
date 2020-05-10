@@ -66,6 +66,18 @@ public:
     void setBearingImageSizeTransition(const TransitionOptions&);
     TransitionOptions getBearingImageSizeTransition() const;
 
+    static PropertyValue<Color> getDefaultEmphasisCircleColor();
+    const PropertyValue<Color>& getEmphasisCircleColor() const;
+    void setEmphasisCircleColor(const PropertyValue<Color>&);
+    void setEmphasisCircleColorTransition(const TransitionOptions&);
+    TransitionOptions getEmphasisCircleColorTransition() const;
+
+    static PropertyValue<float> getDefaultEmphasisCircleRadius();
+    const PropertyValue<float>& getEmphasisCircleRadius() const;
+    void setEmphasisCircleRadius(const PropertyValue<float>&);
+    void setEmphasisCircleRadiusTransition(const TransitionOptions&);
+    TransitionOptions getEmphasisCircleRadiusTransition() const;
+
     static PropertyValue<float> getDefaultImageTiltDisplacement();
     const PropertyValue<float>& getImageTiltDisplacement() const;
     void setImageTiltDisplacement(const PropertyValue<float>&);

@@ -51,6 +51,14 @@ struct BearingImageSize : PaintProperty<float> {
     static float defaultValue() { return 1; }
 };
 
+struct EmphasisCircleColor : PaintProperty<Color> {
+    static Color defaultValue() { return Color::white(); }
+};
+
+struct EmphasisCircleRadius : PaintProperty<float> {
+    static float defaultValue() { return 0; }
+};
+
 struct ImageTiltDisplacement : PaintProperty<float> {
     static float defaultValue() { return 0; }
 };
@@ -83,6 +91,8 @@ class LocationIndicatorPaintProperties : public Properties<
     AccuracyRadiusColor,
     Bearing,
     BearingImageSize,
+    EmphasisCircleColor,
+    EmphasisCircleRadius,
     ImageTiltDisplacement,
     Location,
     PerspectiveCompensation,
