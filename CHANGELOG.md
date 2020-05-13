@@ -2,6 +2,10 @@
 
 ## master
 
+### 🐞 Bug fixes
+
+- [ios, macos] Fix iOS [framework size regression](https://github.com/mapbox/mapbox-gl-native-ios/issues/63) by restoring optimization settings to `-Os`. ([#16460](https://github.com/mapbox/mapbox-gl-native/pull/16460))
+
 ## maps-v1.6.0
 
 ### ✨ New features
