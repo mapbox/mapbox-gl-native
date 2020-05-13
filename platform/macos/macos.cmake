@@ -2,6 +2,18 @@ set(CMAKE_OSX_DEPLOYMENT_TARGET "10.11")
 
 set_target_properties(mbgl-core PROPERTIES XCODE_ATTRIBUTE_CLANG_ENABLE_OBJC_ARC YES)
 
+macro(initialize_macos_target target)
+    # Enable LTO & -Os for Release and RelWithDebInfo (which is currently still used by iOS release packages)
+
+    set_target_properties(${target} PROPERTIES XCODE_ATTRIBUTE_GCC_OPTIMIZATION_LEVEL $<$<CONFIG:RELEASE>:s>)
+    set_target_properties(${target} PROPERTIES XCODE_ATTRIBUTE_GCC_OPTIMIZATION_LEVEL $<$<CONFIG:RELWITHDEBINFO>:s>)
+    set_target_properties(${target} PROPERTIES XCODE_ATTRIBUTE_LLVM_LTO $<$<CONFIG:RELEASE>:YES>)
+    set_target_properties(${target} PROPERTIES XCODE_ATTRIBUTE_LLVM_LTO $<$<CONFIG:RELWITHDEBINFO>:YES>)
+endmacro()
+
+
+
+
 if(MBGL_WITH_OPENGL)
     find_package(OpenGL REQUIRED)
 
@@ -76,6 +88,9 @@ target_include_directories(
 )
 
 include(${PROJECT_SOURCE_DIR}/vendor/icu.cmake)
+
+initialize_macos_target(mbgl-core)
+initialize_macos_target(mbgl-vendor-icu)
 
 target_link_libraries(
     mbgl-core
