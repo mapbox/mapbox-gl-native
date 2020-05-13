@@ -4,12 +4,12 @@ set_target_properties(mbgl-core PROPERTIES XCODE_ATTRIBUTE_CLANG_ENABLE_OBJC_ARC
 
 macro(initialize_macos_target target)
     # Enable LTO & -Os for Release and RelWithDebInfo
-     set_target_properties(${target} PROPERTIES XCODE_ATTRIBUTE_GCC_OPTIMIZATION_LEVEL[variant=MinSizeRel] $<$<CONFIG:MINSIZEREL>:s>)
-     set_target_properties(${target} PROPERTIES XCODE_ATTRIBUTE_GCC_OPTIMIZATION_LEVEL[variant=RelWithDebInfo] $<$<CONFIG:RELWITHDEBINFO>:s>)
-     set_target_properties(${target} PROPERTIES XCODE_ATTRIBUTE_GCC_OPTIMIZATION_LEVEL[variant=Release] $<$<CONFIG:RELEASE>:s>)
+    set_target_properties(${target} PROPERTIES XCODE_ATTRIBUTE_GCC_OPTIMIZATION_LEVEL[variant=MinSizeRel] $<$<CONFIG:MINSIZEREL>:s>)
+    set_target_properties(${target} PROPERTIES XCODE_ATTRIBUTE_GCC_OPTIMIZATION_LEVEL[variant=RelWithDebInfo] $<$<CONFIG:RELWITHDEBINFO>:s>)
+    set_target_properties(${target} PROPERTIES XCODE_ATTRIBUTE_GCC_OPTIMIZATION_LEVEL[variant=Release] $<$<CONFIG:RELEASE>:s>)
 
-     set_target_properties(${target} PROPERTIES XCODE_ATTRIBUTE_LLVM_LTO[variant=RelWithDebInfo] $<$<CONFIG:RELWITHDEBINFO>:YES>)
-     set_target_properties(${target} PROPERTIES XCODE_ATTRIBUTE_LLVM_LTO[variant=Release] $<$<CONFIG:RELEASE>:YES>)
+    set_target_properties(${target} PROPERTIES XCODE_ATTRIBUTE_LLVM_LTO[variant=RelWithDebInfo] $<$<CONFIG:RELWITHDEBINFO>:YES>)
+    set_target_properties(${target} PROPERTIES XCODE_ATTRIBUTE_LLVM_LTO[variant=Release] $<$<CONFIG:RELEASE>:YES>)
 endmacro()
 
 if(MBGL_WITH_OPENGL)
