@@ -1,3 +1,22 @@
+macro(initialize_ios_test_target target bitcode_generation)
+    set(EXTRA_ARGS ${ARGN})
+    list(LENGTH EXTRA_ARGS EXTRA_ARGS_NUM)
+    if(${EXTRA_ARGS_NUM} EQUAL 1)
+        list(GET EXTRA_ARGS 0 PLIST)
+        set_target_properties(${target} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${PLIST})
+    endif()
+
+    if("${bitcode_generation}" STREQUAL "YES")
+        set_target_properties(${target} PROPERTIES XCODE_ATTRIBUTE_ENABLE_BITCODE "YES")
+        set_target_properties(${target} PROPERTIES XCODE_ATTRIBUTE_BITCODE_GENERATION_MODE bitcode)
+    endif()
+
+    set_target_properties(${target} PROPERTIES XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET "${IOS_DEPLOYMENT_TARGET}")
+    set_target_properties(${target} PROPERTIES XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH $<$<CONFIG:Debug>:YES>)
+    set_target_properties(${target} PROPERTIES XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "")
+    set_target_properties(${target} PROPERTIES XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED "NO")
+endmacro()
+
 if(MBGL_IOS_RENDER_TEST)
     include(${PROJECT_SOURCE_DIR}/vendor/zip-archive.cmake)
     initialize_ios_target(mbgl-vendor-zip-archive)
@@ -24,7 +43,7 @@ if(MBGL_IOS_RENDER_TEST)
         ${PROJECT_SOURCE_DIR}/render-test/ios/iosTestRunner.mm
         ${RESOURCES}
     )
-    initialize_ios_target(RenderTestApp)
+    initialize_ios_test_target(RenderTestApp "YES")
     add_dependencies(RenderTestApp RenderTestApp-prepare)
 
     set_target_properties(
@@ -79,12 +98,7 @@ if(MBGL_IOS_RENDER_TEST)
     )
 
     xctest_add_test(XCTest.RenderTestApp RenderTestAppTests)
-
-    set_target_properties(RenderTestAppTests PROPERTIES XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET "${IOS_DEPLOYMENT_TARGET}")
-    set_target_properties(RenderTestAppTests PROPERTIES XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH $<$<CONFIG:Debug>:YES>)
-    set_target_properties(RenderTestAppTests PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${PROJECT_SOURCE_DIR}/render-test/ios/tests/Info.plist)
-    set_target_properties(RenderTestAppTests PROPERTIES XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "")
-    set_target_properties(RenderTestAppTests PROPERTIES XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED "NO")
+    initialize_ios_test_target(RenderTestAppTests "NO" ${PROJECT_SOURCE_DIR}/render-test/ios/tests/Info.plist)
 endif()
 
 if(MBGL_IOS_UNIT_TEST)
@@ -109,7 +123,7 @@ if(MBGL_IOS_UNIT_TEST)
         ${PROJECT_SOURCE_DIR}/test/ios/iosTestRunner.h
         ${RESOURCES}
     )
-    initialize_ios_target(UnitTestsApp)
+    initialize_ios_test_target(UnitTestsApp "YES")
 
     set_target_properties(
         UnitTestsApp
@@ -151,12 +165,7 @@ if(MBGL_IOS_UNIT_TEST)
     )
 
     xctest_add_test(XCTest.UnitTestsApp UnitTestsAppTests)
-
-    set_target_properties(UnitTestsAppTests PROPERTIES XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET "${IOS_DEPLOYMENT_TARGET}")
-    set_target_properties(UnitTestsAppTests PROPERTIES XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH $<$<CONFIG:Debug>:YES>)
-    set_target_properties(UnitTestsAppTests PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${PROJECT_SOURCE_DIR}/test/ios/tests/Info.plist)
-    set_target_properties(UnitTestsAppTests PROPERTIES XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "")
-    set_target_properties(UnitTestsAppTests PROPERTIES XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED "NO")
+    initialize_ios_test_target(UnitTestsAppTests "NO" ${PROJECT_SOURCE_DIR}/test/ios/tests/Info.plist)
 endif()
 
 if(MBGL_IOS_BENCHMARK)
@@ -181,7 +190,7 @@ if(MBGL_IOS_BENCHMARK)
         ${PROJECT_SOURCE_DIR}/benchmark/ios/iosTestRunner.h
         ${RESOURCES}
     )
-    initialize_ios_target(BenchmarkApp)
+    initialize_ios_test_target(BenchmarkApp "YES")
 
     target_include_directories(
         BenchmarkApp
@@ -214,10 +223,5 @@ if(MBGL_IOS_BENCHMARK)
     )
 
     xctest_add_test(XCTest.BenchmarkApp BenchmarkAppTests)
-
-    set_target_properties(BenchmarkAppTests PROPERTIES XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET "${IOS_DEPLOYMENT_TARGET}")
-    set_target_properties(BenchmarkAppTests PROPERTIES XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH $<$<CONFIG:Debug>:YES>)
-    set_target_properties(BenchmarkAppTests PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${PROJECT_SOURCE_DIR}/benchmark/ios/tests/Info.plist)
-    set_target_properties(BenchmarkAppTests PROPERTIES XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "")
-    set_target_properties(BenchmarkAppTests PROPERTIES XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED "NO")
+    initialize_ios_test_target(BenchmarkAppTests "NO" ${PROJECT_SOURCE_DIR}/benchmark/ios/tests/Info.plist)
 endif()
