@@ -144,7 +144,10 @@ target_link_libraries(
     PRIVATE mbgl-compiler-options mbgl-render-test
 )
 
-add_test(NAME mbgl-benchmark-runner COMMAND mbgl-benchmark-runner WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+# Disable benchmarks in CI as they run in VM environment
+if(NOT DEFINED ENV{CI})
+    add_test(NAME mbgl-benchmark-runner COMMAND mbgl-benchmark-runner WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+endif()
 add_test(NAME mbgl-test-runner COMMAND mbgl-test-runner WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 
 install(TARGETS mbgl-render-test-runner RUNTIME DESTINATION bin)
