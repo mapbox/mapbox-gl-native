@@ -1196,8 +1196,8 @@ QMapbox::Coordinate QMapboxGL::coordinateForPixel(const QPointF &pixel) const
     Returns the coordinate and zoom combination needed in order to make the coordinate
     bounding box \a sw and \a ne visible.
 */
-QMapbox::CoordinateZoom QMapboxGL::coordinateZoomForBounds(const QMapbox::Coordinate &sw, QMapbox::Coordinate &ne) const
-{
+QMapbox::CoordinateZoom QMapboxGL::coordinateZoomForBounds(const QMapbox::Coordinate &sw,
+                                                           const QMapbox::Coordinate &ne) const {
     auto bounds = mbgl::LatLngBounds::hull(mbgl::LatLng { sw.first, sw.second }, mbgl::LatLng { ne.first, ne.second });
     mbgl::CameraOptions camera = d_ptr->mapObj->cameraForLatLngBounds(bounds, d_ptr->margins);
 
@@ -1208,8 +1208,10 @@ QMapbox::CoordinateZoom QMapboxGL::coordinateZoomForBounds(const QMapbox::Coordi
     Returns the coordinate and zoom combination needed in order to make the coordinate
     bounding box \a sw and \a ne visible taking into account \a newBearing and \a newPitch.
 */
-QMapbox::CoordinateZoom QMapboxGL::coordinateZoomForBounds(const QMapbox::Coordinate &sw, QMapbox::Coordinate &ne,
-    double newBearing, double newPitch)
+QMapbox::CoordinateZoom QMapboxGL::coordinateZoomForBounds(const QMapbox::Coordinate &sw,
+                                                           const QMapbox::Coordinate &ne,
+                                                           double newBearing,
+                                                           double newPitch)
 
 {
     auto bounds = mbgl::LatLngBounds::hull(mbgl::LatLng { sw.first, sw.second }, mbgl::LatLng { ne.first, ne.second });
