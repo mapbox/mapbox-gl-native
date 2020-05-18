@@ -165,9 +165,9 @@ workflows:
       - android-render-test-runner:
           requires:
             - linux-gcc8-release
-      - android-unit-test-runner:
-          requires:
-            - linux-gcc8-release
+#      - android-unit-test-runner:
+#          requires:
+#            - linux-gcc8-release
       - ios-render-test-runner:
           requires:
             - linux-gcc8-release
