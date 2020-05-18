@@ -248,6 +248,7 @@ executors:
       QT_INSTALL_DOCS: /usr/share/qt5/doc
       QT_VERSION: 5
       TSAN_OPTIONS: suppressions=/src/platform/linux/tsan_suppress.txt
+      GRADLE_OPTS: "-Dorg.gradle.jvmargs='-Xmx14000m'"
   macos-11_1_0:
     macos:
       xcode: '11.1.0'
