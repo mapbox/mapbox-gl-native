@@ -2,6 +2,12 @@
 
 ## master
 
+### ✨ New features
+
+- [core] Add `emphasis-circle-color` and `emphasis-circle-radius` properties to LocationIndicator layer ([#16463](https://github.com/mapbox/mapbox-gl-native/pull/16463))
+
+  LocationIndicator layer gets the ability to draw an additional circle, controlled via these two properties, to create effects that emphasize the indicator.
+
 ## maps-v1.6.0
 
 ### ✨ New features
