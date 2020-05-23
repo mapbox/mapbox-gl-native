@@ -171,7 +171,7 @@ void RenderRasterLayer::render(PaintParameters& parameters) {
             assert(bucket.texture);
             if (bucket.vertexBuffer && bucket.indexBuffer) {
                 // Draw only the parts of the tile that aren't drawn by another tile in the layer.
-                draw(parameters.matrixForTile(tile.id, true),
+                draw(parameters.matrixForTile(tile.id, !parameters.state.isChanging()),
                      *bucket.vertexBuffer,
                      *bucket.indexBuffer,
                      bucket.segments,
@@ -186,7 +186,7 @@ void RenderRasterLayer::render(PaintParameters& parameters) {
                     // Copy over the segments so that we can create our own DrawScopes.
                     bucket.segments = RenderStaticData::rasterSegments();
                 }
-                draw(parameters.matrixForTile(tile.id, true),
+                draw(parameters.matrixForTile(tile.id, !parameters.state.isChanging()),
                      *parameters.staticData.rasterVertexBuffer,
                      *parameters.staticData.quadTriangleIndexBuffer,
                      bucket.segments,
