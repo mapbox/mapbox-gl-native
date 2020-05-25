@@ -218,7 +218,7 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(
 
     const LayerDifference layerDiff = diffLayers(layerImpls, updateParameters->layers);
     layerImpls = updateParameters->layers;
-    const bool layersAddedOrRemoved = !layerDiff.added.empty() || !layerDiff.removed.empty();
+    const bool layersAddedOrRemoved = layerImpls->empty() || !layerDiff.added.empty() || !layerDiff.removed.empty();
 
     // Remove render layers for removed layers.
     for (const auto& entry : layerDiff.removed) {
