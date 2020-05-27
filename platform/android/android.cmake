@@ -21,10 +21,13 @@ target_compile_options(mbgl-compiler-options INTERFACE $<$<CONFIG:Release>:-Oz> 
 target_link_libraries(
     mbgl-compiler-options
     INTERFACE
-        $<$<CONFIG:Release>:-O2>
+        $<$<CONFIG:Release>:-Wl,--gc-sections>
         $<$<CONFIG:Release>:-Wl,--icf=all>
         $<$<CONFIG:Release>:-flto>
-        $<$<CONFIG:Release>:-fuse-ld=gold>
+        $<$<CONFIG:Release>:-fuse-ld=lld>
+        $<$<CONFIG:Release>:-Wl,--lto-new-pass-manager>
+        $<$<CONFIG:Release>:-Wl,--pack-dyn-relocs=android>
+        $<$<CONFIG:Release>:-Wl,--lto-O3>
 )
 
 target_sources(
