@@ -53,6 +53,8 @@ MBGL_DEFINE_ATTRIBUTE(float, 1, halo_blur);
 MBGL_DEFINE_ATTRIBUTE(float, 1, weight);
 MBGL_DEFINE_ATTRIBUTE(uint16_t, 4, pattern_to);
 MBGL_DEFINE_ATTRIBUTE(uint16_t, 4, pattern_from);
+MBGL_DEFINE_ATTRIBUTE(float, 1, pixel_ratio_to);
+MBGL_DEFINE_ATTRIBUTE(float, 1, pixel_ratio_from);
 
 } // namespace attributes
 

@@ -103,7 +103,7 @@ LinePatternProgram::LayoutUniformValues LinePatternProgram::layoutUniformValues(
         state,
         pixelsToGLUnits,
         pixelRatio,
-        uniforms::scale::Value ({ {pixelRatio, tileRatio, crossfade.fromScale, crossfade.toScale} }),
+        uniforms::scale::Value ({ {tileRatio, crossfade.fromScale, crossfade.toScale} }),
         uniforms::texsize::Value( atlasSize ),
         uniforms::fade::Value( crossfade.t )
     );
