@@ -15,9 +15,9 @@ struct ShaderSource;
 template <>
 struct ShaderSource<FillExtrusionPatternProgram> {
     static constexpr const char* name = "fill_extrusion_pattern";
-    static constexpr const uint8_t hash[8] = {0x5a, 0x8f, 0x1a, 0xbf, 0x43, 0x62, 0xf0, 0x86};
-    static constexpr const auto vertexOffset = 23538;
-    static constexpr const auto fragmentOffset = 26509;
+    static constexpr const uint8_t hash[8] = {0x66, 0xa3, 0xd9, 0x87, 0x9b, 0x01, 0x0c, 0xeb};
+    static constexpr const auto vertexOffset = 24680;
+    static constexpr const auto fragmentOffset = 28270;
 };
 
 constexpr const char* ShaderSource<FillExtrusionPatternProgram>::name;
@@ -43,7 +43,7 @@ uniform mat4 u_matrix;
 uniform vec2 u_pixel_coord_upper;
 uniform vec2 u_pixel_coord_lower;
 uniform float u_height_factor;
-uniform vec4 u_scale;
+uniform vec3 u_scale;
 uniform float u_vertical_gradient;
 uniform lowp float u_opacity;
 
@@ -95,6 +95,24 @@ uniform lowp vec4 u_pattern_to;
 #endif
 
 
+#ifndef HAS_UNIFORM_u_pixel_ratio_from
+uniform lowp float u_pixel_ratio_from_t;
+attribute lowp vec2 a_pixel_ratio_from;
+varying lowp float pixel_ratio_from;
+#else
+uniform lowp float u_pixel_ratio_from;
+#endif
+
+
+#ifndef HAS_UNIFORM_u_pixel_ratio_to
+uniform lowp float u_pixel_ratio_to_t;
+attribute lowp vec2 a_pixel_ratio_to;
+varying lowp float pixel_ratio_to;
+#else
+uniform lowp float u_pixel_ratio_to;
+#endif
+
+
 void main() {
     
 #ifndef HAS_UNIFORM_u_base
@@ -124,22 +142,35 @@ void main() {
     mediump vec4 pattern_to = u_pattern_to;
 #endif
 
+    
+#ifndef HAS_UNIFORM_u_pixel_ratio_from
+    pixel_ratio_from = unpack_mix_vec2(a_pixel_ratio_from, u_pixel_ratio_from_t);
+#else
+    lowp float pixel_ratio_from = u_pixel_ratio_from;
+#endif
+
+    
+#ifndef HAS_UNIFORM_u_pixel_ratio_to
+    pixel_ratio_to = unpack_mix_vec2(a_pixel_ratio_to, u_pixel_ratio_to_t);
+#else
+    lowp float pixel_ratio_to = u_pixel_ratio_to;
+#endif
+
 
     vec2 pattern_tl_a = pattern_from.xy;
     vec2 pattern_br_a = pattern_from.zw;
     vec2 pattern_tl_b = pattern_to.xy;
     vec2 pattern_br_b = pattern_to.zw;
 
-    float pixelRatio = u_scale.x;
-    float tileRatio = u_scale.y;
-    float fromScale = u_scale.z;
-    float toScale = u_scale.w;
+    float tileRatio = u_scale.x;
+    float fromScale = u_scale.y;
+    float toScale = u_scale.z;
 
     vec3 normal = a_normal_ed.xyz;
     float edgedistance = a_normal_ed.w;
 
-    vec2 display_size_a = vec2((pattern_br_a.x - pattern_tl_a.x) / pixelRatio, (pattern_br_a.y - pattern_tl_a.y) / pixelRatio);
-    vec2 display_size_b = vec2((pattern_br_b.x - pattern_tl_b.x) / pixelRatio, (pattern_br_b.y - pattern_tl_b.y) / pixelRatio);
+    vec2 display_size_a = (pattern_br_a - pattern_tl_a) / pixel_ratio_from;
+    vec2 display_size_b = (pattern_br_b - pattern_tl_b) / pixel_ratio_to;
 
     base = max(0.0, base);
     height = max(0.0, height);
@@ -214,6 +245,20 @@ uniform lowp vec4 u_pattern_to;
 #endif
 
 
+#ifndef HAS_UNIFORM_u_pixel_ratio_from
+varying lowp float pixel_ratio_from;
+#else
+uniform lowp float u_pixel_ratio_from;
+#endif
+
+
+#ifndef HAS_UNIFORM_u_pixel_ratio_to
+varying lowp float pixel_ratio_to;
+#else
+uniform lowp float u_pixel_ratio_to;
+#endif
+
+
 void main() {
     
 #ifdef HAS_UNIFORM_u_base
@@ -233,6 +278,16 @@ void main() {
     
 #ifdef HAS_UNIFORM_u_pattern_to
     mediump vec4 pattern_to = u_pattern_to;
+#endif
+
+    
+#ifdef HAS_UNIFORM_u_pixel_ratio_from
+    lowp float pixel_ratio_from = u_pixel_ratio_from;
+#endif
+
+    
+#ifdef HAS_UNIFORM_u_pixel_ratio_to
+    lowp float pixel_ratio_to = u_pixel_ratio_to;
 #endif
 
 

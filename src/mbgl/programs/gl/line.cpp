@@ -16,8 +16,8 @@ template <>
 struct ShaderSource<LineProgram> {
     static constexpr const char* name = "line";
     static constexpr const uint8_t hash[8] = {0x7f, 0x8e, 0xaa, 0x53, 0x75, 0x78, 0xac, 0x2c};
-    static constexpr const auto vertexOffset = 30578;
-    static constexpr const auto fragmentOffset = 33575;
+    static constexpr const auto vertexOffset = 32769;
+    static constexpr const auto fragmentOffset = 35766;
 };
 
 constexpr const char* ShaderSource<LineProgram>::name;

@@ -16,8 +16,8 @@ template <>
 struct ShaderSource<SymbolSDFTextProgram> {
     static constexpr const char* name = "symbol_sdf_text";
     static constexpr const uint8_t hash[8] = {0x46, 0xe9, 0x60, 0xde, 0x1e, 0x85, 0x36, 0x54};
-    static constexpr const auto vertexOffset = 53876;
-    static constexpr const auto fragmentOffset = 57916;
+    static constexpr const auto vertexOffset = 57222;
+    static constexpr const auto fragmentOffset = 61262;
 };
 
 constexpr const char* ShaderSource<SymbolSDFTextProgram>::name;
