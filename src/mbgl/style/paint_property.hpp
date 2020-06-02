@@ -41,7 +41,7 @@ public:
     using UniformList = TypeList<U>;
 };
 
-template <class T, class A1, class U1, class A2, class U2>
+template <class T, class A1, class U1, class A2, class U2, class A3, class U3, class A4, class U4>
 class CrossFadedDataDrivenPaintProperty {
 public:
     using TransitionableType = Transitionable<PropertyValue<T>>;
@@ -53,9 +53,9 @@ public:
     static constexpr bool IsOverridable = false;
 
     using Attribute = A1;
-    using AttributeList = TypeList<A1, A2>;
+    using AttributeList = TypeList<A1, A2, A3, A4>;
     using Uniform = U1;
-    using UniformList = TypeList<U1, U2>;
+    using UniformList = TypeList<U1, U2, U3, U4>;
 };
 
 template <class T>

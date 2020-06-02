@@ -162,11 +162,16 @@ private:
     T constant;
 };
 
+struct FadedPaintPropertyData {
+    std::array<uint16_t, 4> patternPositions;
+    float pixelRatio;
+};
+
 template <class T, class... As>
-class ConstantCrossFadedPaintPropertyBinder final : public PaintPropertyBinder<T, std::array<uint16_t, 4>,PossiblyEvaluatedPropertyValue<Faded<T>>, As...> {
+class ConstantCrossFadedPaintPropertyBinder final : public PaintPropertyBinder<T, FadedPaintPropertyData, PossiblyEvaluatedPropertyValue<Faded<T>>, As...> {
 public:
     ConstantCrossFadedPaintPropertyBinder(Faded<T> constant_)
-        : constant(std::move(constant_)), constantPatternPositions({}) {
+        : constant(std::move(constant_)), constantUniforms({}) {
     }
 
     void populateVertexVector(const GeometryTileFeature&,
@@ -183,7 +188,10 @@ public:
         if (!posA || !posB) {
             return;
         } else {
-            constantPatternPositions = std::tuple<std::array<uint16_t, 4>, std::array<uint16_t, 4>> { posB->tlbr(), posA->tlbr() };
+            constantUniforms =  std::tuple<FadedPaintPropertyData, FadedPaintPropertyData> {
+                {posB->tlbr(), posB->pixelRatio},
+                {posA->tlbr(), posA->pixelRatio},
+            };
         }
     }
 
@@ -196,13 +204,13 @@ public:
         return std::tuple<float, float> { 0.0f, 0.0f };
     }
 
-    std::tuple<std::array<uint16_t, 4>, std::array<uint16_t, 4>> uniformValue(const PossiblyEvaluatedPropertyValue<Faded<T>>&) const override {
-        return constantPatternPositions;
+    std::tuple<FadedPaintPropertyData, FadedPaintPropertyData> uniformValue(const PossiblyEvaluatedPropertyValue<Faded<T>>&) const override {
+        return constantUniforms;
     }
 
 private:
     Faded<T> constant;
-    std::tuple<std::array<uint16_t, 4>, std::array<uint16_t, 4>> constantPatternPositions;
+    std::tuple<FadedPaintPropertyData, FadedPaintPropertyData> constantUniforms;
 };
 
 template <class T, class A>
@@ -424,8 +432,8 @@ private:
     FeatureVertexRangeMap featureMap;
 };
 
-template <class T, class A1, class A2>
-class CompositeCrossFadedPaintPropertyBinder final : public PaintPropertyBinder<T, std::array<uint16_t, 4>, PossiblyEvaluatedPropertyValue<Faded<T>>, A1, A2> {
+template <class T, class A1, class A2, class A3, class A4>
+class CompositeCrossFadedPaintPropertyBinder final : public PaintPropertyBinder<T, FadedPaintPropertyData, PossiblyEvaluatedPropertyValue<Faded<T>>, A1, A2, A3, A4> {
 public:
     using AttributeType = ZoomInterpolatedAttributeType<A1>;
     using AttributeType2 = ZoomInterpolatedAttributeType<A2>;
@@ -458,9 +466,10 @@ public:
             // string and will not have a valid entry in patternPositions. We still need to populate the attribute buffers to avoid crashes
             // when we try to draw the layer because we don't know at draw time if all features were evaluated to valid pattern dependencies.
             for (std::size_t i = zoomInVertexVector.elements(); i < length; ++i) {
-                patternToVertexVector.emplace_back(Vertex { std::array<uint16_t, 4>{{0, 0, 0, 0}} });
-                zoomInVertexVector.emplace_back(Vertex2 { std::array<uint16_t, 4>{{0, 0, 0, 0}} } );
-                zoomOutVertexVector.emplace_back(Vertex2 { std::array<uint16_t, 4>{{0, 0, 0, 0}} });
+                // FIXME
+                //patternToVertexVector.emplace_back(Vertex { std::array<uint16_t, 4>{{0, 0, 0, 0}} });
+                //zoomInVertexVector.emplace_back(Vertex2 { std::array<uint16_t, 4>{{0, 0, 0, 0}} } );
+                //zoomOutVertexVector.emplace_back(Vertex2 { std::array<uint16_t, 4>{{0, 0, 0, 0}} });
             }
         } else if (!patternPositions.empty()) {
             const auto min = patternPositions.find(patternDependencies->min);
@@ -475,9 +484,10 @@ public:
             const ImagePosition imageMax = max->second;
 
             for (std::size_t i = zoomInVertexVector.elements(); i < length; ++i) {
-                patternToVertexVector.emplace_back(Vertex { imageMid.tlbr() });
-                zoomInVertexVector.emplace_back(Vertex2 { imageMin.tlbr() });
-                zoomOutVertexVector.emplace_back(Vertex2 { imageMax.tlbr() });
+                // FIXME
+                //patternToVertexVector.emplace_back(Vertex { imageMid.tlbr() });
+                //zoomInVertexVector.emplace_back(Vertex2 { imageMin.tlbr() });
+                //zoomOutVertexVector.emplace_back(Vertex2 { imageMax.tlbr() });
             }
         }
     }
@@ -515,7 +525,7 @@ public:
         return std::tuple<float, float> { 0.0f, 0.0f };
     }
 
-    std::tuple<std::array<uint16_t, 4>, std::array<uint16_t, 4>>  uniformValue(const PossiblyEvaluatedPropertyValue<Faded<T>>& ) const override {
+    std::tuple<FadedPaintPropertyData, FadedPaintPropertyData>  uniformValue(const PossiblyEvaluatedPropertyValue<Faded<T>>& ) const override {
         // Uniform values for vertex attribute arrays are unused.
         return {};
     }
@@ -554,14 +564,14 @@ struct CreateBinder {
 
 template <class T>
 struct CreateBinder<T, PossiblyEvaluatedPropertyValue<Faded<T>>> {
-    template <class A1, class A2>
-    static std::unique_ptr<PaintPropertyBinder<T, std::array<uint16_t, 4>, PossiblyEvaluatedPropertyValue<Faded<T>>, A1, A2>> create(const PossiblyEvaluatedPropertyValue<Faded<T>>& value, float zoom, T defaultValue) {
+    template <class A1, class A2, class A3, class A4>
+    static std::unique_ptr<PaintPropertyBinder<T, FadedPaintPropertyData, PossiblyEvaluatedPropertyValue<Faded<T>>, A1, A2, A3, A4>> create(const PossiblyEvaluatedPropertyValue<Faded<T>>& value, float zoom, T defaultValue) {
         return value.match(
-            [&] (const Faded<T>& constant) -> std::unique_ptr<PaintPropertyBinder<T, std::array<uint16_t, 4>, PossiblyEvaluatedPropertyValue<Faded<T>>, A1, A2>> {
-                return std::make_unique<ConstantCrossFadedPaintPropertyBinder<T, A1, A2>>(constant);
+            [&] (const Faded<T>& constant) -> std::unique_ptr<PaintPropertyBinder<T, FadedPaintPropertyData, PossiblyEvaluatedPropertyValue<Faded<T>>, A1, A2, A3, A4>> {
+                return std::make_unique<ConstantCrossFadedPaintPropertyBinder<T, A1, A2, A3, A4>>(constant);
             },
-            [&] (const style::PropertyExpression<T>& expression) -> std::unique_ptr<PaintPropertyBinder<T, std::array<uint16_t, 4>, PossiblyEvaluatedPropertyValue<Faded<T>>, A1, A2>>  {
-                return std::make_unique<CompositeCrossFadedPaintPropertyBinder<T, A1, A2>>(expression, zoom, defaultValue);
+            [&] (const style::PropertyExpression<T>& expression) -> std::unique_ptr<PaintPropertyBinder<T, FadedPaintPropertyData, PossiblyEvaluatedPropertyValue<Faded<T>>, A1, A2, A3, A4>>  {
+                return std::make_unique<CompositeCrossFadedPaintPropertyBinder<T, A1, A2, A3, A4>>(expression, zoom, defaultValue);
             }
         );
     }

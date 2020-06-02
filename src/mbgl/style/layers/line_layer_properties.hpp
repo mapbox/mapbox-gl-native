@@ -73,7 +73,16 @@ struct LineOpacity : DataDrivenPaintProperty<float, attributes::opacity, uniform
     static float defaultValue() { return 1; }
 };
 
-struct LinePattern : CrossFadedDataDrivenPaintProperty<expression::Image, attributes::pattern_to, uniforms::pattern_to, attributes::pattern_from, uniforms::pattern_from> {
+struct LinePattern : CrossFadedDataDrivenPaintProperty<
+    expression::Image,
+    attributes::pattern_to,
+    uniforms::pattern_to,
+    attributes::pattern_from,
+    uniforms::pattern_from,
+    attributes::pixel_ratio_to,
+    uniforms::pixel_ratio_to,
+    attributes::pixel_ratio_from,
+    uniforms::pixel_ratio_from> {
     static expression::Image defaultValue() { return {}; }
 };
 
