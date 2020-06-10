@@ -599,7 +599,11 @@ FeatureExtensionValue RenderOrchestrator::queryFeatureExtensions(const std::stri
                                                              const std::string& extensionField,
                                                              const optional<std::map<std::string, Value>>& args) const {
     if (RenderSource* renderSource = getRenderSource(sourceID)) {
-        return renderSource->queryFeatureExtensions(feature, extension, extensionField, args);
+        try {
+            return renderSource->queryFeatureExtensions(feature, extension, extensionField, args);
+        } catch (...) {
+            return {};
+        }
     }
     return {};
 }
