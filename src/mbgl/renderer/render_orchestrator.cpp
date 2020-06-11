@@ -602,7 +602,7 @@ FeatureExtensionValue RenderOrchestrator::queryFeatureExtensions(const std::stri
         try {
             return renderSource->queryFeatureExtensions(feature, extension, extensionField, args);
         } catch (...) {
-            return {};
+            mbgl::Log::Warning(mbgl::Event::General, "No FeatureExtension found.");
         }
     }
     return {};
