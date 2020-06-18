@@ -179,32 +179,6 @@ workflows:
       - android-api-breakage:
           requires:
             - baselines
-  nightly:
-    triggers:
-      - schedule:
-          cron: "0 5 * * *"
-          filters:
-            branches:
-              only:
-                - master
-    jobs:
-      - build-template:
-          name: linux-gcc8-debug-coverage-nightly
-          executor_name: ubuntu-eoan
-          target_is_linux: true
-          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=gcc-8 -DCMAKE_CXX_COMPILER=g++-8 -DCMAKE_BUILD_TYPE=Debug -DMBGL_WITH_COVERAGE=ON'
-          style_tests: true
-          upload_coverage: true
-      - build-template:
-          name: macos-xcode11-debug-coverage-nightly
-          executor_name: macos-11_1_0
-          target_is_macos: true
-          requires:
-            - linux-gcc8-debug-coverage-nightly
-          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_BUILD_TYPE=Debug -DMBGL_WITH_COVERAGE=ON'
-          style_tests: true
-          upload_coverage: true
-          publish_coverage: true
 
 #
 # Executors: we currently support two executors, one based on Ubuntu 19.04 aka Disco
