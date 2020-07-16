@@ -111,10 +111,10 @@ namespace android {
         static auto& javaClass = jni::Class<CustomGeometrySource>::Singleton(*_env);
         static auto releaseThreads = javaClass.GetMethod<void ()>(*_env, "releaseThreads");
 
-        assert(javaPeer);
-
-        auto peer = jni::Cast(*_env, javaClass, javaPeer);
-        peer.Call(*_env, releaseThreads);
+        if(javaPeer) {
+            auto peer = jni::Cast(*_env, javaClass, javaPeer);
+            peer.Call(*_env, releaseThreads);
+        }
     };
 
     bool CustomGeometrySource::isCancelled(jni::jint z,
