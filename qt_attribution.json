@@ -9,6 +9,7 @@
         "Homepage": "https://github.com/mapbox/mapbox-gl-native",
         "LicenseId": "BSD-2-Clause",
         "License": "BSD 2-clause \"Simplified\" License",
+        "LicenseFile": "LICENSE_mapbox.txt",
         "Copyright": "Copyright (c) 2014-2017 Mapbox"
     },
     {
@@ -22,7 +23,8 @@
         "Homepage": "https://github.com/kkaefer/css-color-parser-cpp",
         "LicenseId": "MIT",
         "License": "MIT License",
-        "Copyright": "Copyright (c) 2012 Dean McNamee, 2014 Konstantin Käfer"
+        "LicenseFile": "LICENSE_CSSColorParser.txt",
+        "Copyright": "Copyright (c) 2012 Dean McNamee, 2014-2017 Konstantin Käfer"
     },
     {
         "Id": "mapboxgl-parsedate",
@@ -35,6 +37,7 @@
         "Homepage": "https://curl.haxx.se",
         "LicenseId": "MIT",
         "License": "MIT License",
+        "LicenseFile": "LICENSE_parsedate.txt",
         "Copyright": "Copyright (c) 1998-2014 Daniel Stenberg, et al"
     },
     {
@@ -58,9 +61,188 @@
         "Path": "deps/boost",
         "Description": "Boost provides free peer-reviewed portable C++ source libraries.",
         "Homepage": "http://www.boost.org",
+        "Version": "1.65.1",
+        "DownloadLocation": "https://dl.bintray.com/boostorg/release/1.65.1/source/",
         "LicenseId": "BSL-1.0",
         "License": "Boost Software License 1.0",
-        "Copyright": "Copyright (c) Boost developers"
+        "LicenseFile": "LICENSE_Boost.txt",
+        "Copyright": "Copyright (c) 2011-2012 Brandon Kohn
+Copyright (c) 2008 Peter Kankowski
+Copyright (c) 2011-2017 Adam Wulkiewicz, Lodz, Poland
+Copyright (c) 2014 Agustin Berge
+Copyright (c) 2015 Agustin K-ballo Berge
+Copyright (c) 1999-2010 Aleksey Gurtovoy
+Copyright (c) 2006 Alexander Nasonov & Paul A. Bristow
+Copyright (c) 2006-2010 Alexander Nasonov
+Copyright (c) 2011-2013 Andrew Hundt
+Copyright (c) 2007-2013, 2014, 2017 Andrey Semashev
+Copyright (c) 2014-2016 Andrzej Krzemienski
+Copyright (c) 2012 Anthony Williams
+Copyright (c) 2011-2017 Antony Polukhin
+Copyright (c) 2004, 2005, 2006 Arkadiy Vertleyb
+Copyright (c) 2009 Arno Schoedl & Neil Groves
+Copyright (c) 2009-2011 Artyom Beilis
+Copyright (c) 1995, 2007-2017 Barend Gehrels, Amsterdam
+Copyright (c) 2007 Baruch Zilber
+Copyright (c) 1999-2003, 2006, 2008, 2009, 2011 Beman Dawes
+Copyright (c) 1999 Beman Dawes and Daryle Walker
+Copyright (c) 2005 Ben Hutchings
+Copyright (c) 2001, 2002 Bill Kempf
+Copyright (c) 2006-2007 Boris Gubenko
+Copyright (c) 2002 Brad King (brad.king@kitware.com), Douglas Gregor (gregod@cs.rpi.edu)
+Copyright (c) 2016 Brian Kuhl
+Copyright (c) 2015 Bruno Dutra
+Copyright (c) 2008-2015 Bruno Lalande, Paris, France
+Copyright (c) 2010, 2011 Bryce Lelbach
+Copyright (c) 2003-2011 LASMEA UMR 6602 CNRS/Univ. Clermont II
+Copyright (c) 2009-2011 LRI UMR 8623 CNRS/Univ Paris Sud XI
+Copyright (c) 2009 Carl Barron
+Copyright (c) 2015 Charly Chevalier
+Copyright (c) 2003 Christof Meerwald
+Copyright (c) 2005 Christopher Diggins
+Copyright (c) 2011 Christopher Jefferson
+Copyright (c) 2002-2013 Christopher Kormanyos
+Copyright (c) 2009 Christopher Schmidt
+Copyright (c) 2009-2011 Christopher Schmidt
+Copyright (c) 2007-2008 CodeRage, LLC
+Copyright (c) 2013 Cray, Inc.
+Copyright (c) 2013-2014 Damien Buhl
+Copyright (c) 2005-2006 Dan Marsden
+Copyright (c) 2006, 2007 Dan Marsden
+Copyright (c) 2003 Dan Watkins
+Copyright (c) 2001 Daniel C. Nuffer
+Copyright (c) 2003 Daniel Frey
+Copyright (c) 2002-2016 Daniel Frey
+Copyright (c) 2005-2014 Daniel James
+Copyright (c) 2001-2009 Daniel Nuffer
+Copyright (c) 2006, 2007 Daniel Walker
+Copyright (c) 2008-2012 Daniel Walker, Eric Niebler, Michel Morin
+Copyright (c) 2004 Daniel Wallin
+Copyright (c) 2010 Daniel Wallin, Eric Niebler
+Copyright (c) 2017 Daniela Engert
+Copyright (c) 2000-2004, 2012 Darin Adler
+Copyright (c) 2001-2002 Daryle Walker and Stephen Cleary
+Copyright (c) 1999-2003 Dave Abrahams and Daniel Walker
+Copyright (c) 2001 Dave Abrahams and Daryle Walker
+Copyright (c) 2000 Dave Abrahams, Steve Cleary, Beman Dawes, Aleksey Gurtovoy, Howard Hinnant & John Maddock
+Copyright (c) 2000-2003, 2010 Dave Abrahams, Steve Cleary, Beman Dawes, Howard Hinnant & John Maddock
+Copyright (c) 2000-2004, 2006, 2009 David Abrahams
+Copyright (c) 1999-2001 David Abrahams, Jeremy Siek, Daryle Walker
+Copyright (c) 2009 David Abrahams, Vicente Botet
+Copyright (c) 2001-2006, 2008, 2010 Douglas Gregor
+Copyright (c) 2009 Dustin Spicuzza
+Copyright (c) 2017 Dynatrace
+Copyright (c) 2007, 2011, 2013-2015 Edward Diener
+Copyright (c) 2006-2017 Emil Dotchevski and Reverge Studios, Inc.
+Copyright (c) 2002-2003 Eric Friedman
+Copyright (c) 2002-2003 Eric Friedman, Itay Maman
+Copyright (c) 2010 Eric Jourdanneau, Joel Falcou
+Copyright (c) 2004-2006, 2008, 2010-2014 Eric Niebler
+Copyright (c) 2008 Federico J. Fernandez
+Copyright (c) 2000-2008 Fernando Luis Cacciola Carballal
+Copyright (c) 2009 Francois Barel
+Copyright (c) 2016 Frank Hein, maxence business consulting gmbh
+Copyright (c) 2014 Franz Detro
+Copyright (c) 2009-2011 Frederic Bron
+Copyright (c) 2009-2011 Frederic Bron, Robert Stewart, Steven Watanabe & Roman Perepelitsa
+Copyright (c) 2003 Gennaro Prota
+Copyright (c) 1995-2010 Geodan, Amsterdam
+Copyright (c) 2014 Glen Fernandes
+Copyright (c) 2014 Glen Joseph Fernandes
+Copyright (c) 2017 Glen Joseph Fernandes (glenjofe@gmail.com)
+Copyright (c) 1998, 1999 Greg Colvin and Beman Dawes
+Copyright (c) 2002, 2003 Guillaume Melquiond
+Copyright (c) 2001 -2013 Hartmut Kaiser
+Copyright (c) 2004 Herve Bronnimann
+Copyright (c) 2001 Housemarque Oy http://www.housemarque.com
+Copyright (c) 2003 Howard Hinnant
+Copyright (c) 2001 Hubert Holin
+Copyright (c) 2012 IBM Corp.
+Copyright (c) 2005 Igor Chesnokov
+Copyright (c) 2005-2017 Ion Gaztanaga
+Copyright (c) 1999-2003 Jaakko Jarvi
+Copyright (c) 2003 Jaap Suter
+Copyright (c) 2011 Jan Frederick Eick
+Copyright (c) 2001-2003 Jens Maurer
+Copyright (c) 1999-2003 Jeremiah Willcock
+Copyright (c) 2000-2002 Jeremy Siek
+Copyright (c) 2001 Jeremy Siek and John R. Bandela
+Copyright (c) 2016 Jeremy William Murphy
+Copyright (c) 2014 Jessica Hamilton
+Copyright (c) 2005 Jim Douglas
+Copyright (c) 2015 Joel Falcou
+Copyright (c) 2001-2013 Joel de Guzman
+Copyright (c) 2006-2008 Johan Rade
+Copyright (c) 2014-2015 John Fletcher
+Copyright (c) 2000-2008, 2010-2013, 2015-2017 John Maddock
+Copyright (c) 2005 John Maddock & Thorsten Ottosen
+Copyright (c) 2000 John Maddock and Steve Cleary
+Copyright (c) 2013 John Maddock, Antony Polukhin
+Copyright (c) 2001 John R. Bandela
+Copyright (c) 2003-2007 Jonathan Turkanis
+Copyright (c) 2005 Jonathan Turkanis
+Copyright (c) 2001 Kevlin Henney
+Copyright (c) 1999 Kevlin Henney and Dave Abrahams
+Copyright (c) 2000-2005 Kevlin Henney
+Copyright (c) 2014-2016 Kohei Takahashi
+Copyright (c) 2002 Lars Gullik Bjonnes <larsbj@lyx.org>
+Copyright (c) 2016 Lee Clagett
+Copyright (c) 2001 Lie-Quan Lee
+Copyright (c) 2009-2012 Lorenzo Caminiti
+Copyright (c) 1995 Maarten Hilferink, Amsterdam
+Copyright (c) 2002-2003, 2005 Markus Schoepflin
+Copyright (c) 2003 Martin Wille
+Copyright (c) 2001 Mat Marcus, Jesse Jones and Adobe Systems Inc
+Copyright (c) 2009-2015 Mateusz Loskot, London, UK.
+Copyright (c) 2005 Matthew Calabrese
+Copyright (c) 2006 Michael van der Westhuizen
+Copyright (c) 2017 Michel Morin
+Copyright (c) 2014 Microsoft Corporation
+Copyright (c) 2012 Nathan Ridge
+Copyright (c) 2003-2004, 2009-2010, 2014 Neil Groves
+Copyright (c) 2003-2004 Neil Groves & Thorsten Ottosen & Pavol Droba
+Copyright (c) 2001 Nicolai M. Josuttis
+Copyright (c) 2007 Noel Belcourt
+Copyright (c) 2013-2017 Oracle and/or its affiliates
+Copyright (c) 2005 Pablo Aguilar
+Copyright (c) 2009 Pablo Halpern
+Copyright (c) 2006-2012 Paul A. Bristow
+Copyright (c) 2002-2011 Paul Mensonides
+Copyright (c) 1999 Paul Moore
+Copyright (c) 2004 Pavel Vozenilek
+Copyright (c) 2002-2006 Pavol Droba
+Copyright (c) 2004-2007, 2010 Peder Holt
+Copyright (c) 2001-2017 Peter Dimov
+Copyright (c) 2002 Peter Dimov and David Abrahams
+Copyright (c) 2001-2003 Peter Dimov and Multi Media Ltd.
+Copyright (c) 2006 Piotr Wyderski
+Copyright (c) 2002 David Abrahams
+Copyright (c) 2003-2005 Rani Sharoni
+Copyright (c) 2002 Rani Sharoni (rani_sharoni@hotmail.com) and Robert Ramey
+Copyright (c) 2005-2017 Rene Rivera
+Copyright (c) 2002 Robert Ramey
+Copyright (c) 2017 Ruslan Baratov
+Copyright (c) 2014-2015 Samuel Debionne, Grenoble, France
+Copyright (c) 2009 Spirent Communications, Inc.
+Copyright (c) 2004 Stefan Slapeta
+Copyright (c) 2006 Stephen Nutt
+Copyright (c) 2000 Steve Cleary, Beman Dawes, Aleksey Gurtovoy, Howard Hinnant & John Maddock
+Copyright (c) 2000-2005 Steve Cleary, Beman Dawes, Howard Hinnant & John Maddock
+Copyright (c) 2006 Steven Watanabe
+Copyright (c) 2007, 2008 Steven Watanabe, Joseph Gauterin, Niels Dekker
+Copyright (c) 2003 Synge Todo
+Copyright (c) 2002 The Trustees of Indiana University
+Copyright (c) 2010-2011 Thomas Heller
+Copyright (c) 2002 Thomas Witt
+Copyright (c) 2003-2006 Thorsten Ottosen
+Copyright (c) 2006-2008 Thorsten Ottosen, Neil Groves
+Copyright (c) 2006, 2007 Tobias Schwinger
+Copyright (c) 2006 Tomas Puverle
+Copyright (c) 2001-2003 Toon Knapen
+Copyright (c) 2003 Vesa Karvonen
+Copyright (c) 2009-2012 Vicente J. Botet Escriba
+Copyright (c) 2009 Yuriy Krasnoschek
+Copyright (c) 2002 by Andrei Alexandrescu"
     },
     {
         "Id": "mapboxgl-earcut",
@@ -71,8 +253,10 @@
         "Path": "deps/earcut",
         "Description": "A fast polygon triangulation library.",
         "Homepage": "https://github.com/mapbox/earcut.hpp",
+        "Version": "0.12.4",
         "LicenseId": "ISC",
         "License": "ISC License",
+        "LicenseFile": "deps/earcut/0.12.4/LICENSE",
         "Copyright": "Copyright (c) 2015 Mapbox"
     },
     {
@@ -84,8 +268,10 @@
         "Path": "deps/geojson",
         "Description": "A C++14 library for converting GeoJSON into geometry.hpp representation.",
         "Homepage": "https://github.com/mapbox/geojson-cpp",
+        "Version": "0.4.2",
         "LicenseId": "ISC",
         "License": "ISC License",
+        "LicenseFile": "LICENSE_geojson.txt",
         "Copyright": "Copyright (c) 2016 Mapbox"
     },
     {
@@ -96,9 +282,11 @@
 
         "Path": "deps/geojsonvt",
         "Description": "A library for slicing GeoJSON into vector tiles on the fly.",
+        "Version": "6.5.1",
         "Homepage": "https://github.com/mapbox/geojson-vt-cpp",
         "LicenseId": "ISC",
         "License": "ISC License",
+        "LicenseFile": "LICENSE_geojson_vt_cpp.txt",
         "Copyright": "Copyright (c) 2015 Mapbox"
     },
     {
@@ -110,8 +298,10 @@
         "Path": "deps/geometry",
         "Description": "C++ interfaces for geometry types, geometry collections, and features.",
         "Homepage": "https://github.com/mapbox/geometry.hpp",
+        "Version": "0.9.3",
         "LicenseId": "ISC",
         "License": "ISC License",
+        "LicenseFile": "LICENSE_geometry.txt",
         "Copyright": "Copyright (c) 2016 Mapbox"
     },
     {
@@ -123,8 +313,10 @@
         "Path": "deps/kdbush",
         "Description": "A fast static spatial index for 2D points.",
         "Homepage": "https://github.com/mourner/kdbush.hpp",
+        "Version": "0.1.1-1",
         "LicenseId": "ISC",
         "License": "ISC License",
+        "LicenseFile": "deps/kdbush/0.1.1-1/LICENSE",
         "Copyright": "Copyright (c) 2016 Vladimir Agafonkin"
     },
     {
@@ -136,8 +328,10 @@
         "Path": "deps/polylabel",
         "Description": "A fast algorithm for finding polygon pole of inaccessibility.",
         "Homepage": "https://github.com/mapbox/polylabel",
+        "Version": "1.0.3",
         "LicenseId": "ISC",
         "License": "ISC License",
+        "LicenseFile": "deps/polylabel/1.0.3/LICENSE",
         "Copyright": "Copyright (c) 2016 Mapbox"
     },
     {
@@ -149,8 +343,10 @@
         "Path": "deps/protozero",
         "Description": "Minimalist protocol buffer decoder and encoder in C++.",
         "Homepage": "https://github.com/mapbox/protozero",
+        "Version": "1.5.2",
         "LicenseId": "BSD-2-Clause",
         "License": "BSD 2-clause \"Simplified\" License",
+        "LicenseFile": "LICENSE_protozero.txt",
         "Copyright": "Copyright (c) Mapbox"
     },
     {
@@ -162,8 +358,10 @@
         "Path": "deps/rapidjson",
         "Description": "A fast JSON parser/generator for C++ with both SAX/DOM style API.",
         "Homepage": "http://rapidjson.org",
+        "Version": "1.1.0",
         "LicenseId": "MIT",
         "License": "MIT License",
+        "LicenseFile": "LICENSE_rapidjson.txt",
         "Copyright": "Copyright (c) 2015 THL A29 Limited, a Tencent company, and Milo Yip"
     },
     {
@@ -175,8 +373,10 @@
         "Path": "deps/shelf-pack",
         "Description": "A 2D rectangular bin packing data structure.",
         "Homepage": "https://github.com/mapbox/shelf-pack-cpp",
+        "Version": "2.1.1",
         "LicenseId": "ISC",
         "License": "ISC License",
+        "LicenseFile": "deps/shelf-pack/2.1.1/LICENSE.md",
         "Copyright": "Copyright (c) 2017 Mapbox"
     },
     {
@@ -188,8 +388,10 @@
         "Path": "deps/supercluster",
         "Description": "A fast 2D point clustering library for use in interactive maps.",
         "Homepage": "https://github.com/mapbox/supercluster.hpp",
+        "Version": "0.2.2",
         "LicenseId": "ISC",
         "License": "ISC License",
+        "LicenseFile": "deps/supercluster/0.2.2/LICENSE",
         "Copyright": "Copyright (c) 2016 Mapbox"
     },
     {
@@ -201,9 +403,11 @@
         "Path": "deps/tao_tuple",
         "Description": "The Art of C++ implementation of std::tuple and std::integer_sequence.",
         "Homepage": "https://github.com/taocpp/",
+        "Version": "28626e99",
         "LicenseId": "MIT",
         "License": "MIT License",
-        "Copyright": "Copyright (c) 2015-2017 Daniel Frey"
+        "LicenseFile": "deps/tao_tuple/28626e99/LICENSE",
+        "Copyright": "Copyright (c) 2015-2016 Daniel Frey"
     },
     {
         "Id": "mapboxgl-unique_resource",
@@ -214,8 +418,10 @@
         "Path": "deps/unique_resource",
         "Description": "General RAII wrapper for exclusive ownership resource management.",
         "Homepage": "https://github.com/okdshin/unique_resource",
+        "Version": "cba309e",
         "LicenseId": "BSL-1.0",
         "License": "Boost Software License 1.0",
+        "LicenseFile": "LICENSE_Boost.txt",
         "Copyright": "Copyright (c) 2015 okdshin"
     },
     {
@@ -227,9 +433,11 @@
         "Path": "deps/variant",
         "Description": "A header-only alternative to boost::variant for C++11 and C++14.",
         "Homepage": "https://github.com/mapbox/variant",
+        "Version": "1.1.4",
         "LicenseId": "BSD-3-Clause",
         "License": "BSD 3-clause \"New\" or \"Revised\" License",
-        "Copyright": "Copyright (c) Mapbox"
+        "LicenseFile": "deps/variant/1.1.4/LICENSE",
+        "Copyright": "Copyright (c) MapBox"
     },
     {
         "Id": "mapboxgl-vectortile",
@@ -240,8 +448,10 @@
         "Path": "deps/vector-tile",
         "Description": "C++14 library for decoding Mapbox Vector Tiles.",
         "Homepage": "https://github.com/mapbox/vector-tile",
+        "Version": "1.0.2",
         "LicenseId": "ISC",
         "License": "ISC License",
+        "LicenseFile": "LICENSE_vectortile.txt",
         "Copyright": "Copyright (c) 2016 Mapbox"
     },
     {
@@ -253,8 +463,10 @@
         "Path": "deps/wagyu",
         "Description": "A library for basic geometric operations.",
         "Homepage": "https://github.com/mapbox/wagyu",
+        "Version": "0.4.3",
         "LicenseId": "MIT",
         "License": "MIT License",
+        "LicenseFile": "LICENSE_wagyu.txt",
         "Copyright": "Copyright (c) 2010-2015, Angus Johnson, 2016 Mapbox"
     },
     {
@@ -266,8 +478,10 @@
         "Path": "vendor/nunicode",
         "Description": "nunicode is i18n library implementing Unicode 11.0.",
         "Homepage": "https://bitbucket.org/alekseyt/nunicode.git",
+        "Version": "1.8",
         "LicenseId": "MIT",
         "License": "MIT License",
+        "LicenseFile": "vendor/nunicode/LICENSE",
         "Copyright": "Copyright (c) 2013 Aleksey Tulinov <aleksey.tulinov@gmail.com>"
     }
 ]
