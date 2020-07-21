@@ -42,18 +42,6 @@ Copyright (c) 2013 Brandon Jones, Colin MacKenzie IV"
         "Copyright": "Copyright (c) 1998-2014 Daniel Stenberg, et al"
     },
     {
-        "Id": "mapboxgl-libcxx",
-        "Name": "libc++",
-        "QDocModule": "qtlocation",
-        "QtUsage": "Used in the Mapbox GL plugin of Qt Location.",
-
-        "Description": "libc++ is a new implementation of the C++ standard library, targeting C++11.",
-        "Homepage": "https://libcxx.llvm.org",
-        "LicenseId": "MIT and UIUC",
-        "License": "MIT and UIUC (BSD-like)",
-        "Copyright": "Copyright (c) 2009-2014 libc++ developers"
-    },
-    {
         "Id": "mapboxgl-boost",
         "Name": "Boost",
         "QDocModule": "qtlocation",
