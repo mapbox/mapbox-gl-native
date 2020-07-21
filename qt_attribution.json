@@ -321,6 +321,20 @@ Copyright (c) 2002 by Andrei Alexandrescu"
         "Copyright": "Copyright (c) 2016 Vladimir Agafonkin"
     },
     {
+        "Id": "mapboxgl-optional",
+        "Name": "Optional",
+        "QDocModule": "qtlocation",
+        "QtUsage": "Used in the Mapbox GL plugin of Qt Location.",
+
+        "Path": "deps/optional",
+        "Description": "A single-header header-only library for representing optional (nullable) objects for C++14 (and C++11 to some extent) and passing them by value.",
+        "Homepage": "https://github.com/akrzemi1/Optional",
+        "LicenseId": "BSL-1.0",
+        "License": "Boost Software License 1.0",
+        "LicenseFile": "LICENSE_Boost.txt",
+        "Copyright": "Copyright (C) 2011 - 2012 Andrzej Krzemienski"
+    },
+    {
         "Id": "mapboxgl-polylabel",
         "Name": "polylabel",
         "QDocModule": "qtlocation",
