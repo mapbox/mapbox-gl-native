@@ -7,10 +7,11 @@
 
         "Description": "A library for embedding interactive and customizable vector maps.",
         "Homepage": "https://github.com/mapbox/mapbox-gl-native",
-        "LicenseId": "BSD-2-Clause",
-        "License": "BSD 2-clause \"Simplified\" License",
+        "LicenseId": "BSD-2-Clause AND Zlib",
+        "License": "BSD 2-clause \"Simplified\" License and zlib License",
         "LicenseFile": "LICENSE_mapbox.txt",
-        "Copyright": "Copyright (c) 2014-2017 Mapbox"
+        "Copyright": "Copyright (c) 2014-2017 Mapbox
+Copyright (c) 2013 Brandon Jones, Colin MacKenzie IV"
     },
     {
         "Id": "mapboxgl-css_color_parser",
