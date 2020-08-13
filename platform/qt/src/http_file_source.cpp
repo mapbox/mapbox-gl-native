@@ -29,8 +29,13 @@ void HTTPFileSource::Impl::request(HTTPRequest* req)
     }
 
     QNetworkRequest networkRequest = req->networkRequest();
-#if QT_VERSION >= 0x050600
+#if QT_VERSION < 0x060000
+#    if QT_VERSION >= 0x050900
+    networkRequest.setAttribute(QNetworkRequest::RedirectPolicyAttribute,
+                                QNetworkRequest::NoLessSafeRedirectPolicy);
+#    elif QT_VERSION >= 0x050600
     networkRequest.setAttribute(QNetworkRequest::FollowRedirectsAttribute, true);
+#    endif
 #endif
 
     data.first = m_manager->get(networkRequest);
