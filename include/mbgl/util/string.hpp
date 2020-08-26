@@ -47,9 +47,19 @@ inline std::string toString(uint8_t t) {
     return toString(static_cast<uint32_t>(t));
 }
 
+template <typename = std::enable_if<!std::is_same<int64_t, long>::value>>
+inline std::string toString(long t) {
+    return toString(static_cast<int64_t>(t));
+}
+
 template <typename = std::enable_if<!std::is_same<uint64_t, unsigned long>::value>>
 inline std::string toString(unsigned long t) {
     return toString(static_cast<uint64_t>(t));
+}
+
+template <typename = std::enable_if<!std::is_same<int64_t, long long>::value>>
+inline std::string toString(long long t) {
+    return toString(static_cast<int64_t>(t));
 }
 
 template <typename = std::enable_if<!std::is_same<uint64_t, unsigned long long>::value>>
