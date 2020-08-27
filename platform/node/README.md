@@ -9,7 +9,7 @@ Requires a modern C++ runtime that supports C++14.
 By default, installs binaries. On these platforms no additional dependencies are needed.
 
 - 64 bit macOS or 64 bit Linux
-- Node.js v10.x
+- Node.js v10.x and v12.x
 
 Run:
 

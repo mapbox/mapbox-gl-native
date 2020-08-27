@@ -9,7 +9,7 @@ if [[ "${CIRCLE_TAG}" == "node-v${PACKAGE_JSON_VERSION}" ]] || [[ "${PUBLISH:-}"
     # Changes to the version targets here should happen in tandem with updates to the
     # EXCLUDE_NODE_ABIS property in cmake/node.cmake and the "node" engines property in
     # package.json.
-    for TARGET in 6.0.0 8.0.0 10.0.0; do
+    for TARGET in 6.0.0 8.0.0 10.0.0 12.0.0; do
         if [[ "${BUILDTYPE}" == "RelWithDebInfo" ]]; then
             ./node_modules/.bin/node-pre-gyp package publish info --target="${TARGET}"
         elif [[ "${BUILDTYPE}" == "Debug" ]]; then
