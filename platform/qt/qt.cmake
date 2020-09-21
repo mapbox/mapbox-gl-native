@@ -1,9 +1,18 @@
 # Note: Using Sqlite instead of QSqlDatabase for better compatibility.
 
+option(MBGL_WITH_QT_DEMO "Build Mapbox GL Qt demo" ON)
+option(MBGL_WITH_QT_TEST "Build Mapbox GL Qt tests" ON)
+option(MBGL_WITH_QT_HEADLESS "Build Mapbox GL Qt with headless support" ON)
+
 find_package(Qt5Gui REQUIRED)
 find_package(Qt5Network REQUIRED)
-find_package(Qt5OpenGL REQUIRED)
-find_package(Qt5Widgets REQUIRED)
+
+if (MBGL_WITH_QT_DEMO OR MBGL_WITH_QT_TEST OR MBGL_WITH_QT_HEADLESS)
+   find_package(Qt5OpenGL REQUIRED)
+   find_package(Qt5Widgets REQUIRED)
+endif()
+
+include(GNUInstallDirs)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     add_definitions("-DQT_COMPILING_QIMAGE_COMPAT_CPP")
@@ -50,7 +59,6 @@ target_sources(
         ${PROJECT_SOURCE_DIR}/platform/qt/src/async_task_impl.hpp
         ${PROJECT_SOURCE_DIR}/platform/qt/src/number_format.cpp
         ${PROJECT_SOURCE_DIR}/platform/qt/src/gl_functions.cpp
-        ${PROJECT_SOURCE_DIR}/platform/qt/src/headless_backend_qt.cpp
         $<$<BOOL:${MBGL_PUBLIC_BUILD}>:${PROJECT_SOURCE_DIR}/platform/qt/src/http_file_source.cpp>
         $<$<BOOL:${MBGL_PUBLIC_BUILD}>:${PROJECT_SOURCE_DIR}/platform/qt/src/http_file_source.hpp>
         $<$<BOOL:${MBGL_PUBLIC_BUILD}>:${PROJECT_SOURCE_DIR}/platform/qt/src/http_request.cpp>
@@ -67,6 +75,15 @@ target_sources(
         ${PROJECT_SOURCE_DIR}/platform/qt/src/timer_impl.hpp
         ${PROJECT_SOURCE_DIR}/platform/qt/src/utf.cpp
 )
+
+if (MBGL_WITH_QT_HEADLESS OR MBGL_WITH_QT_TEST)
+   target_sources(
+        mbgl-core
+        PRIVATE
+           ${PROJECT_SOURCE_DIR}/platform/qt/src/headless_backend_qt.cpp
+   )
+endif()
+
 
 target_compile_definitions(
     mbgl-core
@@ -91,10 +108,17 @@ target_link_libraries(
         Qt5::Core
         Qt5::Gui
         Qt5::Network
-        Qt5::OpenGL
         mbgl-vendor-nunicode
         mbgl-vendor-sqlite
 )
+
+if (MBGL_WITH_QT_HEADLESS)
+   target_link_libraries(
+        mbgl-core
+        PRIVATE
+          Qt5::OpenGL
+   )
+endif()
 
 add_library(
     qmapboxgl SHARED
@@ -141,60 +165,85 @@ target_link_libraries(
         mbgl-core
 )
 
-add_executable(
+# install library
+install(TARGETS qmapboxgl
+  LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}" COMPONENT shared NAMELINK_SKIP
+  ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}" COMPONENT development)
+
+install(FILES
+        platform/qt/include/QMapbox
+        platform/qt/include/QMapboxGL
+        platform/qt/include/qmapbox.hpp
+        platform/qt/include/qmapboxgl.hpp
+        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/qt5"
+        COMPONENT development)
+
+if (MBGL_WITH_QT_DEMO)
+  add_executable(
     mbgl-qt
     ${PROJECT_SOURCE_DIR}/platform/qt/app/main.cpp
     ${PROJECT_SOURCE_DIR}/platform/qt/app/mapwindow.cpp
     ${PROJECT_SOURCE_DIR}/platform/qt/app/mapwindow.hpp
     ${PROJECT_SOURCE_DIR}/platform/qt/resources/common.qrc
-)
+    )
 
-# Qt public API should keep compatibility with old compilers for legacy systems
-set_property(TARGET mbgl-qt PROPERTY CXX_STANDARD 98)
+  # Qt public API should keep compatibility with old compilers for legacy systems
+  set_property(TARGET mbgl-qt PROPERTY CXX_STANDARD 98)
 
-target_link_libraries(
+  target_link_libraries(
     mbgl-qt
     PRIVATE
-        Qt5::Widgets
-        Qt5::Gui
-        mbgl-compiler-options
-        qmapboxgl
-)
+      Qt5::Widgets
+      Qt5::Gui
+      mbgl-compiler-options
+      qmapboxgl
+  )
 
-add_executable(
+  if (UNIX)
+    target_link_libraries(
+      mbgl-qt
+      PRIVATE
+        pthread
+        )
+  endif()
+endif()
+
+if (MBGL_WITH_QT_TEST)
+  add_executable(
     mbgl-test-runner
     ${PROJECT_SOURCE_DIR}/platform/qt/test/main.cpp
-)
+    )
 
-target_include_directories(
+  target_include_directories(
     mbgl-test-runner
     PUBLIC ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/test/include
-)
+    )
 
-target_compile_definitions(
+  target_compile_definitions(
     mbgl-test-runner
     PRIVATE WORK_DIRECTORY=${PROJECT_SOURCE_DIR}
-)
+    )
 
-target_link_libraries(
+  target_link_libraries(
     mbgl-test-runner
     PRIVATE
-        Qt5::Gui
-        Qt5::OpenGL
-        mbgl-compiler-options
-        pthread
-)
+    Qt5::Gui
+    Qt5::OpenGL
+    mbgl-compiler-options
+    pthread
+    )
 
-if(CMAKE_SYSTEM_NAME STREQUAL Darwin)
+  if(CMAKE_SYSTEM_NAME STREQUAL Darwin)
     target_link_libraries(
-        mbgl-test-runner
-        PRIVATE -Wl,-force_load mbgl-test
-    )
-else()
+      mbgl-test-runner
+      PRIVATE -Wl,-force_load mbgl-test
+      )
+  else()
     target_link_libraries(
-        mbgl-test-runner
-        PRIVATE -Wl,--whole-archive mbgl-test -Wl,--no-whole-archive
-    )
+      mbgl-test-runner
+      PRIVATE -Wl,--whole-archive mbgl-test -Wl,--no-whole-archive
+      )
+  endif()
 endif()
 
 find_program(MBGL_QDOC NAMES qdoc)
