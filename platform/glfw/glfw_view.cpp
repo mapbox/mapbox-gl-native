@@ -109,7 +109,6 @@ void addFillExtrusionLayer(mbgl::style::Style &style, bool visible) {
 
 void glfwError(int error, const char *description) {
     mbgl::Log::Error(mbgl::Event::OpenGL, "GLFW error (%i): %s", error, description);
-    assert(false);
 }
 
 GLFWView::GLFWView(bool fullscreen_, bool benchmark_, const mbgl::ResourceOptions &options)
