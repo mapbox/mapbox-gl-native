@@ -51,7 +51,6 @@ FillExtrusionPatternProgram::layoutUniformValues(mat4 matrix,
                                            const TransformState& state,
                                            const float opacity,
                                            const float heightFactor,
-                                           const float pixelRatio,
                                            const EvaluatedLight& light,
                                            const float verticalGradient) {
     const auto tileRatio = 1 / tileID.pixelsToTileUnits(1, state.getIntegerZoom());
@@ -62,7 +61,7 @@ FillExtrusionPatternProgram::layoutUniformValues(mat4 matrix,
     return {
         uniforms::matrix::Value( matrix ),
         uniforms::opacity::Value( opacity ),
-        uniforms::scale::Value( {{pixelRatio, tileRatio, crossfade.fromScale, crossfade.toScale}} ),
+        uniforms::scale::Value( {{tileRatio, crossfade.fromScale, crossfade.toScale}} ),
         uniforms::texsize::Value( atlasSize ),
         uniforms::fade::Value( crossfade.t ),
         uniforms::pixel_coord_upper::Value( std::array<float, 2>{{ float(pixelX >> 16), float(pixelY >> 16) }} ),

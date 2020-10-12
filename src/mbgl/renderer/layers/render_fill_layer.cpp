@@ -191,8 +191,7 @@ void RenderFillLayer::render(PaintParameters& parameters) {
                         tile.getIconAtlasTexture().size,
                         crossfade,
                         tile.id,
-                        parameters.state,
-                        parameters.pixelRatio
+                        parameters.state
                     ),
                     paintPropertyBinders,
                     evaluated,

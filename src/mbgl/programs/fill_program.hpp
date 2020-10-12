@@ -71,8 +71,7 @@ public:
                                                    Size atlasSize,
                                                    const CrossfadeParameters& crossfade,
                                                    const UnwrappedTileID&,
-                                                   const TransformState&,
-                                                   float pixelRatio);
+                                                   const TransformState&);
 };
 
 class FillOutlineProgram : public Program<

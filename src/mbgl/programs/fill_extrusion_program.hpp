@@ -108,7 +108,6 @@ public:
                                                    const TransformState&,
                                                    float opacity,
                                                    float heightFactor,
-                                                   float pixelRatio,
                                                    const EvaluatedLight&,
                                                    float verticalGradient);
 };

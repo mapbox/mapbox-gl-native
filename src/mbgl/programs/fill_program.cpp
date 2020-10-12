@@ -16,8 +16,7 @@ FillPatternProgram::layoutUniformValues(mat4 matrix,
                                         Size atlasSize,
                                         const CrossfadeParameters& crossfade,
                                         const UnwrappedTileID& tileID,
-                                        const TransformState& state,
-                                        const float pixelRatio) {
+                                        const TransformState& state) {
     const auto tileRatio = 1 / tileID.pixelsToTileUnits(1, state.getIntegerZoom());
     int32_t tileSizeAtNearestZoom = util::tileSize * state.zoomScale(state.getIntegerZoom() - tileID.canonical.z);
     int32_t pixelX = tileSizeAtNearestZoom * (tileID.canonical.x + tileID.wrap * state.zoomScale(tileID.canonical.z));
@@ -27,7 +26,7 @@ FillPatternProgram::layoutUniformValues(mat4 matrix,
         uniforms::matrix::Value( matrix ),
         uniforms::world::Value( framebufferSize ),
         uniforms::texsize::Value( atlasSize ),
-        uniforms::scale::Value({ {pixelRatio, tileRatio, crossfade.fromScale, crossfade.toScale} } ),
+        uniforms::scale::Value({ {tileRatio, crossfade.fromScale, crossfade.toScale} } ),
         uniforms::fade::Value( crossfade.t ),
         uniforms::pixel_coord_upper::Value( std::array<float, 2> {{ float(pixelX >> 16), float(pixelY >> 16) }}),
         uniforms::pixel_coord_lower::Value( std::array<float, 2> {{ float(pixelX & 0xFFFF), float(pixelY & 0xFFFF) }} )

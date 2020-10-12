@@ -51,7 +51,7 @@ MBGL_DEFINE_UNIFORM_SCALAR(float, extrude_scale);
 
 MBGL_DEFINE_UNIFORM_VECTOR(uint16_t, 4, pattern_from);
 MBGL_DEFINE_UNIFORM_VECTOR(uint16_t, 4, pattern_to);
-MBGL_DEFINE_UNIFORM_VECTOR(float, 4, scale);
+MBGL_DEFINE_UNIFORM_VECTOR(float, 3, scale);
 MBGL_DEFINE_UNIFORM_VECTOR(uint16_t, 2, pattern_tl_a);
 MBGL_DEFINE_UNIFORM_VECTOR(uint16_t, 2, pattern_br_a);
 MBGL_DEFINE_UNIFORM_VECTOR(uint16_t, 2, pattern_tl_b);
