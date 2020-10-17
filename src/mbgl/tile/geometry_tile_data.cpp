@@ -242,12 +242,12 @@ GeometryCollection convertGeometry(const Feature::geometry_type& geometryTileFea
             result.reserve(polygons.size());
             for (const auto& pg : polygons) {
                 for (const auto& r : pg) {
-                    LinearRing<int16_t> ring;
-                    ring.reserve(r.size());
+                    LinearRing<int16_t> temp;
+                    temp.reserve(r.size());
                     for (const auto& p : r) {
-                        ring.emplace_back(latLonToTileCoodinates(p));
+                        temp.emplace_back(latLonToTileCoodinates(p));
                     }
-                    result.emplace_back(ring);
+                    result.emplace_back(temp);
                 }
             }
             return result;
