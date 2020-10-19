@@ -193,9 +193,9 @@ commands:
           command: |
             cd /opt/android/tools/bin
             ./sdkmanager --uninstall "ndk-bundle"
-            ./sdkmanager "ndk;21.0.6113669"
+            ./sdkmanager "ndk;21.3.6528147"
             cd /opt/android
-            ln -s ndk/21.0.6113669 ndk-bundle
+            ln -s ndk/21.3.6528147 ndk-bundle
   login-google-cloud-platform:
     steps:
     - run:
