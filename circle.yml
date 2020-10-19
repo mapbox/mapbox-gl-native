@@ -14,171 +14,8 @@ workflows:
   version: 2
   development:
     jobs:
-      - sanity-checks
-      - build-template:
-          name: android-armeabi-v7a-release
-          executor_name: ubuntu-eoan
-          target_is_android: true
-          requires:
-            - sanity-checks
-          config_params: '-G Ninja -DCMAKE_INSTALL_PREFIX=/tmp/workspace/install/$CIRCLE_JOB -DCMAKE_TOOLCHAIN_FILE=/opt/android/ndk-bundle/build/cmake/android.toolchain.cmake -DANDROID_CCACHE=/usr/bin/ccache -DANDROID_ABI=armeabi-v7a'
-          install: true
-      - build-template:
-          name: android-arm64-v8a-release
-          executor_name: ubuntu-eoan
-          target_is_android: true
-          requires:
-            - sanity-checks
-          config_params: '-G Ninja -DCMAKE_INSTALL_PREFIX=/tmp/workspace/install/$CIRCLE_JOB -DCMAKE_TOOLCHAIN_FILE=/opt/android/ndk-bundle/build/cmake/android.toolchain.cmake -DANDROID_CCACHE=/usr/bin/ccache -DANDROID_ABI=arm64-v8a'
-          build_params: '--target libmbgl-render-test-runner.so'
-          install: true
-      - build-template:
-          name: android-x86-release
-          executor_name: ubuntu-eoan
-          target_is_android: true
-          requires:
-            - sanity-checks
-          config_params: '-G Ninja -DCMAKE_INSTALL_PREFIX=/tmp/workspace/install/$CIRCLE_JOB -DCMAKE_TOOLCHAIN_FILE=/opt/android/ndk-bundle/build/cmake/android.toolchain.cmake -DANDROID_CCACHE=/usr/bin/ccache -DANDROID_ABI=x86'
-          build_params: '--target libmbgl-render-test-runner.so'
-          install: true
-      - build-template:
-          name: android-x86_64-release
-          executor_name: ubuntu-eoan
-          target_is_android: true
-          requires:
-            - sanity-checks
-          config_params: '-G Ninja -DCMAKE_INSTALL_PREFIX=/tmp/workspace/install/$CIRCLE_JOB -DCMAKE_TOOLCHAIN_FILE=/opt/android/ndk-bundle/build/cmake/android.toolchain.cmake -DANDROID_CCACHE=/usr/bin/ccache -DANDROID_ABI=x86_64'
-          build_params: '--target libmbgl-render-test-runner.so'
-          install: true
-      - build-template:
-          name: linux-gcc8-release
-          executor_name: ubuntu-eoan
-          target_is_linux: true
-          requires:
-            - sanity-checks
-          config_params: '-G Ninja -DCMAKE_INSTALL_PREFIX=/tmp/workspace/install/$CIRCLE_JOB -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=gcc-8 -DCMAKE_CXX_COMPILER=g++-8'
-          install: true
-          metrics: true
-          style_tests: true
-      - build-template:
-          name: linux-gcc5-release
-          executor_name: ubuntu-eoan
-          target_is_linux: true
-          requires:
-            - linux-gcc8-release
-          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=gcc-5 -DCMAKE_CXX_COMPILER=g++-5'
-          build_params: '--target mbgl-glfw'
-          test_params: '-N -Q'
-      - build-template:
-          name: linux-gcc8-debug-coverage
-          executor_name: ubuntu-eoan
-          target_is_linux: true
-          requires:
-            - linux-gcc8-release
-          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=gcc-8 -DCMAKE_CXX_COMPILER=g++-8 -DCMAKE_BUILD_TYPE=Debug -DMBGL_WITH_COVERAGE=ON'
-          style_tests: true
-          upload_coverage: true
-      - build-template:
-          name: linux-clang8-release
-          executor_name: ubuntu-eoan
-          target_is_linux: true
-          requires:
-            - sanity-checks
-          config_params: '-G Ninja -DCMAKE_INSTALL_PREFIX=/tmp/workspace/install/$CIRCLE_JOB -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8'
-          install: true
-          metrics: true
-          style_tests: true
-      - build-template:
-          name: FIXME-linux-asan
-          executor_name: ubuntu-eoan
-          target_is_linux: true
-          requires:
-            - sanity-checks
-          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8 -DMBGL_WITH_SANITIZER=address'
-          test_params: '|| true'
-          style_tests: true
-      - build-template:
-          name: linux-tsan
-          executor_name: ubuntu-eoan
-          target_is_linux: true
-          requires:
-            - sanity-checks
-          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8 -DMBGL_WITH_SANITIZER=thread'
-          style_tests: true
-      - build-template:
-          name: FIXME-linux-valgrind
-          executor_name: ubuntu-eoan
-          target_is_linux: true
-          requires:
-            - sanity-checks
-          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8 -DCMAKE_CXX_FLAGS=-DSANITIZE'
-          test_params: '-j 4 -E "mbgl-node|gl-benchmark" -D ExperimentalMemCheck || true'
-      - build-template:
-          name: linux-ubsan
-          executor_name: ubuntu-eoan
-          target_is_linux: true
-          requires:
-            - sanity-checks
-          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8 -DMBGL_WITH_SANITIZER=undefined'
-          style_tests: true
-      - build-template:
-          name: qt5-linux-gcc5-release
-          executor_name: ubuntu-eoan
-          target_is_linux: true
-          requires:
-            - sanity-checks
-          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=gcc-5 -DCMAKE_CXX_COMPILER=g++-5 -DMBGL_WITH_QT=ON'
-      - build-template:
-          name: qt5-macos-gcc5-release
-          executor_name: macos-11_1_0
-          target_is_macos: true
-          requires:
-            - linux-gcc8-release
-          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DMBGL_WITH_QT=ON -DCMAKE_PREFIX_PATH=$(echo /usr/local/Cellar/qt/5.*/lib/cmake)'
-      - build-template:
-          name: macos-xcode11-release
-          executor_name: macos-11_1_0
-          target_is_macos: true
-          requires:
-            - linux-gcc8-release
-          config_params: '-G Ninja -DCMAKE_INSTALL_PREFIX=/tmp/workspace/install/$CIRCLE_JOB -DCMAKE_CXX_COMPILER_LAUNCHER=ccache'
-          install: true
-          metrics: true
-          style_tests: true
-      - build-template:
-          name: macos-xcode11-debug
-          executor_name: macos-11_1_0
-          target_is_macos: true
-          requires:
-            - macos-xcode11-release
-          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_BUILD_TYPE=Debug -DMBGL_WITH_COVERAGE=ON'
-          style_tests: true
-          upload_coverage: true
-      - build-template:
-          name: ios-xcode11-release
-          executor_name: macos-11_3_1
-          target_is_macos: true
-          requires:
-            - linux-gcc8-release
-          config_params: '-G Xcode -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_ARCHITECTURES=arm64e -DCMAKE_OSX_SYSROOT=iphoneos -DMBGL_WITH_IOS_CCACHE=ON'
-          build_params: '--config Release'
-      - baselines:
-          requires:
-            - android-arm64-v8a-release
-            - android-armeabi-v7a-release
-            - android-x86-release
-            - android-x86_64-release
-            - linux-clang8-release
-            - linux-gcc8-release
-            - macos-xcode11-release
-      - trigger-pipeline:
-          requires:
-            - baselines
-          name: mapboxci
-          slug: mapbox/mapbox-gl-native-internal
-      - android-api-breakage:
-          requires:
-            - baselines
+      - android-unit-test-runner
+
 
 #
 # Executors: we currently support two executors, one based on Ubuntu 19.04 aka Disco
@@ -192,7 +29,7 @@ executors:
   ubuntu-eoan:
     docker:
       # FIXME: Move the image to mbgl/
-      - image: tmpsantos/mbgl_ci:1.9
+      - image: mbxci/gl-native:e4d859ca66b176a1adbbae15ff3d3477c6bbf6c5
     resource_class: xlarge
     working_directory: /src
     environment:
@@ -349,8 +186,59 @@ commands:
           if [[ $CIRCLE_BRANCH == master ]]; then
               scripts/publish_core_codecoverage.js -p Linux -s Core
           fi
+  prepare-android:
+    steps:
+      - run:
+          name: Prepare Android
+          command: |
+            cd /opt/android/tools/bin
+            ./sdkmanager --uninstall "ndk-bundle"
+            ./sdkmanager "ndk;21.0.6113669"
+            cd /opt/android
+            ln -s ndk/21.0.6113669 ndk-bundle
+  login-google-cloud-platform:
+    steps:
+    - run:
+        name: Login Google Cloud Platform
+        command: |
+          echo "${GCLOUD_SERVICE_ACCOUNT_JSON}" > secret.json
+          gcloud auth activate-service-account --key-file secret.json --project android-gl-native
+          rm secret.json
 
 jobs:
+  android-unit-test-runner:
+    executor: ubuntu-eoan
+    steps:
+      - checkout
+      - prepare
+      - prepare-android
+      - run:
+          name: Build UnitTestRunner APK
+          command: |
+            cd test/android
+            ./gradlew -Pmapbox.abis=arm64-v8a app:assembleRelease app:assembleAndroidTest
+            ./gradlew --rerun-tasks -Pmapbox.abis=arm64-v8a app:packageRelease
+      - login-google-cloud-platform
+      - run:
+          name: Run UnitTestRunner on Firebase
+          no_output_timeout: 20m
+          command: |
+            gcloud firebase test android models list
+            gcloud firebase test android run --type instrumentation \
+              --app test/android/app/build/outputs/apk/release/app-release.apk \
+              --test test/android/app/build/outputs/apk/androidTest/release/app-release-androidTest.apk \
+              --device-ids flame --os-version-ids 29 --locales en --orientations portrait --timeout 20m \
+              --directories-to-pull /sdcard/test/results --results-dir unit-test-${CIRCLE_BUILD_NUM} \
+              --no-record-video --no-performance-metrics
+      - run:
+          name: Retrieve Test Result from gcloud
+          when: always
+          command: |
+            testResult=$(gsutil ls gs://test-lab-186672a0qp5bq-ycr70axads3nc/unit-test-${CIRCLE_BUILD_NUM}/**/results/results.xml)
+            mkdir -p /tmp/tests/unit-test
+            gsutil cp $testResult /tmp/tests/unit-test
+      - save
+
   android-api-breakage:
     executor: ubuntu-eoan
     steps:
