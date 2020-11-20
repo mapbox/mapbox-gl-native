@@ -39,7 +39,7 @@ Polygon<int64_t> getTilePolygon(const Polygon<double>& polygon,
     for (const auto& ring : polygon) {
         LinearRing<int64_t> temp;
         temp.reserve(ring.size());
-        for (const auto p : ring) {
+        for (const auto& p : ring) {
             const auto coord = latLonToTileCoodinates(p, canonical);
             temp.push_back(coord);
             updateBBox(bbox, coord);
