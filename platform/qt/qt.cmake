@@ -1,9 +1,16 @@
 # Note: Using Sqlite instead of QSqlDatabase for better compatibility.
 
+option(MBGL_WITH_QT_LIB_ONLY "Build only qmapboxgl library" OFF)
+option(MBGL_WITH_QT_HEADLESS "Build Mapbox GL Qt with headless support" ON)
+
+include(GNUInstallDirs)
 find_package(Qt5Gui REQUIRED)
 find_package(Qt5Network REQUIRED)
-find_package(Qt5OpenGL REQUIRED)
-find_package(Qt5Widgets REQUIRED)
+
+if(MBGL_WITH_QT_HEADLESS OR NOT MBGL_WITH_QT_LIB_ONLY)
+    find_package(Qt5OpenGL REQUIRED)
+    find_package(Qt5Widgets REQUIRED)
+endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     add_definitions("-DQT_COMPILING_QIMAGE_COMPAT_CPP")
@@ -50,7 +57,6 @@ target_sources(
         ${PROJECT_SOURCE_DIR}/platform/qt/src/async_task_impl.hpp
         ${PROJECT_SOURCE_DIR}/platform/qt/src/number_format.cpp
         ${PROJECT_SOURCE_DIR}/platform/qt/src/gl_functions.cpp
-        ${PROJECT_SOURCE_DIR}/platform/qt/src/headless_backend_qt.cpp
         $<$<BOOL:${MBGL_PUBLIC_BUILD}>:${PROJECT_SOURCE_DIR}/platform/qt/src/http_file_source.cpp>
         $<$<BOOL:${MBGL_PUBLIC_BUILD}>:${PROJECT_SOURCE_DIR}/platform/qt/src/http_file_source.hpp>
         $<$<BOOL:${MBGL_PUBLIC_BUILD}>:${PROJECT_SOURCE_DIR}/platform/qt/src/http_request.cpp>
@@ -67,6 +73,15 @@ target_sources(
         ${PROJECT_SOURCE_DIR}/platform/qt/src/timer_impl.hpp
         ${PROJECT_SOURCE_DIR}/platform/qt/src/utf.cpp
 )
+
+if(MBGL_WITH_QT_HEADLESS OR NOT MBGL_WITH_QT_LIB_ONLY)
+    target_sources(
+        mbgl-core
+        PRIVATE
+            ${PROJECT_SOURCE_DIR}/platform/qt/src/headless_backend_qt.cpp
+    )
+endif()
+
 
 target_compile_definitions(
     mbgl-core
@@ -91,10 +106,17 @@ target_link_libraries(
         Qt5::Core
         Qt5::Gui
         Qt5::Network
-        Qt5::OpenGL
         mbgl-vendor-nunicode
         mbgl-vendor-sqlite
 )
+
+if(MBGL_WITH_QT_HEADLESS)
+    target_link_libraries(
+        mbgl-core
+        PRIVATE
+            Qt5::OpenGL
+    )
+endif()
 
 add_library(
     qmapboxgl SHARED
@@ -140,6 +162,34 @@ target_link_libraries(
         mbgl-compiler-options
         mbgl-core
 )
+
+# install library and headers
+install(
+    DIRECTORY include/mbgl
+    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+    COMPONENT development
+)
+
+install(
+    TARGETS qmapboxgl
+    LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}" COMPONENT shared NAMELINK_SKIP
+    ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}" COMPONENT development
+)
+
+install(
+    FILES
+        platform/qt/include/QMapbox
+        platform/qt/include/QMapboxGL
+        platform/qt/include/qmapbox.hpp
+        platform/qt/include/qmapboxgl.hpp
+    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/qt5"
+    COMPONENT development
+)
+
+# stop here if only library is requested
+if(MBGL_WITH_QT_LIB_ONLY)
+    return()
+endif()
 
 add_executable(
     mbgl-qt
