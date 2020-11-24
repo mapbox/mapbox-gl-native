@@ -448,16 +448,20 @@ void MapWindow::mouseMoveEvent(QMouseEvent *ev)
 
 void MapWindow::wheelEvent(QWheelEvent *ev)
 {
-    if (ev->orientation() == Qt::Horizontal) {
+    if (ev->angleDelta().x() != 0) {
         return;
     }
 
-    float factor = ev->delta() / 1200.;
-    if (ev->delta() < 0) {
+    float factor = ev->angleDelta().y() / 1200.;
+    if (ev->angleDelta().y() < 0) {
         factor = factor > -1 ? factor : 1 / factor;
     }
 
+#if QT_VERSION >= QT_VERSION_CHECK(5,12,0)
+    m_map->scaleBy(1 + factor, ev->position());
+#else
     m_map->scaleBy(1 + factor, ev->pos());
+#endif
     ev->accept();
 }
 
