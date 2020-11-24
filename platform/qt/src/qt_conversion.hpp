@@ -79,9 +79,9 @@ public:
     }
 
     static optional<float> toNumber(const QVariant& value) {
-        if (value.type() == QVariant::Int ||
-            value.type() == QVariant::LongLong ||
-            value.type() == QVariant::Double) {
+        if (value.type() == QVariant::Int
+         || value.type() == QVariant::LongLong 
+         || value.type() == QVariant::Double) {
             return value.toFloat();
         } else {
             return {};
@@ -89,9 +89,9 @@ public:
     }
 
     static optional<double> toDouble(const QVariant& value) {
-        if (value.type() == QVariant::Int ||
-            value.type() == QVariant::LongLong ||
-            value.type() == QVariant::Double) {
+        if (value.type() == QVariant::Int
+         || value.type() == QVariant::LongLong
+         || value.type() == QVariant::Double) {
             return value.toDouble();
         } else {
             return {};
