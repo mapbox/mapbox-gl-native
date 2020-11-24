@@ -38,9 +38,6 @@ QNetworkRequest HTTPRequest::networkRequest() const
 {
     QNetworkRequest req = QNetworkRequest(requestUrl());
     req.setAttribute(QNetworkRequest::CacheLoadControlAttribute, QNetworkRequest::PreferCache);
-    req.setAttribute(QNetworkRequest::HTTP2AllowedAttribute, true);
-    req.setAttribute(QNetworkRequest::HttpPipeliningAllowedAttribute, true);
-    req.setPriority(QNetworkRequest::HighPriority);
 
     static const QByteArray agent = QString("MapboxGL/%1 (Qt %2)").arg(version::revision).arg(QT_VERSION_STR).toLatin1();
     req.setRawHeader("User-Agent", agent);
