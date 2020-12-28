@@ -1,14 +1,14 @@
 #include <mbgl/map/map.hpp>
+#include <mbgl/map/map_options.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/default_styles.hpp>
 
-#include <mbgl/gl/headless_frontend.hpp>
-#include <mbgl/util/default_thread_pool.hpp>
-#include <mbgl/storage/default_file_source.hpp>
+#include <mbgl/gfx/backend.hpp>
+#include <mbgl/gfx/headless_frontend.hpp>
 #include <mbgl/style/style.hpp>
 
-#include <args/args.hxx>
+#include <args.hxx>
 
 #include <cstdlib>
 #include <iostream>
@@ -18,6 +18,7 @@ int main(int argc, char *argv[]) {
     args::ArgumentParser argumentParser("Mapbox GL render tool");
     args::HelpFlag helpFlag(argumentParser, "help", "Display this help menu", {"help"});
 
+    args::ValueFlag<std::string> backendValue(argumentParser, "Backend", "Rendering backend", {"backend"});
     args::ValueFlag<std::string> tokenValue(argumentParser, "key", "Mapbox access token", {'t', "token"});
     args::ValueFlag<std::string> styleValue(argumentParser, "URL", "Map stylesheet", {'s', "style"});
     args::ValueFlag<std::string> outputValue(argumentParser, "file", "Output file name", {'o', "output"});
@@ -75,25 +76,22 @@ int main(int argc, char *argv[]) {
     using namespace mbgl;
 
     util::RunLoop loop;
-    DefaultFileSource fileSource(cache_file, asset_root);
 
-    // Set access token if present
-    if (token.size()) {
-        fileSource.setAccessToken(std::string(token));
-    }
-
-    ThreadPool threadPool(4);
-    HeadlessFrontend frontend({ width, height }, pixelRatio, fileSource, threadPool);
-    Map map(frontend, MapObserver::nullObserver(), frontend.getSize(), pixelRatio, fileSource, threadPool, MapMode::Static);
+    HeadlessFrontend frontend({ width, height }, pixelRatio);
+    Map map(frontend, MapObserver::nullObserver(),
+            MapOptions().withMapMode(MapMode::Static).withSize(frontend.getSize()).withPixelRatio(pixelRatio),
+            ResourceOptions().withCachePath(cache_file).withAssetPath(asset_root).withAccessToken(std::string(token)));
 
     if (style.find("://") == std::string::npos) {
         style = std::string("file://") + style;
     }
 
     map.getStyle().loadURL(style);
-    map.setLatLngZoom({ lat, lon }, zoom);
-    map.setBearing(bearing);
-    map.setPitch(pitch);
+    map.jumpTo(CameraOptions()
+                   .withCenter(LatLng { lat, lon })
+                   .withZoom(zoom)
+                   .withBearing(bearing)
+                   .withPitch(pitch));
 
     if (debug) {
         map.setDebug(debug ? mbgl::MapDebugOptions::TileBorders | mbgl::MapDebugOptions::ParseStatus : mbgl::MapDebugOptions::NoDebug);
@@ -101,7 +99,7 @@ int main(int argc, char *argv[]) {
 
     try {
         std::ofstream out(output, std::ios::binary);
-        out << encodePNG(frontend.render(map));
+        out << encodePNG(frontend.render(map).image);
         out.close();
     } catch(std::exception& e) {
         std::cout << "Error: " << e.what() << std::endl;

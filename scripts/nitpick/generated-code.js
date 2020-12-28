@@ -33,8 +33,8 @@ function checkGeneratedFiles(name, scripts) {
 }
 
 const mode = (process.argv[2] || '').toLowerCase();
-if (!mode || mode == 'cmake') {
-  checkGeneratedFiles('CMake list', ['scripts/generate-cmake-files.js']);
+if (!mode || mode == 'sources') {
+  checkGeneratedFiles('Source list', ['scripts/generate-file-lists.js']);
 }
 if (!mode || mode == 'shader') {
   checkGeneratedFiles('shader', ['scripts/generate-shaders.js']);

@@ -1,0 +1,5 @@
+git_url("git@github.com:mapbox/apple-certificates.git")
+type("development") # The default type, can be: appstore, adhoc, enterprise or development
+app_identifier(["com.mapbox.UnitTestsApp", "com.mapbox.UnitTestsAppTests"])
+username ENV['MAPBOX_APPLE_ID']
+keychain_name("fastlane_keychain")

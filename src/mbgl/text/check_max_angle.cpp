@@ -19,20 +19,19 @@ bool checkMaxAngle(const GeometryCoordinates& line,
                    const float windowSize,
                    const float maxAngle) {
     // horizontal labels always pass
-    if (anchor.segment < 0) return true;
+    if (!anchor.segment) return true;
 
     GeometryCoordinate anchorPoint = convertPoint<int16_t>(anchor.point);
     GeometryCoordinate &p = anchorPoint;
-    int index = anchor.segment + 1;
+    std::size_t index = *anchor.segment + 1;
     float anchorDistance = 0;
 
     // move backwards along the line to the first segment the label appears on
     while (anchorDistance > -labelLength / 2) {
-        index--;
-
         // there isn't enough room for the label after the beginning of the line
-        if (index < 0) return false;
+        if (index == 0u) return false;
 
+        index--;
         anchorDistance -= util::dist<float>(line[index], p);
         p = line[index];
     }
@@ -48,7 +47,7 @@ bool checkMaxAngle(const GeometryCoordinates& line,
     while (anchorDistance < labelLength / 2) {
 
         // there isn't enough room for the label before the end of the line
-        if (index + 1 >= (int)line.size()) return false;
+        if (index + 1 >= line.size()) return false;
 
         auto& prev = line[index - 1];
         auto& current = line[index];

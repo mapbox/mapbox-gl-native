@@ -1,3 +1,5 @@
+// clang-format off
+
 // This file is generated. Do not edit.
 
 #pragma once
@@ -6,8 +8,6 @@
 #include <mbgl/style/layer.hpp>
 #include <mbgl/style/filter.hpp>
 #include <mbgl/style/property_value.hpp>
-#include <mbgl/style/expression/formatted.hpp>
-
 #include <mbgl/util/color.hpp>
 
 #include <vector>
@@ -17,100 +17,100 @@ namespace style {
 
 class TransitionOptions;
 
-class LineLayer : public Layer {
+class LineLayer final : public Layer {
 public:
     LineLayer(const std::string& layerID, const std::string& sourceID);
-    ~LineLayer() final;
-
-    // Dynamic properties
-    optional<conversion::Error> setLayoutProperty(const std::string& name, const conversion::Convertible& value) final;
-    optional<conversion::Error> setPaintProperty(const std::string& name, const conversion::Convertible& value) final;
+    ~LineLayer() override;
 
     // Layout properties
 
     static PropertyValue<LineCapType> getDefaultLineCap();
-    PropertyValue<LineCapType> getLineCap() const;
-    void setLineCap(PropertyValue<LineCapType>);
+    const PropertyValue<LineCapType>& getLineCap() const;
+    void setLineCap(const PropertyValue<LineCapType>&);
 
     static PropertyValue<LineJoinType> getDefaultLineJoin();
-    PropertyValue<LineJoinType> getLineJoin() const;
-    void setLineJoin(PropertyValue<LineJoinType>);
+    const PropertyValue<LineJoinType>& getLineJoin() const;
+    void setLineJoin(const PropertyValue<LineJoinType>&);
 
     static PropertyValue<float> getDefaultLineMiterLimit();
-    PropertyValue<float> getLineMiterLimit() const;
-    void setLineMiterLimit(PropertyValue<float>);
+    const PropertyValue<float>& getLineMiterLimit() const;
+    void setLineMiterLimit(const PropertyValue<float>&);
 
     static PropertyValue<float> getDefaultLineRoundLimit();
-    PropertyValue<float> getLineRoundLimit() const;
-    void setLineRoundLimit(PropertyValue<float>);
+    const PropertyValue<float>& getLineRoundLimit() const;
+    void setLineRoundLimit(const PropertyValue<float>&);
+
+    static PropertyValue<float> getDefaultLineSortKey();
+    const PropertyValue<float>& getLineSortKey() const;
+    void setLineSortKey(const PropertyValue<float>&);
 
     // Paint properties
 
-    static PropertyValue<float> getDefaultLineOpacity();
-    PropertyValue<float> getLineOpacity() const;
-    void setLineOpacity(PropertyValue<float>);
-    void setLineOpacityTransition(const TransitionOptions&);
-    TransitionOptions getLineOpacityTransition() const;
+    static PropertyValue<float> getDefaultLineBlur();
+    const PropertyValue<float>& getLineBlur() const;
+    void setLineBlur(const PropertyValue<float>&);
+    void setLineBlurTransition(const TransitionOptions&);
+    TransitionOptions getLineBlurTransition() const;
 
     static PropertyValue<Color> getDefaultLineColor();
-    PropertyValue<Color> getLineColor() const;
-    void setLineColor(PropertyValue<Color>);
+    const PropertyValue<Color>& getLineColor() const;
+    void setLineColor(const PropertyValue<Color>&);
     void setLineColorTransition(const TransitionOptions&);
     TransitionOptions getLineColorTransition() const;
 
+    static PropertyValue<std::vector<float>> getDefaultLineDasharray();
+    const PropertyValue<std::vector<float>>& getLineDasharray() const;
+    void setLineDasharray(const PropertyValue<std::vector<float>>&);
+    void setLineDasharrayTransition(const TransitionOptions&);
+    TransitionOptions getLineDasharrayTransition() const;
+
+    static PropertyValue<float> getDefaultLineGapWidth();
+    const PropertyValue<float>& getLineGapWidth() const;
+    void setLineGapWidth(const PropertyValue<float>&);
+    void setLineGapWidthTransition(const TransitionOptions&);
+    TransitionOptions getLineGapWidthTransition() const;
+
+    static ColorRampPropertyValue getDefaultLineGradient();
+    const ColorRampPropertyValue& getLineGradient() const;
+    void setLineGradient(const ColorRampPropertyValue&);
+    void setLineGradientTransition(const TransitionOptions&);
+    TransitionOptions getLineGradientTransition() const;
+
+    static PropertyValue<float> getDefaultLineOffset();
+    const PropertyValue<float>& getLineOffset() const;
+    void setLineOffset(const PropertyValue<float>&);
+    void setLineOffsetTransition(const TransitionOptions&);
+    TransitionOptions getLineOffsetTransition() const;
+
+    static PropertyValue<float> getDefaultLineOpacity();
+    const PropertyValue<float>& getLineOpacity() const;
+    void setLineOpacity(const PropertyValue<float>&);
+    void setLineOpacityTransition(const TransitionOptions&);
+    TransitionOptions getLineOpacityTransition() const;
+
+    static PropertyValue<expression::Image> getDefaultLinePattern();
+    const PropertyValue<expression::Image>& getLinePattern() const;
+    void setLinePattern(const PropertyValue<expression::Image>&);
+    void setLinePatternTransition(const TransitionOptions&);
+    TransitionOptions getLinePatternTransition() const;
+
     static PropertyValue<std::array<float, 2>> getDefaultLineTranslate();
-    PropertyValue<std::array<float, 2>> getLineTranslate() const;
-    void setLineTranslate(PropertyValue<std::array<float, 2>>);
+    const PropertyValue<std::array<float, 2>>& getLineTranslate() const;
+    void setLineTranslate(const PropertyValue<std::array<float, 2>>&);
     void setLineTranslateTransition(const TransitionOptions&);
     TransitionOptions getLineTranslateTransition() const;
 
     static PropertyValue<TranslateAnchorType> getDefaultLineTranslateAnchor();
-    PropertyValue<TranslateAnchorType> getLineTranslateAnchor() const;
-    void setLineTranslateAnchor(PropertyValue<TranslateAnchorType>);
+    const PropertyValue<TranslateAnchorType>& getLineTranslateAnchor() const;
+    void setLineTranslateAnchor(const PropertyValue<TranslateAnchorType>&);
     void setLineTranslateAnchorTransition(const TransitionOptions&);
     TransitionOptions getLineTranslateAnchorTransition() const;
 
     static PropertyValue<float> getDefaultLineWidth();
-    PropertyValue<float> getLineWidth() const;
-    void setLineWidth(PropertyValue<float>);
+    const PropertyValue<float>& getLineWidth() const;
+    void setLineWidth(const PropertyValue<float>&);
     void setLineWidthTransition(const TransitionOptions&);
     TransitionOptions getLineWidthTransition() const;
-
-    static PropertyValue<float> getDefaultLineGapWidth();
-    PropertyValue<float> getLineGapWidth() const;
-    void setLineGapWidth(PropertyValue<float>);
-    void setLineGapWidthTransition(const TransitionOptions&);
-    TransitionOptions getLineGapWidthTransition() const;
-
-    static PropertyValue<float> getDefaultLineOffset();
-    PropertyValue<float> getLineOffset() const;
-    void setLineOffset(PropertyValue<float>);
-    void setLineOffsetTransition(const TransitionOptions&);
-    TransitionOptions getLineOffsetTransition() const;
-
-    static PropertyValue<float> getDefaultLineBlur();
-    PropertyValue<float> getLineBlur() const;
-    void setLineBlur(PropertyValue<float>);
-    void setLineBlurTransition(const TransitionOptions&);
-    TransitionOptions getLineBlurTransition() const;
-
-    static PropertyValue<std::vector<float>> getDefaultLineDasharray();
-    PropertyValue<std::vector<float>> getLineDasharray() const;
-    void setLineDasharray(PropertyValue<std::vector<float>>);
-    void setLineDasharrayTransition(const TransitionOptions&);
-    TransitionOptions getLineDasharrayTransition() const;
-
-    static PropertyValue<std::string> getDefaultLinePattern();
-    PropertyValue<std::string> getLinePattern() const;
-    void setLinePattern(PropertyValue<std::string>);
-    void setLinePatternTransition(const TransitionOptions&);
-    TransitionOptions getLinePatternTransition() const;
-
-    static ColorRampPropertyValue getDefaultLineGradient();
-    ColorRampPropertyValue getLineGradient() const;
-    void setLineGradient(ColorRampPropertyValue);
-    void setLineGradientTransition(const TransitionOptions&);
-    TransitionOptions getLineGradientTransition() const;
 
     // Private implementation
 
@@ -122,18 +122,16 @@ public:
     std::unique_ptr<Layer> cloneRef(const std::string& id) const final;
 
 protected:
+    // Dynamic properties
+    optional<conversion::Error> setPropertyInternal(const std::string& name, const conversion::Convertible& value) final;
+
+    StyleProperty getProperty(const std::string& name) const final;
+    Value serialize() const final;
+
     Mutable<Layer::Impl> mutableBaseImpl() const final;
-};
-
-class LineLayerFactory : public LayerFactory {
-public:
-    LineLayerFactory();
-    ~LineLayerFactory() override;
-
-    // LayerFactory overrides.
-    const LayerTypeInfo* getTypeInfo() const noexcept final;
-    std::unique_ptr<style::Layer> createLayer(const std::string& id, const conversion::Convertible& value) final;
 };
 
 } // namespace style
 } // namespace mbgl
+
+// clang-format on

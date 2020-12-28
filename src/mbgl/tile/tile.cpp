@@ -1,6 +1,5 @@
 #include <mbgl/tile/tile.hpp>
 #include <mbgl/tile/tile_observer.hpp>
-#include <mbgl/renderer/buckets/debug_bucket.hpp>
 #include <mbgl/renderer/query.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/logging.hpp>
@@ -9,8 +8,7 @@ namespace mbgl {
 
 static TileObserver nullObserver;
 
-Tile::Tile(Kind kind_, OverscaledTileID id_) : kind(kind_), id(std::move(id_)), observer(&nullObserver) {
-}
+Tile::Tile(Kind kind_, OverscaledTileID id_) : kind(kind_), id(id_), observer(&nullObserver) {}
 
 Tile::~Tile() = default;
 
@@ -40,15 +38,11 @@ void Tile::dumpDebugLogs() const {
     Log::Info(Event::General, "Tile::complete: %s", isComplete() ? "yes" : "no");
 }
 
-void Tile::queryRenderedFeatures(
-        std::unordered_map<std::string, std::vector<Feature>>&,
-        const GeometryCoordinates&,
-        const TransformState&,
-        const std::vector<const RenderLayer*>&,
-        const RenderedQueryOptions&,
-        const mat4&) {}
+void Tile::queryRenderedFeatures(std::unordered_map<std::string, std::vector<Feature>>&, const GeometryCoordinates&,
+                                 const TransformState&, const std::unordered_map<std::string, const RenderLayer*>&,
+                                 const RenderedQueryOptions&, const mat4&, const SourceFeatureState&) {}
 
-float Tile::getQueryPadding(const std::vector<const RenderLayer*>&) {
+float Tile::getQueryPadding(const std::unordered_map<std::string, const RenderLayer*>&) {
     return 0;
 }
 

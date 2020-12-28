@@ -15,7 +15,7 @@ public:
     ~AnnotationTile() override;
 
 private:
-    AnnotationManager& annotationManager;
+    mapbox::base::WeakPtr<AnnotationManager> annotationManager;
 };
 
 class AnnotationTileFeatureData;
@@ -28,7 +28,7 @@ public:
     FeatureType getType() const override;
     optional<Value> getValue(const std::string&) const override;
     FeatureIdentifier getID() const override;
-    GeometryCollection getGeometries() const override;
+    const GeometryCollection& getGeometries() const override;
 
 private:
     std::shared_ptr<const AnnotationTileFeatureData> data;
@@ -44,10 +44,10 @@ public:
     std::unique_ptr<GeometryTileFeature> getFeature(std::size_t i) const override;
     std::string getName() const override;
 
-    void addFeature(const AnnotationID,
+    void addFeature(AnnotationID,
                     FeatureType,
                     GeometryCollection,
-                    std::unordered_map<std::string, std::string> properties = { {} });
+                    std::unordered_map<std::string, std::string> properties = {{}});
 
 private:
     std::shared_ptr<AnnotationTileLayerData> layer;

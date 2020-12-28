@@ -1,11 +1,12 @@
 #pragma once
 
-#include <mbgl/util/optional.hpp>
-#include <mbgl/util/variant.hpp>
-#include <mbgl/util/color.hpp>
+#include <mbgl/style/expression/parsing_context.hpp>
 #include <mbgl/style/expression/type.hpp>
 #include <mbgl/style/expression/value.hpp>
-#include <mbgl/style/expression/parsing_context.hpp>
+#include <mbgl/tile/tile_id.hpp>
+#include <mbgl/util/color.hpp>
+#include <mbgl/util/optional.hpp>
+#include <mbgl/util/variant.hpp>
 
 #include <array>
 #include <vector>
@@ -25,18 +26,48 @@ public:
 
 class EvaluationContext {
 public:
-    EvaluationContext(float zoom_) : zoom(zoom_), feature(nullptr) {}
-    EvaluationContext(GeometryTileFeature const * feature_) : zoom(optional<float>()), feature(feature_) {}
-    EvaluationContext(float zoom_, GeometryTileFeature const * feature_) :
-        zoom(zoom_), feature(feature_)
+    EvaluationContext() = default;
+    explicit EvaluationContext(float zoom_) : zoom(zoom_) {}
+    explicit EvaluationContext(GeometryTileFeature const * feature_) : feature(feature_) {}
+    EvaluationContext(float zoom_, GeometryTileFeature const* feature_) : zoom(zoom_), feature(feature_) {}
+    EvaluationContext(optional<mbgl::Value> accumulated_, GeometryTileFeature const * feature_) :
+        accumulated(std::move(accumulated_)), feature(feature_)
     {}
+    EvaluationContext(float zoom_, GeometryTileFeature const* feature_, const FeatureState* state_)
+        : zoom(zoom_), feature(feature_), featureState(state_) {}
     EvaluationContext(optional<float> zoom_, GeometryTileFeature const * feature_, optional<double> colorRampParameter_) :
         zoom(std::move(zoom_)), feature(feature_), colorRampParameter(std::move(colorRampParameter_))
     {}
-    
+
+    EvaluationContext& withFormattedSection(const Value* formattedSection_) noexcept {
+        formattedSection = formattedSection_;
+        return *this;
+    };
+
+    EvaluationContext& withFeatureState(const FeatureState* featureState_) noexcept {
+        featureState = featureState_;
+        return *this;
+    };
+
+    EvaluationContext& withAvailableImages(const std::set<std::string>* availableImages_) noexcept {
+        availableImages = availableImages_;
+        return *this;
+    };
+
+    EvaluationContext& withCanonicalTileID(const mbgl::CanonicalTileID* canonical_) noexcept {
+        canonical = canonical_;
+        return *this;
+    };
+
     optional<float> zoom;
-    GeometryTileFeature const * feature;
+    optional<mbgl::Value> accumulated;
+    GeometryTileFeature const* feature = nullptr;
     optional<double> colorRampParameter;
+    // Contains formatted section object, std::unordered_map<std::string, Value>.
+    const Value* formattedSection = nullptr;
+    const FeatureState* featureState = nullptr;
+    const std::set<std::string>* availableImages = nullptr;
+    const mbgl::CanonicalTileID* canonical = nullptr;
 };
 
 template <typename T>
@@ -134,6 +165,12 @@ enum class Kind : int32_t {
     All,
     Comparison,
     FormatExpression,
+    FormatSectionOverride,
+    NumberFormat,
+    ImageExpression,
+    In,
+    Within,
+    Distance
 };
 
 class Expression {
@@ -150,8 +187,18 @@ public:
 
     Kind getKind() const { return kind; };
     type::Type getType() const { return type; };
-    
+
     EvaluationResult evaluate(optional<float> zoom, const Feature& feature, optional<double> colorRampParameter) const;
+    EvaluationResult evaluate(optional<float> zoom,
+                              const Feature& feature,
+                              optional<double> colorRampParameter,
+                              const std::set<std::string>& availableImages) const;
+    EvaluationResult evaluate(optional<float> zoom,
+                              const Feature& feature,
+                              optional<double> colorRampParameter,
+                              const std::set<std::string>& availableImages,
+                              const CanonicalTileID& canonical) const;
+    EvaluationResult evaluate(optional<mbgl::Value> accumulated, const Feature& feature) const;
 
     /**
      * Statically analyze the expression, attempting to enumerate possible outputs. Returns

@@ -25,7 +25,6 @@ RunLoop::RunLoop(Type)
 }
 
 RunLoop::~RunLoop() {
-    assert(Scheduler::GetCurrent());
     Scheduler::SetCurrent(nullptr);
 }
 
@@ -38,6 +37,7 @@ void RunLoop::run() {
 }
 
 void RunLoop::runOnce() {
+    wake();
     CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0, false);
 }
 

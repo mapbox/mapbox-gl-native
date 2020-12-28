@@ -10,7 +10,8 @@ CustomTileLoader::CustomTileLoader(const TileFunction& fetchTileFn, const TileFu
     cancelTileFunction = cancelTileFn;
 }
 
-void CustomTileLoader::fetchTile(const OverscaledTileID& tileID, ActorRef<CustomGeometryTile> tileRef) {
+void CustomTileLoader::fetchTile(const OverscaledTileID& tileID, const ActorRef<CustomGeometryTile>& tileRef) {
+    std::lock_guard<std::mutex> guard(dataMutex);
     auto cachedTileData = dataCache.find(tileID.canonical);
     if (cachedTileData != dataCache.end()) {
         tileRef.invoke(&CustomGeometryTile::setTileData, *(cachedTileData->second));
@@ -20,9 +21,9 @@ void CustomTileLoader::fetchTile(const OverscaledTileID& tileID, ActorRef<Custom
         auto tuple = std::make_tuple(tileID.overscaledZ, tileID.wrap, tileRef);
         tileCallbackMap.insert({ tileID.canonical, std::vector<OverscaledIDFunctionTuple>(1, tuple) });
     } else {
-        for (auto iter = tileCallbacks->second.begin(); iter != tileCallbacks->second.end(); iter++) {
-            if (std::get<0>(*iter) == tileID.overscaledZ && std::get<1>(*iter) == tileID.wrap ) {
-                std::get<2>(*iter) = tileRef;
+        for (auto& iter : tileCallbacks->second) {
+            if (std::get<0>(iter) == tileID.overscaledZ && std::get<1>(iter) == tileID.wrap ) {
+                std::get<2>(iter) = tileRef;
                 return;
             }
         }
@@ -34,12 +35,14 @@ void CustomTileLoader::fetchTile(const OverscaledTileID& tileID, ActorRef<Custom
 }
 
 void CustomTileLoader::cancelTile(const OverscaledTileID& tileID) {
+    std::lock_guard<std::mutex> guard(dataMutex);
     if (tileCallbackMap.find(tileID.canonical) != tileCallbackMap.end()) {
         invokeTileCancel(tileID.canonical);
     }
 }
 
 void CustomTileLoader::removeTile(const OverscaledTileID& tileID) {
+    std::lock_guard<std::mutex> guard(dataMutex);
     auto tileCallbacks = tileCallbackMap.find(tileID.canonical);
     if (tileCallbacks == tileCallbackMap.end()) return;
     for (auto iter = tileCallbacks->second.begin(); iter != tileCallbacks->second.end(); iter++) {
@@ -49,17 +52,17 @@ void CustomTileLoader::removeTile(const OverscaledTileID& tileID) {
             break;
         }
     }
-    if (tileCallbacks->second.size() == 0) {
+    if (tileCallbacks->second.empty()) {
         tileCallbackMap.erase(tileCallbacks);
         dataCache.erase(tileID.canonical);
     }
 }
 
 void CustomTileLoader::setTileData(const CanonicalTileID& tileID, const GeoJSON& data) {
-
+    std::lock_guard<std::mutex> guard(dataMutex);
     auto iter = tileCallbackMap.find(tileID);
     if (iter == tileCallbackMap.end()) return;
-    auto dataPtr = std::make_unique<mapbox::geojson::geojson>(std::move(data));
+    auto dataPtr = std::make_unique<mapbox::geojson::geojson>(data);
     for (auto tuple : iter->second) {
         auto actor = std::get<2>(tuple);
         actor.invoke(&CustomGeometryTile::setTileData, *dataPtr);
@@ -68,10 +71,11 @@ void CustomTileLoader::setTileData(const CanonicalTileID& tileID, const GeoJSON&
 }
 
 void CustomTileLoader::invalidateTile(const CanonicalTileID& tileID) {
+    std::lock_guard<std::mutex> guard(dataMutex);
     auto tileCallbacks = tileCallbackMap.find(tileID);
     if (tileCallbacks == tileCallbackMap.end()) { return; }
-    for (auto iter = tileCallbacks->second.begin(); iter != tileCallbacks->second.end(); iter++) {
-        auto actor = std::get<2>(*iter);
+    for (auto& iter : tileCallbacks->second) {
+        auto actor = std::get<2>(iter);
         actor.invoke(&CustomGeometryTile::invalidateTileData);
         invokeTileCancel(tileID);
     }
@@ -80,22 +84,22 @@ void CustomTileLoader::invalidateTile(const CanonicalTileID& tileID) {
 }
 
 void CustomTileLoader::invalidateRegion(const LatLngBounds& bounds, Range<uint8_t> ) {
+    std::lock_guard<std::mutex> guard(dataMutex);
     std::map<uint8_t, util::TileRange> tileRanges;
-
-    for (auto idtuple= tileCallbackMap.begin(); idtuple != tileCallbackMap.end(); idtuple++) {
-        auto zoom = idtuple->first.z;
+    for (auto& idtuple : tileCallbackMap) {
+        auto zoom = idtuple.first.z;
         auto tileRange = tileRanges.find(zoom);
         if(tileRange == tileRanges.end()) {
             tileRange = tileRanges.emplace(std::make_pair(zoom, util::TileRange::fromLatLngBounds(bounds, zoom))).first;
         }
-        if (tileRange->second.contains(idtuple->first)) {
-            for (auto iter = idtuple->second.begin(); iter != idtuple->second.end(); iter++) {
+        if (tileRange->second.contains(idtuple.first)) {
+            for (auto iter = idtuple.second.begin(); iter != idtuple.second.end(); iter++) {
                 auto actor = std::get<2>(*iter);
                 actor.invoke(&CustomGeometryTile::invalidateTileData);
-                invokeTileCancel(idtuple->first);
-                dataCache.erase(idtuple->first);
+                invokeTileCancel(idtuple.first);
+                dataCache.erase(idtuple.first);
             }
-            idtuple->second.clear();
+            idtuple.second.clear();
         }
     }
 }

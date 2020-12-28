@@ -1,7 +1,7 @@
 # Configuration for probot-stale - https://github.com/probot/stale
 
-exemptProjects: false
-exemptMilestones: false
+exemptProjects: true
+exemptMilestones: true
 
 staleLabel: archived
 

@@ -4,6 +4,9 @@
 #include <mbgl/util/feature.hpp>
 
 namespace mbgl {
+namespace style {
+class GeoJSONData;
+} // namespace style
 
 class TileParameters;
 
@@ -12,13 +15,17 @@ public:
     GeoJSONTile(const OverscaledTileID&,
                 std::string sourceID,
                 const TileParameters&,
-                mapbox::feature::feature_collection<int16_t>);
+                std::shared_ptr<style::GeoJSONData>);
 
-    void updateData(mapbox::feature::feature_collection<int16_t>);
+    void updateData(std::shared_ptr<style::GeoJSONData> data, bool needsRelayout = false);
 
     void querySourceFeatures(
         std::vector<Feature>& result,
         const SourceQueryOptions&) override;
+
+private:
+    std::shared_ptr<style::GeoJSONData> data;
+    mapbox::base::WeakPtrFactory<GeoJSONTile> weakFactory{this};
 };
 
 } // namespace mbgl

@@ -40,9 +40,15 @@ void identity(mat3& out) {
 }
 
 void translate(mat3& out, const mat3& a, double x, double y) {
-    double a00 = a[0], a01 = a[1], a02 = a[2],
-          a10 = a[3], a11 = a[4], a12 = a[5],
-          a20 = a[6], a21 = a[7], a22 = a[8];
+    double a00 = a[0];
+    double a01 = a[1];
+    double a02 = a[2];
+    double a10 = a[3];
+    double a11 = a[4];
+    double a12 = a[5];
+    double a20 = a[6];
+    double a21 = a[7];
+    double a22 = a[8];
 
     out[0] = a00;
     out[1] = a01;
@@ -58,17 +64,17 @@ void translate(mat3& out, const mat3& a, double x, double y) {
 }
 
 void rotate(mat3& out, const mat3& a, double rad) {
-    double s = std::sin(rad),
-          c = std::cos(rad),
-          a00 = a[0],
-          a01 = a[1],
-          a02 = a[2],
-          a10 = a[3],
-          a11 = a[4],
-          a12 = a[5],
-          a20 = a[6],
-          a21 = a[7],
-          a22 = a[8];
+    double s = std::sin(rad);
+    double c = std::cos(rad);
+    double a00 = a[0];
+    double a01 = a[1];
+    double a02 = a[2];
+    double a10 = a[3];
+    double a11 = a[4];
+    double a12 = a[5];
+    double a20 = a[6];
+    double a21 = a[7];
+    double a22 = a[8];
 
     out[0] = c * a00 + s * a10;
     out[1] = c * a01 + s * a11;

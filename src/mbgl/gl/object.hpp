@@ -22,7 +22,7 @@ struct ShaderDeleter {
 };
 
 struct BufferDeleter {
-    Context* context;
+    Context& context;
     void operator()(BufferID) const;
 };
 

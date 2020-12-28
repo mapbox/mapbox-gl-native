@@ -11,26 +11,21 @@ class CanonicalTileID;
 
 namespace style {
 
-class GeoJSONData {
+class GeoJSONSource::Impl final : public Source::Impl {
 public:
-    virtual ~GeoJSONData() = default;
-    virtual mapbox::feature::feature_collection<int16_t> getTile(const CanonicalTileID&) = 0;
-};
-
-class GeoJSONSource::Impl : public Source::Impl {
-public:
-    Impl(std::string id, GeoJSONOptions);
-    Impl(const GeoJSONSource::Impl&, const GeoJSON&);
+    Impl(std::string id, Immutable<GeoJSONOptions>);
+    Impl(const GeoJSONSource::Impl&, std::shared_ptr<GeoJSONData>);
     ~Impl() final;
 
     Range<uint8_t> getZoomRange() const;
-    GeoJSONData* getData() const;
+    std::weak_ptr<GeoJSONData> getData() const;
+    const Immutable<GeoJSONOptions>& getOptions() const { return options; }
 
     optional<std::string> getAttribution() const final;
 
 private:
-    GeoJSONOptions options;
-    std::unique_ptr<GeoJSONData> data;
+    Immutable<GeoJSONOptions> options;
+    std::shared_ptr<GeoJSONData> data;
 };
 
 } // namespace style

@@ -6,11 +6,12 @@
 
 namespace mbgl {
 
-RasterDEMTileWorker::RasterDEMTileWorker(ActorRef<RasterDEMTileWorker>, ActorRef<RasterDEMTile> parent_)
-    : parent(std::move(parent_)) {
-}
+RasterDEMTileWorker::RasterDEMTileWorker(const ActorRef<RasterDEMTileWorker>&, ActorRef<RasterDEMTile> parent_)
+    : parent(std::move(parent_)) {}
 
-void RasterDEMTileWorker::parse(std::shared_ptr<const std::string> data, uint64_t correlationID, Tileset::DEMEncoding encoding) {
+void RasterDEMTileWorker::parse(const std::shared_ptr<const std::string>& data,
+                                uint64_t correlationID,
+                                Tileset::DEMEncoding encoding) {
     if (!data) {
         parent.invoke(&RasterDEMTile::onParsed, nullptr, correlationID); // No data; empty tile.
         return;

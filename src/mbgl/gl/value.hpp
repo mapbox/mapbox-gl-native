@@ -1,11 +1,12 @@
 #pragma once
 
 #include <mbgl/gl/types.hpp>
-#include <mbgl/gl/depth_mode.hpp>
-#include <mbgl/gl/stencil_mode.hpp>
-#include <mbgl/gl/color_mode.hpp>
-#include <mbgl/gl/cull_face_mode.hpp>
+#include <mbgl/gfx/depth_mode.hpp>
+#include <mbgl/gfx/stencil_mode.hpp>
+#include <mbgl/gfx/color_mode.hpp>
+#include <mbgl/gfx/cull_face_mode.hpp>
 #include <mbgl/gl/attribute.hpp>
+#include <mbgl/platform/gl_functions.hpp>
 #include <mbgl/util/color.hpp>
 #include <mbgl/util/size.hpp>
 #include <mbgl/util/range.hpp>
@@ -46,14 +47,14 @@ struct StencilMask {
 };
 
 struct DepthMask {
-    using Type = bool;
-    static const constexpr Type Default = true;
+    using Type = gfx::DepthMaskType;
+    static const constexpr Type Default = gfx::DepthMaskType::ReadWrite;
     static void Set(const Type&);
     static Type Get();
 };
 
 struct ColorMask {
-    using Type = ColorMode::Mask;
+    using Type = gfx::ColorMode::Mask;
     static const constexpr Type Default = { true, true, true, true };
     static void Set(const Type&);
     static Type Get();
@@ -61,11 +62,11 @@ struct ColorMask {
 
 struct StencilFunc {
     struct Type {
-        uint32_t func;
+        gfx::StencilFunctionType func;
         int32_t ref;
         uint32_t mask;
     };
-    static const constexpr Type Default = { StencilMode::Always::func, 0, ~0u };
+    static const constexpr Type Default = { gfx::StencilMode::Always::func, 0, ~0u };
     static void Set(const Type&);
     static Type Get();
 };
@@ -83,11 +84,11 @@ struct StencilTest {
 
 struct StencilOp {
     struct Type {
-        StencilMode::Op sfail;
-        StencilMode::Op dpfail;
-        StencilMode::Op dppass;
+        gfx::StencilOpType sfail;
+        gfx::StencilOpType dpfail;
+        gfx::StencilOpType dppass;
     };
-    static const constexpr Type Default = { StencilMode::Keep, StencilMode::Keep, StencilMode::Keep };
+    static const constexpr Type Default = { gfx::StencilOpType::Keep, gfx::StencilOpType::Keep, gfx::StencilOpType::Keep };
     static void Set(const Type&);
     static Type Get();
 };
@@ -111,8 +112,8 @@ struct DepthTest {
 };
 
 struct DepthFunc {
-    using Type = DepthMode::Function;
-    static const constexpr Type Default = DepthMode::Less;
+    using Type = gfx::DepthFunctionType;
+    static const constexpr Type Default = gfx::DepthFunctionType::Less;
     static void Set(const Type&);
     static Type Get();
 };
@@ -125,18 +126,18 @@ struct Blend {
 };
 
 struct BlendEquation {
-    using Type = ColorMode::BlendEquation;
-    static const constexpr Type Default = ColorMode::BlendEquation::Add;
+    using Type = gfx::ColorBlendEquationType;
+    static const constexpr Type Default = gfx::ColorBlendEquationType::Add;
     static void Set(const Type&);
     static Type Get();
 };
 
 struct BlendFunc {
     struct Type {
-        ColorMode::BlendFactor sfactor;
-        ColorMode::BlendFactor dfactor;
+        gfx::ColorBlendFactorType sfactor;
+        gfx::ColorBlendFactorType dfactor;
     };
-    static const constexpr Type Default = { ColorMode::One, ColorMode::Zero };
+    static const constexpr Type Default = { gfx::ColorBlendFactorType::One, gfx::ColorBlendFactorType::Zero };
     static void Set(const Type&);
     static Type Get();
 };
@@ -167,7 +168,7 @@ struct LineWidth {
 };
 
 struct ActiveTextureUnit {
-    using Type = TextureUnit;
+    using Type = uint8_t;
     static const constexpr Type Default = 0;
     static void Set(const Type&);
     static Type Get();
@@ -214,22 +215,22 @@ struct BindRenderbuffer {
 };
 
 struct CullFace {
-    using Type = CullFaceMode::CullFace;
-    static const constexpr Type Default = CullFaceMode::Disable;
+    using Type = bool;
+    static const constexpr Type Default = false;
     static void Set(const Type&);
     static Type Get();
 };
 
 struct CullFaceSide {
-    using Type = CullFaceMode::CullFaceSide;
-    static const constexpr Type Default = CullFaceMode::Back;
+    using Type = gfx::CullFaceSideType;
+    static const constexpr Type Default = gfx::CullFaceSideType::Back;
     static void Set(const Type&);
     static Type Get();
 };
 
-struct FrontFace {
-    using Type = CullFaceMode::FrontFace;
-    static const constexpr Type Default = CullFaceMode::CounterClockwise;
+struct CullFaceWinding {
+    using Type = gfx::CullFaceWindingType;
+    static const constexpr Type Default = gfx::CullFaceWindingType::CounterClockwise;
     static void Set(const Type&);
     static Type Get();
 };
@@ -263,7 +264,7 @@ struct BindVertexArray {
 };
 
 struct VertexAttribute {
-    using Type = optional<gl::AttributeBinding>;
+    using Type = optional<gfx::AttributeBinding>;
     static const Type Default;
     static void Set(const Type&, Context&, AttributeLocation);
 };

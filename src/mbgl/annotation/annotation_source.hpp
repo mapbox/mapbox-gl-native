@@ -5,17 +5,23 @@
 
 namespace mbgl {
 
-class AnnotationSource : public style::Source {
+class AnnotationSource final : public style::Source {
 public:
     AnnotationSource();
 
     class Impl;
     const Impl& impl() const;
 
+protected:
+    Mutable<Source::Impl> createMutable() const noexcept final;
+
 private:
     void loadDescription(FileSource&) final;
-
-    Mutable<Impl> mutableImpl() const;
+    bool supportsLayerType(const mbgl::style::LayerTypeInfo*) const override;
+    mapbox::base::WeakPtr<Source> makeWeakPtr() override {
+        return weakFactory.makeWeakPtr();
+    }
+    mapbox::base::WeakPtrFactory<Source> weakFactory {this};
 };
 
 class AnnotationSource::Impl : public style::Source::Impl {

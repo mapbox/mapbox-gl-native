@@ -1,9 +1,8 @@
 #pragma once
 
-#include "node_thread_pool.hpp"
-
 #include <mbgl/map/map.hpp>
 #include <mbgl/storage/file_source.hpp>
+#include <mbgl/util/async_request.hpp>
 #include <mbgl/util/image.hpp>
 
 #include <exception>
@@ -15,26 +14,24 @@
 #pragma GCC diagnostic pop
 
 namespace mbgl {
-class Map;
 class HeadlessFrontend;
 } // namespace mbgl
 
 namespace node_mbgl {
 
-class NodeMapObserver : public mbgl::MapObserver {
-    void onDidFailLoadingMap(std::exception_ptr) override;
+struct NodeMapObserver : public mbgl::MapObserver {
+    void onDidFailLoadingMap(mbgl::MapLoadError, const std::string&) final;
 };
 
 class RenderRequest;
 
-class NodeMap : public Nan::ObjectWrap,
-                public mbgl::FileSource {
+class NodeMap : public Nan::ObjectWrap {
 public:
     struct RenderOptions;
     class RenderWorker;
 
     NodeMap(v8::Local<v8::Object>);
-    ~NodeMap();
+    ~NodeMap() override;
 
     static Nan::Persistent<v8::Function> constructor;
     static Nan::Persistent<v8::Object> parseError;
@@ -54,8 +51,7 @@ public:
     static void AddImage(const Nan::FunctionCallbackInfo<v8::Value>&);
     static void RemoveImage(const Nan::FunctionCallbackInfo<v8::Value>&);
     static void SetLayerZoomRange(const Nan::FunctionCallbackInfo<v8::Value>&);
-    static void SetLayoutProperty(const Nan::FunctionCallbackInfo<v8::Value>&);
-    static void SetPaintProperty(const Nan::FunctionCallbackInfo<v8::Value>&);
+    static void SetLayerProperty(const Nan::FunctionCallbackInfo<v8::Value>&);
     static void SetFilter(const Nan::FunctionCallbackInfo<v8::Value>&);
     static void SetCenter(const Nan::FunctionCallbackInfo<v8::Value>&);
     static void SetZoom(const Nan::FunctionCallbackInfo<v8::Value>&);
@@ -68,9 +64,13 @@ public:
     static void DumpDebugLogs(const Nan::FunctionCallbackInfo<v8::Value>&);
     static void QueryRenderedFeatures(const Nan::FunctionCallbackInfo<v8::Value>&);
 
+    static void SetFeatureState(const Nan::FunctionCallbackInfo<v8::Value>&);
+    static void GetFeatureState(const Nan::FunctionCallbackInfo<v8::Value>&);
+    static void RemoveFeatureState(const Nan::FunctionCallbackInfo<v8::Value>&);
+
     static v8::Local<v8::Value> ParseError(const char* msg);
 
-    void startRender(RenderOptions options);
+    void startRender(const RenderOptions& options);
     void renderFinished();
 
     void release();
@@ -78,12 +78,9 @@ public:
 
     static RenderOptions ParseOptions(v8::Local<v8::Object>);
 
-    std::unique_ptr<mbgl::AsyncRequest> request(const mbgl::Resource&, mbgl::FileSource::Callback);
-
     const float pixelRatio;
     mbgl::MapMode mode;
     bool crossSourceCollisions;
-    NodeThreadPool threadpool;
     NodeMapObserver mapObserver;
     std::unique_ptr<mbgl::HeadlessFrontend> frontend;
     std::unique_ptr<mbgl::Map> map;
@@ -98,4 +95,12 @@ public:
     bool loaded = false;
 };
 
-}
+struct NodeFileSource : public mbgl::FileSource {
+    NodeFileSource(NodeMap* nodeMap_) : nodeMap(nodeMap_) {}
+    ~NodeFileSource() override = default;
+    std::unique_ptr<mbgl::AsyncRequest> request(const mbgl::Resource&, mbgl::FileSource::Callback) final;
+    bool canRequest(const mbgl::Resource&) const override;
+    NodeMap* nodeMap;
+};
+
+} // namespace node_mbgl

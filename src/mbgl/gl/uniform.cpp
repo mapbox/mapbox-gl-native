@@ -1,5 +1,6 @@
 #include <mbgl/gl/uniform.hpp>
-#include <mbgl/gl/gl.hpp>
+#include <mbgl/gl/defines.hpp>
+#include <mbgl/platform/gl_functions.hpp>
 #include <mbgl/util/color.hpp>
 #include <mbgl/util/size.hpp>
 #include <mbgl/util/convert.hpp>
@@ -8,6 +9,8 @@
 
 namespace mbgl {
 namespace gl {
+
+using namespace platform;
 
 UniformLocation uniformLocation(ProgramID id, const char* name) {
     return MBGL_CHECK_ERROR(glGetUniformLocation(id, name));
@@ -60,6 +63,11 @@ void bindUniform<bool>(UniformLocation location, const bool& t) {
 }
 
 template <>
+void bindUniform<uint32_t>(UniformLocation location, const uint32_t& t) {
+    bindUniform(location, int32_t(t));
+}
+
+template <>
 void bindUniform<uint8_t>(UniformLocation location, const uint8_t& t) {
     bindUniform(location, int32_t(t));
 }
@@ -101,8 +109,7 @@ ActiveUniforms activeUniforms(ProgramID id) {
     GLint size;
     GLenum type;
     for (GLint index = 0; index < count; index++) {
-        MBGL_CHECK_ERROR(
-            glGetActiveUniform(id, index, maxLength, &length, &size, &type, name.get()));
+        MBGL_CHECK_ERROR(glGetActiveUniform(id, index, maxLength, &length, &size, &type, name.get()));
         active.emplace(
             std::string{ name.get(), static_cast<size_t>(length) },
             ActiveUniform{ static_cast<size_t>(size), static_cast<UniformDataType>(type) });
@@ -151,7 +158,7 @@ bool verifyUniform<bool>(const ActiveUniform& uniform) {
 }
 
 template <>
-bool verifyUniform<uint8_t>(const ActiveUniform& uniform) {
+bool verifyUniform<uint32_t>(const ActiveUniform& uniform) {
     assert(uniform.size == 1 &&
            (uniform.type == UniformDataType::Int ||
             uniform.type == UniformDataType::Float ||

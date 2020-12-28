@@ -3,6 +3,8 @@
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/optional.hpp>
 
+#include <mapbox/compatibility/value.hpp>
+
 namespace mbgl {
 namespace style {
 
@@ -29,6 +31,17 @@ public:
 
     bool isDefined() const {
         return duration || delay;
+    }
+
+    mapbox::base::Value serialize() const {
+        mapbox::base::ValueObject result;
+        if (duration) {
+            result.emplace("duration", std::chrono::duration_cast<std::chrono::milliseconds>(*duration).count());
+        }
+        if (delay) {
+            result.emplace("delay", std::chrono::duration_cast<std::chrono::milliseconds>(*delay).count());
+        }
+        return result;
     }
 };
 

@@ -2,35 +2,37 @@
 
 #include <mbgl/programs/program.hpp>
 #include <mbgl/programs/attributes.hpp>
+#include <mbgl/programs/hillshade_prepare_program.hpp>
 #include <mbgl/programs/uniforms.hpp>
-#include <mbgl/shaders/hillshade.hpp>
+#include <mbgl/programs/textures.hpp>
 #include <mbgl/util/geometry.hpp>
 #include <mbgl/style/layers/hillshade_layer_properties.hpp>
 
 namespace mbgl {
 
 namespace uniforms {
-MBGL_DEFINE_UNIFORM_SCALAR(Color, u_shadow);
-MBGL_DEFINE_UNIFORM_SCALAR(Color, u_highlight);
-MBGL_DEFINE_UNIFORM_SCALAR(Color, u_accent);
-MBGL_DEFINE_UNIFORM_VECTOR(float, 2, u_light);
-MBGL_DEFINE_UNIFORM_VECTOR(float, 2, u_latrange);
+MBGL_DEFINE_UNIFORM_SCALAR(Color, shadow);
+MBGL_DEFINE_UNIFORM_SCALAR(Color, highlight);
+MBGL_DEFINE_UNIFORM_SCALAR(Color, accent);
+MBGL_DEFINE_UNIFORM_VECTOR(float, 2, light);
+MBGL_DEFINE_UNIFORM_VECTOR(float, 2, latrange);
 } // namespace uniforms
 
 class HillshadeProgram : public Program<
-    shaders::hillshade,
-    gl::Triangle,
-    gl::Attributes<
-        attributes::a_pos,
-        attributes::a_texture_pos>,
-    gl::Uniforms<
-        uniforms::u_matrix,
-        uniforms::u_image,
-        uniforms::u_highlight,
-        uniforms::u_shadow,
-        uniforms::u_accent,
-        uniforms::u_light,
-        uniforms::u_latrange>,
+    HillshadeProgram,
+    gfx::PrimitiveType::Triangle,
+    TypeList<
+        attributes::pos,
+        attributes::texture_pos>,
+    TypeList<
+        uniforms::matrix,
+        uniforms::highlight,
+        uniforms::shadow,
+        uniforms::accent,
+        uniforms::light,
+        uniforms::latrange>,
+    TypeList<
+        textures::image>,
     style::HillshadePaintProperties>{
 public:
     using Program::Program;
@@ -50,6 +52,15 @@ public:
 };
 
 using HillshadeLayoutVertex = HillshadeProgram::LayoutVertex;
-using HillshadeAttributes = HillshadeProgram::Attributes;
+using HillshadeAttributes = HillshadeProgram::AttributeList;
+
+class HillshadeLayerPrograms final : public LayerTypePrograms  {
+public:
+    HillshadeLayerPrograms(gfx::Context& context, const ProgramParameters& programParameters)
+        : hillshade(context, programParameters),
+          hillshadePrepare(context, programParameters) {}
+    HillshadeProgram hillshade;
+    HillshadePrepareProgram hillshadePrepare;
+};
 
 } // namespace mbgl

@@ -4,65 +4,44 @@
 #include <mbgl/algorithm/update_tile_masks.hpp>
 #include <mbgl/geometry/dem_data.hpp>
 #include <mbgl/renderer/buckets/hillshade_bucket.hpp>
+#include <mbgl/renderer/tile_parameters.hpp>
 
 namespace mbgl {
 
 using namespace style;
 
 RenderRasterDEMSource::RenderRasterDEMSource(Immutable<style::RasterSource::Impl> impl_)
-    : RenderSource(impl_) {
-    tilePyramid.setObserver(this);
+    : RenderTileSetSource(std::move(impl_)) {
 }
 
 const style::RasterSource::Impl& RenderRasterDEMSource::impl() const {
     return static_cast<const style::RasterSource::Impl&>(*baseImpl);
 }
 
-bool RenderRasterDEMSource::isLoaded() const {
-    return tilePyramid.isLoaded();
+const optional<Tileset>& RenderRasterDEMSource::getTileset() const {
+    return impl().tileset;
 }
 
-void RenderRasterDEMSource::update(Immutable<style::Source::Impl> baseImpl_,
-                                const std::vector<Immutable<Layer::Impl>>& layers,
-                                const bool needsRendering,
-                                const bool needsRelayout,
-                                const TileParameters& parameters) {
-    std::swap(baseImpl, baseImpl_);
-
-    enabled = needsRendering;
-
-    optional<Tileset> _tileset = impl().getTileset();
-
-    if (tileset != _tileset) {
-        tileset = _tileset;
-        maxzoom = tileset->zoomRange.max;
-        // TODO: this removes existing buckets, and will cause flickering.
-        // Should instead refresh tile data in place.
-        tilePyramid.tiles.clear();
-        tilePyramid.renderTiles.clear();
-        tilePyramid.cache.clear();
-    }
-    // Allow clearing the tile pyramid first, before the early return in case
-    //  the new tileset is not yet available or has an error in loading
-    if (!_tileset) {
-        return;
-    }
-
-    tilePyramid.update(layers,
-                       needsRendering,
-                       needsRelayout,
-                       parameters,
-                       SourceType::RasterDEM,
-                       impl().getTileSize(),
-                       tileset->zoomRange,
-                       tileset->bounds,
-                       [&] (const OverscaledTileID& tileID) {
-                           return std::make_unique<RasterDEMTile>(tileID, parameters, *tileset);
-                       });
+void RenderRasterDEMSource::updateInternal(const Tileset& tileset,
+                                           const std::vector<Immutable<LayerProperties>>& layers,
+                                           const bool needsRendering,
+                                           const bool needsRelayout,
+                                           const TileParameters& parameters) {
+    tilePyramid.update(
+        layers,
+        needsRendering,
+        needsRelayout,
+        parameters,
+        *baseImpl,
+        impl().getTileSize(),
+        tileset.zoomRange,
+        tileset.bounds,
+        [&](const OverscaledTileID& tileID) { return std::make_unique<RasterDEMTile>(tileID, parameters, tileset); });
+    algorithm::updateTileMasks(tilePyramid.getRenderedTiles());
 }
 
 void RenderRasterDEMSource::onTileChanged(Tile& tile){
-    RasterDEMTile& demtile = static_cast<RasterDEMTile&>(tile);
+    auto& demtile = static_cast<RasterDEMTile&>(tile);
 
     std::map<DEMTileNeighbors, DEMTileNeighbors> opposites = {
         { DEMTileNeighbors::Left, DEMTileNeighbors::Right },
@@ -106,13 +85,13 @@ void RenderRasterDEMSource::onTileChanged(Tile& tile){
         };
 
         for (uint8_t i = 0; i < 8; i++) {
-            DEMTileNeighbors mask = DEMTileNeighbors(std::pow(2,i));
+            auto mask = DEMTileNeighbors(std::pow(2,i));
             // only backfill if this neighbor has not been previously backfilled
             if ((demtile.neighboringTiles & mask) != mask) {
                 OverscaledTileID neighborid = getNeighbor(mask);
                 Tile* renderableNeighbor = tilePyramid.getTile(neighborid);
                 if (renderableNeighbor != nullptr && renderableNeighbor->isRenderable()) {
-                    RasterDEMTile& borderTile = static_cast<RasterDEMTile&>(*renderableNeighbor);
+                    auto& borderTile = static_cast<RasterDEMTile&>(*renderableNeighbor);
                     demtile.backfillBorder(borderTile, mask);
 
                     // if the border tile has not been backfilled by a previous instance of the main
@@ -125,41 +104,21 @@ void RenderRasterDEMSource::onTileChanged(Tile& tile){
             }
         }
     }
-    RenderSource::onTileChanged(tile);
-}
-
-void RenderRasterDEMSource::startRender(PaintParameters& parameters) {
-    algorithm::updateTileMasks(tilePyramid.getRenderTiles());
-    tilePyramid.startRender(parameters);
-}
-
-void RenderRasterDEMSource::finishRender(PaintParameters& parameters) {
-    tilePyramid.finishRender(parameters);
-}
-
-std::vector<std::reference_wrapper<RenderTile>> RenderRasterDEMSource::getRenderTiles() {
-    return tilePyramid.getRenderTiles();
+    RenderTileSource::onTileChanged(tile);
 }
 
 std::unordered_map<std::string, std::vector<Feature>>
 RenderRasterDEMSource::queryRenderedFeatures(const ScreenLineString&,
                                           const TransformState&,
-                                          const std::vector<const RenderLayer*>&,
+                                          const std::unordered_map<std::string, const RenderLayer*>&,
                                           const RenderedQueryOptions&,
                                           const mat4&) const {
-    return std::unordered_map<std::string, std::vector<Feature>> {};
+    return std::unordered_map<std::string, std::vector<Feature>>{};
 }
 
 std::vector<Feature> RenderRasterDEMSource::querySourceFeatures(const SourceQueryOptions&) const {
     return {};
 }
 
-void RenderRasterDEMSource::reduceMemoryUse() {
-    tilePyramid.reduceMemoryUse();
-}
-
-void RenderRasterDEMSource::dumpDebugLogs() const {
-    tilePyramid.dumpDebugLogs();
-}
 
 } // namespace mbgl

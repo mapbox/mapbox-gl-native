@@ -3,6 +3,8 @@
 #include <mbgl/util/geometry.hpp>
 #include <mbgl/util/feature.hpp>
 
+#pragma clang diagnostic ignored "-Wenum-compare-switch"
+
 namespace QMapbox {
 
 mbgl::Point<double> asMapboxGLPoint(const QMapbox::Coordinate &coordinate) {
@@ -119,7 +121,7 @@ mbgl::FeatureIdentifier asMapboxGLFeatureIdentifier(const QVariant &id) {
     }
 }
 
-mbgl::Feature asMapboxGLFeature(const QMapbox::Feature &feature) {
+mbgl::GeoJSONFeature asMapboxGLFeature(const QMapbox::Feature &feature) {
     mbgl::PropertyMap properties;
     properties.reserve(feature.properties.size());
     for (auto it = feature.properties.constBegin(); it != feature.properties.constEnd(); ++it) {

@@ -10,12 +10,13 @@ template <typename T> class Thread;
 
 class AssetFileSource : public FileSource {
 public:
-    AssetFileSource(const std::string& assetRoot);
+    AssetFileSource(const std::string& root);
     ~AssetFileSource() override;
 
     std::unique_ptr<AsyncRequest> request(const Resource&, Callback) override;
-
-    static bool acceptsURL(const std::string& url);
+    bool canRequest(const Resource&) const override;
+    void pause() override;
+    void resume() override;
 
 private:
     class Impl;

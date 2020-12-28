@@ -1,10 +1,9 @@
 #pragma once
 
-#include <mbgl/util/feature.hpp>
+#include <mbgl/i18n/collator.hpp>
 #include <mbgl/util/optional.hpp>
 
 #include <string>
-#include <memory>
 
 namespace mbgl {
 namespace style {
@@ -12,7 +11,7 @@ namespace expression {
 
 class Collator {
 public:
-    Collator(bool caseSensitive, bool diacriticSensitive, optional<std::string> locale = {});
+    Collator(bool caseSensitive, bool diacriticSensitive, const optional<std::string>& locale = {});
 
     bool operator==(const Collator& other) const;
 
@@ -20,8 +19,7 @@ public:
 
     std::string resolvedLocale() const;
 private:
-    class Impl;
-    std::shared_ptr<Impl> impl;
+    platform::Collator collator;
 };
 
 } // namespace expression

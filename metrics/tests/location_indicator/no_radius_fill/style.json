@@ -1,0 +1,61 @@
+{
+  "version": 8,
+  "metadata": {
+    "test": {
+      "width": 512,
+      "height": 256,
+      "operations": [
+        [
+          "addImage",
+          "puck_hat",
+          "puck_hat.png"
+        ],
+        [
+          "addImage",
+          "puck",
+          "puck.png"
+        ],
+        [
+          "addImage",
+          "puck_shadow",
+          "puck_shadow.png"
+        ]
+      ]
+    }
+  },
+  "center": [ 139.766707, 35.693055 ],
+  "zoom": 16,
+  "pitch" : 0,
+  "bearing" : 42,
+  "sources": {},
+  "layers": [
+    {
+      "id": "background",
+      "type": "background",
+      "paint": {
+        "background-color": "white"
+      }
+    },
+    {
+      "id": "puck123",
+      "type": "location-indicator",
+      "layout" : {
+          "bearing-image" : "puck",
+          "top-image" : "puck_hat",
+          "shadow-image" : "puck_shadow"
+      },
+      "paint" : {
+          "bearing" : 45,
+          "perspective-compensation" : 1,
+          "image-tilt-displacement" : 6.5,
+          "location" : [ 35.693055, 139.766707, 0],
+          "accuracy-radius": 90.0,
+          "bearing-image-size" : 0.26,
+          "top-image-size" : 0.18,
+          "shadow-image-size" : 0.2,
+
+          "accuracy-radius-border-color": "rgba(255,0,255,0.6)"
+      }
+    }
+  ]
+}

@@ -1,119 +1,169 @@
+#include <mbgl/renderer/bucket_parameters.hpp>
 #include <mbgl/renderer/buckets/symbol_bucket.hpp>
 #include <mbgl/renderer/layers/render_symbol_layer.hpp>
-#include <mbgl/renderer/bucket_parameters.hpp>
+#include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
+#include <mbgl/text/cross_tile_symbol_index.hpp>
 #include <mbgl/text/glyph_atlas.hpp>
+#include <mbgl/text/placement.hpp>
+
+#include <utility>
 
 namespace mbgl {
 
 using namespace style;
+namespace {
+std::atomic<uint32_t> maxBucketInstanceId;
+} // namespace
 
-SymbolBucket::SymbolBucket(style::SymbolLayoutProperties::PossiblyEvaluated layout_,
-                           const std::map<std::string, std::pair<
-                               style::IconPaintProperties::PossiblyEvaluated,
-                               style::TextPaintProperties::PossiblyEvaluated>>& layerPaintProperties,
+SymbolBucket::SymbolBucket(Immutable<style::SymbolLayoutProperties::PossiblyEvaluated> layout_,
+                           const std::map<std::string, Immutable<style::LayerProperties>>& paintProperties_,
                            const style::PropertyValue<float>& textSize,
                            const style::PropertyValue<float>& iconSize,
                            float zoom,
-                           bool sdfIcons_,
                            bool iconsNeedLinear_,
                            bool sortFeaturesByY_,
-                           const std::string bucketName_,
-                           const std::vector<SymbolInstance>&& symbolInstances_)
-    : Bucket(LayerType::Symbol),
-      layout(std::move(layout_)),
-      sdfIcons(sdfIcons_),
+                           std::string bucketName_,
+                           const std::vector<SymbolInstance>&& symbolInstances_,
+                           const std::vector<SortKeyRange>&& sortKeyRanges_,
+                           float tilePixelRatio_,
+                           bool allowVerticalPlacement_,
+                           std::vector<style::TextWritingModeType> placementModes_,
+                           bool iconsInText_)
+    : layout(std::move(layout_)),
+      bucketLeaderID(std::move(bucketName_)),
       iconsNeedLinear(iconsNeedLinear_ || iconSize.isDataDriven() || !iconSize.isZoomConstant()),
       sortFeaturesByY(sortFeaturesByY_),
-      bucketLeaderID(std::move(bucketName_)),
-      symbolInstances(std::move(symbolInstances_)),
+      staticUploaded(false),
+      placementChangesUploaded(false),
+      dynamicUploaded(false),
+      sortUploaded(false),
+      iconsInText(iconsInText_),
+      justReloaded(false),
+      hasVariablePlacement(false),
+      hasUninitializedSymbols(false),
+      symbolInstances(symbolInstances_),
+      sortKeyRanges(sortKeyRanges_),
       textSizeBinder(SymbolSizeBinder::create(zoom, textSize, TextSize::defaultValue())),
-      iconSizeBinder(SymbolSizeBinder::create(zoom, iconSize, IconSize::defaultValue())) {
-
-    for (const auto& pair : layerPaintProperties) {
-        paintPropertyBinders.emplace(
+      iconSizeBinder(SymbolSizeBinder::create(zoom, iconSize, IconSize::defaultValue())),
+      tilePixelRatio(tilePixelRatio_),
+      bucketInstanceId(++maxBucketInstanceId),
+      allowVerticalPlacement(allowVerticalPlacement_),
+      placementModes(std::move(placementModes_)) {
+    for (const auto& pair : paintProperties_) {
+        const auto& evaluated = getEvaluated<SymbolLayerProperties>(pair.second);
+        paintProperties.emplace(
             std::piecewise_construct,
             std::forward_as_tuple(pair.first),
-            std::forward_as_tuple(
-                std::piecewise_construct,
-                std::forward_as_tuple(pair.second.first, zoom),
-                std::forward_as_tuple(pair.second.second, zoom)));
+            std::forward_as_tuple(PaintProperties {
+                { RenderSymbolLayer::iconPaintProperties(evaluated), zoom },
+                { RenderSymbolLayer::textPaintProperties(evaluated), zoom }
+            }));
     }
 }
 
-void SymbolBucket::upload(gl::Context& context) {
+SymbolBucket::~SymbolBucket() = default;
+
+void SymbolBucket::upload(gfx::UploadPass& uploadPass) {
     if (hasTextData()) {
         if (!staticUploaded) {
-            text.indexBuffer = context.createIndexBuffer(std::move(text.triangles), sortFeaturesByY ? gl::BufferUsage::StreamDraw : gl::BufferUsage::StaticDraw);
-            text.vertexBuffer = context.createVertexBuffer(std::move(text.vertices));
+            text.indexBuffer = uploadPass.createIndexBuffer(std::move(text.triangles), sortFeaturesByY ? gfx::BufferUsageType::StreamDraw : gfx::BufferUsageType::StaticDraw);
+            text.vertexBuffer = uploadPass.createVertexBuffer(std::move(text.vertices));
+            for (auto& pair : paintProperties) {
+                pair.second.textBinders.upload(uploadPass);
+            }
         } else if (!sortUploaded) {
-            context.updateIndexBuffer(*text.indexBuffer, std::move(text.triangles));
+            uploadPass.updateIndexBuffer(*text.indexBuffer, std::move(text.triangles));
         }
 
         if (!dynamicUploaded) {
-            text.dynamicVertexBuffer = context.createVertexBuffer(std::move(text.dynamicVertices), gl::BufferUsage::StreamDraw);
+            if (!text.dynamicVertexBuffer) {
+                text.dynamicVertexBuffer = uploadPass.createVertexBuffer(std::move(text.dynamicVertices), gfx::BufferUsageType::StreamDraw);
+            } else {
+                uploadPass.updateVertexBuffer(*text.dynamicVertexBuffer, std::move(text.dynamicVertices));
+            }
         }
         if (!placementChangesUploaded) {
             if (!text.opacityVertexBuffer) {
-                text.opacityVertexBuffer = context.createVertexBuffer(std::move(text.opacityVertices), gl::BufferUsage::StreamDraw);
+                text.opacityVertexBuffer = uploadPass.createVertexBuffer(std::move(text.opacityVertices), gfx::BufferUsageType::StreamDraw);
             } else {
-                context.updateVertexBuffer(*text.opacityVertexBuffer, std::move(text.opacityVertices));
+                uploadPass.updateVertexBuffer(*text.opacityVertexBuffer, std::move(text.opacityVertices));
             }
         }
     }
 
-    if (hasIconData()) {
+    auto updateIconBuffer = [&](Buffer& iconBuffer) {
         if (!staticUploaded) {
-            icon.indexBuffer = context.createIndexBuffer(std::move(icon.triangles), sortFeaturesByY ? gl::BufferUsage::StreamDraw : gl::BufferUsage::StaticDraw);
-            icon.vertexBuffer = context.createVertexBuffer(std::move(icon.vertices));
+            iconBuffer.indexBuffer = uploadPass.createIndexBuffer(std::move(iconBuffer.triangles), sortFeaturesByY ? gfx::BufferUsageType::StreamDraw : gfx::BufferUsageType::StaticDraw);
+            iconBuffer.vertexBuffer = uploadPass.createVertexBuffer(std::move(iconBuffer.vertices));
+            for (auto& pair : paintProperties) {
+                pair.second.iconBinders.upload(uploadPass);
+            }
         } else if (!sortUploaded) {
-            context.updateIndexBuffer(*icon.indexBuffer, std::move(icon.triangles));
+            uploadPass.updateIndexBuffer(*iconBuffer.indexBuffer, std::move(iconBuffer.triangles));
         }
         if (!dynamicUploaded) {
-            icon.dynamicVertexBuffer = context.createVertexBuffer(std::move(icon.dynamicVertices), gl::BufferUsage::StreamDraw);
-        }
-        if (!placementChangesUploaded) {
-            if (!icon.opacityVertexBuffer) {
-                icon.opacityVertexBuffer = context.createVertexBuffer(std::move(icon.opacityVertices), gl::BufferUsage::StreamDraw);
+            if (!iconBuffer.dynamicVertexBuffer) {
+                iconBuffer.dynamicVertexBuffer = uploadPass.createVertexBuffer(std::move(iconBuffer.dynamicVertices), gfx::BufferUsageType::StreamDraw);
             } else {
-                context.updateVertexBuffer(*icon.opacityVertexBuffer, std::move(icon.opacityVertices));
+                uploadPass.updateVertexBuffer(*iconBuffer.dynamicVertexBuffer, std::move(iconBuffer.dynamicVertices));
             }
         }
+        if (!placementChangesUploaded) {
+            if (!iconBuffer.opacityVertexBuffer) {
+                iconBuffer.opacityVertexBuffer = uploadPass.createVertexBuffer(std::move(iconBuffer.opacityVertices), gfx::BufferUsageType::StreamDraw);
+            } else {
+                uploadPass.updateVertexBuffer(*iconBuffer.opacityVertexBuffer, std::move(iconBuffer.opacityVertices));
+            }
+        }
+    };
+    if (hasIconData()) {
+        updateIconBuffer(icon);
+    }
+    if (hasSdfIconData()) {
+        updateIconBuffer(sdfIcon);
     }
 
-    if (hasCollisionBoxData()) {
+    const auto updateCollisionBox = [&](CollisionBoxBuffer& collisionBox) {
         if (!staticUploaded) {
-            collisionBox.indexBuffer = context.createIndexBuffer(std::move(collisionBox.lines));
-            collisionBox.vertexBuffer = context.createVertexBuffer(std::move(collisionBox.vertices));
+            collisionBox.indexBuffer = uploadPass.createIndexBuffer(std::move(collisionBox.lines));
+            collisionBox.vertexBuffer = uploadPass.createVertexBuffer(std::move(collisionBox.vertices));
         }
         if (!placementChangesUploaded) {
             if (!collisionBox.dynamicVertexBuffer) {
-                collisionBox.dynamicVertexBuffer = context.createVertexBuffer(std::move(collisionBox.dynamicVertices), gl::BufferUsage::StreamDraw);
+                collisionBox.dynamicVertexBuffer = uploadPass.createVertexBuffer(std::move(collisionBox.dynamicVertices), gfx::BufferUsageType::StreamDraw);
             } else {
-                context.updateVertexBuffer(*collisionBox.dynamicVertexBuffer, std::move(collisionBox.dynamicVertices));
+                uploadPass.updateVertexBuffer(*collisionBox.dynamicVertexBuffer, std::move(collisionBox.dynamicVertices));
             }
         }
+    };
+    if (hasIconCollisionBoxData()) {
+        updateCollisionBox(*iconCollisionBox);
     }
 
-    if (hasCollisionCircleData()) {
+    if (hasTextCollisionBoxData()) {
+        updateCollisionBox(*textCollisionBox);
+    }
+
+    const auto updateCollisionCircle = [&](CollisionCircleBuffer& collisionCircle) {
         if (!staticUploaded) {
-            collisionCircle.indexBuffer = context.createIndexBuffer(std::move(collisionCircle.triangles));
-            collisionCircle.vertexBuffer = context.createVertexBuffer(std::move(collisionCircle.vertices));
+            collisionCircle.indexBuffer = uploadPass.createIndexBuffer(std::move(collisionCircle.triangles));
+            collisionCircle.vertexBuffer = uploadPass.createVertexBuffer(std::move(collisionCircle.vertices));
         }
         if (!placementChangesUploaded) {
             if (!collisionCircle.dynamicVertexBuffer) {
-                collisionCircle.dynamicVertexBuffer = context.createVertexBuffer(std::move(collisionCircle.dynamicVertices), gl::BufferUsage::StreamDraw);
+                collisionCircle.dynamicVertexBuffer = uploadPass.createVertexBuffer(std::move(collisionCircle.dynamicVertices), gfx::BufferUsageType::StreamDraw);
             } else {
-                context.updateVertexBuffer(*collisionCircle.dynamicVertexBuffer, std::move(collisionCircle.dynamicVertices));
+                uploadPass.updateVertexBuffer(*collisionCircle.dynamicVertexBuffer, std::move(collisionCircle.dynamicVertices));
             }
         }
+    };
+    if (hasIconCollisionCircleData()) {
+        updateCollisionCircle(*iconCollisionCircle);
     }
 
-    if (!staticUploaded) {
-        for (auto& pair : paintPropertyBinders) {
-            pair.second.first.upload(context);
-            pair.second.second.upload(context);
-        }
+    if (hasTextCollisionCircleData()) {
+        updateCollisionCircle(*textCollisionCircle);
     }
 
     uploaded = true;
@@ -124,7 +174,8 @@ void SymbolBucket::upload(gl::Context& context) {
 }
 
 bool SymbolBucket::hasData() const {
-    return hasTextData() || hasIconData() || hasCollisionBoxData();
+    return hasTextData() || hasIconData() || hasSdfIconData() || hasIconCollisionBoxData() ||
+           hasTextCollisionBoxData() || hasIconCollisionCircleData() || hasTextCollisionCircleData();
 }
 
 bool SymbolBucket::hasTextData() const {
@@ -135,20 +186,27 @@ bool SymbolBucket::hasIconData() const {
     return !icon.segments.empty();
 }
 
-bool SymbolBucket::hasCollisionBoxData() const {
-    return !collisionBox.segments.empty();
+bool SymbolBucket::hasSdfIconData() const {
+    return !sdfIcon.segments.empty();
 }
 
-bool SymbolBucket::hasCollisionCircleData() const {
-    return !collisionCircle.segments.empty();
+bool SymbolBucket::hasIconCollisionBoxData() const {
+    return iconCollisionBox && !iconCollisionBox->segments.empty();
 }
 
-void SymbolBucket::updateOpacity() {
-    placementChangesUploaded = false;
-    uploaded = false;
+bool SymbolBucket::hasIconCollisionCircleData() const {
+    return iconCollisionCircle && !iconCollisionCircle->segments.empty();
 }
 
-void addPlacedSymbol(gl::IndexVector<gl::Triangles>& triangles, const PlacedSymbol& placedSymbol) {
+bool SymbolBucket::hasTextCollisionBoxData() const {
+    return textCollisionBox && !textCollisionBox->segments.empty();
+}
+
+bool SymbolBucket::hasTextCollisionCircleData() const {
+    return textCollisionCircle && !textCollisionCircle->segments.empty();
+}
+
+void addPlacedSymbol(gfx::IndexVector<gfx::Triangles>& triangles, const PlacedSymbol& placedSymbol) {
     auto endIndex = placedSymbol.vertexStartIndex + placedSymbol.glyphOffsets.size() * 4;
     for (auto vertexIndex = placedSymbol.vertexStartIndex; vertexIndex < endIndex; vertexIndex += 4) {
         triangles.emplace_back(vertexIndex + 0, vertexIndex + 1, vertexIndex + 2);
@@ -160,65 +218,122 @@ void SymbolBucket::sortFeatures(const float angle) {
     if (!sortFeaturesByY) {
         return;
     }
+    assert(angle != std::numeric_limits<float>::max());
 
-    if (sortedAngle && *sortedAngle == angle) {
+    if (sortedAngle == angle) {
         return;
     }
 
     sortedAngle = angle;
 
-    // The current approach to sorting doesn't sort across segments so don't try.
+    // The current approach to sorting doesn't sort across text and icon segments so don't try.
     // Sorting within segments separately seemed not to be worth the complexity.
-    if (text.segments.size() > 1 || icon.segments.size() > 1) {
+    if (text.segments.size() > 1 || (icon.segments.size() > 1 || sdfIcon.segments.size() > 1)) {
         return;
     }
 
     sortUploaded = false;
     uploaded = false;
 
+    text.triangles.clear();
+    icon.triangles.clear();
+    sdfIcon.triangles.clear();
+
+    auto symbolsSortOrder = std::make_unique<std::vector<size_t>>();
+    symbolsSortOrder->reserve(symbolInstances.size());
+
     // If the symbols are allowed to overlap sort them by their vertical screen position.
     // The index array buffer is rewritten to reference the (unchanged) vertices in the
     // sorted order.
+    for (const SymbolInstance& symbolInstance : getSortedSymbols(angle)) {
+        symbolsSortOrder->push_back(symbolInstance.dataFeatureIndex);
 
-    // To avoid sorting the actual symbolInstance array we sort an array of indexes.
-    std::vector<size_t> symbolInstanceIndexes;
-    symbolInstanceIndexes.reserve(symbolInstances.size());
-    for (size_t i = 0; i < symbolInstances.size(); i++) {
-        symbolInstanceIndexes.push_back(i);
-    }
-
-    const float sin = std::sin(angle);
-    const float cos = std::cos(angle);
-
-    std::sort(symbolInstanceIndexes.begin(), symbolInstanceIndexes.end(), [sin, cos, this](size_t &aIndex, size_t &bIndex) {
-        const SymbolInstance& a = symbolInstances[aIndex];
-        const SymbolInstance& b = symbolInstances[bIndex];
-        const int32_t aRotated = static_cast<int32_t>(::lround(sin * a.anchor.point.x + cos * a.anchor.point.y));
-        const int32_t bRotated = static_cast<int32_t>(::lround(sin * b.anchor.point.x + cos * b.anchor.point.y));
-        return aRotated != bRotated ?
-            aRotated < bRotated :
-            a.dataFeatureIndex > b.dataFeatureIndex;
-    });
-
-    text.triangles.clear();
-    icon.triangles.clear();
-
-    featureSortOrder = std::make_unique<std::vector<size_t>>();
-    featureSortOrder->reserve(symbolInstanceIndexes.size());
-
-    for (auto i : symbolInstanceIndexes) {
-        const SymbolInstance& symbolInstance = symbolInstances[i];
-        featureSortOrder->push_back(symbolInstance.dataFeatureIndex);
-
-        if (symbolInstance.placedTextIndex) {
-            addPlacedSymbol(text.triangles, text.placedSymbols[*symbolInstance.placedTextIndex]);
+        if (symbolInstance.placedRightTextIndex) {
+            addPlacedSymbol(text.triangles, text.placedSymbols[*symbolInstance.placedRightTextIndex]);
         }
+
+        if (symbolInstance.placedCenterTextIndex && !symbolInstance.singleLine) {
+            addPlacedSymbol(text.triangles, text.placedSymbols[*symbolInstance.placedCenterTextIndex]);
+        }
+
+        if (symbolInstance.placedLeftTextIndex && !symbolInstance.singleLine) {
+            addPlacedSymbol(text.triangles, text.placedSymbols[*symbolInstance.placedLeftTextIndex]);
+        }
+
         if (symbolInstance.placedVerticalTextIndex) {
             addPlacedSymbol(text.triangles, text.placedSymbols[*symbolInstance.placedVerticalTextIndex]);
         }
+
+        auto& iconBuffer = symbolInstance.hasSdfIcon() ? sdfIcon : icon;
         if (symbolInstance.placedIconIndex) {
-            addPlacedSymbol(icon.triangles, icon.placedSymbols[*symbolInstance.placedIconIndex]);
+            addPlacedSymbol(iconBuffer.triangles, iconBuffer.placedSymbols[*symbolInstance.placedIconIndex]);
         }
+
+        if (symbolInstance.placedVerticalIconIndex) {
+            addPlacedSymbol(iconBuffer.triangles, iconBuffer.placedSymbols[*symbolInstance.placedVerticalIconIndex]);
+        }
+    }
+
+    featureSortOrder = std::move(symbolsSortOrder);
+}
+
+SymbolInstanceReferences SymbolBucket::getSortedSymbols(const float angle) const {
+    SymbolInstanceReferences result(symbolInstances.begin(), symbolInstances.end());
+    const float sin = std::sin(angle);
+    const float cos = std::cos(angle);
+
+    std::sort(result.begin(), result.end(), [sin, cos](const SymbolInstance& a, const SymbolInstance& b) {
+        const auto aRotated = std::lround(sin * a.anchor.point.x + cos * a.anchor.point.y);
+        const auto bRotated = std::lround(sin * b.anchor.point.x + cos * b.anchor.point.y);
+        if (aRotated != bRotated) {
+            return aRotated < bRotated;
+        }
+        return a.dataFeatureIndex > b.dataFeatureIndex;  // aRotated == bRotated
+    });
+
+    return result;
+}
+
+SymbolInstanceReferences SymbolBucket::getSymbols(const optional<SortKeyRange>& range) const {
+    if (!range) return SymbolInstanceReferences(symbolInstances.begin(), symbolInstances.end());
+    assert(range->start < range->end);
+    assert(range->end <= symbolInstances.size());
+    auto begin = symbolInstances.begin() + range->start;
+    auto end = symbolInstances.begin() + range->end;
+    return SymbolInstanceReferences(begin, end);
+}
+
+bool SymbolBucket::hasFormatSectionOverrides() const {
+    if (!hasFormatSectionOverrides_) {
+        hasFormatSectionOverrides_= SymbolLayerPaintPropertyOverrides::hasOverrides(layout->get<TextField>());
+    }
+    return *hasFormatSectionOverrides_;
+}
+
+std::pair<uint32_t, bool> SymbolBucket::registerAtCrossTileIndex(CrossTileSymbolLayerIndex& index,
+                                                                 const RenderTile& renderTile) {
+    bool firstTimeAdded = index.addBucket(renderTile.getOverscaledTileID(), renderTile.matrix, *this);
+    return std::make_pair(bucketInstanceId, firstTimeAdded);
+}
+
+void SymbolBucket::place(Placement& placement, const BucketPlacementData& data, std::set<uint32_t>& seenIds) {
+    placement.placeSymbolBucket(data, seenIds);
+}
+
+void SymbolBucket::updateVertices(const Placement& placement,
+                                  bool updateOpacities,
+                                  const TransformState& state,
+                                  const RenderTile& tile,
+                                  std::set<uint32_t>& seenIds) {
+    if (updateOpacities) {
+        placement.updateBucketOpacities(*this, state, seenIds);
+        placementChangesUploaded = false;
+        uploaded = false;
+    }
+
+    if (placement.updateBucketDynamicVertices(*this, state, tile)) {
+        dynamicUploaded = false;
+        uploaded = false;
     }
 }
 

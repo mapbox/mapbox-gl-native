@@ -6,24 +6,26 @@
 #include <nan.h>
 #pragma GCC diagnostic pop
 
-#include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/file_source.hpp>
+#include <mbgl/storage/resource.hpp>
+#include <mbgl/util/async_request.hpp>
 
 namespace node_mbgl {
 
-class NodeMap;
+class NodeRequest;
 
-class NodeRequest : public Nan::ObjectWrap,
-                    public Nan::AsyncWorker {
+struct NodeAsyncRequest : public mbgl::AsyncRequest {
+    NodeAsyncRequest();
+    ~NodeAsyncRequest() override;
+    NodeRequest* request = nullptr;
+};
+
+class NodeRequest : public Nan::ObjectWrap {
+
 public:
-    struct NodeAsyncRequest : public mbgl::AsyncRequest {
-        NodeAsyncRequest(NodeRequest*);
-        ~NodeAsyncRequest() override;
-        NodeRequest* request;
-    };
 
-    NodeRequest(NodeMap*, mbgl::FileSource::Callback);
-    ~NodeRequest();
+    NodeRequest(mbgl::FileSource::Callback, NodeAsyncRequest*);
+    ~NodeRequest() override;
 
     static Nan::Persistent<v8::Function> constructor;
 
@@ -32,12 +34,11 @@ public:
     static void New(const Nan::FunctionCallbackInfo<v8::Value>&);
     static void HandleCallback(const Nan::FunctionCallbackInfo<v8::Value>&);
 
-    void Execute();
+    void unrefRequest();
 
-private:
-    NodeMap* target;
     mbgl::FileSource::Callback callback;
-    NodeAsyncRequest* asyncRequest = nullptr;
+    NodeAsyncRequest* asyncRequest;
+    Nan::AsyncResource* asyncResource = new Nan::AsyncResource("mbgl:execute");
 };
 
-}
+} // namespace node_mbgl

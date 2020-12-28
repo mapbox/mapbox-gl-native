@@ -77,6 +77,15 @@ void stringify(Writer& writer, const std::array<float, 4>& v) {
 }
 
 template <class Writer>
+void stringify(Writer& writer, const std::array<double, 3>& v) {
+    writer.StartArray();
+    writer.Double(v[0]);
+    writer.Double(v[1]);
+    writer.Double(v[2]);
+    writer.EndArray();
+}
+
+template <class Writer>
 void stringify(Writer&, const Value&);
 
 template <class Writer, class T>
@@ -142,6 +151,11 @@ void stringify(Writer& writer, const expression::Formatted& v) {
 }
 
 template <class Writer>
+void stringify(Writer& writer, const expression::Image& v) {
+    stringify(writer, expression::ValueConverter<mbgl::Value>::fromExpressionValue(v));
+}
+
+template <class Writer>
 void stringify(Writer& writer, const Undefined&) {
     assert(false); // Should be omitted entirely instead.
     writer.Null();
@@ -160,7 +174,7 @@ void stringify(Writer& writer, const PropertyValue<T>& v) {
 template <class Property, class Writer, class T>
 void stringify(Writer& writer, const PropertyValue<T>& value) {
     if (!value.isUndefined()) {
-        writer.Key(Property::key);
+        writer.Key(Property::name());
         stringify(writer, value);
     }
 }

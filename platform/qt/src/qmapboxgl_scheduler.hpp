@@ -1,6 +1,5 @@
 #pragma once
 
-#include <mbgl/actor/mailbox.hpp>
 #include <mbgl/actor/scheduler.hpp>
 #include <mbgl/util/util.hpp>
 
@@ -19,7 +18,8 @@ public:
     virtual ~QMapboxGLScheduler();
 
     // mbgl::Scheduler implementation.
-    void schedule(std::weak_ptr<mbgl::Mailbox> scheduled) final;
+    void schedule(std::function<void()> scheduled) final;
+    mapbox::base::WeakPtr<Scheduler> makeWeakPtr() override { return weakFactory.makeWeakPtr(); }
 
     void processEvents();
 
@@ -30,5 +30,6 @@ private:
     MBGL_STORE_THREAD(tid);
 
     std::mutex m_taskQueueMutex;
-    std::queue<std::weak_ptr<mbgl::Mailbox>> m_taskQueue;
+    std::queue<std::function<void()>> m_taskQueue;
+    mapbox::base::WeakPtrFactory<Scheduler> weakFactory{this};
 };

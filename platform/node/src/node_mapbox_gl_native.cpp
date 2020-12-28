@@ -6,11 +6,22 @@
 #pragma GCC diagnostic pop
 
 #include <mbgl/util/run_loop.hpp>
+#include <mbgl/gfx/backend.hpp>
 
 #include "node_map.hpp"
 #include "node_logging.hpp"
 #include "node_request.hpp"
 #include "node_expression.hpp"
+
+
+void SetBackendType(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+    if (info.Length() < 1 || info[0]->IsUndefined()) {
+        return Nan::ThrowTypeError("Requires a render backend name");
+    }
+
+    const std::string backendName { *Nan::Utf8String(info[0]) };
+    (void)backendName;
+}
 
 void RegisterModule(v8::Local<v8::Object> target, v8::Local<v8::Object> module) {
     // This has the effect of:
@@ -18,6 +29,8 @@ void RegisterModule(v8::Local<v8::Object> target, v8::Local<v8::Object> module) 
     //   b) unreffing an async handle, which otherwise would keep the default loop running.
     static mbgl::util::RunLoop nodeRunLoop;
     nodeRunLoop.stop();
+
+    Nan::SetMethod(target, "setBackendType", SetBackendType);
 
     node_mbgl::NodeMap::Init(target);
     node_mbgl::NodeRequest::Init();

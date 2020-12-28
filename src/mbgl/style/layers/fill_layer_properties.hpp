@@ -1,8 +1,12 @@
+// clang-format off
+
 // This file is generated. Edit scripts/generate-style-code.js, then run `make style-code`.
 
 #pragma once
 
 #include <mbgl/style/types.hpp>
+#include <mbgl/style/layer_properties.hpp>
+#include <mbgl/style/layers/fill_layer.hpp>
 #include <mbgl/style/layout_property.hpp>
 #include <mbgl/style/paint_property.hpp>
 #include <mbgl/style/properties.hpp>
@@ -12,43 +16,71 @@
 namespace mbgl {
 namespace style {
 
+struct FillSortKey : DataDrivenLayoutProperty<float> {
+    static constexpr const char *name() { return "fill-sort-key"; }
+    static float defaultValue() { return 0; }
+};
+
 struct FillAntialias : PaintProperty<bool> {
     static bool defaultValue() { return true; }
 };
 
-struct FillOpacity : DataDrivenPaintProperty<float, attributes::a_opacity, uniforms::u_opacity> {
-    static float defaultValue() { return 1; }
-};
-
-struct FillColor : DataDrivenPaintProperty<Color, attributes::a_color, uniforms::u_color> {
+struct FillColor : DataDrivenPaintProperty<Color, attributes::color, uniforms::color> {
     static Color defaultValue() { return Color::black(); }
 };
 
-struct FillOutlineColor : DataDrivenPaintProperty<Color, attributes::a_outline_color, uniforms::u_outline_color> {
+struct FillOpacity : DataDrivenPaintProperty<float, attributes::opacity, uniforms::opacity> {
+    static float defaultValue() { return 1; }
+};
+
+struct FillOutlineColor : DataDrivenPaintProperty<Color, attributes::outline_color, uniforms::outline_color> {
     static Color defaultValue() { return {}; }
 };
 
+struct FillPattern : CrossFadedDataDrivenPaintProperty<expression::Image, attributes::pattern_to, uniforms::pattern_to, attributes::pattern_from, uniforms::pattern_from> {
+    static expression::Image defaultValue() { return {}; }
+};
+
 struct FillTranslate : PaintProperty<std::array<float, 2>> {
-    static std::array<float, 2> defaultValue() { return {{ 0, 0 }}; }
+    static std::array<float, 2> defaultValue() { return {{0, 0}}; }
 };
 
 struct FillTranslateAnchor : PaintProperty<TranslateAnchorType> {
     static TranslateAnchorType defaultValue() { return TranslateAnchorType::Map; }
 };
 
-struct FillPattern : CrossFadedDataDrivenPaintProperty<std::string, attributes::a_pattern_to, uniforms::u_pattern_to, attributes::a_pattern_from, uniforms::u_pattern_from> {
-    static std::string defaultValue() { return ""; }
-};
+class FillLayoutProperties : public Properties<
+    FillSortKey
+> {};
 
 class FillPaintProperties : public Properties<
     FillAntialias,
-    FillOpacity,
     FillColor,
+    FillOpacity,
     FillOutlineColor,
+    FillPattern,
     FillTranslate,
-    FillTranslateAnchor,
-    FillPattern
+    FillTranslateAnchor
 > {};
+
+class FillLayerProperties final : public LayerProperties {
+public:
+    explicit FillLayerProperties(Immutable<FillLayer::Impl>);
+    FillLayerProperties(
+        Immutable<FillLayer::Impl>,
+        CrossfadeParameters,
+        FillPaintProperties::PossiblyEvaluated);
+    ~FillLayerProperties() override;
+
+    unsigned long constantsMask() const override;
+
+    const FillLayer::Impl& layerImpl() const;
+    // Data members.
+    CrossfadeParameters crossfade;
+    FillPaintProperties::PossiblyEvaluated evaluated;
+};
 
 } // namespace style
 } // namespace mbgl
+
+// clang-format on

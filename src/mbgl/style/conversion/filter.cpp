@@ -1,11 +1,12 @@
 #include <mbgl/style/conversion/filter.hpp>
 #include <mbgl/style/conversion_impl.hpp>
-#include <mbgl/style/expression/literal.hpp>
-#include <mbgl/style/expression/expression.hpp>
-#include <mbgl/style/expression/type.hpp>
-#include <mbgl/style/expression/compound_expression.hpp>
 #include <mbgl/style/expression/boolean_operator.hpp>
+#include <mbgl/style/expression/compound_expression.hpp>
+#include <mbgl/style/expression/expression.hpp>
+#include <mbgl/style/expression/literal.hpp>
+#include <mbgl/style/expression/type.hpp>
 #include <mbgl/util/geometry.hpp>
+#include <utility>
 
 namespace mbgl {
 namespace style {
@@ -53,8 +54,13 @@ bool isExpression(const Convertible& filter) {
         optional<std::string> operand = toString(arrayMember(filter, 1));
         return operand && *operand != "$id" && *operand != "$type";
 
-    } else if (*op == "in" || *op == "!in" || *op == "!has" || *op == "none") {
+    } else if (*op == "!in" || *op == "!has" || *op == "none") {
         return false;
+
+    } else if (*op == "in") {
+        optional<std::string> str = toString(arrayMember(filter, 1));
+
+        return arrayLength(filter) >= 3 && (!str || isArray(arrayMember(filter, 2)));
 
     } else if (*op == "==" || *op == "!=" || *op == ">" || *op == ">=" || *op == "<" || *op == "<=") {
         return arrayLength(filter) != 3 || isArray(arrayMember(filter, 1)) || isArray(arrayMember(filter, 2));
@@ -73,7 +79,9 @@ bool isExpression(const Convertible& filter) {
     }
 }
 
-ParseResult createExpression(std::string op, optional<std::vector<std::unique_ptr<Expression>>> args, Error& error) {
+ParseResult createExpression(const std::string& op,
+                             optional<std::vector<std::unique_ptr<Expression>>> args,
+                             Error& error) {
     if (!args) return {};
     assert(std::all_of(args->begin(), args->end(), [](const std::unique_ptr<Expression> &e) {
         return bool(e.get());
@@ -95,7 +103,7 @@ ParseResult createExpression(std::string op, optional<std::vector<std::unique_pt
     }
 }
 
-ParseResult createExpression(std::string op, ParseResult arg, Error& error) {
+ParseResult createExpression(const std::string& op, ParseResult arg, Error& error) {
     if (!arg) {
         return {};
     }
@@ -129,7 +137,9 @@ optional<std::vector<std::unique_ptr<Expression>>> convertLiteralArray(const Con
     return {std::move(output)};
 }
 
-ParseResult convertLegacyComparisonFilter(const Convertible& values, Error& error, optional<std::string> opOverride = {}) {
+ParseResult convertLegacyComparisonFilter(const Convertible& values,
+                                          Error& error,
+                                          const optional<std::string>& opOverride = {}) {
     optional<std::string> op = opOverride ? opOverride : toString(arrayMember(values, 0));
     optional<std::string> property = toString(arrayMember(values, 1));
 
@@ -195,13 +205,21 @@ ParseResult convertLegacyFilter(const Convertible& values, Error& error) {
         return {std::make_unique<Literal>(true)};
     }
 
+    if (!isArray(values) || arrayLength(values) == 0) {
+       error.message = "filter value must be a non empty array";
+       return nullopt;
+    }
+
     optional<std::string> op = toString(arrayMember(values, 0));
 
     if (!op) {
         error.message = "filter operator must be a string";
-        return {};
+        return nullopt;
     } else if (arrayLength(values) <= 1) {
         return {std::make_unique<Literal>(*op != "any")};
+    } else if (*op == "within") {
+        expression::ParsingContext ctx;
+        return ctx.parseExpression(values);
     } else {
         return {
             *op == "==" ||
@@ -233,10 +251,10 @@ optional<mbgl::Value> serializeLegacyFilter(const Convertible& values) {
             if (arrayValue) {
                 result.push_back(*arrayValue);
             } else {
-                result.push_back(NullValue());
+                result.emplace_back(NullValue());
             }
         }
-        return (mbgl::Value)result;
+        return mbgl::Value(result);
     }
     return toValue(values);
 }

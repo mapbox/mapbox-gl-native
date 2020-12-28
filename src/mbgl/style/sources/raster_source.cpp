@@ -1,11 +1,14 @@
-#include <mbgl/style/sources/raster_source.hpp>
-#include <mbgl/style/sources/raster_source_impl.hpp>
-#include <mbgl/style/source_observer.hpp>
+#include <mbgl/storage/file_source.hpp>
 #include <mbgl/style/conversion/json.hpp>
 #include <mbgl/style/conversion/tileset.hpp>
-#include <mbgl/storage/file_source.hpp>
-#include <mbgl/util/mapbox.hpp>
+#include <mbgl/style/layer.hpp>
+#include <mbgl/style/source_observer.hpp>
+#include <mbgl/style/sources/raster_source.hpp>
+#include <mbgl/style/sources/raster_source_impl.hpp>
+#include <mbgl/tile/tile.hpp>
+#include <mbgl/util/async_request.hpp>
 #include <mbgl/util/exception.hpp>
+#include <mbgl/util/mapbox.hpp>
 
 namespace mbgl {
 namespace style {
@@ -41,6 +44,7 @@ void RasterSource::loadDescription(FileSource& fileSource) {
     if (urlOrTileset.is<Tileset>()) {
         baseImpl = makeMutable<Impl>(impl(), urlOrTileset.get<Tileset>());
         loaded = true;
+        observer->onSourceLoaded(*this);
         return;
     }
 
@@ -48,8 +52,8 @@ void RasterSource::loadDescription(FileSource& fileSource) {
         return;
     }
 
-    const std::string& url = urlOrTileset.get<std::string>();
-    req = fileSource.request(Resource::source(url), [this, url](Response res) {
+    const auto& url = urlOrTileset.get<std::string>();
+    req = fileSource.request(Resource::source(url), [this, url](const Response& res) {
         if (res.error) {
             observer->onSourceError(*this, std::make_exception_ptr(std::runtime_error(res.error->message)));
         } else if (res.notModified) {
@@ -65,7 +69,7 @@ void RasterSource::loadDescription(FileSource& fileSource) {
             }
 
             util::mapbox::canonicalizeTileset(*tileset, url, getType(), getTileSize());
-            bool changed = impl().getTileset() != *tileset;
+            bool changed = impl().tileset != *tileset;
 
             baseImpl = makeMutable<Impl>(impl(), *tileset);
             loaded = true;
@@ -77,6 +81,14 @@ void RasterSource::loadDescription(FileSource& fileSource) {
             }
         }
     });
+}
+
+bool RasterSource::supportsLayerType(const mbgl::style::LayerTypeInfo* info) const {
+    return mbgl::underlying_type(Tile::Kind::Raster) == mbgl::underlying_type(info->tileKind);
+}
+
+Mutable<Source::Impl> RasterSource::createMutable() const noexcept {
+    return staticMutableCast<Source::Impl>(makeMutable<Impl>(impl()));
 }
 
 } // namespace style

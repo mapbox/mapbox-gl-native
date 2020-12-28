@@ -2,26 +2,27 @@
 
 #include <mbgl/programs/program.hpp>
 #include <mbgl/programs/attributes.hpp>
+#include <mbgl/programs/heatmap_texture_program.hpp>
 #include <mbgl/programs/uniforms.hpp>
-#include <mbgl/shaders/heatmap.hpp>
 #include <mbgl/util/geometry.hpp>
 #include <mbgl/style/layers/heatmap_layer_properties.hpp>
 
 namespace mbgl {
 
 namespace uniforms {
-MBGL_DEFINE_UNIFORM_SCALAR(float, u_intensity);
+MBGL_DEFINE_UNIFORM_SCALAR(float, intensity);
 } // namespace uniforms
 
 class HeatmapProgram : public Program<
-    shaders::heatmap,
-    gl::Triangle,
-    gl::Attributes<
-        attributes::a_pos>,
-    gl::Uniforms<
-        uniforms::u_intensity,
-        uniforms::u_matrix,
-        uniforms::heatmap::u_extrude_scale>,
+    HeatmapProgram,
+    gfx::PrimitiveType::Triangle,
+    TypeList<
+        attributes::pos>,
+    TypeList<
+        uniforms::intensity,
+        uniforms::matrix,
+        uniforms::heatmap::extrude_scale>,
+    TypeList<>,
     style::HeatmapPaintProperties>
 {
 public:
@@ -44,6 +45,15 @@ public:
 };
 
 using HeatmapLayoutVertex = HeatmapProgram::LayoutVertex;
-using HeatmapAttributes = HeatmapProgram::Attributes;
+using HeatmapAttributes = HeatmapProgram::AttributeList;
+
+class HeatmapLayerPrograms final : public LayerTypePrograms  {
+public:
+    HeatmapLayerPrograms(gfx::Context& context, const ProgramParameters& programParameters) 
+        : heatmap(context, programParameters),
+          heatmapTexture(context, programParameters) {}
+    HeatmapProgram heatmap;
+    HeatmapTextureProgram heatmapTexture;
+};
 
 } // namespace mbgl

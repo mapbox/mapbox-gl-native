@@ -1,0 +1,24 @@
+{
+    "file-size": [
+        [
+            "image",
+            "expected.png",
+            169
+        ],
+        [
+            "image-compressed",
+            "expected.png",
+            167
+        ],
+        [
+            "style",
+            "style.json",
+            674
+        ],
+        [
+            "style-compressed",
+            "style.json",
+            256
+        ]
+    ]
+}

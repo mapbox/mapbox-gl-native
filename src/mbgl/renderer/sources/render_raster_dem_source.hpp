@@ -1,59 +1,36 @@
 #pragma once
 
-#include <mbgl/renderer/render_source.hpp>
-#include <mbgl/renderer/tile_pyramid.hpp>
+#include <mbgl/renderer/sources/render_tile_source.hpp>
 #include <mbgl/style/sources/raster_source_impl.hpp>
 
 namespace mbgl {
 
-class RenderRasterDEMSource : public RenderSource {
+class RenderRasterDEMSource final : public RenderTileSetSource {
 public:
-    RenderRasterDEMSource(Immutable<style::RasterSource::Impl>);
-
-    bool isLoaded() const final;
-
-    void update(Immutable<style::Source::Impl>,
-                const std::vector<Immutable<style::Layer::Impl>>&,
-                bool needsRendering,
-                bool needsRelayout,
-                const TileParameters&) final;
-
-    void startRender(PaintParameters&) final;
-    void finishRender(PaintParameters&) final;
-
-    std::vector<std::reference_wrapper<RenderTile>> getRenderTiles() final;
+    explicit RenderRasterDEMSource(Immutable<style::RasterSource::Impl>);
 
     std::unordered_map<std::string, std::vector<Feature>>
     queryRenderedFeatures(const ScreenLineString& geometry,
                           const TransformState& transformState,
-                          const std::vector<const RenderLayer*>& layers,
+                          const std::unordered_map<std::string, const RenderLayer*>& layers,
                           const RenderedQueryOptions& options,
-                          const mat4& projMatrix) const final;
+                          const mat4& projMatrix) const override;
 
     std::vector<Feature>
-    querySourceFeatures(const SourceQueryOptions&) const final;
-
-    void reduceMemoryUse() final;
-    void dumpDebugLogs() const final;
-
-    uint8_t getMaxZoom() const {
-        return maxzoom;
-    };
+    querySourceFeatures(const SourceQueryOptions&) const override;
 
 private:
+    // RenderTileSetSource overrides
+    void updateInternal(const Tileset&,
+                        const std::vector<Immutable<style::LayerProperties>>&,
+                        bool needsRendering,
+                        bool needsRelayout,
+                        const TileParameters&) override;
+    const optional<Tileset>& getTileset() const override;
+
     const style::RasterSource::Impl& impl() const;
 
-    TilePyramid tilePyramid;
-    optional<Tileset> tileset;
-    uint8_t maxzoom = 15;
-
-protected:
-    void onTileChanged(Tile&) final;
+    void onTileChanged(Tile&) override;
 };
-
-template <>
-inline bool RenderSource::is<RenderRasterDEMSource>() const {
-    return baseImpl->type == style::SourceType::RasterDEM;
-}
 
 } // namespace mbgl

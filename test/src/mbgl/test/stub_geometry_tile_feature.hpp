@@ -16,6 +16,9 @@ public:
           geometry(std::move(geometry_)) {
     }
 
+    StubGeometryTileFeature(FeatureType type_, GeometryCollection geometry_)
+        : type(type_), geometry(std::move(geometry_)) {}
+
     PropertyMap properties;
     FeatureIdentifier id;
     FeatureType type = FeatureType::Point;
@@ -33,7 +36,7 @@ public:
         return properties.count(key) ? properties.at(key) : optional<Value>();
     }
 
-    GeometryCollection getGeometries() const override {
+    const GeometryCollection& getGeometries() const override {
         return geometry;
     }
 };

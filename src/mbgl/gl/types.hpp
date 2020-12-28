@@ -25,62 +25,9 @@ using AttributeLocation = uint32_t;
 // "silently ignored".
 using UniformLocation = int32_t;
 
-using TextureUnit = uint8_t;
-
 enum class ShaderType : uint32_t {
     Vertex = 0x8B31,
     Fragment = 0x8B30
-};
-
-enum class DataType : uint16_t {
-    Byte = 0x1400,
-    UnsignedByte = 0x1401,
-    Short = 0x1402,
-    UnsignedShort = 0x1403,
-    Integer = 0x1404,
-    UnsignedInteger = 0x1405,
-    Float = 0x1406
-};
-
-enum class RenderbufferType : uint32_t {
-    RGBA = 0x8058,
-    DepthStencil = 0x88F0,
-#if not MBGL_USE_GLES2
-    DepthComponent = 0x1902,     // GL_DEPTH_COMPONENT
-#else
-    DepthComponent = 0x81A5,     // GL_DEPTH_COMPONENT16
-#endif // MBGL_USE_GLES2
-};
-
-enum class TextureMipMap : bool { No = false, Yes = true };
-enum class TextureFilter : bool { Nearest = false, Linear = true };
-enum class TextureWrap : bool { Clamp, Repeat };
-enum class TextureFormat : uint32_t {
-    RGBA = 0x1908,
-    Alpha = 0x1906,
-#if not MBGL_USE_GLES2
-    Stencil = 0x1901,
-    Depth = 0x1902,
-#endif // MBGL_USE_GLES2
-};
-
-enum class TextureType : uint32_t {
-    UnsignedByte = 0x1401,
-#if MBGL_USE_GLES2
-    HalfFloat = 0x8D61,
-#else
-    HalfFloat = 0x140B,
-#endif // MBGL_USE_GLES2
-};
-
-enum class PrimitiveType {
-    Points = 0x0000,
-    Lines = 0x0001,
-    LineLoop = 0x0002,
-    LineStrip = 0x0003,
-    Triangles = 0x0004,
-    TriangleStrip = 0x0005,
-    TriangleFan = 0x0006
 };
 
 struct PixelStorageType {
@@ -90,8 +37,6 @@ struct PixelStorageType {
 constexpr bool operator!=(const PixelStorageType& a, const PixelStorageType& b) {
     return a.alignment != b.alignment;
 }
-
-using BinaryProgramFormat = uint32_t;
 
 enum class UniformDataType : uint32_t {
     Float = 0x1406,
@@ -111,12 +56,6 @@ enum class UniformDataType : uint32_t {
     FloatMat4 = 0x8B5C,
     Sampler2D = 0x8B5E,
     SamplerCube = 0x8B60,
-};
-
-enum class BufferUsage : uint32_t {
-    StreamDraw = 0x88E0,
-    StaticDraw = 0x88E4,
-    DynamicDraw = 0x88E8,
 };
 
 } // namespace gl

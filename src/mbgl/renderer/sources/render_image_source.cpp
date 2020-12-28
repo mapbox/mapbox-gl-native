@@ -7,6 +7,7 @@
 #include <mbgl/renderer/tile_parameters.hpp>
 #include <mbgl/renderer/render_static_data.hpp>
 #include <mbgl/programs/programs.hpp>
+#include <mbgl/gfx/cull_face_mode.hpp>
 #include <mbgl/util/tile_coordinate.hpp>
 #include <mbgl/util/tile_cover.hpp>
 #include <mbgl/util/logging.hpp>
@@ -16,8 +17,56 @@ namespace mbgl {
 
 using namespace style;
 
+ImageSourceRenderData::~ImageSourceRenderData() = default;
+
+void ImageSourceRenderData::upload(gfx::UploadPass& uploadPass) const {
+    if (bucket && bucket->needsUpload()) {
+        bucket->upload(uploadPass);
+    }
+
+    if (!debugTexture) {
+        std::array<uint8_t, 4> data{{0, 0, 0, 0}};
+        static const PremultipliedImage emptyImage{Size(1, 1), data.data(), data.size()};
+        debugTexture = uploadPass.createTexture(emptyImage);
+    }
+}
+
+void ImageSourceRenderData::render(PaintParameters& parameters) const {
+    if (!bucket || !(parameters.debugOptions & MapDebugOptions::TileBorders)) {
+        return;
+    }
+    assert(debugTexture);
+    static const style::Properties<>::PossiblyEvaluated properties {};
+    static const DebugProgram::Binders paintAttributeData(properties, 0);
+
+    auto& programInstance = parameters.programs.debug;
+
+    for (auto matrix : matrices) {
+        programInstance.draw(parameters.context,
+                             *parameters.renderPass,
+                             gfx::LineStrip{4.0f * parameters.pixelRatio},
+                             gfx::DepthMode::disabled(),
+                             gfx::StencilMode::disabled(),
+                             gfx::ColorMode::unblended(),
+                             gfx::CullFaceMode::disabled(),
+                             *parameters.staticData.tileBorderIndexBuffer,
+                             RenderStaticData::tileBorderSegments(),
+                             DebugProgram::computeAllUniformValues(
+                                 DebugProgram::LayoutUniformValues{uniforms::matrix::Value(matrix),
+                                                                   uniforms::color::Value(Color::red()),
+                                                                   uniforms::overlay_scale::Value(1.0f)},
+                                 paintAttributeData,
+                                 properties,
+                                 parameters.state.getZoom()),
+                             DebugProgram::computeAllAttributeBindings(
+                                 *parameters.staticData.tileVertexBuffer, paintAttributeData, properties),
+                             DebugProgram::TextureBindings{textures::image::Value{debugTexture->getResource()}},
+                             "image");
+    }
+}
+
 RenderImageSource::RenderImageSource(Immutable<style::ImageSource::Impl> impl_)
-    : RenderSource(impl_) {
+    : RenderSource(std::move(impl_)) {
 }
 
 RenderImageSource::~RenderImageSource() = default;
@@ -30,69 +79,33 @@ bool RenderImageSource::isLoaded() const {
     return !!bucket;
 }
 
-void RenderImageSource::startRender(PaintParameters& parameters) {
-    if (!isLoaded()) {
-        return;
-    }
-
-    matrices.clear();
-
-    for (size_t i = 0; i < tileIds.size(); i++) {
-        mat4 matrix;
-        matrix::identity(matrix);
-        parameters.state.matrixFor(matrix, tileIds[i]);
-        matrix::multiply(matrix, parameters.alignedProjMatrix, matrix);
-        matrices.push_back(matrix);
-    }
-
-    if (bucket->needsUpload()) {
-        bucket->upload(parameters.context);
-    }
+std::unique_ptr<RenderItem> RenderImageSource::createRenderItem() {
+    assert(renderData);
+    return std::move(renderData);
 }
 
-void RenderImageSource::finishRender(PaintParameters& parameters) {
-    if (!isLoaded() || !(parameters.debugOptions & MapDebugOptions::TileBorders)) {
+void RenderImageSource::prepare(const SourcePrepareParameters& parameters) {
+    assert(!renderData);
+    if (!isLoaded()) {
+        renderData = std::make_unique<ImageSourceRenderData>(bucket, std::vector<mat4>{}, baseImpl->id);
         return;
     }
 
-    static const style::Properties<>::PossiblyEvaluated properties {};
-    static const DebugProgram::PaintPropertyBinders paintAttributeData(properties, 0);
-
-    auto& programInstance = parameters.programs.debug;
-
-    for (auto matrix : matrices) {
-        programInstance.draw(
-            parameters.context,
-            gl::LineStrip { 4.0f * parameters.pixelRatio },
-            gl::DepthMode::disabled(),
-            gl::StencilMode::disabled(),
-            gl::ColorMode::unblended(),
-            gl::CullFaceMode::disabled(),
-            parameters.staticData.tileBorderIndexBuffer,
-            parameters.staticData.tileBorderSegments,
-            programInstance.computeAllUniformValues(
-                DebugProgram::UniformValues {
-                    uniforms::u_matrix::Value( matrix ),
-                    uniforms::u_color::Value( Color::red() )
-                },
-                paintAttributeData,
-                properties,
-                parameters.state.getZoom()
-            ),
-            programInstance.computeAllAttributeBindings(
-                parameters.staticData.tileVertexBuffer,
-                paintAttributeData,
-                properties
-            ),
-            "image"
-        );
+    std::vector<mat4> matrices{tileIds.size(), mat4()};
+    const auto& transformParams = parameters.transform;
+    for (size_t i = 0u; i < tileIds.size(); ++i) {
+        mat4& matrix = matrices[i];
+        matrix::identity(matrix);
+        transformParams.state.matrixFor(matrix, tileIds[i]);
+        matrix::multiply(matrix, transformParams.alignedProjMatrix, matrix);
     }
+    renderData = std::make_unique<ImageSourceRenderData>(bucket, std::move(matrices), baseImpl->id);
 }
 
 std::unordered_map<std::string, std::vector<Feature>>
 RenderImageSource::queryRenderedFeatures(const ScreenLineString&,
                                          const TransformState&,
-                                         const std::vector<const RenderLayer*>&,
+                                         const std::unordered_map<std::string, const RenderLayer*>&,
                                          const RenderedQueryOptions&,
                                          const mat4&) const {
     return std::unordered_map<std::string, std::vector<Feature>> {};
@@ -103,7 +116,7 @@ std::vector<Feature> RenderImageSource::querySourceFeatures(const SourceQueryOpt
 }
 
 void RenderImageSource::update(Immutable<style::Source::Impl> baseImpl_,
-                               const std::vector<Immutable<Layer::Impl>>&,
+                               const std::vector<Immutable<LayerProperties>>&,
                                const bool needsRendering,
                                const bool,
                                const TileParameters& parameters) {
@@ -164,7 +177,7 @@ void RenderImageSource::update(Immutable<style::Source::Impl> baseImpl_,
     auto idealTiles = util::tileCover(transformState, transformState.getZoom());
     for (auto tile : idealTiles) {
         if (tile.wrap != 0 && tileCover[0].canonical.isChildOf(tile.canonical)) {
-            tileIds.push_back({ tile.wrap, tileCover[0].canonical });
+            tileIds.emplace_back(tile.wrap, tileCover[0].canonical);
             hasVisibleTile = true;
         }
         else if (!hasVisibleTile) {
@@ -190,7 +203,7 @@ void RenderImageSource::update(Immutable<style::Source::Impl> baseImpl_,
         geomCoords.push_back(gc);
     }
     if (!bucket) {
-        bucket = std::make_unique<RasterBucket>(image);
+        bucket = std::make_shared<RasterBucket>(image);
     } else {
         bucket->clear();
         if (image != bucket->image) {

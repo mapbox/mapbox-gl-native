@@ -1,3 +1,5 @@
+// clang-format off
+
 // This file is generated. Edit scripts/generate-style-code.js, then run `make style-code`.
 
 #include <mbgl/style/layers/raster_layer.hpp>
@@ -9,23 +11,29 @@
 #include <mbgl/style/conversion/transition_options.hpp>
 #include <mbgl/style/conversion/json.hpp>
 #include <mbgl/style/conversion_impl.hpp>
-#include <mbgl/util/fnv_hash.hpp>
+#include <mbgl/util/traits.hpp>
+
+#include <mapbox/eternal.hpp>
 
 namespace mbgl {
 namespace style {
 
-namespace {
-    const LayerTypeInfo typeInfoRaster
-        {"raster",
-          LayerTypeInfo::Source::Required,
-          LayerTypeInfo::Pass3D::NotRequired,
-          LayerTypeInfo::Layout::NotRequired,
-          LayerTypeInfo::Clipping::NotRequired
-        };
-}  // namespace
+
+// static
+const LayerTypeInfo* RasterLayer::Impl::staticTypeInfo() noexcept {
+    const static LayerTypeInfo typeInfo{"raster",
+                                        LayerTypeInfo::Source::Required,
+                                        LayerTypeInfo::Pass3D::NotRequired,
+                                        LayerTypeInfo::Layout::NotRequired,
+                                        LayerTypeInfo::FadingTiles::NotRequired,
+                                        LayerTypeInfo::CrossTileIndex::NotRequired,
+                                        LayerTypeInfo::TileKind::Raster};
+    return &typeInfo;
+}
+
 
 RasterLayer::RasterLayer(const std::string& layerID, const std::string& sourceID)
-    : Layer(makeMutable<Impl>(LayerType::Raster, layerID, sourceID)) {
+    : Layer(makeMutable<Impl>(layerID, sourceID)) {
 }
 
 RasterLayer::RasterLayer(Immutable<Impl> impl_)
@@ -52,105 +60,20 @@ std::unique_ptr<Layer> RasterLayer::cloneRef(const std::string& id_) const {
 void RasterLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const {
 }
 
-const LayerTypeInfo* RasterLayer::Impl::getTypeInfo() const noexcept {
-    return &typeInfoRaster;
-}
-
 // Layout properties
 
 
 // Paint properties
 
-PropertyValue<float> RasterLayer::getDefaultRasterOpacity() {
-    return { 1 };
-}
-
-PropertyValue<float> RasterLayer::getRasterOpacity() const {
-    return impl().paint.template get<RasterOpacity>().value;
-}
-
-void RasterLayer::setRasterOpacity(PropertyValue<float> value) {
-    if (value == getRasterOpacity())
-        return;
-    auto impl_ = mutableImpl();
-    impl_->paint.template get<RasterOpacity>().value = value;
-    baseImpl = std::move(impl_);
-    observer->onLayerChanged(*this);
-}
-
-void RasterLayer::setRasterOpacityTransition(const TransitionOptions& options) {
-    auto impl_ = mutableImpl();
-    impl_->paint.template get<RasterOpacity>().options = options;
-    baseImpl = std::move(impl_);
-}
-
-TransitionOptions RasterLayer::getRasterOpacityTransition() const {
-    return impl().paint.template get<RasterOpacity>().options;
-}
-
-PropertyValue<float> RasterLayer::getDefaultRasterHueRotate() {
-    return { 0 };
-}
-
-PropertyValue<float> RasterLayer::getRasterHueRotate() const {
-    return impl().paint.template get<RasterHueRotate>().value;
-}
-
-void RasterLayer::setRasterHueRotate(PropertyValue<float> value) {
-    if (value == getRasterHueRotate())
-        return;
-    auto impl_ = mutableImpl();
-    impl_->paint.template get<RasterHueRotate>().value = value;
-    baseImpl = std::move(impl_);
-    observer->onLayerChanged(*this);
-}
-
-void RasterLayer::setRasterHueRotateTransition(const TransitionOptions& options) {
-    auto impl_ = mutableImpl();
-    impl_->paint.template get<RasterHueRotate>().options = options;
-    baseImpl = std::move(impl_);
-}
-
-TransitionOptions RasterLayer::getRasterHueRotateTransition() const {
-    return impl().paint.template get<RasterHueRotate>().options;
-}
-
-PropertyValue<float> RasterLayer::getDefaultRasterBrightnessMin() {
-    return { 0 };
-}
-
-PropertyValue<float> RasterLayer::getRasterBrightnessMin() const {
-    return impl().paint.template get<RasterBrightnessMin>().value;
-}
-
-void RasterLayer::setRasterBrightnessMin(PropertyValue<float> value) {
-    if (value == getRasterBrightnessMin())
-        return;
-    auto impl_ = mutableImpl();
-    impl_->paint.template get<RasterBrightnessMin>().value = value;
-    baseImpl = std::move(impl_);
-    observer->onLayerChanged(*this);
-}
-
-void RasterLayer::setRasterBrightnessMinTransition(const TransitionOptions& options) {
-    auto impl_ = mutableImpl();
-    impl_->paint.template get<RasterBrightnessMin>().options = options;
-    baseImpl = std::move(impl_);
-}
-
-TransitionOptions RasterLayer::getRasterBrightnessMinTransition() const {
-    return impl().paint.template get<RasterBrightnessMin>().options;
-}
-
 PropertyValue<float> RasterLayer::getDefaultRasterBrightnessMax() {
-    return { 1 };
+    return {1};
 }
 
-PropertyValue<float> RasterLayer::getRasterBrightnessMax() const {
+const PropertyValue<float>& RasterLayer::getRasterBrightnessMax() const {
     return impl().paint.template get<RasterBrightnessMax>().value;
 }
 
-void RasterLayer::setRasterBrightnessMax(PropertyValue<float> value) {
+void RasterLayer::setRasterBrightnessMax(const PropertyValue<float>& value) {
     if (value == getRasterBrightnessMax())
         return;
     auto impl_ = mutableImpl();
@@ -169,42 +92,42 @@ TransitionOptions RasterLayer::getRasterBrightnessMaxTransition() const {
     return impl().paint.template get<RasterBrightnessMax>().options;
 }
 
-PropertyValue<float> RasterLayer::getDefaultRasterSaturation() {
-    return { 0 };
+PropertyValue<float> RasterLayer::getDefaultRasterBrightnessMin() {
+    return {0};
 }
 
-PropertyValue<float> RasterLayer::getRasterSaturation() const {
-    return impl().paint.template get<RasterSaturation>().value;
+const PropertyValue<float>& RasterLayer::getRasterBrightnessMin() const {
+    return impl().paint.template get<RasterBrightnessMin>().value;
 }
 
-void RasterLayer::setRasterSaturation(PropertyValue<float> value) {
-    if (value == getRasterSaturation())
+void RasterLayer::setRasterBrightnessMin(const PropertyValue<float>& value) {
+    if (value == getRasterBrightnessMin())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<RasterSaturation>().value = value;
+    impl_->paint.template get<RasterBrightnessMin>().value = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
 
-void RasterLayer::setRasterSaturationTransition(const TransitionOptions& options) {
+void RasterLayer::setRasterBrightnessMinTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<RasterSaturation>().options = options;
+    impl_->paint.template get<RasterBrightnessMin>().options = options;
     baseImpl = std::move(impl_);
 }
 
-TransitionOptions RasterLayer::getRasterSaturationTransition() const {
-    return impl().paint.template get<RasterSaturation>().options;
+TransitionOptions RasterLayer::getRasterBrightnessMinTransition() const {
+    return impl().paint.template get<RasterBrightnessMin>().options;
 }
 
 PropertyValue<float> RasterLayer::getDefaultRasterContrast() {
-    return { 0 };
+    return {0};
 }
 
-PropertyValue<float> RasterLayer::getRasterContrast() const {
+const PropertyValue<float>& RasterLayer::getRasterContrast() const {
     return impl().paint.template get<RasterContrast>().value;
 }
 
-void RasterLayer::setRasterContrast(PropertyValue<float> value) {
+void RasterLayer::setRasterContrast(const PropertyValue<float>& value) {
     if (value == getRasterContrast())
         return;
     auto impl_ = mutableImpl();
@@ -223,42 +146,15 @@ TransitionOptions RasterLayer::getRasterContrastTransition() const {
     return impl().paint.template get<RasterContrast>().options;
 }
 
-PropertyValue<RasterResamplingType> RasterLayer::getDefaultRasterResampling() {
-    return { RasterResamplingType::Linear };
-}
-
-PropertyValue<RasterResamplingType> RasterLayer::getRasterResampling() const {
-    return impl().paint.template get<RasterResampling>().value;
-}
-
-void RasterLayer::setRasterResampling(PropertyValue<RasterResamplingType> value) {
-    if (value == getRasterResampling())
-        return;
-    auto impl_ = mutableImpl();
-    impl_->paint.template get<RasterResampling>().value = value;
-    baseImpl = std::move(impl_);
-    observer->onLayerChanged(*this);
-}
-
-void RasterLayer::setRasterResamplingTransition(const TransitionOptions& options) {
-    auto impl_ = mutableImpl();
-    impl_->paint.template get<RasterResampling>().options = options;
-    baseImpl = std::move(impl_);
-}
-
-TransitionOptions RasterLayer::getRasterResamplingTransition() const {
-    return impl().paint.template get<RasterResampling>().options;
-}
-
 PropertyValue<float> RasterLayer::getDefaultRasterFadeDuration() {
-    return { 300 };
+    return {300};
 }
 
-PropertyValue<float> RasterLayer::getRasterFadeDuration() const {
+const PropertyValue<float>& RasterLayer::getRasterFadeDuration() const {
     return impl().paint.template get<RasterFadeDuration>().value;
 }
 
-void RasterLayer::setRasterFadeDuration(PropertyValue<float> value) {
+void RasterLayer::setRasterFadeDuration(const PropertyValue<float>& value) {
     if (value == getRasterFadeDuration())
         return;
     auto impl_ = mutableImpl();
@@ -277,270 +173,341 @@ TransitionOptions RasterLayer::getRasterFadeDurationTransition() const {
     return impl().paint.template get<RasterFadeDuration>().options;
 }
 
+PropertyValue<float> RasterLayer::getDefaultRasterHueRotate() {
+    return {0};
+}
+
+const PropertyValue<float>& RasterLayer::getRasterHueRotate() const {
+    return impl().paint.template get<RasterHueRotate>().value;
+}
+
+void RasterLayer::setRasterHueRotate(const PropertyValue<float>& value) {
+    if (value == getRasterHueRotate())
+        return;
+    auto impl_ = mutableImpl();
+    impl_->paint.template get<RasterHueRotate>().value = value;
+    baseImpl = std::move(impl_);
+    observer->onLayerChanged(*this);
+}
+
+void RasterLayer::setRasterHueRotateTransition(const TransitionOptions& options) {
+    auto impl_ = mutableImpl();
+    impl_->paint.template get<RasterHueRotate>().options = options;
+    baseImpl = std::move(impl_);
+}
+
+TransitionOptions RasterLayer::getRasterHueRotateTransition() const {
+    return impl().paint.template get<RasterHueRotate>().options;
+}
+
+PropertyValue<float> RasterLayer::getDefaultRasterOpacity() {
+    return {1};
+}
+
+const PropertyValue<float>& RasterLayer::getRasterOpacity() const {
+    return impl().paint.template get<RasterOpacity>().value;
+}
+
+void RasterLayer::setRasterOpacity(const PropertyValue<float>& value) {
+    if (value == getRasterOpacity())
+        return;
+    auto impl_ = mutableImpl();
+    impl_->paint.template get<RasterOpacity>().value = value;
+    baseImpl = std::move(impl_);
+    observer->onLayerChanged(*this);
+}
+
+void RasterLayer::setRasterOpacityTransition(const TransitionOptions& options) {
+    auto impl_ = mutableImpl();
+    impl_->paint.template get<RasterOpacity>().options = options;
+    baseImpl = std::move(impl_);
+}
+
+TransitionOptions RasterLayer::getRasterOpacityTransition() const {
+    return impl().paint.template get<RasterOpacity>().options;
+}
+
+PropertyValue<RasterResamplingType> RasterLayer::getDefaultRasterResampling() {
+    return {RasterResamplingType::Linear};
+}
+
+const PropertyValue<RasterResamplingType>& RasterLayer::getRasterResampling() const {
+    return impl().paint.template get<RasterResampling>().value;
+}
+
+void RasterLayer::setRasterResampling(const PropertyValue<RasterResamplingType>& value) {
+    if (value == getRasterResampling())
+        return;
+    auto impl_ = mutableImpl();
+    impl_->paint.template get<RasterResampling>().value = value;
+    baseImpl = std::move(impl_);
+    observer->onLayerChanged(*this);
+}
+
+void RasterLayer::setRasterResamplingTransition(const TransitionOptions& options) {
+    auto impl_ = mutableImpl();
+    impl_->paint.template get<RasterResampling>().options = options;
+    baseImpl = std::move(impl_);
+}
+
+TransitionOptions RasterLayer::getRasterResamplingTransition() const {
+    return impl().paint.template get<RasterResampling>().options;
+}
+
+PropertyValue<float> RasterLayer::getDefaultRasterSaturation() {
+    return {0};
+}
+
+const PropertyValue<float>& RasterLayer::getRasterSaturation() const {
+    return impl().paint.template get<RasterSaturation>().value;
+}
+
+void RasterLayer::setRasterSaturation(const PropertyValue<float>& value) {
+    if (value == getRasterSaturation())
+        return;
+    auto impl_ = mutableImpl();
+    impl_->paint.template get<RasterSaturation>().value = value;
+    baseImpl = std::move(impl_);
+    observer->onLayerChanged(*this);
+}
+
+void RasterLayer::setRasterSaturationTransition(const TransitionOptions& options) {
+    auto impl_ = mutableImpl();
+    impl_->paint.template get<RasterSaturation>().options = options;
+    baseImpl = std::move(impl_);
+}
+
+TransitionOptions RasterLayer::getRasterSaturationTransition() const {
+    return impl().paint.template get<RasterSaturation>().options;
+}
+
 using namespace conversion;
 
-optional<Error> RasterLayer::setPaintProperty(const std::string& name, const Convertible& value) {
-    enum class Property {
-        Unknown,
-        RasterOpacity,
-        RasterHueRotate,
-        RasterBrightnessMin,
-        RasterBrightnessMax,
-        RasterSaturation,
-        RasterContrast,
-        RasterResampling,
-        RasterFadeDuration,
-        RasterOpacityTransition,
-        RasterHueRotateTransition,
-        RasterBrightnessMinTransition,
-        RasterBrightnessMaxTransition,
-        RasterSaturationTransition,
-        RasterContrastTransition,
-        RasterResamplingTransition,
-        RasterFadeDurationTransition,
-    };
+namespace {
 
-    Property property = Property::Unknown;
-    switch (util::hashFNV1a(name.c_str())) {
-    case util::hashFNV1a("raster-opacity"):
-        if (name == "raster-opacity") {
-            property = Property::RasterOpacity;
-        }
-        break;
-    case util::hashFNV1a("raster-opacity-transition"):
-        if (name == "raster-opacity-transition") {
-            property = Property::RasterOpacityTransition;
-        }
-        break;
-    case util::hashFNV1a("raster-hue-rotate"):
-        if (name == "raster-hue-rotate") {
-            property = Property::RasterHueRotate;
-        }
-        break;
-    case util::hashFNV1a("raster-hue-rotate-transition"):
-        if (name == "raster-hue-rotate-transition") {
-            property = Property::RasterHueRotateTransition;
-        }
-        break;
-    case util::hashFNV1a("raster-brightness-min"):
-        if (name == "raster-brightness-min") {
-            property = Property::RasterBrightnessMin;
-        }
-        break;
-    case util::hashFNV1a("raster-brightness-min-transition"):
-        if (name == "raster-brightness-min-transition") {
-            property = Property::RasterBrightnessMinTransition;
-        }
-        break;
-    case util::hashFNV1a("raster-brightness-max"):
-        if (name == "raster-brightness-max") {
-            property = Property::RasterBrightnessMax;
-        }
-        break;
-    case util::hashFNV1a("raster-brightness-max-transition"):
-        if (name == "raster-brightness-max-transition") {
-            property = Property::RasterBrightnessMaxTransition;
-        }
-        break;
-    case util::hashFNV1a("raster-saturation"):
-        if (name == "raster-saturation") {
-            property = Property::RasterSaturation;
-        }
-        break;
-    case util::hashFNV1a("raster-saturation-transition"):
-        if (name == "raster-saturation-transition") {
-            property = Property::RasterSaturationTransition;
-        }
-        break;
-    case util::hashFNV1a("raster-contrast"):
-        if (name == "raster-contrast") {
-            property = Property::RasterContrast;
-        }
-        break;
-    case util::hashFNV1a("raster-contrast-transition"):
-        if (name == "raster-contrast-transition") {
-            property = Property::RasterContrastTransition;
-        }
-        break;
-    case util::hashFNV1a("raster-resampling"):
-        if (name == "raster-resampling") {
-            property = Property::RasterResampling;
-        }
-        break;
-    case util::hashFNV1a("raster-resampling-transition"):
-        if (name == "raster-resampling-transition") {
-            property = Property::RasterResamplingTransition;
-        }
-        break;
-    case util::hashFNV1a("raster-fade-duration"):
-        if (name == "raster-fade-duration") {
-            property = Property::RasterFadeDuration;
-        }
-        break;
-    case util::hashFNV1a("raster-fade-duration-transition"):
-        if (name == "raster-fade-duration-transition") {
-            property = Property::RasterFadeDurationTransition;
-        }
-        break;
-    
+constexpr uint8_t kPaintPropertyCount = 16u;
+
+enum class Property : uint8_t {
+    RasterBrightnessMax,
+    RasterBrightnessMin,
+    RasterContrast,
+    RasterFadeDuration,
+    RasterHueRotate,
+    RasterOpacity,
+    RasterResampling,
+    RasterSaturation,
+    RasterBrightnessMaxTransition,
+    RasterBrightnessMinTransition,
+    RasterContrastTransition,
+    RasterFadeDurationTransition,
+    RasterHueRotateTransition,
+    RasterOpacityTransition,
+    RasterResamplingTransition,
+    RasterSaturationTransition,
+};
+
+template <typename T>
+constexpr uint8_t toUint8(T t) noexcept {
+    return uint8_t(mbgl::underlying_type(t));
+}
+
+MAPBOX_ETERNAL_CONSTEXPR const auto layerProperties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>(
+    {{"raster-brightness-max", toUint8(Property::RasterBrightnessMax)},
+     {"raster-brightness-min", toUint8(Property::RasterBrightnessMin)},
+     {"raster-contrast", toUint8(Property::RasterContrast)},
+     {"raster-fade-duration", toUint8(Property::RasterFadeDuration)},
+     {"raster-hue-rotate", toUint8(Property::RasterHueRotate)},
+     {"raster-opacity", toUint8(Property::RasterOpacity)},
+     {"raster-resampling", toUint8(Property::RasterResampling)},
+     {"raster-saturation", toUint8(Property::RasterSaturation)},
+     {"raster-brightness-max-transition", toUint8(Property::RasterBrightnessMaxTransition)},
+     {"raster-brightness-min-transition", toUint8(Property::RasterBrightnessMinTransition)},
+     {"raster-contrast-transition", toUint8(Property::RasterContrastTransition)},
+     {"raster-fade-duration-transition", toUint8(Property::RasterFadeDurationTransition)},
+     {"raster-hue-rotate-transition", toUint8(Property::RasterHueRotateTransition)},
+     {"raster-opacity-transition", toUint8(Property::RasterOpacityTransition)},
+     {"raster-resampling-transition", toUint8(Property::RasterResamplingTransition)},
+     {"raster-saturation-transition", toUint8(Property::RasterSaturationTransition)}});
+
+StyleProperty getLayerProperty(const RasterLayer& layer, Property property) {
+    switch (property) {
+        case Property::RasterBrightnessMax:
+            return makeStyleProperty(layer.getRasterBrightnessMax());
+        case Property::RasterBrightnessMin:
+            return makeStyleProperty(layer.getRasterBrightnessMin());
+        case Property::RasterContrast:
+            return makeStyleProperty(layer.getRasterContrast());
+        case Property::RasterFadeDuration:
+            return makeStyleProperty(layer.getRasterFadeDuration());
+        case Property::RasterHueRotate:
+            return makeStyleProperty(layer.getRasterHueRotate());
+        case Property::RasterOpacity:
+            return makeStyleProperty(layer.getRasterOpacity());
+        case Property::RasterResampling:
+            return makeStyleProperty(layer.getRasterResampling());
+        case Property::RasterSaturation:
+            return makeStyleProperty(layer.getRasterSaturation());
+        case Property::RasterBrightnessMaxTransition:
+            return makeStyleProperty(layer.getRasterBrightnessMaxTransition());
+        case Property::RasterBrightnessMinTransition:
+            return makeStyleProperty(layer.getRasterBrightnessMinTransition());
+        case Property::RasterContrastTransition:
+            return makeStyleProperty(layer.getRasterContrastTransition());
+        case Property::RasterFadeDurationTransition:
+            return makeStyleProperty(layer.getRasterFadeDurationTransition());
+        case Property::RasterHueRotateTransition:
+            return makeStyleProperty(layer.getRasterHueRotateTransition());
+        case Property::RasterOpacityTransition:
+            return makeStyleProperty(layer.getRasterOpacityTransition());
+        case Property::RasterResamplingTransition:
+            return makeStyleProperty(layer.getRasterResamplingTransition());
+        case Property::RasterSaturationTransition:
+            return makeStyleProperty(layer.getRasterSaturationTransition());
     }
+    return {};
+}
 
-    if (property == Property::Unknown) {
-        return Error { "layer doesn't support this property" };
+StyleProperty getLayerProperty(const RasterLayer& layer, const std::string& name) {
+    const auto it = layerProperties.find(name.c_str());
+    if (it == layerProperties.end()) {
+        return {};
     }
+    return getLayerProperty(layer, static_cast<Property>(it->second));
+}
 
-        
-    if (property == Property::RasterOpacity || property == Property::RasterHueRotate || property == Property::RasterBrightnessMin || property == Property::RasterBrightnessMax || property == Property::RasterSaturation || property == Property::RasterContrast || property == Property::RasterFadeDuration) {
+} // namespace
+
+Value RasterLayer::serialize() const {
+    auto result = Layer::serialize();
+    assert(result.getObject());
+    for (const auto& property : layerProperties) {
+        auto styleProperty = getLayerProperty(*this, static_cast<Property>(property.second));
+        if (styleProperty.getKind() == StyleProperty::Kind::Undefined) continue;
+        serializeProperty(result, styleProperty, property.first.c_str(), property.second < kPaintPropertyCount);
+    }
+    return result;
+}
+
+optional<Error> RasterLayer::setPropertyInternal(const std::string& name, const Convertible& value) {
+    const auto it = layerProperties.find(name.c_str());
+    if (it == layerProperties.end()) return Error{"layer doesn't support this property"};
+
+    auto property = static_cast<Property>(it->second);
+
+    if (property == Property::RasterBrightnessMax || property == Property::RasterBrightnessMin ||
+        property == Property::RasterContrast || property == Property::RasterFadeDuration ||
+        property == Property::RasterHueRotate || property == Property::RasterOpacity ||
+        property == Property::RasterSaturation) {
         Error error;
-        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, false, false);
+        const auto& typedValue = convert<PropertyValue<float>>(value, error, false, false);
         if (!typedValue) {
             return error;
         }
-        
-        if (property == Property::RasterOpacity) {
-            setRasterOpacity(*typedValue);
-            return nullopt;
-        }
-        
-        if (property == Property::RasterHueRotate) {
-            setRasterHueRotate(*typedValue);
-            return nullopt;
-        }
-        
-        if (property == Property::RasterBrightnessMin) {
-            setRasterBrightnessMin(*typedValue);
-            return nullopt;
-        }
-        
+
         if (property == Property::RasterBrightnessMax) {
             setRasterBrightnessMax(*typedValue);
             return nullopt;
         }
-        
-        if (property == Property::RasterSaturation) {
-            setRasterSaturation(*typedValue);
+
+        if (property == Property::RasterBrightnessMin) {
+            setRasterBrightnessMin(*typedValue);
             return nullopt;
         }
-        
+
         if (property == Property::RasterContrast) {
             setRasterContrast(*typedValue);
             return nullopt;
         }
-        
+
         if (property == Property::RasterFadeDuration) {
             setRasterFadeDuration(*typedValue);
             return nullopt;
         }
-        
+
+        if (property == Property::RasterHueRotate) {
+            setRasterHueRotate(*typedValue);
+            return nullopt;
+        }
+
+        if (property == Property::RasterOpacity) {
+            setRasterOpacity(*typedValue);
+            return nullopt;
+        }
+
+        if (property == Property::RasterSaturation) {
+            setRasterSaturation(*typedValue);
+            return nullopt;
+        }
     }
-    
     if (property == Property::RasterResampling) {
         Error error;
-        optional<PropertyValue<RasterResamplingType>> typedValue = convert<PropertyValue<RasterResamplingType>>(value, error, false, false);
+        const auto& typedValue = convert<PropertyValue<RasterResamplingType>>(value, error, false, false);
         if (!typedValue) {
             return error;
         }
-        
+
         setRasterResampling(*typedValue);
         return nullopt;
-        
     }
-    
 
     Error error;
     optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
     if (!transition) {
         return error;
     }
-    
-    if (property == Property::RasterOpacityTransition) {
-        setRasterOpacityTransition(*transition);
-        return nullopt;
-    }
-    
-    if (property == Property::RasterHueRotateTransition) {
-        setRasterHueRotateTransition(*transition);
-        return nullopt;
-    }
-    
-    if (property == Property::RasterBrightnessMinTransition) {
-        setRasterBrightnessMinTransition(*transition);
-        return nullopt;
-    }
-    
+
     if (property == Property::RasterBrightnessMaxTransition) {
         setRasterBrightnessMaxTransition(*transition);
         return nullopt;
     }
-    
-    if (property == Property::RasterSaturationTransition) {
-        setRasterSaturationTransition(*transition);
+
+    if (property == Property::RasterBrightnessMinTransition) {
+        setRasterBrightnessMinTransition(*transition);
         return nullopt;
     }
-    
+
     if (property == Property::RasterContrastTransition) {
         setRasterContrastTransition(*transition);
         return nullopt;
     }
-    
-    if (property == Property::RasterResamplingTransition) {
-        setRasterResamplingTransition(*transition);
-        return nullopt;
-    }
-    
+
     if (property == Property::RasterFadeDurationTransition) {
         setRasterFadeDurationTransition(*transition);
         return nullopt;
     }
-    
 
-    return Error { "layer doesn't support this property" };
+    if (property == Property::RasterHueRotateTransition) {
+        setRasterHueRotateTransition(*transition);
+        return nullopt;
+    }
+
+    if (property == Property::RasterOpacityTransition) {
+        setRasterOpacityTransition(*transition);
+        return nullopt;
+    }
+
+    if (property == Property::RasterResamplingTransition) {
+        setRasterResamplingTransition(*transition);
+        return nullopt;
+    }
+
+    if (property == Property::RasterSaturationTransition) {
+        setRasterSaturationTransition(*transition);
+        return nullopt;
+    }
+
+    return Error{"layer doesn't support this property"};
 }
 
-optional<Error> RasterLayer::setLayoutProperty(const std::string& name, const Convertible& value) {
-    if (name == "visibility") {
-        return Layer::setVisibility(value);
-    }
-
-    enum class Property {
-        Unknown,
-    };
-
-    Property property = Property::Unknown;
-    switch (util::hashFNV1a(name.c_str())) {
-    
-    }
-
-    if (property == Property::Unknown) {
-        return Error { "layer doesn't support this property" };
-    }
-
-        
-
-    return Error { "layer doesn't support this property" };
+StyleProperty RasterLayer::getProperty(const std::string& name) const {
+    return getLayerProperty(*this, name);
 }
 
 Mutable<Layer::Impl> RasterLayer::mutableBaseImpl() const {
     return staticMutableCast<Layer::Impl>(mutableImpl());
 }
 
-RasterLayerFactory::RasterLayerFactory() = default;
-
-RasterLayerFactory::~RasterLayerFactory() = default;
-
-const LayerTypeInfo* RasterLayerFactory::getTypeInfo() const noexcept {
-    return &typeInfoRaster;
-}
-
-std::unique_ptr<style::Layer> RasterLayerFactory::createLayer(const std::string& id, const conversion::Convertible& value) {
-    optional<std::string> source = getSource(value);
-    if (!source) {
-        return nullptr;
-    }
-
-    std::unique_ptr<style::Layer> layer = std::unique_ptr<style::Layer>(new RasterLayer(id, *source));
-    return layer;
-}
-
 } // namespace style
 } // namespace mbgl
+
+// clang-format on

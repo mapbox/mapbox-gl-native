@@ -1,8 +1,12 @@
+// clang-format off
+
 // This file is generated. Edit scripts/generate-style-code.js, then run `make style-code`.
 
 #pragma once
 
 #include <mbgl/style/types.hpp>
+#include <mbgl/style/layer_properties.hpp>
+#include <mbgl/style/layers/fill_extrusion_layer.hpp>
 #include <mbgl/style/layout_property.hpp>
 #include <mbgl/style/paint_property.hpp>
 #include <mbgl/style/properties.hpp>
@@ -12,43 +16,67 @@
 namespace mbgl {
 namespace style {
 
+struct FillExtrusionBase : DataDrivenPaintProperty<float, attributes::base, uniforms::base> {
+    static float defaultValue() { return 0; }
+};
+
+struct FillExtrusionColor : DataDrivenPaintProperty<Color, attributes::color, uniforms::color> {
+    static Color defaultValue() { return Color::black(); }
+};
+
+struct FillExtrusionHeight : DataDrivenPaintProperty<float, attributes::height, uniforms::height> {
+    static float defaultValue() { return 0; }
+};
+
 struct FillExtrusionOpacity : PaintProperty<float> {
     static float defaultValue() { return 1; }
 };
 
-struct FillExtrusionColor : DataDrivenPaintProperty<Color, attributes::a_color, uniforms::u_color> {
-    static Color defaultValue() { return Color::black(); }
+struct FillExtrusionPattern : CrossFadedDataDrivenPaintProperty<expression::Image, attributes::pattern_to, uniforms::pattern_to, attributes::pattern_from, uniforms::pattern_from> {
+    static expression::Image defaultValue() { return {}; }
 };
 
 struct FillExtrusionTranslate : PaintProperty<std::array<float, 2>> {
-    static std::array<float, 2> defaultValue() { return {{ 0, 0 }}; }
+    static std::array<float, 2> defaultValue() { return {{0, 0}}; }
 };
 
 struct FillExtrusionTranslateAnchor : PaintProperty<TranslateAnchorType> {
     static TranslateAnchorType defaultValue() { return TranslateAnchorType::Map; }
 };
 
-struct FillExtrusionPattern : CrossFadedDataDrivenPaintProperty<std::string, attributes::a_pattern_to, uniforms::u_pattern_to, attributes::a_pattern_from, uniforms::u_pattern_from> {
-    static std::string defaultValue() { return ""; }
-};
-
-struct FillExtrusionHeight : DataDrivenPaintProperty<float, attributes::a_height, uniforms::u_height> {
-    static float defaultValue() { return 0; }
-};
-
-struct FillExtrusionBase : DataDrivenPaintProperty<float, attributes::a_base, uniforms::u_base> {
-    static float defaultValue() { return 0; }
+struct FillExtrusionVerticalGradient : PaintProperty<bool> {
+    static bool defaultValue() { return true; }
 };
 
 class FillExtrusionPaintProperties : public Properties<
-    FillExtrusionOpacity,
+    FillExtrusionBase,
     FillExtrusionColor,
+    FillExtrusionHeight,
+    FillExtrusionOpacity,
+    FillExtrusionPattern,
     FillExtrusionTranslate,
     FillExtrusionTranslateAnchor,
-    FillExtrusionPattern,
-    FillExtrusionHeight,
-    FillExtrusionBase
+    FillExtrusionVerticalGradient
 > {};
+
+class FillExtrusionLayerProperties final : public LayerProperties {
+public:
+    explicit FillExtrusionLayerProperties(Immutable<FillExtrusionLayer::Impl>);
+    FillExtrusionLayerProperties(
+        Immutable<FillExtrusionLayer::Impl>,
+        CrossfadeParameters,
+        FillExtrusionPaintProperties::PossiblyEvaluated);
+    ~FillExtrusionLayerProperties() override;
+
+    unsigned long constantsMask() const override;
+
+    const FillExtrusionLayer::Impl& layerImpl() const;
+    // Data members.
+    CrossfadeParameters crossfade;
+    FillExtrusionPaintProperties::PossiblyEvaluated evaluated;
+};
 
 } // namespace style
 } // namespace mbgl
+
+// clang-format on

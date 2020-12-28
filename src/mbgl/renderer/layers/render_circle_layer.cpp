@@ -7,6 +7,7 @@
 #include <mbgl/tile/tile.hpp>
 #include <mbgl/style/layers/circle_layer_impl.hpp>
 #include <mbgl/geometry/feature_index.hpp>
+#include <mbgl/gfx/cull_face_mode.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/intersection_tests.hpp>
 
@@ -14,25 +15,46 @@ namespace mbgl {
 
 using namespace style;
 
+namespace {
+
+struct RenderableSegment {
+    RenderableSegment(const Segment<CircleAttributes>& segment_,
+                      const RenderTile& tile_,
+                      const LayerRenderData* renderData_,
+                      float sortKey_)
+        : segment(segment_), tile(tile_), renderData(renderData_), sortKey(sortKey_) {}
+
+    const Segment<CircleAttributes>& segment;
+    const RenderTile& tile;
+    const LayerRenderData* renderData;
+    const float sortKey;
+
+    friend bool operator<(const RenderableSegment& lhs, const RenderableSegment& rhs) {
+        if (lhs.sortKey == rhs.sortKey) return lhs.tile.id < rhs.tile.id;
+        return lhs.sortKey < rhs.sortKey;
+    }
+};
+
+inline const style::CircleLayer::Impl& impl_cast(const Immutable<style::Layer::Impl>& impl) {
+    assert(impl->getTypeInfo() == CircleLayer::Impl::staticTypeInfo());
+    return static_cast<const style::CircleLayer::Impl&>(*impl);
+}
+
+} // namespace
+
 RenderCircleLayer::RenderCircleLayer(Immutable<style::CircleLayer::Impl> _impl)
-    : RenderLayer(style::LayerType::Circle, _impl),
-      unevaluated(impl().paint.untransitioned()) {
-}
-
-const style::CircleLayer::Impl& RenderCircleLayer::impl() const {
-    return static_cast<const style::CircleLayer::Impl&>(*baseImpl);
-}
-
-std::unique_ptr<Bucket> RenderCircleLayer::createBucket(const BucketParameters& parameters, const std::vector<const RenderLayer*>& layers) const {
-    return std::make_unique<CircleBucket>(parameters, layers);
-}
+    : RenderLayer(makeMutable<CircleLayerProperties>(std::move(_impl))),
+      unevaluated(impl_cast(baseImpl).paint.untransitioned()) {}
 
 void RenderCircleLayer::transition(const TransitionParameters& parameters) {
-    unevaluated = impl().paint.transitioned(parameters, std::move(unevaluated));
+    unevaluated = impl_cast(baseImpl).paint.transitioned(parameters, std::move(unevaluated));
 }
 
 void RenderCircleLayer::evaluate(const PropertyEvaluationParameters& parameters) {
-    evaluated = unevaluated.evaluate(parameters);
+    auto properties = makeMutable<CircleLayerProperties>(
+        staticImmutableCast<CircleLayer::Impl>(baseImpl),
+        unevaluated.evaluate(parameters));
+    const auto& evaluated = properties->evaluated;
 
     passes = ((evaluated.get<style::CircleRadius>().constantOr(1) > 0 ||
                evaluated.get<style::CircleStrokeWidth>().constantOr(1) > 0)
@@ -41,6 +63,8 @@ void RenderCircleLayer::evaluate(const PropertyEvaluationParameters& parameters)
               && (evaluated.get<style::CircleOpacity>().constantOr(1) > 0 ||
                   evaluated.get<style::CircleStrokeOpacity>().constantOr(1) > 0))
              ? RenderPass::Translucent : RenderPass::None;
+    properties->renderPasses = mbgl::underlying_type(passes);
+    evaluatedProperties = std::move(properties);
 }
 
 bool RenderCircleLayer::hasTransition() const {
@@ -51,68 +75,78 @@ bool RenderCircleLayer::hasCrossfade() const {
     return false;
 }
 
-void RenderCircleLayer::render(PaintParameters& parameters, RenderSource*) {
+void RenderCircleLayer::render(PaintParameters& parameters) {
+    assert(renderTiles);
     if (parameters.pass == RenderPass::Opaque) {
         return;
     }
+    const auto drawTile = [&](const RenderTile& tile, const LayerRenderData* data, const auto& segments) {
+        auto& circleBucket = static_cast<CircleBucket&>(*data->bucket);
+        const auto& evaluated = getEvaluated<CircleLayerProperties>(data->layerProperties);
+        const bool scaleWithMap = evaluated.template get<CirclePitchScale>() == CirclePitchScaleType::Map;
+        const bool pitchWithMap = evaluated.template get<CirclePitchAlignment>() == AlignmentType::Map;
+        const auto& paintPropertyBinders = circleBucket.paintPropertyBinders.at(getID());
 
-    const bool scaleWithMap = evaluated.get<CirclePitchScale>() == CirclePitchScaleType::Map;
-    const bool pitchWithMap = evaluated.get<CirclePitchAlignment>() == AlignmentType::Map;
-
-    for (const RenderTile& tile : renderTiles) {
-        auto bucket_ = tile.tile.getBucket<CircleBucket>(*baseImpl);
-        if (!bucket_) {
-            continue;
-        }
-        CircleBucket& bucket = *bucket_;
-
-        const auto& paintPropertyBinders = bucket.paintPropertyBinders.at(getID());
-
-        auto& programInstance = parameters.programs.circle.get(evaluated);
-   
-        const auto allUniformValues = programInstance.computeAllUniformValues(
-            CircleProgram::UniformValues {
-                uniforms::u_matrix::Value(
-                    tile.translatedMatrix(evaluated.get<CircleTranslate>(),
-                                          evaluated.get<CircleTranslateAnchor>(),
-                                          parameters.state)
-                ),
-                uniforms::u_scale_with_map::Value( scaleWithMap ),
-                uniforms::u_extrude_scale::Value( pitchWithMap
-                    ? std::array<float, 2> {{
-                        tile.id.pixelsToTileUnits(1, parameters.state.getZoom()),
-                        tile.id.pixelsToTileUnits(1, parameters.state.getZoom()) }}
-                    : parameters.pixelsToGLUnits ),
-                uniforms::u_camera_to_center_distance::Value( parameters.state.getCameraToCenterDistance() ),
-                uniforms::u_pitch_with_map::Value( pitchWithMap )
-            },
+        auto& programInstance = parameters.programs.getCircleLayerPrograms().circle;
+        using LayoutUniformValues = CircleProgram::LayoutUniformValues;
+        const auto& allUniformValues = CircleProgram::computeAllUniformValues(
+            LayoutUniformValues(
+                uniforms::matrix::Value(tile.translatedMatrix(evaluated.template get<CircleTranslate>(),
+                                                              evaluated.template get<CircleTranslateAnchor>(),
+                                                              parameters.state)),
+                uniforms::scale_with_map::Value(scaleWithMap),
+                uniforms::extrude_scale::Value(
+                    pitchWithMap ? std::array<float, 2>{{tile.id.pixelsToTileUnits(1, parameters.state.getZoom()),
+                                                         tile.id.pixelsToTileUnits(1, parameters.state.getZoom())}}
+                                 : parameters.pixelsToGLUnits),
+                uniforms::device_pixel_ratio::Value(parameters.pixelRatio),
+                uniforms::camera_to_center_distance::Value(parameters.state.getCameraToCenterDistance()),
+                uniforms::pitch_with_map::Value(pitchWithMap)),
             paintPropertyBinders,
             evaluated,
-            parameters.state.getZoom()
-        );
-        const auto allAttributeBindings = programInstance.computeAllAttributeBindings(
-            *bucket.vertexBuffer,
-            paintPropertyBinders,
-            evaluated
-        );
+            parameters.state.getZoom());
+        const auto& allAttributeBindings =
+            CircleProgram::computeAllAttributeBindings(*circleBucket.vertexBuffer, paintPropertyBinders, evaluated);
 
-        checkRenderability(parameters, programInstance.activeBindingCount(allAttributeBindings));
+        checkRenderability(parameters, CircleProgram::activeBindingCount(allAttributeBindings));
 
-        programInstance.draw(
-            parameters.context,
-            gl::Triangles(),
-            parameters.depthModeForSublayer(0, gl::DepthMode::ReadOnly),
-            parameters.mapMode != MapMode::Continuous
-                ? parameters.stencilModeForClipping(tile.clip)
-                : gl::StencilMode::disabled(),
-            parameters.colorModeForRenderPass(),
-            gl::CullFaceMode::disabled(),
-            *bucket.indexBuffer,
-            bucket.segments,
-            allUniformValues,
-            allAttributeBindings,
-            getID()
-        );
+        programInstance.draw(parameters.context,
+                             *parameters.renderPass,
+                             gfx::Triangles(),
+                             parameters.depthModeForSublayer(0, gfx::DepthMaskType::ReadOnly),
+                             gfx::StencilMode::disabled(),
+                             parameters.colorModeForRenderPass(),
+                             gfx::CullFaceMode::disabled(),
+                             *circleBucket.indexBuffer,
+                             segments,
+                             allUniformValues,
+                             allAttributeBindings,
+                             CircleProgram::TextureBindings{},
+                             getID());
+    };
+
+    const bool sortFeaturesByKey = !impl_cast(baseImpl).layout.get<CircleSortKey>().isUndefined();
+    std::multiset<RenderableSegment> renderableSegments;
+
+    for (const RenderTile& renderTile : *renderTiles) {
+        const LayerRenderData* renderData = getRenderDataForPass(renderTile, parameters.pass);
+        if (!renderData) {
+            continue;
+        }
+        auto& bucket = static_cast<CircleBucket&>(*renderData->bucket);
+        if (!sortFeaturesByKey) {
+            drawTile(renderTile, renderData, bucket.segments);
+            continue;
+        }
+        for (auto& segment : bucket.segments) {
+            renderableSegments.emplace(segment, renderTile, renderData, segment.sortKey);
+        }
+    }
+
+    if (sortFeaturesByKey) {
+        for (const auto& renderable : renderableSegments) {
+            drawTile(renderable.tile, renderable.renderData, renderable.segment);
+        }
     }
 }
 
@@ -133,25 +167,22 @@ GeometryCoordinates projectQueryGeometry(const GeometryCoordinates& queryGeometr
     return projectedGeometry;
 }
 
-bool RenderCircleLayer::queryIntersectsFeature(
-        const GeometryCoordinates& queryGeometry,
-        const GeometryTileFeature& feature,
-        const float zoom,
-        const TransformState& transformState,
-        const float pixelsToTileUnits,
-        const mat4& posMatrix) const {
-
+bool RenderCircleLayer::queryIntersectsFeature(const GeometryCoordinates& queryGeometry,
+                                               const GeometryTileFeature& feature, const float zoom,
+                                               const TransformState& transformState, const float pixelsToTileUnits,
+                                               const mat4& posMatrix, const FeatureState& featureState) const {
+    const auto& evaluated = static_cast<const CircleLayerProperties&>(*evaluatedProperties).evaluated;
     // Translate query geometry
     const GeometryCoordinates& translatedQueryGeometry = FeatureIndex::translateQueryGeometry(
             queryGeometry,
             evaluated.get<style::CircleTranslate>(),
             evaluated.get<style::CircleTranslateAnchor>(),
-            transformState.getAngle(),
+            transformState.getBearing(),
             pixelsToTileUnits).value_or(queryGeometry);
 
     // Evaluate functions
-    auto radius = evaluated.evaluate<style::CircleRadius>(zoom, feature);
-    auto stroke = evaluated.evaluate<style::CircleStrokeWidth>(zoom, feature);
+    auto radius = evaluated.evaluate<style::CircleRadius>(zoom, feature, featureState);
+    auto stroke = evaluated.evaluate<style::CircleStrokeWidth>(zoom, feature, featureState);
     auto size = radius + stroke;
 
     // For pitch-alignment: map, compare feature geometry to query geometry in the plane of the tile
@@ -164,7 +195,7 @@ bool RenderCircleLayer::queryIntersectsFeature(
         projectQueryGeometry(translatedQueryGeometry, posMatrix, transformState.getSize());
     auto transformedSize = alignWithMap ? size * pixelsToTileUnits : size;
 
-    auto geometry = feature.getGeometries();
+    const auto& geometry = feature.getGeometries();
     for (auto& ring : geometry) {
         for (auto& point : ring) {
             const GeometryCoordinate& transformedPoint = alignWithMap ? point : projectPoint(point, posMatrix, transformState.getSize());

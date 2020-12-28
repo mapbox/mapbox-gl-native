@@ -37,8 +37,8 @@ public:
         delegate.invoke(&mbgl::RendererObserver::onWillStartRenderingFrame);
     }
 
-    void onDidFinishRenderingFrame(RenderMode mode, bool repaintNeeded) final {
-        delegate.invoke(&mbgl::RendererObserver::onDidFinishRenderingFrame, mode, repaintNeeded);
+    void onDidFinishRenderingFrame(RenderMode mode, bool repaintNeeded, bool placementChanged) final {
+        delegate.invoke(&mbgl::RendererObserver::onDidFinishRenderingFrame, mode, repaintNeeded, placementChanged);
     }
 
     void onDidFinishRenderingMap() final {

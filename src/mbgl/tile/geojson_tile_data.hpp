@@ -17,7 +17,7 @@ public:
         return apply_visitor(ToFeatureType(), feature.geometry);
     }
 
-    PropertyMap getProperties() const override {
+    const PropertyMap& getProperties() const override {
         return feature.properties;
     }
 
@@ -25,15 +25,17 @@ public:
         return feature.id;
     }
 
-    GeometryCollection getGeometries() const override {
-        GeometryCollection geometry = apply_visitor(ToGeometryCollection(), feature.geometry);
+    const GeometryCollection& getGeometries() const override {
+        if (!geometry) {
+            geometry = apply_visitor(ToGeometryCollection(), feature.geometry);
 
-        // https://github.com/mapbox/geojson-vt-cpp/issues/44
-        if (getType() == FeatureType::Polygon) {
-            geometry = fixupPolygons(geometry);
+            // https://github.com/mapbox/geojson-vt-cpp/issues/44
+            if (getType() == FeatureType::Polygon) {
+                geometry = fixupPolygons(*geometry);
+            }
         }
 
-        return geometry;
+        return *geometry;
     }
 
     optional<Value> getValue(const std::string& key) const override {
@@ -43,6 +45,8 @@ public:
         }
         return optional<Value>();
     }
+
+    mutable optional<GeometryCollection> geometry;
 };
 
 class GeoJSONTileLayer : public GeometryTileLayer {

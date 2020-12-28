@@ -10,17 +10,18 @@ namespace style {
 
 class CustomGeometrySource::Impl : public Source::Impl {
 public:
-    Impl(std::string id, CustomGeometrySource::Options options);
-    Impl(const Impl&, ActorRef<CustomTileLoader>);
+    Impl(std::string id, const CustomGeometrySource::Options& options);
+    Impl(const Impl&, const ActorRef<CustomTileLoader>&);
 
     optional<std::string> getAttribution() const final;
 
-    CustomGeometrySource::TileOptions getTileOptions() const;
+    Immutable<CustomGeometrySource::TileOptions> getTileOptions() const;
     Range<uint8_t> getZoomRange() const;
     optional<ActorRef<CustomTileLoader>> getTileLoader() const;
+    bool operator!=(const Impl&) const noexcept;
 
 private:
-    CustomGeometrySource::TileOptions tileOptions;
+    Immutable<CustomGeometrySource::TileOptions> tileOptions;
     Range<uint8_t> zoomRange;
     optional<ActorRef<CustomTileLoader>> loaderRef;
 };

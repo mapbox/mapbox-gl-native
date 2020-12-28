@@ -58,7 +58,7 @@ public:
     uint32_t overscaleFactor() const;
     OverscaledTileID scaledTo(uint8_t z) const;
     UnwrappedTileID toUnwrapped() const;
-    OverscaledTileID unwrapTo(int16_t wrap);
+    OverscaledTileID unwrapTo(int16_t wrap) const;
 
     uint8_t overscaledZ;
     int16_t wrap;
@@ -85,7 +85,7 @@ public:
     std::array<UnwrappedTileID, 4> children() const;
     OverscaledTileID overscaleTo(uint8_t z) const;
     float pixelsToTileUnits(float pixelValue, float zoom) const;
-    UnwrappedTileID unwrapTo(int16_t wrap);
+    UnwrappedTileID unwrapTo(int16_t wrap) const;
 
     int16_t wrap;
     CanonicalTileID canonical;
@@ -141,7 +141,7 @@ inline std::array<CanonicalTileID, 4> CanonicalTileID::children() const {
 }
 
 inline OverscaledTileID::OverscaledTileID(uint8_t overscaledZ_, int16_t wrap_, CanonicalTileID canonical_)
-    : overscaledZ(overscaledZ_), wrap(wrap_), canonical(std::move(canonical_)) {
+    : overscaledZ(overscaledZ_), wrap(wrap_), canonical(canonical_) {
     assert(overscaledZ >= canonical.z);
 }
 
@@ -181,7 +181,8 @@ inline uint32_t OverscaledTileID::overscaleFactor() const {
 }
 
 inline bool OverscaledTileID::isChildOf(const OverscaledTileID& rhs) const {
-    return overscaledZ > rhs.overscaledZ &&
+    return wrap == rhs.wrap &&
+           overscaledZ > rhs.overscaledZ &&
            (canonical == rhs.canonical || canonical.isChildOf(rhs.canonical));
 }
 
@@ -193,7 +194,7 @@ inline UnwrappedTileID OverscaledTileID::toUnwrapped() const {
     return { wrap, canonical };
 }
 
-inline OverscaledTileID OverscaledTileID::unwrapTo(int16_t newWrap) {
+inline OverscaledTileID OverscaledTileID::unwrapTo(int16_t newWrap) const {
     return { overscaledZ, newWrap, canonical };
 }
 
@@ -206,8 +207,7 @@ inline UnwrappedTileID::UnwrappedTileID(uint8_t z_, int64_t x_, int64_t y_)
 }
 
 inline UnwrappedTileID::UnwrappedTileID(int16_t wrap_, CanonicalTileID canonical_)
-    : wrap(wrap_), canonical(std::move(canonical_)) {
-}
+    : wrap(wrap_), canonical(canonical_) {}
 
 inline bool UnwrappedTileID::operator==(const UnwrappedTileID& rhs) const {
     return wrap == rhs.wrap && canonical == rhs.canonical;
@@ -221,7 +221,7 @@ inline bool UnwrappedTileID::operator<(const UnwrappedTileID& rhs) const {
     return std::tie(wrap, canonical) < std::tie(rhs.wrap, rhs.canonical);
 }
 
-inline UnwrappedTileID UnwrappedTileID::unwrapTo(int16_t newWrap) {
+inline UnwrappedTileID UnwrappedTileID::unwrapTo(int16_t newWrap) const {
     return { newWrap, canonical };
 }
 

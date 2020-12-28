@@ -1,78 +1,51 @@
 [submodule "mapbox-gl-js"]
 	path = mapbox-gl-js
 	url = https://github.com/mapbox/mapbox-gl-js.git
-[submodule "platform/ios/vendor/mapbox-events-ios"]
-	path = platform/ios/vendor/mapbox-events-ios
-	url = https://github.com/mapbox/mapbox-events-ios.git
 [submodule "vendor/nunicode"]
 	path = vendor/nunicode
 	url = https://bitbucket.org/alekseyt/nunicode.git
-[submodule "vendor/rapidjson"]
-	path = vendor/rapidjson
-	url = https://github.com/Tencent/rapidjson.git
 [submodule "vendor/earcut.hpp"]
 	path = vendor/earcut.hpp
 	url = https://github.com/mapbox/earcut.hpp.git
-[submodule "vendor/geojson-vt-cpp"]
-	path = vendor/geojson-vt-cpp
-	url = https://github.com/mapbox/geojson-vt-cpp.git
-[submodule "vendor/geojson.hpp"]
-	path = vendor/geojson.hpp
-	url = https://github.com/mapbox/geojson.hpp.git
-[submodule "vendor/geometry.hpp"]
-	path = vendor/geometry.hpp
-	url = https://github.com/mapbox/geometry.hpp.git
 [submodule "vendor/polylabel"]
 	path = vendor/polylabel
 	url = https://github.com/mapbox/polylabel.git
 [submodule "vendor/protozero"]
 	path = vendor/protozero
 	url = https://github.com/mapbox/protozero.git
-[submodule "vendor/shelf-pack-cpp"]
-	path = vendor/shelf-pack-cpp
-	url = https://github.com/mapbox/shelf-pack-cpp.git
-[submodule "vendor/supercluster.hpp"]
-	path = vendor/supercluster.hpp
-	url = https://github.com/mapbox/supercluster.hpp.git
-[submodule "vendor/variant"]
-	path = vendor/variant
-	url = https://github.com/mapbox/variant.git
 [submodule "vendor/vector-tile"]
 	path = vendor/vector-tile
 	url = https://github.com/mapbox/vector-tile.git
 [submodule "vendor/wagyu"]
 	path = vendor/wagyu
 	url = https://github.com/mapbox/wagyu.git
-[submodule "vendor/expected-lite"]
-	path = vendor/expected
-	url = https://github.com/martinmoene/expected-lite.git
-[submodule "vendor/kdbush.hpp"]
-	path = vendor/kdbush.hpp
-	url = https://github.com/mourner/kdbush.hpp.git
 [submodule "vendor/unique_resource"]
 	path = vendor/unique_resource
 	url = https://github.com/okdshin/unique_resource.git
 [submodule "vendor/icu"]
 	path = vendor/icu
 	url = https://github.com/unicode-org/icu.git
-[submodule "vendor/optional"]
-	path = vendor/optional
-	url = https://github.com/mapbox/Optional.git
 [submodule "vendor/boost"]
 	path = vendor/boost
 	url = https://github.com/mapbox/mapbox-gl-native-boost.git
 [submodule "vendor/benchmark"]
 	path = vendor/benchmark
 	url = https://github.com/google/benchmark.git
-[submodule "vendor/cheap-ruler-cpp"]
-	path = vendor/cheap-ruler-cpp
-	url = https://github.com/mapbox/cheap-ruler-cpp.git
-[submodule "vendor/pixelmatch-cpp"]
-	path = vendor/pixelmatch-cpp
-	url = https://github.com/mapbox/pixelmatch-cpp.git
-[submodule "vendor/jni.hpp"]
-	path = vendor/jni.hpp
-	url = https://github.com/mapbox/jni.hpp.git
-[submodule "vendor/glfw"]
-	path = vendor/glfw
-	url = https://github.com/glfw/glfw.git
+[submodule "vendor/eternal"]
+	path = vendor/eternal
+	url = https://github.com/mapbox/eternal.git
+[submodule "vendor/mapbox-base"]
+	path = vendor/mapbox-base
+	url = https://github.com/mapbox/mapbox-base.git
+[submodule "vendor/googletest"]
+	path = vendor/googletest
+	url = https://github.com/google/googletest.git
+[submodule "vendor/zip-archive"]
+	path = vendor/zip-archive
+	url = https://github.com/ZipArchive/ZipArchive.git
+[submodule "vendor/cpp-httplib"]
+	path = vendor/cpp-httplib
+	url = https://github.com/yhirose/cpp-httplib.git
+[submodule "vendor/mapbox-gl-native-curl"]
+	path = vendor/mapbox-gl-native-curl
+	url = https://github.com/mapbox/mapbox-gl-native-curl.git

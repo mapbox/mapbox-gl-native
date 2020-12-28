@@ -1,7 +1,6 @@
 #pragma once
 
-#include <mbgl/renderer/render_source.hpp>
-#include <mbgl/renderer/tile_pyramid.hpp>
+#include <mbgl/renderer/sources/render_tile_source.hpp>
 #include <mbgl/style/sources/geojson_source_impl.hpp>
 
 namespace mbgl {
@@ -10,46 +9,27 @@ namespace style {
 class GeoJSONData;
 } // namespace style
 
-class RenderGeoJSONSource : public RenderSource {
+class RenderGeoJSONSource final : public RenderTileSource {
 public:
-    RenderGeoJSONSource(Immutable<style::GeoJSONSource::Impl>);
-
-    bool isLoaded() const final;
+    explicit RenderGeoJSONSource(Immutable<style::GeoJSONSource::Impl>);
+    ~RenderGeoJSONSource() override;
 
     void update(Immutable<style::Source::Impl>,
-                const std::vector<Immutable<style::Layer::Impl>>&,
+                const std::vector<Immutable<style::LayerProperties>>&,
                 bool needsRendering,
                 bool needsRelayout,
-                const TileParameters&) final;
+                const TileParameters&) override;
 
-    void startRender(PaintParameters&) final;
-    void finishRender(PaintParameters&) final;
-
-    std::vector<std::reference_wrapper<RenderTile>> getRenderTiles() final;
-
-    std::unordered_map<std::string, std::vector<Feature>>
-    queryRenderedFeatures(const ScreenLineString& geometry,
-                          const TransformState& transformState,
-                          const std::vector<const RenderLayer*>& layers,
-                          const RenderedQueryOptions& options,
-                          const mat4& projMatrix) const final;
-
-    std::vector<Feature>
-    querySourceFeatures(const SourceQueryOptions&) const final;
-
-    void reduceMemoryUse() final;
-    void dumpDebugLogs() const final;
+    FeatureExtensionValue
+    queryFeatureExtensions(const Feature& feature,
+                           const std::string& extension,
+                           const std::string& extensionField,
+                           const optional<std::map<std::string, Value>>& args) const override;
 
 private:
     const style::GeoJSONSource::Impl& impl() const;
 
-    TilePyramid tilePyramid;
-    style::GeoJSONData* data = nullptr;
+    std::weak_ptr<style::GeoJSONData> data;
 };
-
-template <>
-inline bool RenderSource::is<RenderGeoJSONSource>() const {
-    return baseImpl->type == style::SourceType::GeoJSON;
-}
 
 } // namespace mbgl

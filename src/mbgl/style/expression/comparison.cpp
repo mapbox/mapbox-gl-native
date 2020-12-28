@@ -2,6 +2,7 @@
 #include <mbgl/style/expression/comparison.hpp>
 #include <mbgl/style/expression/dsl.hpp>
 #include <mbgl/style/conversion_impl.hpp>
+#include <utility>
 
 namespace mbgl {
 namespace style {
@@ -21,30 +22,34 @@ static bool isComparableType(const std::string& op, const type::Type& type) {
     }
 }
 
-bool eq(Value a, Value b) { return a == b; }
-bool neq(Value a, Value b) { return a != b; }
-bool lt(Value lhs, Value rhs) {
+bool eq(const Value& a, const Value& b) {
+    return a == b;
+}
+bool neq(const Value& a, const Value& b) {
+    return a != b;
+}
+bool lt(const Value& lhs, const Value& rhs) {
     return lhs.match(
         [&](const std::string& a) { return a < rhs.get<std::string>(); },
         [&](double a) { return a < rhs.get<double>(); },
         [&](const auto&) { assert(false); return false; }
     );
 }
-bool gt(Value lhs, Value rhs) {
+bool gt(const Value& lhs, const Value& rhs) {
     return lhs.match(
         [&](const std::string& a) { return a > rhs.get<std::string>(); },
         [&](double a) { return a > rhs.get<double>(); },
         [&](const auto&) { assert(false); return false; }
     );
 }
-bool lteq(Value lhs, Value rhs) {
+bool lteq(const Value& lhs, const Value& rhs) {
     return lhs.match(
         [&](const std::string& a) { return a <= rhs.get<std::string>(); },
         [&](double a) { return a <= rhs.get<double>(); },
         [&](const auto&) { assert(false); return false; }
     );
 }
-bool gteq(Value lhs, Value rhs) {
+bool gteq(const Value& lhs, const Value& rhs) {
     return lhs.match(
         [&](const std::string& a) { return a >= rhs.get<std::string>(); },
         [&](double a) { return a >= rhs.get<double>(); },
@@ -52,12 +57,24 @@ bool gteq(Value lhs, Value rhs) {
     );
 }
 
-bool eqCollate(std::string a, std::string b, Collator c) { return c.compare(a, b) == 0; }
-bool neqCollate(std::string a, std::string b, Collator c) { return !eqCollate(a, b, c); }
-bool ltCollate(std::string a, std::string b, Collator c) { return c.compare(a, b) < 0; }
-bool gtCollate(std::string a, std::string b, Collator c) { return c.compare(a, b) > 0; }
-bool lteqCollate(std::string a, std::string b, Collator c) { return c.compare(a, b) <= 0; }
-bool gteqCollate(std::string a, std::string b, Collator c) { return c.compare(a, b) >= 0; }
+bool eqCollate(const std::string& a, const std::string& b, const Collator& c) {
+    return c.compare(a, b) == 0;
+}
+bool neqCollate(const std::string& a, const std::string& b, const Collator& c) {
+    return !eqCollate(a, b, c);
+}
+bool ltCollate(const std::string& a, const std::string& b, const Collator& c) {
+    return c.compare(a, b) < 0;
+}
+bool gtCollate(const std::string& a, const std::string& b, const Collator& c) {
+    return c.compare(a, b) > 0;
+}
+bool lteqCollate(const std::string& a, const std::string& b, const Collator& c) {
+    return c.compare(a, b) <= 0;
+}
+bool gteqCollate(const std::string& a, const std::string& b, const Collator& c) {
+    return c.compare(a, b) >= 0;
+}
 
 static BasicComparison::CompareFunctionType getBasicCompareFunction(const std::string& op) {
     if (op == "==") return eq;
@@ -149,7 +166,7 @@ CollatorComparison::CollatorComparison(
         std::unique_ptr<Expression> rhs_,
         std::unique_ptr<Expression> collator_)
     : Expression(Kind::Comparison, type::Boolean),
-      op(op_),
+      op(std::move(op_)),
       compare(getCollatorComparisonFunction(op)),
       lhs(std::move(lhs_)),
       rhs(std::move(rhs_)),

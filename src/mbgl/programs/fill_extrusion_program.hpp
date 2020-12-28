@@ -3,8 +3,7 @@
 #include <mbgl/programs/program.hpp>
 #include <mbgl/programs/attributes.hpp>
 #include <mbgl/programs/uniforms.hpp>
-#include <mbgl/shaders/fill_extrusion.hpp>
-#include <mbgl/shaders/fill_extrusion_pattern.hpp>
+#include <mbgl/programs/textures.hpp>
 #include <mbgl/util/geometry.hpp>
 #include <mbgl/util/mat4.hpp>
 #include <mbgl/util/size.hpp>
@@ -22,56 +21,45 @@ class TransformState;
 template <class> class Faded;
 
 namespace uniforms {
-MBGL_DEFINE_UNIFORM_VECTOR(float, 3, u_lightpos);
-MBGL_DEFINE_UNIFORM_VECTOR(float, 3, u_lightcolor);
-MBGL_DEFINE_UNIFORM_SCALAR(float,    u_lightintensity);
-MBGL_DEFINE_UNIFORM_SCALAR(float,    u_height_factor);
+MBGL_DEFINE_UNIFORM_VECTOR(float, 3, lightpos);
+MBGL_DEFINE_UNIFORM_VECTOR(float, 3, lightcolor);
+MBGL_DEFINE_UNIFORM_SCALAR(float,    lightintensity);
+MBGL_DEFINE_UNIFORM_SCALAR(float,    vertical_gradient);
+MBGL_DEFINE_UNIFORM_SCALAR(float,    height_factor);
 } // namespace uniforms
 
-struct FillExtrusionLayoutAttributes : gl::Attributes<
-    attributes::a_pos,
-    attributes::a_normal_ed>
-{};
+using FillExtrusionLayoutAttributes = TypeList<
+    attributes::pos,
+    attributes::normal_ed>;
 
-struct FillExtrusionUniforms : gl::Uniforms<
-    uniforms::u_matrix,
-    uniforms::u_lightcolor,
-    uniforms::u_lightpos,
-    uniforms::u_lightintensity>
-{
-    static Values values(mat4,
-                         const TransformState&,
-                         const EvaluatedLight&);
-};
+using FillExtrusionUniforms = TypeList<
+    uniforms::matrix,
+    uniforms::opacity,
+    uniforms::lightcolor,
+    uniforms::lightpos,
+    uniforms::lightintensity,
+    uniforms::vertical_gradient>;
 
-struct FillExtrusionPatternUniforms : gl::Uniforms<
-    uniforms::u_matrix,
-    uniforms::u_scale,
-    uniforms::u_texsize,
-    uniforms::u_fade,
-    uniforms::u_image,
-    uniforms::u_pixel_coord_upper,
-    uniforms::u_pixel_coord_lower,
-    uniforms::u_height_factor,
-    uniforms::u_lightcolor,
-    uniforms::u_lightpos,
-    uniforms::u_lightintensity>
-{
-    static Values values(mat4,
-                         Size atlasSize,
-                         const CrossfadeParameters&,
-                         const UnwrappedTileID&,
-                         const TransformState&,
-                         const float heightFactor,
-                         const float pixelRatio,
-                         const EvaluatedLight&);
-};
+using FillExtrusionPatternUniforms = TypeList<
+    uniforms::matrix,
+    uniforms::opacity,
+    uniforms::scale,
+    uniforms::texsize,
+    uniforms::fade,
+    uniforms::pixel_coord_upper,
+    uniforms::pixel_coord_lower,
+    uniforms::height_factor,
+    uniforms::lightcolor,
+    uniforms::lightpos,
+    uniforms::lightintensity,
+    uniforms::vertical_gradient>;
 
 class FillExtrusionProgram : public Program<
-    shaders::fill_extrusion,
-    gl::Triangle,
+    FillExtrusionProgram,
+    gfx::PrimitiveType::Triangle,
     FillExtrusionLayoutAttributes,
     FillExtrusionUniforms,
+    TypeList<>,
     style::FillExtrusionPaintProperties>
 {
 public:
@@ -96,20 +84,47 @@ public:
             }}
         };
     }
+
+    static LayoutUniformValues layoutUniformValues(
+        mat4, const TransformState&, float opacity, const EvaluatedLight&, float verticalGradient);
 };
 
 class FillExtrusionPatternProgram : public Program<
-    shaders::fill_extrusion_pattern,
-    gl::Triangle,
+    FillExtrusionPatternProgram,
+    gfx::PrimitiveType::Triangle,
     FillExtrusionLayoutAttributes,
     FillExtrusionPatternUniforms,
+    TypeList<
+        textures::image>,
     style::FillExtrusionPaintProperties>
 {
 public:
     using Program::Program;
+
+    static LayoutUniformValues layoutUniformValues(mat4,
+                                                   Size atlasSize,
+                                                   const CrossfadeParameters&,
+                                                   const UnwrappedTileID&,
+                                                   const TransformState&,
+                                                   float opacity,
+                                                   float heightFactor,
+                                                   float pixelRatio,
+                                                   const EvaluatedLight&,
+                                                   float verticalGradient);
 };
 
 using FillExtrusionLayoutVertex = FillExtrusionProgram::LayoutVertex;
-using FillExtrusionAttributes = FillExtrusionProgram::Attributes;
+using FillExtrusionAttributes = FillExtrusionProgram::AttributeList;
+
+
+class FillExtrusionLayerPrograms final : public LayerTypePrograms {
+public:
+    FillExtrusionLayerPrograms(gfx::Context& context, const ProgramParameters& programParameters)
+        : fillExtrusion(context, programParameters),
+          fillExtrusionPattern(context, programParameters) {
+    }
+    FillExtrusionProgram fillExtrusion;
+    FillExtrusionPatternProgram fillExtrusionPattern;
+};
 
 } // namespace mbgl

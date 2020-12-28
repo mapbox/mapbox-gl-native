@@ -15,7 +15,7 @@ ParseResult parseComparison(const mbgl::style::conversion::Convertible&, Parsing
 
 class BasicComparison : public Expression {
 public:
-    using CompareFunctionType = bool (*) (Value, Value);
+    using CompareFunctionType = bool (*)(const Value&, const Value&);
 
     BasicComparison(
         std::string op,
@@ -38,7 +38,7 @@ private:
 
 class CollatorComparison : public Expression {
 public:
-    using CompareFunctionType = bool (*) (std::string, std::string, Collator);
+    using CompareFunctionType = bool (*)(const std::string&, const std::string&, const Collator&);
 
     CollatorComparison(
         std::string op,

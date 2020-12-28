@@ -1,13 +1,18 @@
 #pragma once
 
-#include <mbgl/tile/tile_loader.hpp>
-#include <mbgl/storage/file_source.hpp>
 #include <mbgl/renderer/tile_parameters.hpp>
+#include <mbgl/storage/file_source.hpp>
+#include <mbgl/tile/tile_loader.hpp>
+#include <mbgl/util/async_request.hpp>
 #include <mbgl/util/tileset.hpp>
 
 #include <cassert>
 
 namespace mbgl {
+
+inline std::exception_ptr getCantLoadTileError() {
+    return std::make_exception_ptr(std::runtime_error("Can't load tile."));
+}
 
 template <typename T>
 TileLoader<T>::TileLoader(T& tile_,
@@ -23,11 +28,15 @@ TileLoader<T>::TileLoader(T& tile_,
         id.canonical.y,
         id.canonical.z,
         tileset.scheme,
-        Resource::Priority::Regular,
         Resource::LoadingMethod::CacheOnly)),
       fileSource(parameters.fileSource) {
     assert(!request);
-    if (fileSource.supportsCacheOnlyRequests()) {
+    if (!fileSource) {
+        tile.setError(getCantLoadTileError());
+        return;
+    }
+
+    if (fileSource->supportsCacheOnlyRequests()) {
         // When supported, the first request is always optional, even if the TileLoader
         // is marked as required. That way, we can let the first optional request continue
         // to load when the TileLoader is later changed from required to optional. If we
@@ -48,11 +57,39 @@ template <typename T>
 TileLoader<T>::~TileLoader() = default;
 
 template <typename T>
+void TileLoader<T>::setNecessity(TileNecessity newNecessity) {
+    if (newNecessity != necessity) {
+        necessity = newNecessity;
+        if (necessity == TileNecessity::Required) {
+            makeRequired();
+        } else {
+            makeOptional();
+        }
+    }
+}
+
+template <typename T>
+void TileLoader<T>::setUpdateParameters(const TileUpdateParameters& params) {
+    if (updateParameters != params) {
+        updateParameters = params;
+        if (hasPendingNetworkRequest()) {
+            // Update the pending request.
+            request.reset();
+            loadFromNetwork();
+        }
+    }
+}
+
+template <typename T>
 void TileLoader<T>::loadFromCache() {
     assert(!request);
+    if (!fileSource) {
+        tile.setError(getCantLoadTileError());
+        return;
+    }
 
     resource.loadingMethod = Resource::LoadingMethod::CacheOnly;
-    request = fileSource.request(resource, [this](Response res) {
+    request = fileSource->request(resource, [this](const Response& res) {
         request.reset();
 
         tile.setTriedCache();
@@ -86,7 +123,7 @@ void TileLoader<T>::makeRequired() {
 
 template <typename T>
 void TileLoader<T>::makeOptional() {
-    if (resource.loadingMethod == Resource::LoadingMethod::NetworkOnly && request) {
+    if (hasPendingNetworkRequest()) {
         // Abort the current request, but only when we know that we're specifically querying for a
         // network resource only.
         request.reset();
@@ -114,11 +151,18 @@ void TileLoader<T>::loadedData(const Response& res) {
 template <typename T>
 void TileLoader<T>::loadFromNetwork() {
     assert(!request);
+    if (!fileSource) {
+        tile.setError(getCantLoadTileError());
+        return;
+    }
 
     // Instead of using Resource::LoadingMethod::All, we're first doing a CacheOnly, and then a
     // NetworkOnly request.
     resource.loadingMethod = Resource::LoadingMethod::NetworkOnly;
-    request = fileSource.request(resource, [this](Response res) { loadedData(res); });
+    resource.minimumUpdateInterval = updateParameters.minimumUpdateInterval;
+    resource.storagePolicy =
+        updateParameters.isVolatile ? Resource::StoragePolicy::Volatile : Resource::StoragePolicy::Permanent;
+    request = fileSource->request(resource, [this](const Response& res) { loadedData(res); });
 }
 
 } // namespace mbgl

@@ -1,0 +1,16 @@
+{
+    "base_test_path": "../mapbox-gl-js/test/integration",
+    "cache_path": "cache-style.db",
+    "expectation_paths": [
+        "expectations/platform-all"
+    ],
+    "ignore_paths": [
+        "ignores/platform-all.json",
+        "ignores/platform-macos.json"
+    ],
+    "metric_path": "macos-xcode11-release",
+    "probes": [
+        "probeGFX",
+        "probeNetwork"
+    ]
+}

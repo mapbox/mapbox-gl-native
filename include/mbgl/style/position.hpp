@@ -23,13 +23,9 @@ public:
         return !(lhs == rhs);
     }
 
-    const std::array<float, 3> getCartesian() const {
-        return { { x, y, z } };
-    };
+    std::array<float, 3> getCartesian() const { return {{x, y, z}}; };
 
-    const std::array<float, 3> getSpherical() const {
-        return { { radial, azimuthal, polar } };
-    };
+    std::array<float, 3> getSpherical() const { return {{radial, azimuthal, polar}}; };
 
     void set(std::array<float, 3>& position_) {
         radial = position_[0];

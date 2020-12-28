@@ -13,7 +13,7 @@ CameraOptions RendererState::getCameraOptions(const UpdateParameters& updatePara
 
 bool RendererState::hasImage(const UpdateParameters& updateParameters, const std::string& id) {
     for (const auto& image : *updateParameters.images) {
-        if (image.get()->id == id) {
+        if (image->id == id) {
             return true;
         }
     }
@@ -22,7 +22,7 @@ bool RendererState::hasImage(const UpdateParameters& updateParameters, const std
 
 bool RendererState::hasLayer(const UpdateParameters& updateParameters, const std::string& id) {
     for (const auto& layer : *updateParameters.layers) {
-        if (layer.get()->id == id) {
+        if (layer->id == id) {
             return true;
         }
     }
@@ -31,7 +31,7 @@ bool RendererState::hasLayer(const UpdateParameters& updateParameters, const std
 
 bool RendererState::hasSource(const UpdateParameters& updateParameters, const std::string& id) {
     for (const auto& source : *updateParameters.sources) {
-        if (source.get()->id == id) {
+        if (source->id == id) {
             return true;
         }
     }
@@ -45,12 +45,12 @@ ScreenCoordinate RendererState::pixelForLatLng(const UpdateParameters& updatePar
     LatLng unwrappedLatLng = latLng.wrapped();
     unwrappedLatLng.unwrapForShortestPath(updateParameters.transformState.getLatLng());
     const ScreenCoordinate point = updateParameters.transformState.latLngToScreenCoordinate(latLng);
-    return ScreenCoordinate { point.x, updateParameters.transformState.size.height - point.y };
+    return ScreenCoordinate{point.x, updateParameters.transformState.getSize().height - point.y};
 }
 
 LatLng RendererState::latLngForPixel(const UpdateParameters& updateParameters, const ScreenCoordinate& point) {
     ScreenCoordinate flippedPoint = point;
-    flippedPoint.y = updateParameters.transformState.size.height - flippedPoint.y;
+    flippedPoint.y = updateParameters.transformState.getSize().height - flippedPoint.y;
     return updateParameters.transformState.screenCoordinateToLatLng(flippedPoint);
 }
 

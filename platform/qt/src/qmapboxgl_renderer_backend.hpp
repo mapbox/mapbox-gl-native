@@ -2,33 +2,36 @@
 
 #include "qmapboxgl.hpp"
 
-#include <mbgl/renderer/renderer_backend.hpp>
-#include <mbgl/storage/default_file_source.hpp>
-#include <mbgl/util/shared_thread_pool.hpp>
+#include <mbgl/gfx/renderable.hpp>
+#include <mbgl/gl/renderer_backend.hpp>
 
-class QMapboxGLRendererBackend : public mbgl::RendererBackend
-{
+class QMapboxGLRendererBackend final : public mbgl::gl::RendererBackend,
+                                       public mbgl::gfx::Renderable {
 public:
-    QMapboxGLRendererBackend() = default;
-    virtual ~QMapboxGLRendererBackend() = default;
+    QMapboxGLRendererBackend(mbgl::gfx::ContextMode);
+    ~QMapboxGLRendererBackend() override;
 
-    // mbgl::RendererBackend implementation
-    void updateAssumedState() final;
-    void bind() final;
-    mbgl::Size getFramebufferSize() const final;
+    void updateFramebuffer(quint32 fbo, const mbgl::Size&);
+    void restoreFramebufferBinding();
 
-    void updateFramebuffer(quint32 fbo, const mbgl::Size &);
+    // mbgl::gfx::RendererBackend implementation
+public:
+    mbgl::gfx::Renderable& getDefaultRenderable() override {
+        return *this;
+    }
 
 protected:
-    mbgl::gl::ProcAddress getExtensionFunctionPointer(const char*) final;
-
     // No-op, implicit mode.
-    void activate() final {}
-    void deactivate() final {}
+    void activate() override {}
+    void deactivate() override {}
+
+    // mbgl::gl::RendererBackend implementation
+protected:
+    mbgl::gl::ProcAddress getExtensionFunctionPointer(const char*) override;
+    void updateAssumedState() override;
 
 private:
     quint32 m_fbo = 0;
-    mbgl::Size m_size = { 0, 0 };
 
     Q_DISABLE_COPY(QMapboxGLRendererBackend)
 };

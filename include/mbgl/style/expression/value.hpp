@@ -2,8 +2,10 @@
 
 #include <mbgl/style/expression/collator.hpp>
 #include <mbgl/style/expression/formatted.hpp>
+#include <mbgl/style/expression/image.hpp>
 #include <mbgl/style/expression/type.hpp>
 #include <mbgl/style/position.hpp>
+#include <mbgl/style/rotation.hpp>
 #include <mbgl/style/types.hpp>
 #include <mbgl/util/color.hpp>
 #include <mbgl/util/enum.hpp>
@@ -19,16 +21,16 @@ namespace expression {
 
 struct Value;
 
-using ValueBase = variant<
-    NullValue,
-    bool,
-    double,
-    std::string,
-    Color,
-    Collator,
-    Formatted,
-    mapbox::util::recursive_wrapper<std::vector<Value>>,
-    mapbox::util::recursive_wrapper<std::unordered_map<std::string, Value>>>;
+using ValueBase = variant<NullValue,
+                          bool,
+                          double,
+                          std::string,
+                          Color,
+                          Collator,
+                          Formatted,
+                          Image,
+                          mapbox::util::recursive_wrapper<std::vector<Value>>,
+                          mapbox::util::recursive_wrapper<std::unordered_map<std::string, Value>>>;
 struct Value : ValueBase {
     using ValueBase::ValueBase;
     
@@ -91,7 +93,7 @@ struct ValueConverter<mbgl::Value> {
 template <>
 struct ValueConverter<float> {
     static type::Type expressionType() { return type::Number; }
-    static Value toExpressionValue(const float value);
+    static Value toExpressionValue(float value);
     static optional<float> fromExpressionValue(const Value& value);
 };
 
@@ -140,11 +142,19 @@ optional<T> fromExpressionValue(const Value& value) {
 template <typename T>
 std::vector<optional<T>> fromExpressionValues(const std::vector<optional<Value>>& values) {
     std::vector<optional<T>> result;
+    result.reserve(values.size());
     for (const auto& value : values) {
         result.push_back(value ? fromExpressionValue<T>(*value) : nullopt);
     }
     return result;
 }
+
+template <>
+struct ValueConverter<Rotation> {
+    static type::Type expressionType() { return type::Number; }
+    static Value toExpressionValue(const mbgl::style::Rotation& value);
+    static optional<Rotation> fromExpressionValue(const Value& v);
+};
 
 } // namespace expression
 } // namespace style

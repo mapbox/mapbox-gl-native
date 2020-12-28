@@ -29,11 +29,11 @@ static int sqlite3_test_fs_close(sqlite3_file* pFile) {
     if (!sqlite3_test_fs_io) {
         return SQLITE_AUTH;
     }
-    File* file = (File*)pFile;
+    auto* file = (File*)pFile;
     const int rc = file->real->pMethods->xClose(file->real);
     if (rc == SQLITE_OK) {
         sqlite3_free((void*)file->base.pMethods);
-        file->base.pMethods = 0;
+        file->base.pMethods = nullptr;
     }
     return rc;
 }
@@ -52,7 +52,7 @@ static int sqlite3_test_fs_read(sqlite3_file* pFile, void* zBuf, int iAmt, sqlit
         }
         sqlite3_test_fs_read_limit -= iAmt;
     }
-    File* file = (File*)pFile;
+    auto* file = (File*)pFile;
     return file->real->pMethods->xRead(file->real, zBuf, iAmt, iOfst);
 }
 
@@ -70,7 +70,7 @@ static int sqlite3_test_fs_write(sqlite3_file* pFile, const void* zBuf, int iAmt
         }
         sqlite3_test_fs_write_limit -= iAmt;
     }
-    File* file = (File*)pFile;
+    auto* file = (File*)pFile;
     return file->real->pMethods->xWrite(file->real, zBuf, iAmt, iOfst);
 }
 
@@ -81,7 +81,7 @@ static int sqlite3_test_fs_truncate(sqlite3_file* pFile, sqlite3_int64 size) {
     if (!sqlite3_test_fs_io) {
         return SQLITE_AUTH;
     }
-    File* file = (File*)pFile;
+    auto* file = (File*)pFile;
     return file->real->pMethods->xTruncate(file->real, size);
 }
 
@@ -92,7 +92,7 @@ static int sqlite3_test_fs_sync(sqlite3_file* pFile, int flags) {
     if (!sqlite3_test_fs_io) {
         return SQLITE_AUTH;
     }
-    File* file = (File*)pFile;
+    auto* file = (File*)pFile;
     return file->real->pMethods->xSync(file->real, flags);
 }
 
@@ -103,7 +103,7 @@ static int sqlite3_test_fs_file_size(sqlite3_file* pFile, sqlite3_int64* pSize) 
     if (!sqlite3_test_fs_io) {
         return SQLITE_AUTH;
     }
-    File* file = (File*)pFile;
+    auto* file = (File*)pFile;
     return file->real->pMethods->xFileSize(file->real, pSize);
 }
 
@@ -111,7 +111,7 @@ static int sqlite3_test_fs_lock(sqlite3_file* pFile, int eLock) {
     if (sqlite3_test_fs_debug) {
         fprintf(stderr, "SQLite3: lock(%p, %d)\n", pFile, eLock);
     }
-    File* file = (File*)pFile;
+    auto* file = (File*)pFile;
     return file->real->pMethods->xLock(file->real, eLock);
 }
 
@@ -119,7 +119,7 @@ static int sqlite3_test_fs_unlock(sqlite3_file* pFile, int eLock) {
     if (sqlite3_test_fs_debug) {
         fprintf(stderr, "SQLite3: unlock(%p, %d)\n", pFile, eLock);
     }
-    File* file = (File*)pFile;
+    auto* file = (File*)pFile;
     return file->real->pMethods->xUnlock(file->real, eLock);
 }
 
@@ -127,7 +127,7 @@ static int sqlite3_test_fs_check_reserved_lock(sqlite3_file* pFile, int* pResOut
     if (sqlite3_test_fs_debug) {
         fprintf(stderr, "SQLite3: check_reserved_lock(%p)\n", pFile);
     }
-    File* file = (File*)pFile;
+    auto* file = (File*)pFile;
     return file->real->pMethods->xCheckReservedLock(file->real, pResOut);
 }
 
@@ -138,7 +138,7 @@ static int sqlite3_test_fs_file_control(sqlite3_file* pFile, int op, void* pArg)
     if (!sqlite3_test_fs_io) {
         return SQLITE_AUTH;
     }
-    File* file = (File*)pFile;
+    auto* file = (File*)pFile;
     return file->real->pMethods->xFileControl(file->real, op, pArg);
 }
 
@@ -149,7 +149,7 @@ static int sqlite3_test_fs_sector_size(sqlite3_file* pFile) {
     if (!sqlite3_test_fs_io) {
         return SQLITE_AUTH;
     }
-    File* file = (File*)pFile;
+    auto* file = (File*)pFile;
     return file->real->pMethods->xSectorSize(file->real);
 }
 
@@ -160,7 +160,7 @@ static int sqlite3_test_fs_device_characteristics(sqlite3_file* pFile) {
     if (!sqlite3_test_fs_io) {
         return SQLITE_AUTH;
     }
-    File* file = (File*)pFile;
+    auto* file = (File*)pFile;
     return file->real->pMethods->xDeviceCharacteristics(file->real);
 }
 
@@ -169,34 +169,34 @@ static int sqlite3_test_fs_open(sqlite3_vfs* vfs, const char* zName, sqlite3_fil
         fprintf(stderr, "SQLite3: open(name=%s, flags=%d) -> %p\n", zName, flags, pFile);
     }
     if (!sqlite3_test_fs_io) {
-        pFile->pMethods = NULL;
+        pFile->pMethods = nullptr;
         return SQLITE_AUTH;
     }
     if (!sqlite3_test_fs_file_open) {
-        pFile->pMethods = NULL;
+        pFile->pMethods = nullptr;
         return SQLITE_CANTOPEN;
     }
 
-    File* file = (File*)pFile;
-    sqlite3_vfs* unix_fs = (sqlite3_vfs*)vfs->pAppData;
+    auto* file = (File*)pFile;
+    auto* unix_fs = (sqlite3_vfs*)vfs->pAppData;
     file->real = (sqlite3_file*)&file[1];
 
     if (!sqlite3_test_fs_file_create) {
         int res;
         const int result = unix_fs->xAccess(vfs, zName, SQLITE_ACCESS_EXISTS, &res);
         if (result != SQLITE_OK) {
-            pFile->pMethods = NULL;
+            pFile->pMethods = nullptr;
             return result;
         }
         if (res != 1) {
-            pFile->pMethods = NULL;
+            pFile->pMethods = nullptr;
             return SQLITE_CANTOPEN;
         }
     }
 
     const int status = unix_fs->xOpen(unix_fs, zName, file->real, flags, pOutFlags);
     if (file->real->pMethods) {
-        sqlite3_io_methods* methods = (sqlite3_io_methods*)sqlite3_malloc(sizeof(sqlite3_io_methods));
+        auto* methods = (sqlite3_io_methods*)sqlite3_malloc(sizeof(sqlite3_io_methods));
         memset(methods, 0, sizeof(sqlite3_io_methods));
         methods->iVersion = 1;
         methods->xClose = sqlite3_test_fs_close;
@@ -223,7 +223,7 @@ static int sqlite3_test_fs_delete(sqlite3_vfs* vfs, const char *zPath, int dirSy
     if (!sqlite3_test_fs_io) {
         return SQLITE_AUTH;
     }
-    sqlite3_vfs* unix_fs = (sqlite3_vfs*)vfs->pAppData;
+    auto* unix_fs = (sqlite3_vfs*)vfs->pAppData;
     return unix_fs->xDelete(unix_fs, zPath, dirSync);
 }
 
@@ -234,7 +234,7 @@ static int sqlite3_test_fs_access(sqlite3_vfs* vfs, const char *zPath, int flags
     if (!sqlite3_test_fs_io) {
         return SQLITE_AUTH;
     }
-    sqlite3_vfs* unix_fs = (sqlite3_vfs*)vfs->pAppData;
+    auto* unix_fs = (sqlite3_vfs*)vfs->pAppData;
     return unix_fs->xAccess(unix_fs, zPath, flags, pResOut);
 }
 
@@ -243,12 +243,12 @@ namespace test {
 
 SQLite3TestFS::SQLite3TestFS() {
     sqlite3_vfs* unix_fs = sqlite3_vfs_find("unix");
-    if (unix_fs == 0) {
+    if (unix_fs == nullptr) {
         abort();
     }
 
-    sqlite3_vfs* test_fs = (sqlite3_vfs*)sqlite3_malloc(sizeof(sqlite3_vfs));
-    if (test_fs == 0) {
+    auto* test_fs = (sqlite3_vfs*)sqlite3_malloc(sizeof(sqlite3_vfs));
+    if (test_fs == nullptr) {
         abort();
     }
     memset(test_fs, 0, sizeof(sqlite3_vfs));
@@ -278,6 +278,7 @@ SQLite3TestFS::~SQLite3TestFS() {
     sqlite3_vfs* test_fs = sqlite3_vfs_find("test_fs");
     if (test_fs) {
         sqlite3_vfs_unregister(test_fs);
+        sqlite3_free((void*)test_fs);
     }
 }
 

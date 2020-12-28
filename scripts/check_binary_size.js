@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 
 const jwt = require('jsonwebtoken');
-const github = require('@octokit/rest')();
+const github = require('@octokit/rest').plugin(require('@octokit/plugin-retry'))({
+    retry: { doNotRetry: [ /* Empty — retry on any error code. */ ] }
+})
 const prettyBytes = require('pretty-bytes');
 const fs = require('fs');
 

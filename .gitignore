@@ -4,12 +4,16 @@
 *.gcno
 *.gcda
 *~
+**/actual.png
+**/diff.png
 offline.db
+new_offline.db
 xcuserdata
 /platform/node/test/actual
 /platform/node/test/diff
 /mason_packages
 /build
+/next/build
 /lib
 /test/node_modules
 /test/fixtures/*/*_actual.*
@@ -17,13 +21,11 @@ xcuserdata
 /test/fixtures/api/2.png
 /test/fixtures/offline_database/offline.db
 /test/fixtures/offline_database/offline.db-*
-/test/fixtures/**/actual.png
-/test/fixtures/**/diff.png
 /test/output
 /node_modules
 /platform/ios/benchmark/assets/glyphs/DIN*
 /platform/ios/benchmark/assets/tiles/mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v6
-**/token
+/platform/darwin/developer.xcconfig
 /platform/macos/macos.xcworkspace/xcshareddata/macos.xcscmblueprint
 /platform/ios/ios.xcworkspace/xcshareddata/ios.xcscmblueprint
 /documentation
@@ -31,8 +33,35 @@ test/fixtures/api/assets.zip
 test/fixtures/storage/assets.zip
 /.circle-week
 /vendor/.cache
+buck-out
+.buckd
+
+# Generated metrics results
+metrics/*.html
+
+# Android RenderTestRunner
+render-test/android/.*
+render-test/android/app/build/
+render-test/android/app/src/main/assets/data.zip
+render-test/android/local.properties
+render-test/android/app/.*
+render-test/android/package.json
+render-test/android/app/app.iml
+render-test/android/android.iml
+
+# IOS RenderTestRunner
+render-test/ios/codesigning/*.xcent
+render-test/ios/fastlane/README.md
+test-data/
+
+# Generated file from npm/yarn
+package-lock.json
+
+# Visual Studio Code
+.vscode
+mapbox-gl-native.code-workspace
 
 # Generated list files from code generation
-/scripts/generate-cmake-files.list
+/scripts/generate-file-lists.list
 /scripts/generate-shaders.list
 /scripts/generate-style-code.list

@@ -39,8 +39,18 @@ struct Converter<PropertyValue<T>> {
             ? PropertyValue<T>(PropertyExpression<T>(convertTokenStringToFormatExpression(firstUnformattedSection)))
             : PropertyValue<T>(t);
     }
+
+    PropertyValue<T> maybeConvertTokens(const expression::Image& image) const {
+        return hasTokens(image.id())
+                   ? PropertyValue<T>(PropertyExpression<T>(convertTokenStringToImageExpression(image.id())))
+                   : PropertyValue<T>(image);
+    }
 };
 
+template <>
+struct Converter<PropertyValue<std::array<double, 3>>, void> {
+    optional<PropertyValue<std::array<double, 3>>> operator()(const Convertible& value, Error& error, bool, bool) const;
+};
 } // namespace conversion
 } // namespace style
 } // namespace mbgl

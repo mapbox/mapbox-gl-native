@@ -5,17 +5,14 @@
 #include <mbgl/util/geometry.hpp>
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/noncopyable.hpp>
-#include <mbgl/gl/vertex_buffer.hpp>
-#include <mbgl/gl/index_buffer.hpp>
+#include <mbgl/gfx/vertex_buffer.hpp>
+#include <mbgl/gfx/index_buffer.hpp>
 #include <mbgl/programs/debug_program.hpp>
+#include <mbgl/programs/fill_program.hpp>
 
 namespace mbgl {
 
 class OverscaledTileID;
-
-namespace gl {
-class Context;
-} // namespace gl
 
 class DebugBucket : private util::noncopyable {
 public:
@@ -24,8 +21,9 @@ public:
                 bool complete,
                 optional<Timestamp> modified,
                 optional<Timestamp> expires,
-                MapDebugOptions,
-                gl::Context&);
+                MapDebugOptions);
+
+    void upload(gfx::UploadPass&);
 
     const bool renderable;
     const bool complete;
@@ -33,9 +31,15 @@ public:
     const optional<Timestamp> expires;
     const MapDebugOptions debugMode;
 
+
+    gfx::VertexVector<FillLayoutVertex> vertices;
+    gfx::IndexVector<gfx::Lines> indices;
+
     SegmentVector<DebugAttributes> segments;
-    optional<gl::VertexBuffer<DebugLayoutVertex>> vertexBuffer;
-    optional<gl::IndexBuffer<gl::Lines>> indexBuffer;
+    SegmentVector<DebugAttributes> tileBorderSegments;
+    optional<gfx::VertexBuffer<DebugLayoutVertex>> vertexBuffer;
+    optional<gfx::IndexBuffer> indexBuffer;
+    optional<gfx::Texture> texture;
 };
 
 } // namespace mbgl

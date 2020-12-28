@@ -69,8 +69,11 @@ public:
     QString apiBaseUrl() const;
     void setApiBaseUrl(const QString &);
 
-    std::function<std::string(const std::string &&)> resourceTransform() const;
-    void setResourceTransform(const std::function<std::string(const std::string &&)> &);
+    QString localFontFamily() const;
+    void setLocalFontFamily(const QString &);
+
+    std::function<std::string(const std::string &)> resourceTransform() const;
+    void setResourceTransform(const std::function<std::string(const std::string &)> &);
 
 private:
     GLContextMode m_contextMode;
@@ -83,14 +86,15 @@ private:
     QString m_assetPath;
     QString m_accessToken;
     QString m_apiBaseUrl;
-    std::function<std::string(const std::string &&)> m_resourceTransform;
+    QString m_localFontFamily;
+    std::function<std::string(const std::string &)> m_resourceTransform;
 };
 
 struct Q_MAPBOXGL_EXPORT QMapboxGLCameraOptions {
     QVariant center;  // Coordinate
     QVariant anchor;  // QPointF
     QVariant zoom;    // double
-    QVariant angle;   // double
+    QVariant bearing; // double
     QVariant pitch;   // double
 };
 
@@ -149,8 +153,6 @@ public:
               qreal pixelRatio = 1);
     virtual ~QMapboxGL();
 
-    void cycleDebugOptions();
-
     QString styleJson() const;
     QString styleUrl() const;
 
@@ -178,6 +180,7 @@ public:
 
     double pitch() const;
     void setPitch(double pitch);
+    void pitchBy(double pitch);
 
     NorthOrientation northOrientation() const;
     void setNorthOrientation(NorthOrientation);
@@ -236,7 +239,7 @@ public:
     bool layerExists(const QString &id);
     void removeLayer(const QString &id);
 
-    QList<QString> layerIds() const;
+    QVector<QString> layerIds() const;
 
     void setFilter(const QString &layer, const QVariant &filter);
     QVariant getFilter(const QString &layer) const;

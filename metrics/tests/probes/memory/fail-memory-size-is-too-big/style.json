@@ -1,0 +1,52 @@
+{
+  "version": 8,
+  "metadata": {
+    "test": {
+      "width": 64,
+      "height": 64,
+      "operations": [
+        [ "wait" ],
+        [ "probeMemoryStart" ],
+        [ "probeMemory", "start" ],
+        [
+          "setZoom",
+          0.9
+        ],
+        [
+          "wait"
+        ],
+        [ "probeMemory", "after setZoom 0.9", 0.005 ],
+        [
+          "setLayerZoomRange",
+          "circle",
+          1,
+          2
+        ],
+        [
+          "wait"
+        ],
+        [ "probeMemory", "end", 0.005 ],
+        [ "probeMemoryEnd" ]
+      ]
+    }
+  },
+  "sources": {
+    "geojson": {
+      "type": "geojson",
+      "data": {
+        "type": "Point",
+        "coordinates": [
+          0,
+          0
+        ]
+      }
+    }
+  },
+  "layers": [
+    {
+      "id": "circle",
+      "type": "circle",
+      "source": "geojson"
+    }
+  ]
+}

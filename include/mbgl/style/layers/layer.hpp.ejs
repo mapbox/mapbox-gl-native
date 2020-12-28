@@ -3,6 +3,8 @@
   const layoutProperties = locals.layoutProperties;
   const paintProperties = locals.paintProperties;
 -%>
+// clang-format off
+
 // This file is generated. Do not edit.
 
 #pragma once
@@ -13,8 +15,12 @@
 #include <mbgl/style/layer.hpp>
 #include <mbgl/style/filter.hpp>
 #include <mbgl/style/property_value.hpp>
+<% if (type === 'location-indicator') { -%>
+#include <mbgl/style/rotation.hpp>
+<% } -%>
+<% if (type === 'symbol') { -%>
 #include <mbgl/style/expression/formatted.hpp>
-
+<% } -%>
 #include <mbgl/util/color.hpp>
 
 <% if (type === 'line' || type === 'symbol') { -%>
@@ -26,26 +32,22 @@ namespace style {
 
 class TransitionOptions;
 
-class <%- camelize(type) %>Layer : public Layer {
+class <%- camelize(type) %>Layer final : public Layer {
 public:
-<% if (type === 'background') { -%>
+<% if ((type === 'background') || (type === 'location-indicator')) { -%>
     <%- camelize(type) %>Layer(const std::string& layerID);
 <% } else { -%>
     <%- camelize(type) %>Layer(const std::string& layerID, const std::string& sourceID);
 <% } -%>
-    ~<%- camelize(type) %>Layer() final;
-
-    // Dynamic properties
-    optional<conversion::Error> setLayoutProperty(const std::string& name, const conversion::Convertible& value) final;
-    optional<conversion::Error> setPaintProperty(const std::string& name, const conversion::Convertible& value) final;
+    ~<%- camelize(type) %>Layer() override;
 
 <% if (layoutProperties.length) { -%>
     // Layout properties
 
 <% for (const property of layoutProperties) { -%>
     static <%- propertyValueType(property) %> getDefault<%- camelize(property.name) %>();
-    <%- propertyValueType(property) %> get<%- camelize(property.name) %>() const;
-    void set<%- camelize(property.name) %>(<%- propertyValueType(property) %>);
+    const <%- propertyValueType(property) %>& get<%- camelize(property.name) %>() const;
+    void set<%- camelize(property.name) %>(const <%- propertyValueType(property) %>&);
 
 <% } -%>
 <% } -%>
@@ -53,8 +55,8 @@ public:
 
 <% for (const property of paintProperties) { -%>
     static <%- propertyValueType(property) %> getDefault<%- camelize(property.name) %>();
-    <%- propertyValueType(property) %> get<%- camelize(property.name) %>() const;
-    void set<%- camelize(property.name) %>(<%- propertyValueType(property) %>);
+    const <%- propertyValueType(property) %>& get<%- camelize(property.name) %>() const;
+    void set<%- camelize(property.name) %>(const <%- propertyValueType(property) %>&);
     void set<%- camelize(property.name) %>Transition(const TransitionOptions&);
     TransitionOptions get<%- camelize(property.name) %>Transition() const;
 
@@ -69,18 +71,16 @@ public:
     std::unique_ptr<Layer> cloneRef(const std::string& id) const final;
 
 protected:
+    // Dynamic properties
+    optional<conversion::Error> setPropertyInternal(const std::string& name, const conversion::Convertible& value) final;
+
+    StyleProperty getProperty(const std::string& name) const final;
+    Value serialize() const final;
+
     Mutable<Layer::Impl> mutableBaseImpl() const final;
-};
-
-class <%- camelize(type) %>LayerFactory : public LayerFactory {
-public:
-    <%- camelize(type) %>LayerFactory();
-    ~<%- camelize(type) %>LayerFactory() override;
-
-    // LayerFactory overrides.
-    const LayerTypeInfo* getTypeInfo() const noexcept final;
-    std::unique_ptr<style::Layer> createLayer(const std::string& id, const conversion::Convertible& value) final;
 };
 
 } // namespace style
 } // namespace mbgl
+
+// clang-format on

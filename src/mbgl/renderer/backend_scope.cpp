@@ -1,13 +1,13 @@
-#include <mbgl/renderer/backend_scope.hpp>
-#include <mbgl/renderer/renderer_backend.hpp>
+#include <mbgl/gfx/backend_scope.hpp>
+#include <mbgl/gfx/renderer_backend.hpp>
 #include <mbgl/util/thread_local.hpp>
 
 #include <cassert>
 
 namespace {
 
-mbgl::util::ThreadLocal<mbgl::BackendScope>& currentScope() {
-    static mbgl::util::ThreadLocal<mbgl::BackendScope> backendScope;
+mbgl::util::ThreadLocal<mbgl::gfx::BackendScope>& currentScope() {
+    static mbgl::util::ThreadLocal<mbgl::gfx::BackendScope> backendScope;
 
     return backendScope;
 }
@@ -15,6 +15,7 @@ mbgl::util::ThreadLocal<mbgl::BackendScope>& currentScope() {
 } // namespace
 
 namespace mbgl {
+namespace gfx {
 
 BackendScope::BackendScope(RendererBackend& backend_, ScopeType scopeType_)
     : priorScope(currentScope().get()),
@@ -71,4 +72,5 @@ bool BackendScope::exists() {
     return currentScope().get();
 }
 
+} // namespace gfx
 } // namespace mbgl

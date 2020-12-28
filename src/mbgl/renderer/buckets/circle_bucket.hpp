@@ -3,8 +3,8 @@
 #include <mbgl/renderer/bucket.hpp>
 #include <mbgl/map/mode.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
-#include <mbgl/gl/vertex_buffer.hpp>
-#include <mbgl/gl/index_buffer.hpp>
+#include <mbgl/gfx/vertex_buffer.hpp>
+#include <mbgl/gfx/index_buffer.hpp>
 #include <mbgl/programs/segment.hpp>
 #include <mbgl/programs/circle_program.hpp>
 #include <mbgl/style/layers/circle_layer_properties.hpp>
@@ -13,36 +13,33 @@ namespace mbgl {
 
 class BucketParameters;
 
-class CircleBucket : public Bucket {
+class CircleBucket final : public Bucket {
 public:
-    CircleBucket(const BucketParameters&, const std::vector<const RenderLayer*>&);
+    using PossiblyEvaluatedLayoutProperties = style::CircleLayoutProperties::PossiblyEvaluated;
 
-    void addFeature(const GeometryTileFeature&,
-                    const GeometryCollection&,
-                    const ImagePositions&,
-                    const PatternLayerMap&) override;
+    CircleBucket(const std::map<std::string, Immutable<style::LayerProperties>>& layerPaintProperties,
+                 MapMode mode,
+                 float zoom);
+    ~CircleBucket() override;
 
     bool hasData() const override;
 
-    void upload(gl::Context&) override;
+    void upload(gfx::UploadPass&) override;
 
     float getQueryRadius(const RenderLayer&) const override;
 
-    gl::VertexVector<CircleLayoutVertex> vertices;
-    gl::IndexVector<gl::Triangles> triangles;
+    void update(const FeatureStates&, const GeometryTileLayer&, const std::string&, const ImagePositions&) override;
+
+    gfx::VertexVector<CircleLayoutVertex> vertices;
+    gfx::IndexVector<gfx::Triangles> triangles;
     SegmentVector<CircleAttributes> segments;
 
-    optional<gl::VertexBuffer<CircleLayoutVertex>> vertexBuffer;
-    optional<gl::IndexBuffer<gl::Triangles>> indexBuffer;
+    optional<gfx::VertexBuffer<CircleLayoutVertex>> vertexBuffer;
+    optional<gfx::IndexBuffer> indexBuffer;
 
-    std::map<std::string, CircleProgram::PaintPropertyBinders> paintPropertyBinders;
+    std::map<std::string, CircleProgram::Binders> paintPropertyBinders;
 
     const MapMode mode;
 };
-
-template <>
-inline bool Bucket::is<CircleBucket>() const {
-    return layerType == style::LayerType::Circle;
-}
 
 } // namespace mbgl

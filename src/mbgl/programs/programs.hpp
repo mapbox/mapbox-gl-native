@@ -1,82 +1,54 @@
 #pragma once
 
-#include <mbgl/programs/background_program.hpp>
-#include <mbgl/programs/circle_program.hpp>
 #include <mbgl/programs/clipping_mask_program.hpp>
-#include <mbgl/programs/extrusion_texture_program.hpp>
-#include <mbgl/programs/fill_program.hpp>
-#include <mbgl/programs/fill_extrusion_program.hpp>
-#include <mbgl/programs/heatmap_program.hpp>
-#include <mbgl/programs/heatmap_texture_program.hpp>
-#include <mbgl/programs/hillshade_program.hpp>
-#include <mbgl/programs/hillshade_prepare_program.hpp>
-#include <mbgl/programs/line_program.hpp>
-#include <mbgl/programs/raster_program.hpp>
-#include <mbgl/programs/symbol_program.hpp>
 #include <mbgl/programs/debug_program.hpp>
-#include <mbgl/programs/collision_box_program.hpp>
 #include <mbgl/programs/program_parameters.hpp>
+#include <memory>
 
 namespace mbgl {
 
+class BackgroundLayerPrograms;
+
+class CircleLayerPrograms;
+class RasterLayerPrograms;
+class HeatmapLayerPrograms;
+class HillshadeLayerPrograms;
+class FillLayerPrograms;
+class FillExtrusionLayerPrograms;
+class LineLayerPrograms;
+class SymbolLayerPrograms;
+
 class Programs {
 public:
-    Programs(gl::Context& context, const ProgramParameters& programParameters)
-        : background(context, programParameters),
-          backgroundPattern(context, programParameters),
-          circle(context, programParameters),
-          extrusionTexture(context, programParameters),
-          fill(context, programParameters),
-          fillExtrusion(context, programParameters),
-          fillExtrusionPattern(context, programParameters),
-          fillPattern(context, programParameters),
-          fillOutline(context, programParameters),
-          fillOutlinePattern(context, programParameters),
-          heatmap(context, programParameters),
-          heatmapTexture(context, programParameters),
-          hillshade(context, programParameters),
-          hillshadePrepare(context, programParameters),
-          line(context, programParameters),
-          lineGradient(context, programParameters),
-          lineSDF(context, programParameters),
-          linePattern(context, programParameters),
-          raster(context, programParameters),
-          symbolIcon(context, programParameters),
-          symbolIconSDF(context, programParameters),
-          symbolGlyph(context, programParameters),
-          debug(context, programParameters),
-          collisionBox(context, programParameters),
-          collisionCircle(context, programParameters),
-          clippingMask(context, programParameters) {
-    }
+    Programs(gfx::Context&, const ProgramParameters&);
+    ~Programs();
 
-    BackgroundProgram background;
-    BackgroundPatternProgram backgroundPattern;
-    ProgramMap<CircleProgram> circle;
-    ExtrusionTextureProgram extrusionTexture;
-    ProgramMap<FillProgram> fill;
-    ProgramMap<FillExtrusionProgram> fillExtrusion;
-    ProgramMap<FillExtrusionPatternProgram> fillExtrusionPattern;
-    ProgramMap<FillPatternProgram> fillPattern;
-    ProgramMap<FillOutlineProgram> fillOutline;
-    ProgramMap<FillOutlinePatternProgram> fillOutlinePattern;
-    ProgramMap<HeatmapProgram> heatmap;
-    HeatmapTextureProgram heatmapTexture;
-    HillshadeProgram hillshade;
-    HillshadePrepareProgram hillshadePrepare;
-    ProgramMap<LineProgram> line;
-    ProgramMap<LineGradientProgram> lineGradient;
-    ProgramMap<LineSDFProgram> lineSDF;
-    ProgramMap<LinePatternProgram> linePattern;
-    RasterProgram raster;
-    ProgramMap<SymbolIconProgram> symbolIcon;
-    ProgramMap<SymbolSDFIconProgram> symbolIconSDF;
-    ProgramMap<SymbolSDFTextProgram> symbolGlyph;
+    BackgroundLayerPrograms& getBackgroundLayerPrograms() noexcept;
+    RasterLayerPrograms& getRasterLayerPrograms() noexcept;
+    HeatmapLayerPrograms& getHeatmapLayerPrograms() noexcept;
+    CircleLayerPrograms& getCircleLayerPrograms() noexcept;
+    HillshadeLayerPrograms& getHillshadeLayerPrograms() noexcept;
+    FillLayerPrograms& getFillLayerPrograms() noexcept;
+    FillExtrusionLayerPrograms& getFillExtrusionLayerPrograms() noexcept;
+    LineLayerPrograms& getLineLayerPrograms() noexcept;
+    SymbolLayerPrograms& getSymbolLayerPrograms() noexcept;
 
     DebugProgram debug;
-    CollisionBoxProgram collisionBox;
-    CollisionCircleProgram collisionCircle;
     ClippingMaskProgram clippingMask;
+
+private:
+    std::unique_ptr<LayerTypePrograms> backgroundPrograms;
+    std::unique_ptr<LayerTypePrograms> circlePrograms;
+    std::unique_ptr<LayerTypePrograms> rasterPrograms;
+    std::unique_ptr<LayerTypePrograms> heatmapPrograms;
+    std::unique_ptr<LayerTypePrograms> hillshadePrograms;
+    std::unique_ptr<LayerTypePrograms> fillPrograms;
+    std::unique_ptr<LayerTypePrograms> fillExtrusionPrograms;
+    std::unique_ptr<LayerTypePrograms> linePrograms;
+    std::unique_ptr<LayerTypePrograms> symbolPrograms;
+
+    gfx::Context& context;
+    ProgramParameters programParameters;
 };
 
 } // namespace mbgl

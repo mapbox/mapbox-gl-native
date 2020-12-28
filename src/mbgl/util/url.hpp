@@ -45,7 +45,7 @@ public:
 // * {filename} == "baz"
 // * {extension} == ".png"
 // The query string of the source URL will always be appended.
-std::string transformURL(const std::string& tpl, const std::string& url, const URL&);
+std::string transformURL(const std::string& tpl, const std::string& str, const URL&);
 inline std::string transformURL(const std::string& tpl, const std::string& url) {
     return transformURL(tpl, url, URL(url));
 }

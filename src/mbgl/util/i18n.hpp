@@ -75,6 +75,8 @@ char16_t verticalizePunctuation(char16_t chr);
     
 bool isStringInSupportedScript(const std::string& input);
 
+bool isCharInComplexShapingScript(char16_t chr);
+
 bool isWhitespace(char16_t chr);
 
 } // namespace i18n

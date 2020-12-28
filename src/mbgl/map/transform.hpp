@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mbgl/map/camera.hpp>
+#include <mbgl/map/projection_mode.hpp>
 #include <mbgl/map/map_observer.hpp>
 #include <mbgl/map/mode.hpp>
 #include <mbgl/map/transform_state.hpp>
@@ -28,17 +29,21 @@ public:
 
     // Camera
     /** Returns the current camera options. */
-    CameraOptions getCameraOptions(const EdgeInsets&) const;
+    CameraOptions getCameraOptions(const optional<EdgeInsets>&) const;
 
     /** Instantaneously, synchronously applies the given camera options. */
     void jumpTo(const CameraOptions&);
     /** Asynchronously transitions all specified camera options linearly along
-        an optional time curve. */
+        an optional time curve. However, center coordinate is not transitioned
+        linearly as, instead, ground speed is kept linear.*/
     void easeTo(const CameraOptions&, const AnimationOptions& = {});
     /** Asynchronously zooms out, pans, and zooms back into the given camera
         along a great circle, as though the viewer is riding a supersonic
-        jetcopter. */
-    void flyTo(const CameraOptions&, const AnimationOptions& = {});
+        jetcopter.
+        Parameter linearZoomInterpolation: when true, there is no additional
+        zooming out as zoom is linearly interpolated from current to given
+        camera zoom. This is used for easeTo.*/
+    void flyTo(const CameraOptions&, const AnimationOptions& = {}, bool linearZoomInterpolation = false);
 
     // Position
 
@@ -46,71 +51,29 @@ public:
         @param offset The distance to pan the map by, measured in pixels from
             top to bottom and from left to right. */
     void moveBy(const ScreenCoordinate& offset, const AnimationOptions& = {});
-    void setLatLng(const LatLng&, const AnimationOptions& = {});
-    void setLatLng(const LatLng&, const EdgeInsets&, const AnimationOptions& = {});
-    void setLatLng(const LatLng&, optional<ScreenCoordinate>, const AnimationOptions& = {});
-    void setLatLngZoom(const LatLng&, double zoom, const AnimationOptions& = {});
-    void setLatLngZoom(const LatLng&, double zoom, const EdgeInsets&, const AnimationOptions& = {});
-    LatLng getLatLng(const EdgeInsets& = {}) const;
-    ScreenCoordinate getScreenCoordinate(const EdgeInsets& = {}) const;
+    LatLng getLatLng(LatLng::WrapMode = LatLng::Wrapped) const;
 
     // Bounds
 
-    void setLatLngBounds(optional<LatLngBounds>);
+    void setLatLngBounds(LatLngBounds);
     void setMinZoom(double);
     void setMaxZoom(double);
+
     void setMinPitch(double);
     void setMaxPitch(double);
 
     // Zoom
 
-    /** Sets the zoom level, keeping the given point fixed within the view.
-        @param zoom The new zoom level. */
-    void setZoom(double zoom, const AnimationOptions& = {});
-    /** Sets the zoom level, keeping the given point fixed within the view.
-        @param zoom The new zoom level.
-        @param anchor A point relative to the top-left corner of the view.
-            If unspecified, the center point is fixed within the view. */
-    void setZoom(double zoom, optional<ScreenCoordinate> anchor, const AnimationOptions& = {});
-    /** Sets the zoom level, keeping the center point fixed within the inset view.
-        @param zoom The new zoom level.
-        @param padding The viewport padding that affects the fixed center point. */
-    void setZoom(double zoom, const EdgeInsets& padding, const AnimationOptions& = {});
     /** Returns the zoom level. */
     double getZoom() const;
 
-    // Angle
+    // Bearing
 
     void rotateBy(const ScreenCoordinate& first, const ScreenCoordinate& second, const AnimationOptions& = {});
-    /** Sets the angle of rotation.
-        @param angle The new angle of rotation, measured in radians
-            counterclockwise from true north. */
-    void setAngle(double angle, const AnimationOptions& = {});
-    /** Sets the angle of rotation, keeping the given point fixed within the view.
-        @param angle The new angle of rotation, measured in radians
-            counterclockwise from true north.
-        @param anchor A point relative to the top-left corner of the view. */
-    void setAngle(double angle, optional<ScreenCoordinate> anchor, const AnimationOptions& = {});
-    /** Sets the angle of rotation, keeping the center point fixed within the inset view.
-        @param angle The new angle of rotation, measured in radians
-            counterclockwise from true north.
-        @param padding The viewport padding that affects the fixed center point. */
-    void setAngle(double angle, const EdgeInsets& padding, const AnimationOptions& = {});
-    /** Returns the angle of rotation.
-        @return The angle of rotation, measured in radians counterclockwise from
-            true north. */
-    double getAngle() const;
+    double getBearing() const;
 
     // Pitch
-    /** Sets the pitch angle.
-        @param angle The new pitch angle, measured in radians toward the
-            horizon. */
-    void setPitch(double pitch, const AnimationOptions& = {});
-    /** Sets the pitch angle, keeping the given point fixed within the view.
-        @param angle The new pitch angle, measured in radians toward the
-            horizon.
-        @param anchor A point relative to the top-left corner of the view. */
-    void setPitch(double pitch, optional<ScreenCoordinate> anchor, const AnimationOptions& = {});
+
     double getPitch() const;
 
     // North Orientation
@@ -126,12 +89,8 @@ public:
     ViewportMode getViewportMode() const;
 
     // Projection mode
-    void setAxonometric(bool);
-    bool getAxonometric() const;
-    void setXSkew(double xSkew);
-    double getXSkew() const;
-    void setYSkew(double ySkew);
-    double getYSkew() const;
+    void setProjectionMode(const ProjectionMode&);
+    ProjectionMode getProjectionMode() const;
 
     // Transitions
     bool inTransition() const;
@@ -152,7 +111,10 @@ public:
 
     // Conversion and projection
     ScreenCoordinate latLngToScreenCoordinate(const LatLng&) const;
-    LatLng screenCoordinateToLatLng(const ScreenCoordinate&) const;
+    LatLng screenCoordinateToLatLng(const ScreenCoordinate&, LatLng::WrapMode = LatLng::Wrapped) const;
+
+    FreeCameraOptions getFreeCameraOptions() const;
+    void setFreeCameraOptions(const FreeCameraOptions& options);
 
 private:
     MapObserver& observer;
@@ -160,8 +122,11 @@ private:
 
     void startTransition(const CameraOptions&,
                          const AnimationOptions&,
-                         std::function<void(double)>,
+                         const std::function<void(double)>&,
                          const Duration&);
+
+    // We don't want to show horizon: limit max pitch based on edge insets.
+    double getMaxPitchForEdgeInsets(const EdgeInsets &insets) const;
 
     TimePoint transitionStart;
     Duration transitionDuration;

@@ -51,3 +51,8 @@ TEST(GridIndex, CircleBox) {
     EXPECT_EQ(grid.query({{0, 80}, {20, 100}}), (std::vector<int16_t>{2}));
 }
 
+TEST(GridIndex, IndexesFeaturesOverflow) {
+    GridIndex<int16_t> grid(5000, 5000, 25);
+    grid.insert(0, {{4500, 4500}, {4900, 4900}});
+    EXPECT_EQ(grid.query({{4000, 4000}, {5000, 5000}}), (std::vector<int16_t>{0}));
+}

@@ -74,25 +74,26 @@ TEST_P(StyleParserTest, ParseStyle) {
     }
 }
 
-INSTANTIATE_TEST_CASE_P(StyleParser, StyleParserTest, ::testing::ValuesIn([] {
-    std::vector<std::string> names;
-    const std::string ending = ".info.json";
+INSTANTIATE_TEST_SUITE_P(StyleParser, StyleParserTest, ::testing::ValuesIn([] {
+                             std::vector<std::string> names;
+                             const std::string ending = ".info.json";
 
-    const std::string style_directory = "test/fixtures/style_parser";
-    DIR *dir = opendir(style_directory.c_str());
-    if (dir != nullptr) {
-        for (dirent *dp = nullptr; (dp = readdir(dir)) != nullptr;) {
-            const std::string name = dp->d_name;
-            if (name.length() >= ending.length() && name.compare(name.length() - ending.length(), ending.length(), ending) == 0) {
-                names.push_back(name.substr(0, name.length() - ending.length()));
-            }
-        }
-        closedir(dir);
-    }
+                             const std::string style_directory = "test/fixtures/style_parser";
+                             DIR *dir = opendir(style_directory.c_str());
+                             if (dir != nullptr) {
+                                 for (dirent *dp = nullptr; (dp = readdir(dir)) != nullptr;) {
+                                     const std::string name = dp->d_name;
+                                     if (name.length() >= ending.length() &&
+                                         name.compare(name.length() - ending.length(), ending.length(), ending) == 0) {
+                                         names.push_back(name.substr(0, name.length() - ending.length()));
+                                     }
+                                 }
+                                 closedir(dir);
+                             }
 
-    EXPECT_GT(names.size(), 0u);
-    return names;
-}()));
+                             EXPECT_GT(names.size(), 0u);
+                             return names;
+                         }()));
 
 TEST(StyleParser, FontStacks) {
     style::Parser parser;

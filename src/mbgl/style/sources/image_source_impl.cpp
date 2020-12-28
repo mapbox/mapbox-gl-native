@@ -5,15 +5,10 @@ namespace mbgl {
 namespace style {
 
 ImageSource::Impl::Impl(std::string id_, std::array<LatLng, 4> coords_)
-    : Source::Impl(SourceType::Image, std::move(id_)),
-    coords(std::move(coords_)) {
-}
+    : Source::Impl(SourceType::Image, std::move(id_)), coords(coords_) {}
 
 ImageSource::Impl::Impl(const Impl& other, std::array<LatLng, 4> coords_)
-    : Source::Impl(other),
-    coords(std::move(coords_)),
-    image(other.image) {
-}
+    : Source::Impl(other), coords(coords_), image(other.image) {}
 
 ImageSource::Impl::Impl(const Impl& rhs, PremultipliedImage&& image_)
     : Source::Impl(rhs),

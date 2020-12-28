@@ -2,6 +2,7 @@
 
 #include <mbgl/tile/tile_id.hpp>
 #include <mbgl/tile/tile_necessity.hpp>
+#include <mbgl/util/optional.hpp>
 #include <mbgl/util/range.hpp>
 
 #include <unordered_set>
@@ -20,18 +21,18 @@ void updateRenderables(GetTileFn getTile,
                        RenderTileFn renderTile,
                        const IdealTileIDs& idealTileIDs,
                        const Range<uint8_t>& zoomRange,
-                       const uint8_t dataTileZoom) {
+                       const optional<uint8_t>& maxParentOverscaleFactor = nullopt) {
     std::unordered_set<OverscaledTileID> checked;
     bool covered;
     int32_t overscaledZ;
 
     // for (all in the set of ideal tiles of the source) {
-    for (const auto& idealRenderTileID : idealTileIDs) {
-        assert(idealRenderTileID.canonical.z >= zoomRange.min);
-        assert(idealRenderTileID.canonical.z <= zoomRange.max);
-        assert(dataTileZoom >= idealRenderTileID.canonical.z);
+    for (const auto& idealDataTileID : idealTileIDs) {
+        assert(idealDataTileID.canonical.z >= zoomRange.min);
+        assert(idealDataTileID.canonical.z <= zoomRange.max);
+        assert(idealDataTileID.overscaledZ >= idealDataTileID.canonical.z);
 
-        const OverscaledTileID idealDataTileID(dataTileZoom, idealRenderTileID.wrap, idealRenderTileID.canonical);
+        const UnwrappedTileID idealRenderTileID = idealDataTileID.toUnwrapped();
         auto tile = getTile(idealDataTileID);
         if (!tile) {
             tile = createTile(idealDataTileID);
@@ -54,7 +55,7 @@ void updateRenderables(GetTileFn getTile,
             // The tile isn't loaded yet, but retain it anyway because it's an ideal tile.
             retainTile(*tile, TileNecessity::Required);
             covered = true;
-            overscaledZ = dataTileZoom + 1;
+            overscaledZ = idealDataTileID.overscaledZ + 1;
             if (overscaledZ > zoomRange.max) {
                 // We're looking for an overzoomed child tile.
                 const auto childDataTileID = idealDataTileID.scaledTo(overscaledZ);
@@ -83,8 +84,14 @@ void updateRenderables(GetTileFn getTile,
 
             if (!covered) {
                 // We couldn't find child tiles that entirely cover the ideal tile.
-                for (overscaledZ = dataTileZoom - 1; overscaledZ >= zoomRange.min; --overscaledZ) {
+                for (overscaledZ = idealDataTileID.overscaledZ - 1; overscaledZ >= zoomRange.min; --overscaledZ) {
                     const auto parentDataTileID = idealDataTileID.scaledTo(overscaledZ);
+
+                    // Request / render parent tile only if it's overscale factor is less than defined maximum.
+                    if (maxParentOverscaleFactor &&
+                        (idealDataTileID.overscaledZ - overscaledZ) > *maxParentOverscaleFactor) {
+                        break;
+                    }
 
                     if (checked.find(parentDataTileID) != checked.end()) {
                         // Break parent tile ascent, this route has been checked by another child

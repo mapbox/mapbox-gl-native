@@ -39,35 +39,12 @@ bool LatLngBounds::contains(const CanonicalTileID& tileID) const {
 }
 
 bool LatLngBounds::contains(const LatLng& point, LatLng::WrapMode wrap /*= LatLng::Unwrapped*/) const {
-    bool containsLatitude = point.latitude() >= sw.latitude() &&
-                            point.latitude() <= ne.latitude();
-    if (!containsLatitude) {
-        return false;
-    }
-
-    bool containsUnwrappedLongitude = point.longitude() >= sw.longitude() &&
-                                      point.longitude() <= ne.longitude();
-    if (containsUnwrappedLongitude) {
-        return true;
-    } else if (wrap == LatLng::Wrapped) {
-        LatLngBounds wrapped(sw.wrapped(), ne.wrapped());
-        auto ptLon = point.wrapped().longitude();
-        if (crossesAntimeridian()) {
-            return (ptLon >= wrapped.sw.longitude() &&
-                    ptLon <= util::LONGITUDE_MAX) ||
-                   (ptLon <= wrapped.ne.longitude() &&
-                    ptLon >= -util::LONGITUDE_MAX);
-        } else {
-            return (ptLon >= wrapped.sw.longitude() &&
-                    ptLon <= wrapped.ne.longitude());
-        }
-    }
-    return false;
+    return containsLatitude(point.latitude()) && containsLongitude(point.longitude(), wrap);
 }
 
 bool LatLngBounds::contains(const LatLngBounds& area, LatLng::WrapMode wrap /*= LatLng::Unwrapped*/) const {
-    bool containsLatitude = area.north() <= north() && area.south() >= south();
-    if (!containsLatitude) {
+    bool containsAreaLatitude = area.north() <= north() && area.south() >= south();
+    if (!containsAreaLatitude) {
         return false;
     }
 
@@ -111,6 +88,48 @@ bool LatLngBounds::intersects(const LatLngBounds area, LatLng::WrapMode wrap /*=
                    other.west() < wrapped.east();
         }
     }
+    return false;
+}
+
+LatLng LatLngBounds::constrain(const LatLng& p) const {
+    if (!bounded) {
+        return p;
+    }
+
+    double lat = p.latitude();
+    double lng = p.longitude();
+
+    if (!containsLatitude(lat)) {
+        lat = util::clamp(lat, south(), north());
+    }
+
+    if (!containsLongitude(lng, LatLng::Unwrapped)) {
+        lng = util::clamp(lng, west(), east());
+    }
+
+    return LatLng { lat, lng };
+}
+
+bool LatLngBounds::containsLatitude(double latitude) const {
+    return latitude >= south() && latitude <= north();
+}
+
+bool LatLngBounds::containsLongitude(double longitude, LatLng::WrapMode wrap) const {
+    if (longitude >= west() && longitude <= east()) {
+        return true;
+    }
+
+    if (wrap == LatLng::Wrapped) {
+        LatLngBounds wrapped(sw.wrapped(), ne.wrapped());
+        longitude = LatLng(0.0, longitude).wrapped().longitude();
+        if (crossesAntimeridian()) {
+            return (longitude >= -util::LONGITUDE_MAX && longitude <= wrapped.east()) ||
+                   (longitude >= wrapped.west() && longitude <= util::LONGITUDE_MAX);
+        }
+
+        return longitude >= wrapped.west() && longitude <= wrapped.east();
+    }
+
     return false;
 }
 

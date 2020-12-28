@@ -1,6 +1,9 @@
 #pragma once
 
+#include <mbgl/util/util.hpp>
+
 #include <string>
+#include <jni/jni.hpp>
 
 typedef struct _jmethodID* jmethodID;
 typedef struct _JavaVM JavaVM;
@@ -16,8 +19,6 @@ extern std::string dataPath;
 
 bool attach_jni_thread(JavaVM* vm, JNIEnv** env, std::string threadName);
 void detach_jni_thread(JavaVM* vm, JNIEnv** env, bool detach);
-
-extern void registerNatives(JavaVM* vm);
 
 } // namespace android
 } // namespace mbgl

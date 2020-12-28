@@ -2,7 +2,6 @@
 
 #include <mbgl/text/glyph.hpp>
 #include <mbgl/renderer/render_layer.hpp>
-#include <mbgl/renderer/layers/render_layer_symbol_interface.hpp>
 #include <mbgl/style/image_impl.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
 #include <mbgl/style/layers/symbol_layer_properties.hpp>
@@ -51,58 +50,37 @@ public:
     bool hasFill;
 };
 
+enum class SymbolType : uint8_t {
+    Text,
+    IconRGBA,
+    IconSDF
+};
+
 } // namespace style
 
-class BucketParameters;
-class SymbolLayout;
-class GeometryTileLayer;
-
-class RenderSymbolLayer: public RenderLayer, public RenderLayerSymbolInterface {
+class RenderSymbolLayer final: public RenderLayer {
 public:
-    RenderSymbolLayer(Immutable<style::SymbolLayer::Impl>);
-    ~RenderSymbolLayer() final = default;
+    explicit RenderSymbolLayer(Immutable<style::SymbolLayer::Impl>);
+    ~RenderSymbolLayer() override;
 
+    static style::IconPaintProperties::PossiblyEvaluated iconPaintProperties(const style::SymbolPaintProperties::PossiblyEvaluated&);
+    static style::TextPaintProperties::PossiblyEvaluated textPaintProperties(const style::SymbolPaintProperties::PossiblyEvaluated&);
+
+private:
     void transition(const TransitionParameters&) override;
     void evaluate(const PropertyEvaluationParameters&) override;
     bool hasTransition() const override;
     bool hasCrossfade() const override;
-    void render(PaintParameters&, RenderSource*) override;
-
-    style::IconPaintProperties::PossiblyEvaluated iconPaintProperties() const;
-    style::TextPaintProperties::PossiblyEvaluated textPaintProperties() const;
-
-    style::SymbolPropertyValues iconPropertyValues(const style::SymbolLayoutProperties::PossiblyEvaluated&) const;
-    style::SymbolPropertyValues textPropertyValues(const style::SymbolLayoutProperties::PossiblyEvaluated&) const;
-
-    std::unique_ptr<Bucket> createBucket(const BucketParameters&, const std::vector<const RenderLayer*>&) const override;
-    std::unique_ptr<Layout> createLayout(const BucketParameters&,
-                                               const std::vector<const RenderLayer*>&,
-                                               std::unique_ptr<GeometryTileLayer>,
-                                               GlyphDependencies&,
-                                               ImageDependencies&) const override;
-
-    // RenderLayerSymbolInterface overrides
-    const RenderLayerSymbolInterface* getSymbolInterface() const final;
-    const std::string& layerID() const final;
-    const std::vector<std::reference_wrapper<RenderTile>>& getRenderTiles() const final;
-    SymbolBucket* getSymbolBucket(const RenderTile&) const final;
+    void render(PaintParameters&) override;
+    void prepare(const LayerPrepareParameters&) override;
 
     // Paint properties
     style::SymbolPaintProperties::Unevaluated unevaluated;
-    style::SymbolPaintProperties::PossiblyEvaluated evaluated;
 
     float iconSize = 1.0f;
     float textSize = 16.0f;
 
-    const style::SymbolLayer::Impl& impl() const;
-
-protected:
-    RenderTiles filterRenderTiles(RenderTiles) const final;
-    void sortRenderTiles(const TransformState&) final;
+    bool hasFormatSectionOverrides = false;
 };
-
-inline const RenderSymbolLayer* toRenderSymbolLayer(const RenderLayer* layer) {
-    return static_cast<const RenderSymbolLayer*>(layer);
-}
 
 } // namespace mbgl

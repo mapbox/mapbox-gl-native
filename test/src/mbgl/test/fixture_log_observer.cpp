@@ -60,6 +60,7 @@ size_t FixtureLog::Observer::count(const Message& message, bool substring) const
 
 FixtureLog::FixtureLog() : observer(new FixtureLogObserver(this)) {
     Log::setObserver(std::unique_ptr<Log::Observer>(observer));
+    Log::useLogThread(false);
 }
 
 bool FixtureLog::empty() const {

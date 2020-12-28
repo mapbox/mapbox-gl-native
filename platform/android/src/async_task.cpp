@@ -13,10 +13,10 @@ class AsyncTask::Impl : public RunLoop::Impl::Runnable {
 public:
     Impl(std::function<void()>&& fn)
         : queued(true), task(std::move(fn)) {
-        loop->initRunnable(this);
     }
 
     ~Impl() {
+        queued = true;
         loop->removeRunnable(this);
     }
 
@@ -32,9 +32,11 @@ public:
     }
 
     void runTask() override {
-        loop->removeRunnable(this);
-        queued = true;
-        task();
+        if (!queued) {
+            queued = true;
+            loop->removeRunnable(this);
+            task();
+        }
     }
 
 private:

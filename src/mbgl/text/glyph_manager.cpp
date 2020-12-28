@@ -1,25 +1,25 @@
-#include <mbgl/text/glyph_manager.hpp>
-#include <mbgl/text/glyph_manager_observer.hpp>
-#include <mbgl/text/glyph_pbf.hpp>
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
-#include <mbgl/util/tiny_sdf.hpp>
+#include <mbgl/text/glyph_manager.hpp>
+#include <mbgl/text/glyph_manager_observer.hpp>
+#include <mbgl/text/glyph_pbf.hpp>
+#include <mbgl/util/async_request.hpp>
 #include <mbgl/util/std.hpp>
+#include <mbgl/util/tiny_sdf.hpp>
 
 namespace mbgl {
 
 static GlyphManagerObserver nullObserver;
 
-GlyphManager::GlyphManager(FileSource& fileSource_, std::unique_ptr<LocalGlyphRasterizer> localGlyphRasterizer_)
-    : fileSource(fileSource_),
-      observer(&nullObserver),
+GlyphManager::GlyphManager(std::unique_ptr<LocalGlyphRasterizer> localGlyphRasterizer_)
+    : observer(&nullObserver),
       localGlyphRasterizer(std::move(localGlyphRasterizer_)) {
 }
 
 GlyphManager::~GlyphManager() = default;
 
-void GlyphManager::getGlyphs(GlyphRequestor& requestor, GlyphDependencies glyphDependencies) {
+void GlyphManager::getGlyphs(GlyphRequestor& requestor, GlyphDependencies glyphDependencies, FileSource& fileSource) {
     auto dependencies = std::make_shared<GlyphDependencies>(std::move(glyphDependencies));
 
     // Figure out which glyph ranges need to be fetched. For each range that does need to
@@ -47,7 +47,7 @@ void GlyphManager::getGlyphs(GlyphRequestor& requestor, GlyphDependencies glyphD
             if (it == entry.ranges.end() || !it->second.parsed) {
                 GlyphRequest& request = entry.ranges[range];
                 request.requestors[&requestor] = dependencies;
-                requestRange(request, fontStack, range);
+                requestRange(request, fontStack, range, fileSource);
             }
         }
     }
@@ -65,14 +65,14 @@ Glyph GlyphManager::generateLocalSDF(const FontStack& fontStack, GlyphID glyphID
     return local;
 }
 
-void GlyphManager::requestRange(GlyphRequest& request, const FontStack& fontStack, const GlyphRange& range) {
+void GlyphManager::requestRange(GlyphRequest& request, const FontStack& fontStack, const GlyphRange& range, FileSource& fileSource) {
     if (request.req) {
         return;
     }
 
-    request.req = fileSource.request(Resource::glyphs(glyphURL, fontStack, range), [this, fontStack, range](Response res) {
-        processResponse(res, fontStack, range);
-    });
+    request.req =
+        fileSource.request(Resource::glyphs(glyphURL, fontStack, range),
+                           [this, fontStack, range](const Response& res) { processResponse(res, fontStack, range); });
 }
 
 void GlyphManager::processResponse(const Response& res, const FontStack& fontStack, const GlyphRange& range) {
@@ -99,8 +99,11 @@ void GlyphManager::processResponse(const Response& res, const FontStack& fontSta
         }
 
         for (auto& glyph : glyphs) {
-            entry.glyphs.erase(glyph.id);
-            entry.glyphs.emplace(glyph.id, makeMutable<Glyph>(std::move(glyph)));
+            auto id = glyph.id;
+            if (!localGlyphRasterizer->canRasterizeGlyph(fontStack, id)) {
+                entry.glyphs.erase(id);
+                entry.glyphs.emplace(id, makeMutable<Glyph>(std::move(glyph)));
+            }
         }
     }
 

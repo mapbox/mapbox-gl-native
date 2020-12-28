@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <map>
+#include <mapbox/eternal.hpp>
 
 namespace {
 
@@ -11,12 +12,10 @@ namespace {
     @param first The first codepoint in the block, inclusive.
     @param last The last codepoint in the block, inclusive.
  */
-#define DEFINE_IS_IN_UNICODE_BLOCK(name, first, last)                                              \
-    inline bool isIn##name(char16_t codepoint) {                                                   \
-        return codepoint >= first && codepoint <= last;                                            \
-    }
+#define DEFINE_IS_IN_UNICODE_BLOCK(name, first, last) \
+    inline bool isIn##name(char16_t codepoint) { return codepoint >= (first) && codepoint <= (last); }
 
-// The following table comes from <http://www.unicode.org/Public/10.0.0/ucd/Blocks.txt>.
+// The following table comes from <http://www.unicode.org/Public/12.0.0/ucd/Blocks.txt>.
 // Keep it synchronized with <http://www.unicode.org/Public/UCD/latest/ucd/Blocks.txt>.
 
 // DEFINE_IS_IN_UNICODE_BLOCK(BasicLatin, 0x0000, 0x007F)
@@ -82,6 +81,7 @@ DEFINE_IS_IN_UNICODE_BLOCK(UnifiedCanadianAboriginalSyllabicsExtended, 0x18B0, 0
 // DEFINE_IS_IN_UNICODE_BLOCK(Lepcha, 0x1C00, 0x1C4F)
 // DEFINE_IS_IN_UNICODE_BLOCK(OlChiki, 0x1C50, 0x1C7F)
 // DEFINE_IS_IN_UNICODE_BLOCK(CyrillicExtendedC, 0x1C80, 0x1C8F)
+// DEFINE_IS_IN_UNICODE_BLOCK(GeorgianExtended, 0x1C90, 0x1CBF)
 // DEFINE_IS_IN_UNICODE_BLOCK(SundaneseSupplement, 0x1CC0, 0x1CCF)
 // DEFINE_IS_IN_UNICODE_BLOCK(VedicExtensions, 0x1CD0, 0x1CFF)
 // DEFINE_IS_IN_UNICODE_BLOCK(PhoneticExtensions, 0x1D00, 0x1D7F)
@@ -221,7 +221,11 @@ DEFINE_IS_IN_UNICODE_BLOCK(HalfwidthandFullwidthForms, 0xFF00, 0xFFEF)
 // DEFINE_IS_IN_UNICODE_BLOCK(PsalterPahlavi, 0x10B80, 0x10BAF)
 // DEFINE_IS_IN_UNICODE_BLOCK(OldTurkic, 0x10C00, 0x10C4F)
 // DEFINE_IS_IN_UNICODE_BLOCK(OldHungarian, 0x10C80, 0x10CFF)
+// DEFINE_IS_IN_UNICODE_BLOCK(HanifiRohingya, 0x10D00, 0x10D3F)
 // DEFINE_IS_IN_UNICODE_BLOCK(RumiNumeralSymbols, 0x10E60, 0x10E7F)
+// DEFINE_IS_IN_UNICODE_BLOCK(OldSogdian, 0x10F00, 0x10F2F)
+// DEFINE_IS_IN_UNICODE_BLOCK(Sogdian, 0x10F30, 0x10F6F)
+// DEFINE_IS_IN_UNICODE_BLOCK(Elymaic, 0x10FE0, 0x10FFF)
 // DEFINE_IS_IN_UNICODE_BLOCK(Brahmi, 0x11000, 0x1107F)
 // DEFINE_IS_IN_UNICODE_BLOCK(Kaithi, 0x11080, 0x110CF)
 // DEFINE_IS_IN_UNICODE_BLOCK(SoraSompeng, 0x110D0, 0x110FF)
@@ -240,41 +244,54 @@ DEFINE_IS_IN_UNICODE_BLOCK(HalfwidthandFullwidthForms, 0xFF00, 0xFFEF)
 // DEFINE_IS_IN_UNICODE_BLOCK(MongolianSupplement, 0x11660, 0x1167F)
 // DEFINE_IS_IN_UNICODE_BLOCK(Takri, 0x11680, 0x116CF)
 // DEFINE_IS_IN_UNICODE_BLOCK(Ahom, 0x11700, 0x1173F)
+// DEFINE_IS_IN_UNICODE_BLOCK(Dogra, 0x11800, 0x1184F)
 // DEFINE_IS_IN_UNICODE_BLOCK(WarangCiti, 0x118A0, 0x118FF)
+// DEFINE_IS_IN_UNICODE_BLOCK(Nandinagari, 0x119A0, 0x119FF)
 // DEFINE_IS_IN_UNICODE_BLOCK(ZanabazarSquare, 0x11A00, 0x11A4F)
 // DEFINE_IS_IN_UNICODE_BLOCK(Soyombo, 0x11A50, 0x11AAF)
 // DEFINE_IS_IN_UNICODE_BLOCK(PauCinHau, 0x11AC0, 0x11AFF)
 // DEFINE_IS_IN_UNICODE_BLOCK(Bhaiksuki, 0x11C00, 0x11C6F)
 // DEFINE_IS_IN_UNICODE_BLOCK(Marchen, 0x11C70, 0x11CBF)
 // DEFINE_IS_IN_UNICODE_BLOCK(MasaramGondi, 0x11D00, 0x11D5F)
+// DEFINE_IS_IN_UNICODE_BLOCK(GunjalaGondi, 0x11D60, 0x11DAF)
+// DEFINE_IS_IN_UNICODE_BLOCK(Makasar, 0x11EE0, 0x11EFF)
+// DEFINE_IS_IN_UNICODE_BLOCK(TamilSupplement, 0x11FC0, 0x11FFF)
 // DEFINE_IS_IN_UNICODE_BLOCK(Cuneiform, 0x12000, 0x123FF)
 // DEFINE_IS_IN_UNICODE_BLOCK(CuneiformNumbersandPunctuation, 0x12400, 0x1247F)
 // DEFINE_IS_IN_UNICODE_BLOCK(EarlyDynasticCuneiform, 0x12480, 0x1254F)
 // DEFINE_IS_IN_UNICODE_BLOCK(EgyptianHieroglyphs, 0x13000, 0x1342F)
+// DEFINE_IS_IN_UNICODE_BLOCK(EgyptianHieroglyphFormatControls, 0x13430, 0x1343F)
 // DEFINE_IS_IN_UNICODE_BLOCK(AnatolianHieroglyphs, 0x14400, 0x1467F)
 // DEFINE_IS_IN_UNICODE_BLOCK(BamumSupplement, 0x16800, 0x16A3F)
 // DEFINE_IS_IN_UNICODE_BLOCK(Mro, 0x16A40, 0x16A6F)
 // DEFINE_IS_IN_UNICODE_BLOCK(BassaVah, 0x16AD0, 0x16AFF)
 // DEFINE_IS_IN_UNICODE_BLOCK(PahawhHmong, 0x16B00, 0x16B8F)
+// DEFINE_IS_IN_UNICODE_BLOCK(Medefaidrin, 0x16E40, 0x16E9F)
 // DEFINE_IS_IN_UNICODE_BLOCK(Miao, 0x16F00, 0x16F9F)
 // DEFINE_IS_IN_UNICODE_BLOCK(IdeographicSymbolsandPunctuation, 0x16FE0, 0x16FFF)
 // DEFINE_IS_IN_UNICODE_BLOCK(Tangut, 0x17000, 0x187FF)
 // DEFINE_IS_IN_UNICODE_BLOCK(TangutComponents, 0x18800, 0x18AFF)
 // DEFINE_IS_IN_UNICODE_BLOCK(KanaSupplement, 0x1B000, 0x1B0FF)
 // DEFINE_IS_IN_UNICODE_BLOCK(KanaExtendedA, 0x1B100, 0x1B12F)
+// DEFINE_IS_IN_UNICODE_BLOCK(SmallKanaExtension, 0x1B130, 0x1B16F)
 // DEFINE_IS_IN_UNICODE_BLOCK(Nushu, 0x1B170, 0x1B2FF)
 // DEFINE_IS_IN_UNICODE_BLOCK(Duployan, 0x1BC00, 0x1BC9F)
 // DEFINE_IS_IN_UNICODE_BLOCK(ShorthandFormatControls, 0x1BCA0, 0x1BCAF)
 // DEFINE_IS_IN_UNICODE_BLOCK(ByzantineMusicalSymbols, 0x1D000, 0x1D0FF)
 // DEFINE_IS_IN_UNICODE_BLOCK(MusicalSymbols, 0x1D100, 0x1D1FF)
 // DEFINE_IS_IN_UNICODE_BLOCK(AncientGreekMusicalNotation, 0x1D200, 0x1D24F)
+// DEFINE_IS_IN_UNICODE_BLOCK(MayanNumerals, 0x1D2E0, 0x1D2FF)
 // DEFINE_IS_IN_UNICODE_BLOCK(TaiXuanJingSymbols, 0x1D300, 0x1D35F)
 // DEFINE_IS_IN_UNICODE_BLOCK(CountingRodNumerals, 0x1D360, 0x1D37F)
 // DEFINE_IS_IN_UNICODE_BLOCK(MathematicalAlphanumericSymbols, 0x1D400, 0x1D7FF)
 // DEFINE_IS_IN_UNICODE_BLOCK(SuttonSignWriting, 0x1D800, 0x1DAAF)
 // DEFINE_IS_IN_UNICODE_BLOCK(GlagoliticSupplement, 0x1E000, 0x1E02F)
+// DEFINE_IS_IN_UNICODE_BLOCK(NyiakengPuachueHmong, 0x1E100, 0x1E14F)
+// DEFINE_IS_IN_UNICODE_BLOCK(Wancho, 0x1E2C0, 0x1E2FF)
 // DEFINE_IS_IN_UNICODE_BLOCK(MendeKikakui, 0x1E800, 0x1E8DF)
 // DEFINE_IS_IN_UNICODE_BLOCK(Adlam, 0x1E900, 0x1E95F)
+// DEFINE_IS_IN_UNICODE_BLOCK(IndicSiyaqNumbers, 0x1EC70, 0x1ECBF)
+// DEFINE_IS_IN_UNICODE_BLOCK(OttomanSiyaqNumbers, 0x1ED00, 0x1ED4F)
 // DEFINE_IS_IN_UNICODE_BLOCK(ArabicMathematicalAlphabeticSymbols, 0x1EE00, 0x1EEFF)
 // DEFINE_IS_IN_UNICODE_BLOCK(MahjongTiles, 0x1F000, 0x1F02F)
 // DEFINE_IS_IN_UNICODE_BLOCK(DominoTiles, 0x1F030, 0x1F09F)
@@ -289,6 +306,8 @@ DEFINE_IS_IN_UNICODE_BLOCK(HalfwidthandFullwidthForms, 0xFF00, 0xFFEF)
 // DEFINE_IS_IN_UNICODE_BLOCK(GeometricShapesExtended, 0x1F780, 0x1F7FF)
 // DEFINE_IS_IN_UNICODE_BLOCK(SupplementalArrowsC, 0x1F800, 0x1F8FF)
 // DEFINE_IS_IN_UNICODE_BLOCK(SupplementalSymbolsandPictographs, 0x1F900, 0x1F9FF)
+// DEFINE_IS_IN_UNICODE_BLOCK(ChessSymbols, 0x1FA00, 0x1FA6F)
+// DEFINE_IS_IN_UNICODE_BLOCK(SymbolsandPictographsExtendedA, 0x1FA70, 0x1FAFF)
 // DEFINE_IS_IN_UNICODE_BLOCK(CJKUnifiedIdeographsExtensionB, 0x20000, 0x2A6DF)
 // DEFINE_IS_IN_UNICODE_BLOCK(CJKUnifiedIdeographsExtensionC, 0x2A700, 0x2B73F)
 // DEFINE_IS_IN_UNICODE_BLOCK(CJKUnifiedIdeographsExtensionD, 0x2B740, 0x2B81F)
@@ -300,7 +319,7 @@ DEFINE_IS_IN_UNICODE_BLOCK(HalfwidthandFullwidthForms, 0xFF00, 0xFFEF)
 // DEFINE_IS_IN_UNICODE_BLOCK(SupplementaryPrivateUseAreaA, 0xF0000, 0xFFFFF)
 // DEFINE_IS_IN_UNICODE_BLOCK(SupplementaryPrivateUseAreaB, 0x100000, 0x10FFFF)
 
-const std::map<char16_t, char16_t> verticalPunctuation = {
+MAPBOX_ETERNAL_CONSTEXPR const auto verticalPunctuation = mapbox::eternal::map<char16_t, char16_t>({
     { u'!', u'︕' },  { u'#', u'＃' },  { u'$', u'＄' },  { u'%', u'％' },  { u'&', u'＆' },
     { u'(', u'︵' },  { u')', u'︶' },  { u'*', u'＊' },  { u'+', u'＋' },  { u',', u'︐' },
     { u'-', u'︲' },  { u'.', u'・' },  { u'/', u'／' },  { u':', u'︓' },  { u';', u'︔' },
@@ -318,7 +337,8 @@ const std::map<char16_t, char16_t> verticalPunctuation = {
     { u'＞', u'﹀' }, { u'？', u'︖' }, { u'［', u'﹇' }, { u'］', u'﹈' }, { u'＿', u'︳' },
     { u'｛', u'︷' }, { u'｜', u'―' },  { u'｝', u'︸' }, { u'｟', u'︵' }, { u'｠', u'︶' },
     { u'｡', u'︒' },  { u'｢', u'﹁' },  { u'｣', u'﹂' },
-};
+});
+
 } // namespace
 
 namespace mbgl {
@@ -395,7 +415,8 @@ bool allowsIdeographicBreaking(char16_t chr) {
 
 bool allowsFixedWidthGlyphGeneration(char16_t chr) {
     // Mirrors conservative set of characters used in glyph_manager.js/_tinySDF
-    return isInCJKUnifiedIdeographs(chr) || isInHangulSyllables(chr);
+    return isInCJKUnifiedIdeographs(chr) || isInHangulSyllables(chr)
+        || isInKatakana(chr) || isInHiragana(chr);
 }
 
 bool allowsVerticalWritingMode(const std::u16string& string) {
@@ -408,7 +429,9 @@ bool allowsVerticalWritingMode(const std::u16string& string) {
 }
 
 // The following logic comes from
-// <http://www.unicode.org/Public/vertical/revision-17/VerticalOrientation-17.txt>.
+// <http://www.unicode.org/Public/12.0.0/ucd/VerticalOrientation.txt>.
+// Keep it synchronized with
+// <http://www.unicode.org/Public/UCD/latest/ucd/VerticalOrientation.txt>.
 // The data file denotes with “U” or “Tu” any codepoint that may be drawn
 // upright in vertical text but does not distinguish between upright and
 // “neutral” characters.
@@ -591,21 +614,19 @@ bool charInSupportedScript(char16_t chr) {
     // actually depends on the properties of the font being used
     // and whether differences from the ideal rendering are considered
     // semantically significant.
-    
+
     // Even in Latin script, we "can't render" combinations such as the fi
     // ligature, but we don't consider that semantically significant.n false;
-    if ((chr >= 0x0900 && chr <= 0x0DFF) ||
-        // Main blocks for Indic scripts and Sinhala
-        (chr >= 0x0F00 && chr <= 0x109F) ||
-        // Main blocks for Tibetan and Myanmar
-        isInKhmer(chr)) {
-        // These blocks cover common scripts that require
-        // complex text shaping, based on unicode script metadata:
-        // http://www.unicode.org/repos/cldr/trunk/common/properties/scriptMetadata.txt
-        // where "Web Rank <= 32" "Shaping Required = YES"
-        return false;
-    }
-    return true;
+
+    // These blocks cover common scripts that require
+    // complex text shaping, based on unicode script metadata:
+    // http://www.unicode.org/repos/cldr/trunk/common/properties/scriptMetadata.txt
+    // where "Web Rank <= 32" "Shaping Required = YES"
+    return !((chr >= 0x0900 && chr <= 0x0DFF) ||
+             // Main blocks for Indic scripts and Sinhala
+             (chr >= 0x0F00 && chr <= 0x109F) ||
+             // Main blocks for Tibetan and Myanmar
+             isInKhmer(chr));
 }
     
 bool isStringInSupportedScript(const std::string& input) {
@@ -616,6 +637,14 @@ bool isStringInSupportedScript(const std::string& input) {
         }
     }
     return true;
+}
+
+bool isCharInComplexShapingScript(char16_t chr) {
+    return isInArabic(chr) ||
+           isInArabicSupplement(chr) ||
+           isInArabicExtendedA(chr) ||
+           isInArabicPresentationFormsA(chr) ||
+           isInArabicPresentationFormsB(chr);
 }
 
 bool isWhitespace(char16_t chr) {

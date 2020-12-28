@@ -9,11 +9,14 @@
 #include <list>
 #include <memory>
 #include <mutex>
+#include <unordered_map>
 
 struct ALooper;
 
 namespace mbgl {
 namespace util {
+
+using WatchCallback = std::function<void(int, RunLoop::Event)>;
 
 template <typename T> class Thread;
 class Alarm;
@@ -26,8 +29,6 @@ public:
 
         virtual void runTask() = 0;
         virtual TimePoint dueTime() const = 0;
-
-        std::list<Runnable*>::iterator iter;
     };
 
     Impl(RunLoop*, RunLoop::Type);
@@ -37,27 +38,25 @@ public:
 
     void addRunnable(Runnable*);
     void removeRunnable(Runnable*);
-    void initRunnable(Runnable*);
 
     Milliseconds processRunnables();
 
     ALooper* loop = nullptr;
     RunLoop* runLoop = nullptr;
     std::atomic<bool> running;
+    std::atomic_flag coalesce = ATOMIC_FLAG_INIT;
+
+    std::unordered_map<int, WatchCallback> readPoll;
 
 private:
     friend RunLoop;
 
     int fds[2];
 
-    JNIEnv *env = nullptr;
-    bool detach = false;
-
     std::unique_ptr<Thread<Alarm>> alarm;
 
-    std::recursive_mutex mtx;
+    std::mutex mutex;
     std::list<Runnable*> runnables;
-    std::list<Runnable*>::iterator nextRunnable = runnables.end();
 };
 
 } // namespace util
