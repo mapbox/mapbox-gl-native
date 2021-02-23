@@ -7,10 +7,11 @@
 
 #include <iterator>
 #include <map>
-#include <unordered_map>
-#include <string>
-#include <vector>
 #include <memory>
+#include <string>
+#include <unordered_map>
+#include <utility>
+#include <vector>
 
 namespace mbgl {
 namespace style {
@@ -87,13 +88,13 @@ public:
     std::string getKey() const { return key; }
     optional<type::Type> getExpected() const { return expected; }
     const std::vector<ParsingError>& getErrors() const { return *errors; }
-    const std::string getCombinedErrors() const;
+    std::string getCombinedErrors() const;
 
     /*
         Parse the given style-spec JSON value as an expression.
     */
     ParseResult parseExpression(const mbgl::style::conversion::Convertible& value,
-                                optional<TypeAnnotationOption> = {});
+                                const optional<TypeAnnotationOption>& = {});
 
     /*
         Parse the given style-spec JSON value as an expression intended to be used
@@ -108,8 +109,8 @@ public:
     ParseResult parse(const mbgl::style::conversion::Convertible&,
                       std::size_t,
                       optional<type::Type> = {},
-                      optional<TypeAnnotationOption> = {});
-    
+                      const optional<TypeAnnotationOption>& = {});
+
     /*
         Parse a child expression.  For use by individual Expression::parse() methods.
     */
@@ -122,22 +123,21 @@ public:
         Check whether `t` is a subtype of `expected`, collecting an error if not.
      */
     optional<std::string> checkType(const type::Type& t);
-    
-    optional<std::shared_ptr<Expression>> getBinding(const std::string name) {
+
+    optional<std::shared_ptr<Expression>> getBinding(const std::string& name) {
         if (!scope) return optional<std::shared_ptr<Expression>>();
         return scope->get(name);
     }
 
-    void error(std::string message) {
-        errors->push_back({message, key});
-    }
-    
+    void error(std::string message) { errors->push_back({std::move(message), key}); }
+
     void error(std::string message, std::size_t child) {
-        errors->push_back({message, key + "[" + util::toString(child) + "]"});
+        errors->push_back({std::move(message), key + "[" + util::toString(child) + "]"});
     }
     
     void error(std::string message, std::size_t child, std::size_t grandchild) {
-        errors->push_back({message, key + "[" + util::toString(child) + "][" + util::toString(grandchild) + "]"});
+        errors->push_back(
+            {std::move(message), key + "[" + util::toString(child) + "][" + util::toString(grandchild) + "]"});
     }
     
     void appendErrors(ParsingContext&& ctx) {
@@ -168,18 +168,15 @@ private:
         type (either Literal, or the one named in value[0]) and dispatching to the
         appropriate ParseXxxx::parse(const V&, ParsingContext) method.
     */
-    ParseResult parse(const mbgl::style::conversion::Convertible& value,
-                      optional<TypeAnnotationOption> = {});
-    
+    ParseResult parse(const mbgl::style::conversion::Convertible& value, const optional<TypeAnnotationOption>& = {});
+
     std::string key;
     optional<type::Type> expected;
     std::shared_ptr<detail::Scope> scope;
     std::shared_ptr<std::vector<ParsingError>> errors;
 };
 
-using ParseFunction = ParseResult (*)(const conversion::Convertible&, ParsingContext&);
-using ExpressionRegistry = std::unordered_map<std::string, ParseFunction>;
-const ExpressionRegistry& getExpressionRegistry();
+bool isExpression(const std::string&);
 
 } // namespace expression
 } // namespace style

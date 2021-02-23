@@ -1,6 +1,7 @@
+#include <mbgl/style/conversion_impl.hpp>
 #include <mbgl/style/expression/assertion.hpp>
 #include <mbgl/style/expression/check_subtype.hpp>
-#include <mbgl/style/conversion_impl.hpp>
+#include <utility>
 
 namespace mbgl {
 namespace style {
@@ -8,20 +9,18 @@ namespace expression {
 
 using namespace mbgl::style::conversion;
 
-Assertion::Assertion(type::Type type_, std::vector<std::unique_ptr<Expression>> inputs_) :
-    Expression(Kind::Assertion, type_),
-    inputs(std::move(inputs_))
-{
+Assertion::Assertion(type::Type type_, std::vector<std::unique_ptr<Expression>> inputs_)
+    : Expression(Kind::Assertion, std::move(type_)), inputs(std::move(inputs_)) {
     assert(!inputs.empty());
 }
 
 ParseResult Assertion::parse(const Convertible& value, ParsingContext& ctx) {
-    static std::unordered_map<std::string, type::Type> types {
+    static std::unordered_map<std::string, type::Type> types{
         {"string", type::String},
+        {"image", type::String}, // TODO: replace once we implement image expressions
         {"number", type::Number},
         {"boolean", type::Boolean},
-        {"object", type::Object}
-    };
+        {"object", type::Object}};
 
     std::size_t length = arrayLength(value);
 

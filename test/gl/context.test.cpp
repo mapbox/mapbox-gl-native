@@ -1,21 +1,25 @@
 #include <mbgl/test/util.hpp>
 
-#include <mbgl/gl/gl.hpp>
+#include <mbgl/gfx/backend_scope.hpp>
+#include <mbgl/gfx/headless_frontend.hpp>
 #include <mbgl/gl/context.hpp>
+#include <mbgl/gl/custom_layer.hpp>
+#include <mbgl/gl/defines.hpp>
+#include <mbgl/gl/renderable_resource.hpp>
 #include <mbgl/map/map.hpp>
-#include <mbgl/util/default_thread_pool.hpp>
-#include <mbgl/storage/default_file_source.hpp>
-#include <mbgl/gl/headless_frontend.hpp>
-#include <mbgl/style/style.hpp>
-#include <mbgl/style/layers/custom_layer.hpp>
-#include <mbgl/style/layers/fill_layer.hpp>
+#include <mbgl/map/map_options.hpp>
+#include <mbgl/platform/gl_functions.hpp>
+#include <mbgl/storage/resource_options.hpp>
 #include <mbgl/style/layers/background_layer.hpp>
+#include <mbgl/style/layers/fill_layer.hpp>
+#include <mbgl/style/style.hpp>
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/mat4.hpp>
 #include <mbgl/util/run_loop.hpp>
 
 using namespace mbgl;
 using namespace mbgl::style;
+using namespace mbgl::platform;
 
 static const GLchar* vertexShaderSource = R"MBGL_SHADER(
 #ifdef GL_ES
@@ -81,27 +85,30 @@ struct Buffer {
 };
 
 TEST(GLContextMode, Shared) {
+    if (gfx::Backend::GetType() != gfx::Backend::Type::OpenGL) {
+        return;
+    }
+
     util::RunLoop loop;
 
-    DefaultFileSource fileSource(":memory:", "test/fixtures/api/assets");
-    ThreadPool threadPool(4);
-    float pixelRatio { 1 };
+    HeadlessFrontend frontend{1, gfx::HeadlessBackend::SwapBehaviour::NoFlush, gfx::ContextMode::Shared};
 
-    HeadlessFrontend frontend { pixelRatio, fileSource, threadPool, {}, GLContextMode::Shared };
-
-    Map map(frontend, MapObserver::nullObserver(), frontend.getSize(), pixelRatio, fileSource, threadPool, MapMode::Static);
+    Map map(frontend,
+            MapObserver::nullObserver(),
+            MapOptions().withMapMode(MapMode::Static).withSize(frontend.getSize()),
+            ResourceOptions().withCachePath(":memory:").withAssetPath("test/fixtures/api/assets"));
     map.getStyle().loadJSON(util::read_file("test/fixtures/api/water.json"));
-    map.setLatLngZoom({ 37.8, -122.5 }, 10);
+    map.jumpTo(CameraOptions().withCenter(LatLng { 37.8, -122.5 }).withZoom(10.0));
 
     // Set transparent background layer.
     auto layer = map.getStyle().getLayer("background");
-    ASSERT_EQ(LayerType::Background, layer->getType());
+    ASSERT_STREQ("background", layer->getTypeInfo()->type);
     static_cast<BackgroundLayer*>(layer)->setBackgroundColor( { { 1.0f, 0.0f, 0.0f, 0.5f } } );
 
     {
         // Custom rendering outside of GL Native render loop.
-        BackendScope scope { *frontend.getBackend() };
-        frontend.getBackend()->bind();
+        gfx::BackendScope scope { *frontend.getBackend() };
+        frontend.getBackend()->getDefaultRenderable().getResource<gl::RenderableResource>().bind();
 
         Shader paintShader(vertexShaderSource, fragmentShaderSource);
         Buffer triangleBuffer({ 0, 0.5, 0.5, -0.5, -0.5, -0.5 });
@@ -112,5 +119,5 @@ TEST(GLContextMode, Shared) {
         MBGL_CHECK_ERROR(glDrawArrays(GL_TRIANGLE_STRIP, 0, 3));
     }
 
-    test::checkImage("test/fixtures/shared_context", frontend.render(map), 0.5, 0.1);
+    test::checkImage("test/fixtures/shared_context", frontend.render(map).image, 0.5, 0.1);
 }

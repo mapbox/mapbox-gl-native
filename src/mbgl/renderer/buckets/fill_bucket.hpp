@@ -2,8 +2,8 @@
 
 #include <mbgl/renderer/bucket.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
-#include <mbgl/gl/vertex_buffer.hpp>
-#include <mbgl/gl/index_buffer.hpp>
+#include <mbgl/gfx/vertex_buffer.hpp>
+#include <mbgl/gfx/index_buffer.hpp>
 #include <mbgl/programs/segment.hpp>
 #include <mbgl/programs/fill_program.hpp>
 #include <mbgl/style/layers/fill_layer_properties.hpp>
@@ -15,46 +15,42 @@ namespace mbgl {
 class BucketParameters;
 class RenderFillLayer;
 
-class FillBucket : public Bucket {
+class FillBucket final : public Bucket {
 public:
+    ~FillBucket() override;
+    using PossiblyEvaluatedLayoutProperties = style::FillLayoutProperties::PossiblyEvaluated;
 
-    // These aliases are used by the PatternLayout template
-    using RenderLayerType = RenderFillLayer;
-    using PossiblyEvaluatedPaintProperties = style::FillPaintProperties::PossiblyEvaluated;
-    using PossiblyEvaluatedLayoutProperties = style::Properties<>::PossiblyEvaluated;
-
-    FillBucket(const PossiblyEvaluatedLayoutProperties layout,
-               std::map<std::string, PossiblyEvaluatedPaintProperties> layerPaintProperties,
-               const float zoom,
-               const uint32_t overscaling);
+    FillBucket(const PossiblyEvaluatedLayoutProperties& layout,
+               const std::map<std::string, Immutable<style::LayerProperties>>& layerPaintProperties,
+               float zoom,
+               uint32_t overscaling);
 
     void addFeature(const GeometryTileFeature&,
                     const GeometryCollection&,
                     const mbgl::ImagePositions&,
-                    const PatternLayerMap&) override;
+                    const PatternLayerMap&,
+                    std::size_t,
+                    const CanonicalTileID&) override;
 
     bool hasData() const override;
 
-    void upload(gl::Context&) override;
+    void upload(gfx::UploadPass&) override;
 
     float getQueryRadius(const RenderLayer&) const override;
 
-    gl::VertexVector<FillLayoutVertex> vertices;
-    gl::IndexVector<gl::Lines> lines;
-    gl::IndexVector<gl::Triangles> triangles;
+    void update(const FeatureStates&, const GeometryTileLayer&, const std::string&, const ImagePositions&) override;
+
+    gfx::VertexVector<FillLayoutVertex> vertices;
+    gfx::IndexVector<gfx::Lines> lines;
+    gfx::IndexVector<gfx::Triangles> triangles;
     SegmentVector<FillAttributes> lineSegments;
     SegmentVector<FillAttributes> triangleSegments;
 
-    optional<gl::VertexBuffer<FillLayoutVertex>> vertexBuffer;
-    optional<gl::IndexBuffer<gl::Lines>> lineIndexBuffer;
-    optional<gl::IndexBuffer<gl::Triangles>> triangleIndexBuffer;
+    optional<gfx::VertexBuffer<FillLayoutVertex>> vertexBuffer;
+    optional<gfx::IndexBuffer> lineIndexBuffer;
+    optional<gfx::IndexBuffer> triangleIndexBuffer;
 
-    std::map<std::string, FillProgram::PaintPropertyBinders> paintPropertyBinders;
+    std::map<std::string, FillProgram::Binders> paintPropertyBinders;
 };
-
-template <>
-inline bool Bucket::is<FillBucket>() const {
-    return layerType == style::LayerType::Fill;
-}
 
 } // namespace mbgl

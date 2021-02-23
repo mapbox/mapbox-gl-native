@@ -14,12 +14,12 @@ public:
     ~LocalFileSource() override;
 
     std::unique_ptr<AsyncRequest> request(const Resource&, Callback) override;
-
-    static bool acceptsURL(const std::string& url);
+    bool canRequest(const Resource&) const override;
+    void pause() override;
+    void resume() override;
 
 private:
     class Impl;
-
     std::unique_ptr<util::Thread<Impl>> impl;
 };
 

@@ -1,12 +1,48 @@
+#include <mbgl/math/minmax.hpp>
 #include <mbgl/text/tagged_string.hpp>
 #include <mbgl/util/i18n.hpp>
+#include <mbgl/util/logging.hpp>
+
+namespace {
+char16_t PUAbegin = u'\uE000';
+char16_t PUAend = u'\uF8FF';
+} // namespace
 
 namespace mbgl {
-    
-void TaggedString::addSection(const std::u16string& sectionText, double scale, FontStackHash fontStack) {
+
+void TaggedString::addTextSection(const std::u16string& sectionText,
+                                  double scale,
+                                  const FontStack& fontStack,
+                                  optional<Color> textColor) {
     styledText.first += sectionText;
-    sections.emplace_back(scale, fontStack);
+    sections.emplace_back(scale, fontStack, std::move(textColor));
     styledText.second.resize(styledText.first.size(), sections.size() - 1);
+    supportsVerticalWritingMode = nullopt;
+}
+
+void TaggedString::addImageSection(const std::string& imageID) {
+    const auto& nextImageSectionCharCode = getNextImageSectionCharCode();
+    if (!nextImageSectionCharCode) {
+        Log::Warning(Event::Style, "Exceeded maximum number of images in a label.");
+        return;
+    }
+
+    styledText.first += *nextImageSectionCharCode;
+    sections.emplace_back(imageID);
+    styledText.second.resize(styledText.first.size(), static_cast<uint8_t>(sections.size() - 1));
+}
+
+optional<char16_t> TaggedString::getNextImageSectionCharCode() {
+    if (imageSectionID == 0u) {
+        imageSectionID = PUAbegin;
+        return imageSectionID;
+    }
+
+    if (++imageSectionID > PUAend) {
+        return nullopt;
+    }
+
+    return imageSectionID;
 }
 
 void TaggedString::trim() {
@@ -26,7 +62,7 @@ void TaggedString::trim() {
 double TaggedString::getMaxScale() const {
     double maxScale = 0.0;
     for (std::size_t i = 0; i < styledText.first.length(); i++) {
-        maxScale = std::max(maxScale, getSection(i).scale);
+        maxScale = util::max(maxScale, getSection(i).scale);
     }
     return maxScale;
 }
@@ -34,6 +70,13 @@ double TaggedString::getMaxScale() const {
 void TaggedString::verticalizePunctuation() {
     // Relies on verticalization changing characters in place so that style indices don't need updating
     styledText.first = util::i18n::verticalizePunctuation(styledText.first);
+}
+
+bool TaggedString::allowsVerticalWritingMode() {
+    if (!supportsVerticalWritingMode) {
+        supportsVerticalWritingMode = util::i18n::allowsVerticalWritingMode(rawText());
+    }
+    return *supportsVerticalWritingMode;
 }
 
 } // namespace mbgl

@@ -48,27 +48,25 @@ void QMapboxGLMapObserver::onDidFinishLoadingMap()
     emit mapChanged(QMapboxGL::MapChangeDidFinishLoadingMap);
 }
 
-void QMapboxGLMapObserver::onDidFailLoadingMap(std::exception_ptr exception)
+void QMapboxGLMapObserver::onDidFailLoadingMap(mbgl::MapLoadError error, const std::string& what)
 {
     emit mapChanged(QMapboxGL::MapChangeDidFailLoadingMap);
 
     QMapboxGL::MapLoadingFailure type;
-    QString description;
+    QString description(what.c_str());
 
-    try {
-        std::rethrow_exception(exception);
-    } catch (const mbgl::util::StyleParseException& e) {
-        type = QMapboxGL::MapLoadingFailure::StyleParseFailure;
-        description = e.what();
-    } catch (const mbgl::util::StyleLoadException& e) {
-        type = QMapboxGL::MapLoadingFailure::StyleLoadFailure;
-        description = e.what();
-    } catch (const mbgl::util::NotFoundException& e) {
-        type = QMapboxGL::MapLoadingFailure::NotFoundFailure;
-        description = e.what();
-    } catch (const std::exception& e) {
-        type = QMapboxGL::MapLoadingFailure::UnknownFailure;
-        description = e.what();
+    switch (error) {
+        case mbgl::MapLoadError::StyleParseError:
+            type = QMapboxGL::MapLoadingFailure::StyleParseFailure;
+            break;
+        case mbgl::MapLoadError::StyleLoadError:
+            type = QMapboxGL::MapLoadingFailure::StyleLoadFailure;
+            break;
+        case mbgl::MapLoadError::NotFoundError:
+            type = QMapboxGL::MapLoadingFailure::NotFoundFailure;
+            break;
+        default:
+            type = QMapboxGL::MapLoadingFailure::UnknownFailure;
     }
 
     emit mapLoadingFailed(type, description);
@@ -79,9 +77,9 @@ void QMapboxGLMapObserver::onWillStartRenderingFrame()
     emit mapChanged(QMapboxGL::MapChangeWillStartRenderingFrame);
 }
 
-void QMapboxGLMapObserver::onDidFinishRenderingFrame(mbgl::MapObserver::RenderMode mode)
+void QMapboxGLMapObserver::onDidFinishRenderingFrame(mbgl::MapObserver::RenderFrameStatus status)
 {
-    if (mode == mbgl::MapObserver::RenderMode::Partial) {
+    if (status.mode == mbgl::MapObserver::RenderMode::Partial) {
         emit mapChanged(QMapboxGL::MapChangeDidFinishRenderingFrame);
     } else {
         emit mapChanged(QMapboxGL::MapChangeDidFinishRenderingFrameFullyRendered);

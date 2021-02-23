@@ -1,13 +1,20 @@
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/platform.hpp>
+#include <mbgl/platform/thread.hpp>
 
 #include <sys/prctl.h>
 #include <sys/resource.h>
+
+#include <cassert>
+#include "jni.hpp"
 
 // Implementation based on Chromium's platform_thread_android.cc.
 
 namespace mbgl {
 namespace platform {
+
+thread_local static JNIEnv* env;
+thread_local static bool detach;
 
 std::string getCurrentThreadName() {
     char name[32] = "unknown";
@@ -31,6 +38,26 @@ void makeThreadLowPriority() {
     // Supposedly would set the priority for the whole process, but
     // on Linux/Android it only sets for the current thread.
     setpriority(PRIO_PROCESS, 0, 19);
+}
+
+void setCurrentThreadPriority(double priority) {
+    if (priority < -20 || priority > 19) {
+        Log::Warning(Event::General, "Couldn't set thread priority");
+        return;
+    }
+    setpriority(PRIO_PROCESS, 0, int(priority));
+}
+
+void attachThread() {
+    using namespace android;
+    assert(env == nullptr);
+    detach = attach_jni_thread(theJVM, &env, platform::getCurrentThreadName());
+}
+
+void detachThread() {
+    using namespace android;
+    assert(env);
+    detach_jni_thread(theJVM, &env, detach);
 }
 
 } // namespace platform

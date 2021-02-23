@@ -1,17 +1,26 @@
 #pragma once
 
-#include <mbgl/text/glyph.hpp>
 #include <mbgl/text/bidi.hpp>
+#include <mbgl/style/expression/formatted.hpp>
+#include <mbgl/util/font_stack.hpp>
 
 namespace mbgl {
 
 struct SectionOptions {
-    SectionOptions(double scale_, FontStackHash fontStackHash_)
-        : scale(scale_), fontStackHash(fontStackHash_)
+    SectionOptions(double scale_, FontStack fontStack_, optional<Color> textColor_ = nullopt)
+        : scale(scale_),
+          fontStackHash(FontStackHasher()(fontStack_)),
+          fontStack(std::move(fontStack_)),
+          textColor(std::move(textColor_))
     {}
-    
+
+    explicit SectionOptions(std::string imageID_) : scale(1.0), imageID(std::move(imageID_)) {}
+
     double scale;
     FontStackHash fontStackHash;
+    FontStack fontStack;
+    optional<Color> textColor;
+    optional<std::string> imageID;
 };
 
 /**
@@ -70,8 +79,14 @@ struct TaggedString {
     const StyledText& getStyledText() const {
         return styledText;
     }
-    
-    void addSection(const std::u16string& text, double scale, FontStackHash fontStack);
+
+    void addTextSection(const std::u16string& text,
+                        double scale,
+                        const FontStack& fontStack,
+                        optional<Color> textColor_ = nullopt);
+
+    void addImageSection(const std::string& imageID);
+
     const SectionOptions& sectionAt(std::size_t index) const {
         return sections.at(index);
     }
@@ -88,10 +103,18 @@ struct TaggedString {
     void trim();
     
     void verticalizePunctuation();
-   
+    bool allowsVerticalWritingMode();
+
+private:
+    optional<char16_t> getNextImageSectionCharCode();
+
 private:
     StyledText styledText;
     std::vector<SectionOptions> sections;
+    optional<bool> supportsVerticalWritingMode;
+    // Max number of images within a text is 6400 U+E000–U+F8FF
+    // that covers Basic Multilingual Plane Unicode Private Use Area (PUA).
+    char16_t imageSectionID = 0u;
 };
 
 } // namespace mbgl

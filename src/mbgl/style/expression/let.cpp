@@ -12,8 +12,8 @@ EvaluationResult Let::evaluate(const EvaluationContext& params) const {
 }
 
 void Let::eachChild(const std::function<void(const Expression&)>& visit) const {
-    for (auto it = bindings.begin(); it != bindings.end(); it++) {
-        visit(*it->second);
+    for (const auto& binding : bindings) {
+        visit(*binding.second);
     }
     visit(*result);
 }
@@ -69,7 +69,7 @@ ParseResult Let::parse(const Convertible& value, ParsingContext& ctx) {
 mbgl::Value Let::serialize() const {
     std::vector<mbgl::Value> serialized;
     serialized.emplace_back(getOperator());
-    for (auto entry : bindings) {
+    for (const auto& entry : bindings) {
         serialized.emplace_back(entry.first);
         serialized.emplace_back(entry.second->serialize());
     }

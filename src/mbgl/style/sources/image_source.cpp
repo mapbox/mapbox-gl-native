@@ -1,9 +1,12 @@
+#include <mbgl/storage/file_source.hpp>
+#include <mbgl/style/layer.hpp>
+#include <mbgl/style/source_observer.hpp>
 #include <mbgl/style/sources/image_source.hpp>
 #include <mbgl/style/sources/image_source_impl.hpp>
+#include <mbgl/tile/tile.hpp>
+#include <mbgl/util/async_request.hpp>
 #include <mbgl/util/geo.hpp>
-#include <mbgl/style/source_observer.hpp>
 #include <mbgl/util/premultiply.hpp>
-#include <mbgl/storage/file_source.hpp>
 
 namespace mbgl {
 namespace style {
@@ -28,7 +31,7 @@ std::array<LatLng, 4> ImageSource::getCoordinates() const {
 }
 
 void ImageSource::setURL(const std::string& url_) {
-    url = std::move(url_);
+    url = url_;
     // Signal that the source description needs a reload
     if (loaded || req) {
         loaded = false;
@@ -61,7 +64,7 @@ void ImageSource::loadDescription(FileSource& fileSource) {
     }
     const Resource imageResource { Resource::Image, *url, {} };
 
-    req = fileSource.request(imageResource, [this](Response res) {
+    req = fileSource.request(imageResource, [this](const Response& res) {
         if (res.error) {
             observer->onSourceError(*this, std::make_exception_ptr(std::runtime_error(res.error->message)));
         } else if (res.notModified) {
@@ -78,6 +81,14 @@ void ImageSource::loadDescription(FileSource& fileSource) {
             observer->onSourceLoaded(*this);
         }
     });
+}
+
+bool ImageSource::supportsLayerType(const mbgl::style::LayerTypeInfo* info) const {
+    return mbgl::underlying_type(Tile::Kind::Raster) == mbgl::underlying_type(info->tileKind);
+}
+
+Mutable<Source::Impl> ImageSource::createMutable() const noexcept {
+    return staticMutableCast<Source::Impl>(makeMutable<Impl>(impl()));
 }
 
 } // namespace style

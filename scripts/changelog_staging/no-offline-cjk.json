@@ -1,0 +1,6 @@
+{
+  "core": "Add `--includeIdeographs` option to mbgl-offline tool to include CJK glyphs in offline region, at the cost of increased size requirements.",
+  "darwin": "Added the `MGLOfflineRegion.includesIdeographicGlyphs` property, which you can set to NO to exclude CJK glyphs and save space.",
+  "android": "Added the `includeIdeographs` property to `OfflineRegionDefinition`, which you can set to false to exclude CJK glyphs and save space.",
+  "issue": 11561
+}

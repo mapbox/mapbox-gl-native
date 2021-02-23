@@ -49,6 +49,27 @@ optional<T> Converter<T, typename std::enable_if_t<std::is_enum<T>::value>>::ope
     return *result;
 }
 
+template <class T>
+auto Converter<std::vector<T>, typename std::enable_if_t<std::is_enum<T>::value>>::operator()(const Convertible& value, Error& error) const -> optional<std::vector<T>> {
+    if (!isArray(value)) {
+        error.message = "value must be an array";
+        return nullopt;
+    }
+
+    std::vector<T> result;
+    result.reserve(arrayLength(value));
+
+    for (std::size_t i = 0; i < arrayLength(value); ++i) {
+        optional<T> enumItem = Converter<T>{}(arrayMember(value, i), error);
+        if (!enumItem) {
+            return nullopt;
+        }
+        result.push_back(*enumItem);
+    }
+
+    return result;
+}
+
 template optional<AlignmentType> Converter<AlignmentType>::operator()(const Convertible&, Error&) const;
 template optional<CirclePitchScaleType> Converter<CirclePitchScaleType>::operator()(const Convertible&, Error&) const;
 template optional<HillshadeIlluminationAnchorType> Converter<HillshadeIlluminationAnchorType>::operator()(const Convertible&, Error&) const;
@@ -64,6 +85,8 @@ template optional<TextJustifyType> Converter<TextJustifyType>::operator()(const 
 template optional<TextTransformType> Converter<TextTransformType>::operator()(const Convertible&, Error&) const;
 template optional<TranslateAnchorType> Converter<TranslateAnchorType>::operator()(const Convertible&, Error&) const;
 template optional<VisibilityType> Converter<VisibilityType>::operator()(const Convertible&, Error&) const;
+template optional<std::vector<TextVariableAnchorType>> Converter<std::vector<TextVariableAnchorType>>::operator()(const Convertible&, Error&) const;
+template optional<std::vector<TextWritingModeType>> Converter<std::vector<TextWritingModeType>>::operator()(const Convertible&, Error&) const;
 
 optional<Color> Converter<Color>::operator()(const Convertible& value, Error& error) const {
     optional<std::string> string = toString(value);
@@ -103,6 +126,28 @@ optional<std::array<float, N>> Converter<std::array<float, N>>::operator()(const
 template optional<std::array<float, 2>> Converter<std::array<float, 2>>::operator()(const Convertible&, Error&) const;
 template optional<std::array<float, 3>> Converter<std::array<float, 3>>::operator()(const Convertible&, Error&) const;
 template optional<std::array<float, 4>> Converter<std::array<float, 4>>::operator()(const Convertible&, Error&) const;
+
+template <size_t N>
+optional<std::array<double, N>> Converter<std::array<double, N>>::operator()(const Convertible& value,
+                                                                             Error& error) const {
+    if (!isArray(value) || arrayLength(value) != N) {
+        error.message = "value must be an array of " + util::toString(N) + " numbers";
+        return nullopt;
+    }
+
+    std::array<double, N> result;
+    for (size_t i = 0; i < N; i++) {
+        optional<double> n = toDouble(arrayMember(value, i));
+        if (!n) {
+            error.message = "value must be an array of " + util::toString(N) + " numbers";
+            return nullopt;
+        }
+        result[i] = *n;
+    }
+    return result;
+}
+
+template optional<std::array<double, 3>> Converter<std::array<double, 3>>::operator()(const Convertible&, Error&) const;
 
 optional<std::vector<float>> Converter<std::vector<float>>::operator()(const Convertible& value, Error& error) const {
     if (!isArray(value)) {

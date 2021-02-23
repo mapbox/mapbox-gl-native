@@ -1,0 +1,3 @@
+app_identifier("com.mapbox.UnitTestsApp") # The bundle identifier of your app
+apple_id ENV['MAPBOX_APPLE_ID']
+team_id ENV['MAPBOX_APPLE_TEAM_ID'] # Developer Portal Team ID

@@ -10,50 +10,54 @@ namespace mbgl {
 
 using namespace style;
 
-static_assert(sizeof(LineLayoutVertex) == 12, "expected LineLayoutVertex size");
+static_assert(sizeof(LineLayoutVertex) == 8, "expected LineLayoutVertex size");
 
 template <class Values, class...Args>
-Values makeValues(const RenderLinePaintProperties::PossiblyEvaluated& properties,
+Values makeValues(const style::LinePaintProperties::PossiblyEvaluated& properties,
                   const RenderTile& tile,
                   const TransformState& state,
                   const std::array<float, 2>& pixelsToGLUnits,
+                  const float pixelRatio,
                   Args&&... args) {
 
     return Values {
-        uniforms::u_matrix::Value(
+        uniforms::matrix::Value(
             tile.translatedMatrix(properties.get<LineTranslate>(),
                                   properties.get<LineTranslateAnchor>(),
                                   state)
         ),
-        uniforms::u_ratio::Value( 1.0f / tile.id.pixelsToTileUnits(1.0, state.getZoom()) ),
-        uniforms::u_gl_units_to_pixels::Value({ {1.0f / pixelsToGLUnits[0], 1.0f / pixelsToGLUnits[1]} }),
+        uniforms::ratio::Value( 1.0f / tile.id.pixelsToTileUnits(1.0, state.getZoom()) ),
+        uniforms::units_to_pixels::Value({ {1.0f / pixelsToGLUnits[0], 1.0f / pixelsToGLUnits[1]} }),
+        uniforms::device_pixel_ratio::Value( pixelRatio ),
         std::forward<Args>(args)...
     };
 }
 
-LineProgram::UniformValues
-LineProgram::uniformValues(const RenderLinePaintProperties::PossiblyEvaluated& properties,
-                           const RenderTile& tile,
-                           const TransformState& state,
-                           const std::array<float, 2>& pixelsToGLUnits) {
-    return makeValues<LineProgram::UniformValues>(
+LineProgram::LayoutUniformValues
+LineProgram::layoutUniformValues(const style::LinePaintProperties::PossiblyEvaluated& properties,
+                                 const RenderTile& tile,
+                                 const TransformState& state,
+                                 const std::array<float, 2>& pixelsToGLUnits,
+                                 const float pixelRatio) {
+    return makeValues<LineProgram::LayoutUniformValues>(
         properties,
         tile,
         state,
-        pixelsToGLUnits
+        pixelsToGLUnits,
+        pixelRatio
     );
 }
 
-LineSDFProgram::UniformValues
-LineSDFProgram::uniformValues(const RenderLinePaintProperties::PossiblyEvaluated& properties,
-                              float pixelRatio,
-                              const RenderTile& tile,
-                              const TransformState& state,
-                              const std::array<float, 2>& pixelsToGLUnits,
-                              const LinePatternPos& posA,
-                              const LinePatternPos& posB,
-                              const CrossfadeParameters& crossfade,
-                              float atlasWidth) {
+LineSDFProgram::LayoutUniformValues
+LineSDFProgram::layoutUniformValues(const style::LinePaintProperties::PossiblyEvaluated& properties,
+                                    float pixelRatio,
+                                    const RenderTile& tile,
+                                    const TransformState& state,
+                                    const std::array<float, 2>& pixelsToGLUnits,
+                                    const LinePatternPos& posA,
+                                    const LinePatternPos& posB,
+                                    const CrossfadeParameters& crossfade,
+                                    float atlasWidth) {
     const float widthA = posA.width * crossfade.fromScale;
     const float widthB = posB.width * crossfade.toScale;
 
@@ -67,55 +71,56 @@ LineSDFProgram::uniformValues(const RenderLinePaintProperties::PossiblyEvaluated
         -posB.height / 2.0f
     }};
 
-    return makeValues<LineSDFProgram::UniformValues>(
+    return makeValues<LineSDFProgram::LayoutUniformValues>(
         properties,
         tile,
         state,
         pixelsToGLUnits,
-        uniforms::u_patternscale_a::Value( scaleA ),
-        uniforms::u_patternscale_b::Value( scaleB ),
-        uniforms::u_tex_y_a::Value( posA.y ),
-        uniforms::u_tex_y_b::Value( posB.y ),
-        uniforms::u_mix::Value( crossfade.t ),
-        uniforms::u_sdfgamma::Value( atlasWidth / (std::min(widthA, widthB) * 256.0f * pixelRatio) / 2.0f ),
-        uniforms::u_image::Value( 0 )
+        pixelRatio,
+        uniforms::patternscale_a::Value( scaleA ),
+        uniforms::patternscale_b::Value( scaleB ),
+        uniforms::tex_y_a::Value( posA.y ),
+        uniforms::tex_y_b::Value( posB.y ),
+        uniforms::mix::Value( crossfade.t ),
+        uniforms::sdfgamma::Value( atlasWidth / (std::min(widthA, widthB) * 256.0f * pixelRatio) / 2.0f )
     );
 }
 
-LinePatternProgram::UniformValues
-LinePatternProgram::uniformValues(const RenderLinePaintProperties::PossiblyEvaluated& properties,
-                                  const RenderTile& tile,
-                                  const TransformState& state,
-                                  const std::array<float, 2>& pixelsToGLUnits,
-                                  const Size atlasSize,
-                                  const CrossfadeParameters& crossfade,
-                                  const float pixelRatio) {
-    
+LinePatternProgram::LayoutUniformValues LinePatternProgram::layoutUniformValues(
+    const style::LinePaintProperties::PossiblyEvaluated& properties,
+    const RenderTile& tile,
+    const TransformState& state,
+    const std::array<float, 2>& pixelsToGLUnits,
+    const float pixelRatio,
+    const Size atlasSize,
+    const CrossfadeParameters& crossfade) {
+
     const auto tileRatio = 1 / tile.id.pixelsToTileUnits(1, state.getIntegerZoom());
 
-    return makeValues<LinePatternProgram::UniformValues>(
+    return makeValues<LinePatternProgram::LayoutUniformValues>(
         properties,
         tile,
         state,
         pixelsToGLUnits,
-        uniforms::u_scale::Value ({ {pixelRatio, tileRatio, crossfade.fromScale, crossfade.toScale} }),
-        uniforms::u_texsize::Value( atlasSize ),
-        uniforms::u_fade::Value( crossfade.t ),
-        uniforms::u_image::Value( 0 )
+        pixelRatio,
+        uniforms::scale::Value ({ {pixelRatio, tileRatio, crossfade.fromScale, crossfade.toScale} }),
+        uniforms::texsize::Value( atlasSize ),
+        uniforms::fade::Value( crossfade.t )
     );
 }
 
-LineGradientProgram::UniformValues
-LineGradientProgram::uniformValues(const RenderLinePaintProperties::PossiblyEvaluated& properties,
-                           const RenderTile& tile,
-                           const TransformState& state,
-                           const std::array<float, 2>& pixelsToGLUnits) {
-    return makeValues<LineGradientProgram::UniformValues>(
+LineGradientProgram::LayoutUniformValues LineGradientProgram::layoutUniformValues(
+    const style::LinePaintProperties::PossiblyEvaluated& properties,
+    const RenderTile& tile,
+    const TransformState& state,
+    const std::array<float, 2>& pixelsToGLUnits,
+    const float pixelRatio) {
+    return makeValues<LineGradientProgram::LayoutUniformValues>(
         properties,
         tile,
         state,
         pixelsToGLUnits,
-        uniforms::u_image::Value{ 0 }
+        pixelRatio
     );
 }
 

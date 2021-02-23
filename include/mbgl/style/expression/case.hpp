@@ -5,6 +5,7 @@
 #include <mbgl/style/conversion.hpp>
 
 #include <memory>
+#include <utility>
 #include <vector>
 
 namespace mbgl {
@@ -16,8 +17,7 @@ public:
     using Branch = std::pair<std::unique_ptr<Expression>, std::unique_ptr<Expression>>;
 
     Case(type::Type type_, std::vector<Branch> branches_, std::unique_ptr<Expression> otherwise_)
-        : Expression(Kind::Case, type_), branches(std::move(branches_)), otherwise(std::move(otherwise_)) {
-    }
+        : Expression(Kind::Case, std::move(type_)), branches(std::move(branches_)), otherwise(std::move(otherwise_)) {}
 
     static ParseResult parse(const mbgl::style::conversion::Convertible& value, ParsingContext& ctx);
 

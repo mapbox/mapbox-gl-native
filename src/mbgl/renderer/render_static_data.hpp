@@ -1,35 +1,48 @@
 #pragma once
 
-#include <mbgl/gl/vertex_buffer.hpp>
-#include <mbgl/gl/index_buffer.hpp>
+#include <mbgl/gfx/vertex_buffer.hpp>
+#include <mbgl/gfx/index_buffer.hpp>
+#include <mbgl/gfx/renderbuffer.hpp>
+#include <mbgl/programs/background_program.hpp>
+#include <mbgl/programs/heatmap_texture_program.hpp>
 #include <mbgl/programs/programs.hpp>
+#include <mbgl/programs/raster_program.hpp>
 #include <mbgl/util/optional.hpp>
 
 #include <string>
 
 namespace mbgl {
+namespace gfx {
+class Context;
+class UploadPass;
+} // namespace gfx
 
 class RenderStaticData {
 public:
-    RenderStaticData(gl::Context&, float pixelRatio, const optional<std::string>& programCacheDir);
+    RenderStaticData(gfx::Context&, float pixelRatio);
 
-    gl::VertexBuffer<PositionOnlyLayoutAttributes::Vertex> tileVertexBuffer;
-    gl::VertexBuffer<RasterLayoutVertex> rasterVertexBuffer;
-    gl::VertexBuffer<ExtrusionTextureLayoutVertex> extrusionTextureVertexBuffer;
+    void upload(gfx::UploadPass&);
 
-    gl::IndexBuffer<gl::Triangles> quadTriangleIndexBuffer;
-    gl::IndexBuffer<gl::LineStrip> tileBorderIndexBuffer;
+    optional<gfx::VertexBuffer<gfx::Vertex<PositionOnlyLayoutAttributes>>> tileVertexBuffer;
+    optional<gfx::VertexBuffer<RasterLayoutVertex>> rasterVertexBuffer;
+    optional<gfx::VertexBuffer<HeatmapTextureLayoutVertex>> heatmapTextureVertexBuffer;
 
-    SegmentVector<BackgroundAttributes> tileTriangleSegments;
-    SegmentVector<DebugAttributes> tileBorderSegments;
-    SegmentVector<RasterAttributes> rasterSegments;
-    SegmentVector<ExtrusionTextureAttributes> extrusionTextureSegments;
+    optional<gfx::IndexBuffer> quadTriangleIndexBuffer;
+    optional<gfx::IndexBuffer> tileBorderIndexBuffer;
 
-    optional<gl::Renderbuffer<gl::RenderbufferType::DepthComponent>> depthRenderbuffer;
+    static SegmentVector<BackgroundAttributes> tileTriangleSegments();
+    static SegmentVector<DebugAttributes> tileBorderSegments();
+    static SegmentVector<RasterAttributes> rasterSegments();
+    static SegmentVector<HeatmapTextureAttributes> heatmapTextureSegments();
+
+    optional<gfx::Renderbuffer<gfx::RenderbufferPixelType::Depth>> depthRenderbuffer;
     bool has3D = false;
+    bool uploaded = false;
     Size backendSize;
 
     Programs programs;
+
+    const SegmentVector<BackgroundAttributes> clippingMaskSegments;
 
 #ifndef NDEBUG
     Programs overdrawPrograms;

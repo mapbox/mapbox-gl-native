@@ -48,7 +48,7 @@ std::string toString(double t, bool decimal) {
     return data;
 }
 
-std::string toString(std::exception_ptr error) {
+std::string toString(const std::exception_ptr& error) {
     assert(error);
 
     if (!error) {
@@ -78,9 +78,13 @@ std::string toPaddedHex(T x) {
     return result;
 }
 
+} // namespace
+
+std::string toHex(uint32_t value) {
+    return toPaddedHex(value);
 }
 
-std::string toHex(size_t value) {
+std::string toHex(uint64_t value) {
     return toPaddedHex(value);
 }
 

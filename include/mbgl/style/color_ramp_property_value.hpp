@@ -27,7 +27,7 @@ public:
     ColorRampPropertyValue() : value(nullptr) {}
     ColorRampPropertyValue(std::shared_ptr<expression::Expression> value_) : value(std::move(value_)) {}
 
-    bool isUndefined() const { return value.get() == nullptr; }
+    bool isUndefined() const { return value == nullptr; }
 
     // noop, needed for batch evaluation of paint property values to compile
     template <typename Evaluator>

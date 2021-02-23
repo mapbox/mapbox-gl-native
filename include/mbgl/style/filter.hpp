@@ -18,8 +18,8 @@ public:
 private:
     optional<mbgl::Value> legacyFilter;
 public:
-    Filter() : expression() {}
-    
+    Filter() = default;
+
     Filter(expression::ParseResult _expression, optional<mbgl::Value> _filter = {})
     : expression(std::move(*_expression)),
      legacyFilter(std::move(_filter)){
@@ -27,6 +27,8 @@ public:
     }
     
     bool operator()(const expression::EvaluationContext& context) const;
+
+    operator bool() const { return expression || legacyFilter; }
 
     friend bool operator==(const Filter& lhs, const Filter& rhs) {
         if (!lhs.expression || !rhs.expression) {

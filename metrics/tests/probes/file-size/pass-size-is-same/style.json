@@ -1,0 +1,34 @@
+{
+  "version": 8,
+  "metadata": {
+    "test": {
+      "operations": [
+        ["probeFileSize", "image", "expected.png", 0],
+        ["probeFileSize", "image-compressed", "expected.png", 0, "compressed"],
+        ["probeFileSize", "style", "style.json", 0],
+        ["probeFileSize", "style-compressed", "style.json", 0, "compressed"]
+      ],
+      "width": 64,
+      "height": 64
+    }
+  },
+  "sources": {
+    "geojson": {
+      "type": "geojson",
+      "data": {
+        "type": "Point",
+        "coordinates": [
+          0,
+          0
+        ]
+      }
+    }
+  },
+  "layers": [
+    {
+      "id": "circle",
+      "type": "circle",
+      "source": "geojson"
+    }
+  ]
+}

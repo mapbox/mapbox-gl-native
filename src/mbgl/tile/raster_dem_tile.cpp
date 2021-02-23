@@ -1,14 +1,16 @@
 #include <mbgl/tile/raster_dem_tile.hpp>
-#include <mbgl/tile/raster_dem_tile_worker.hpp>
-#include <mbgl/tile/tile_observer.hpp>
-#include <mbgl/tile/tile_loader_impl.hpp>
-#include <mbgl/style/source.hpp>
+
+#include <mbgl/actor/scheduler.hpp>
+#include <mbgl/renderer/buckets/hillshade_bucket.hpp>
+#include <mbgl/renderer/tile_parameters.hpp>
+#include <mbgl/renderer/tile_render_data.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
-#include <mbgl/storage/file_source.hpp>
-#include <mbgl/renderer/tile_parameters.hpp>
-#include <mbgl/renderer/buckets/hillshade_bucket.hpp>
-#include <mbgl/actor/scheduler.hpp>
+#include <mbgl/style/source.hpp>
+#include <mbgl/tile/raster_dem_tile_worker.hpp>
+#include <mbgl/tile/tile_loader_impl.hpp>
+#include <mbgl/tile/tile_observer.hpp>
+#include <utility>
 
 namespace mbgl {
 
@@ -18,7 +20,7 @@ RasterDEMTile::RasterDEMTile(const OverscaledTileID& id_,
     : Tile(Kind::RasterDEM, id_),
       loader(*this, id_, parameters, tileset),
       mailbox(std::make_shared<Mailbox>(*Scheduler::GetCurrent())),
-      worker(parameters.workerScheduler,
+      worker(Scheduler::GetBackground(),
              ActorRef<RasterDEMTile>(*this, mailbox)) {
 
     encoding = tileset.encoding;
@@ -35,17 +37,21 @@ RasterDEMTile::RasterDEMTile(const OverscaledTileID& id_,
 
 RasterDEMTile::~RasterDEMTile() = default;
 
+std::unique_ptr<TileRenderData> RasterDEMTile::createRenderData() {
+    return std::make_unique<SharedBucketTileRenderData<HillshadeBucket>>(bucket);
+}
+
 void RasterDEMTile::setError(std::exception_ptr err) {
     loaded = true;
-    observer->onTileError(*this, err);
+    observer->onTileError(*this, std::move(err));
 }
 
 void RasterDEMTile::setMetadata(optional<Timestamp> modified_, optional<Timestamp> expires_) {
-    modified = modified_;
-    expires = expires_;
+    modified = std::move(modified_);
+    expires = std::move(expires_);
 }
 
-void RasterDEMTile::setData(std::shared_ptr<const std::string> data) {
+void RasterDEMTile::setData(const std::shared_ptr<const std::string>& data) {
     pending = true;
     ++correlationID;
     worker.self().invoke(&RasterDEMTileWorker::parse, data, correlationID, encoding);
@@ -57,7 +63,7 @@ void RasterDEMTile::onParsed(std::unique_ptr<HillshadeBucket> result, const uint
     if (resultCorrelationID == correlationID) {
         pending = false;
     }
-    renderable = bucket ? true : false;
+    renderable = static_cast<bool>(bucket);
     observer->onTileChanged(*this);
 }
 
@@ -66,18 +72,11 @@ void RasterDEMTile::onError(std::exception_ptr err, const uint64_t resultCorrela
     if (resultCorrelationID == correlationID) {
         pending = false;
     }
-    observer->onTileError(*this, err);
+    observer->onTileError(*this, std::move(err));
 }
 
-void RasterDEMTile::upload(gl::Context& context) {
-    if (bucket) {
-        bucket->upload(context);
-    }
-}
-
-
-Bucket* RasterDEMTile::getBucket(const style::Layer::Impl&) const {
-    return bucket.get();
+bool RasterDEMTile::layerPropertiesUpdated(const Immutable<style::LayerProperties>&) {
+    return bool(bucket);
 }
 
 HillshadeBucket* RasterDEMTile::getBucket() const {
@@ -85,8 +84,9 @@ HillshadeBucket* RasterDEMTile::getBucket() const {
 }
 
 void RasterDEMTile::backfillBorder(const RasterDEMTile& borderTile, const DEMTileNeighbors mask) {
-    int32_t dx = borderTile.id.canonical.x - id.canonical.x;
-    const int8_t dy = borderTile.id.canonical.y - id.canonical.y;
+    int32_t dx = static_cast<int32_t>(borderTile.id.canonical.x) - static_cast<int32_t>(id.canonical.x);
+    const auto dy =
+        static_cast<int8_t>(static_cast<int32_t>(borderTile.id.canonical.y) - static_cast<int32_t>(id.canonical.y));
     const uint32_t dim = pow(2, id.canonical.z);
     if (dx == 0 && dy == 0) return;
     if (std::abs(dy) > 1) return;
@@ -120,6 +120,10 @@ void RasterDEMTile::setMask(TileMask&& mask) {
 
 void RasterDEMTile::setNecessity(TileNecessity necessity) {
     loader.setNecessity(necessity);
+}
+
+void RasterDEMTile::setUpdateParameters(const TileUpdateParameters& params) {
+    loader.setUpdateParameters(params);
 }
 
 } // namespace mbgl

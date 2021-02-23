@@ -76,13 +76,15 @@ MBGL_DEFINE_ENUM(SymbolAnchorType, {
     { SymbolAnchorType::BottomLeft, "bottom-left" },
     { SymbolAnchorType::BottomRight, "bottom-right" }
 });
-    
+
 MBGL_DEFINE_ENUM(SymbolZOrderType, {
+    { SymbolZOrderType::Auto, "auto" },
     { SymbolZOrderType::ViewportY, "viewport-y" },
     { SymbolZOrderType::Source, "source" }
 });
 
 MBGL_DEFINE_ENUM(TextJustifyType, {
+    { TextJustifyType::Auto, "auto" },
     { TextJustifyType::Center, "center" },
     { TextJustifyType::Left, "left" },
     { TextJustifyType::Right, "right" },
@@ -92,6 +94,11 @@ MBGL_DEFINE_ENUM(TextTransformType, {
     { TextTransformType::None, "none" },
     { TextTransformType::Uppercase, "uppercase" },
     { TextTransformType::Lowercase, "lowercase" },
+});
+
+MBGL_DEFINE_ENUM(TextWritingModeType, {
+    { TextWritingModeType::Horizontal, "horizontal" },
+    { TextWritingModeType::Vertical, "vertical" }
 });
 
 MBGL_DEFINE_ENUM(AlignmentType, {

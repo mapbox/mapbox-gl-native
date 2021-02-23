@@ -1,6 +1,5 @@
 #pragma once
 
-#include <memory>
 #include <string>
 
 namespace mbgl {
@@ -23,10 +22,9 @@ void setCurrentThreadName(const std::string& name);
 // Makes the current thread low priority.
 void makeThreadLowPriority();
 
-// Shows an alpha image with the specified dimensions in a named window.
-void showDebugImage(std::string name, const char *data, size_t width, size_t height);
+// Sets priority of a current thread. Platform implementation
+// must validate provided value.
+void setCurrentThreadPriority(double priority);
 
-// Shows an alpha image with the specified dimensions in a named window.
-void showColorDebugImage(std::string name, const char *data, size_t logical_width, size_t logical_height, size_t width, size_t height);
 } // namespace platform
 } // namespace mbgl

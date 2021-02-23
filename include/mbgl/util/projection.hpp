@@ -61,7 +61,7 @@ public:
         const double easting  = util::EARTH_RADIUS_M * constrainedLongitude * util::DEG2RAD;
         const double northing = 0.5 * util::EARTH_RADIUS_M * std::log((1 + f) / (1 - f));
 
-        return ProjectedMeters(northing, easting);
+        return {northing, easting};
     }
 
     static LatLng latLngForProjectedMeters(const ProjectedMeters& projectedMeters) {
@@ -71,7 +71,7 @@ public:
         latitude = util::clamp(latitude, -util::LATITUDE_MAX, util::LATITUDE_MAX);
         longitude = util::clamp(longitude, -util::LONGITUDE_MAX, util::LONGITUDE_MAX);
 
-        return LatLng(latitude, longitude);
+        return {latitude, longitude};
     }
 
     static Point<double> project(const LatLng& latLng, double scale) {
@@ -98,7 +98,7 @@ private:
         return Point<double> {
             util::LONGITUDE_MAX + latLng.longitude(),
             util::LONGITUDE_MAX - util::RAD2DEG * std::log(std::tan(M_PI / 4 + latitude * M_PI / util::DEGREES_MAX))
-        } * worldSize / util::DEGREES_MAX;
+        } * (worldSize / util::DEGREES_MAX);
     }
 };
 

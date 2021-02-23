@@ -1,7 +1,6 @@
 #include <mbgl/annotation/annotation_tile.hpp>
 #include <mbgl/annotation/annotation_manager.hpp>
 #include <mbgl/util/constants.hpp>
-#include <mbgl/storage/file_source.hpp>
 #include <mbgl/renderer/tile_parameters.hpp>
 
 #include <utility>
@@ -12,11 +11,17 @@ AnnotationTile::AnnotationTile(const OverscaledTileID& overscaledTileID,
                                const TileParameters& parameters)
     : GeometryTile(overscaledTileID, AnnotationManager::SourceID, parameters),
       annotationManager(parameters.annotationManager) {
-    annotationManager.addTile(*this);
+    auto guard = annotationManager.lock();
+    if (annotationManager) {
+        annotationManager->addTile(*this);
+    }
 }
 
 AnnotationTile::~AnnotationTile() {
-    annotationManager.removeTile(*this);
+    auto guard = annotationManager.lock();
+    if (annotationManager) {
+        annotationManager->removeTile(*this);
+    }
 }
 
 class AnnotationTileFeatureData {
@@ -59,14 +64,13 @@ FeatureIdentifier AnnotationTileFeature::getID() const {
     return data->id;
 }
 
-GeometryCollection AnnotationTileFeature::getGeometries() const {
+const GeometryCollection& AnnotationTileFeature::getGeometries() const {
     return data->geometries;
 }
 
 class AnnotationTileLayerData {
 public:
-    AnnotationTileLayerData(const std::string& name_) : name(name_) {
-    }
+    explicit AnnotationTileLayerData(std::string name_) : name(std::move(name_)) {}
 
     const std::string name;
     std::vector<std::shared_ptr<const AnnotationTileFeatureData>> features;

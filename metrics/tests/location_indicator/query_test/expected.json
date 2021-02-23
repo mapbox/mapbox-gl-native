@@ -1,0 +1,16 @@
+[
+  {
+    "type": "Feature",
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        35.693055,
+        139.766707
+      ]
+    },
+    "properties": {},
+    "source": "",
+    "sourceLayer": "puck123",
+    "state": {}
+  }
+]

@@ -11,12 +11,12 @@ using namespace mbgl::style::conversion;
 template <typename T>
 class InterpolateImpl : public Interpolate {
 public:
-    InterpolateImpl(type::Type type_,
-          Interpolator interpolator_,
-          std::unique_ptr<Expression> input_,
-          std::map<double, std::unique_ptr<Expression>> stops_
-    ) : Interpolate(std::move(type_), std::move(interpolator_), std::move(input_), std::move(stops_))
-    {
+    InterpolateImpl(const type::Type& type_,
+                    const Interpolator& interpolator_,
+                    std::unique_ptr<Expression> input_,
+                    // NOLINTNEXTLINE(performance-unnecessary-value-param)
+                    std::map<double, std::unique_ptr<Expression>> stops_)
+        : Interpolate(type_, interpolator_, std::move(input_), std::move(stops_)) {
         static_assert(util::Interpolatable<T>::value, "Interpolate expression requires an interpolatable value type.");
     }
 

@@ -1,4 +1,12 @@
 ignore:
+  - "benchmark/"
+  - "expression-test/"
+  - "render-test/"
   - "test/"
   - "vendor/"
-        
+
+coverage:
+  status:
+    project:
+      default:
+        threshold: 1%

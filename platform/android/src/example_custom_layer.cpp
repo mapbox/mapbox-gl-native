@@ -1,8 +1,8 @@
-#include <jni.h>
 #include <GLES2/gl2.h>
-#include <sstream>
 #include <android/log.h>
-#include <mbgl/style/layers/custom_layer.hpp>
+#include <jni.h>
+#include <mbgl/gl/custom_layer.hpp>
+#include <sstream>
 
 // DEBUGGING
 

@@ -25,9 +25,19 @@ public:
 
     void loadDescription(FileSource&) final;
 
+    bool supportsLayerType(const mbgl::style::LayerTypeInfo*) const override;
+
+    mapbox::base::WeakPtr<Source> makeWeakPtr() final {
+        return weakFactory.makeWeakPtr();
+    }
+
+protected:
+    Mutable<Source::Impl> createMutable() const noexcept final;
+
 private:
     const variant<std::string, Tileset> urlOrTileset;
     std::unique_ptr<AsyncRequest> req;
+    mapbox::base::WeakPtrFactory<Source> weakFactory {this};
 };
 
 template <>

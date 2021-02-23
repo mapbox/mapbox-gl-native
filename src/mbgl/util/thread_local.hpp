@@ -1,29 +1,41 @@
 #pragma once
 
-#include <mbgl/util/noncopyable.hpp>
-
-#include <memory>
+#include <type_traits>
 
 namespace mbgl {
 namespace util {
+namespace impl {
+
+class ThreadLocalBase {
+protected:
+    ThreadLocalBase();
+    ~ThreadLocalBase();
+
+    void* get();
+    void set(void*);
+
+private:
+    std::aligned_storage_t<sizeof(void*), alignof(void*)> storage;
+};
+
+} // namespace impl
 
 template <class T>
-class ThreadLocal : public noncopyable {
+class ThreadLocal : public impl::ThreadLocalBase {
 public:
+    ThreadLocal() = default;
+
     ThreadLocal(T* val) {
-        ThreadLocal();
         set(val);
     }
 
-    ThreadLocal();
-    ~ThreadLocal();
+    T* get() {
+        return reinterpret_cast<T*>(impl::ThreadLocalBase::get());
+    }
 
-    T* get();
-    void set(T* ptr);
-
-private:
-    class Impl;
-    std::unique_ptr<Impl> impl;
+    void set(T* ptr) {
+        impl::ThreadLocalBase::set(ptr);
+    }
 };
 
 } // namespace util

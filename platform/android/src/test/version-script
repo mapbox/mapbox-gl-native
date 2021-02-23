@@ -1,0 +1,8 @@
+{
+global:
+  EnsureFrontOfChain;
+  AddSpecialSignalHandlerFn;
+  RemoveSpecialSignalHandlerFn;
+local:
+  *;
+};

@@ -1,3 +1,5 @@
+// clang-format off
+
 // This file is generated. Do not edit.
 
 #pragma once
@@ -6,7 +8,6 @@
 #include <mbgl/style/filter.hpp>
 #include <mbgl/style/property_value.hpp>
 #include <mbgl/style/expression/formatted.hpp>
-
 #include <mbgl/util/color.hpp>
 
 #include <vector>
@@ -16,248 +17,260 @@ namespace style {
 
 class TransitionOptions;
 
-class SymbolLayer : public Layer {
+class SymbolLayer final : public Layer {
 public:
     SymbolLayer(const std::string& layerID, const std::string& sourceID);
-    ~SymbolLayer() final;
-
-    // Dynamic properties
-    optional<conversion::Error> setLayoutProperty(const std::string& name, const conversion::Convertible& value) final;
-    optional<conversion::Error> setPaintProperty(const std::string& name, const conversion::Convertible& value) final;
+    ~SymbolLayer() override;
 
     // Layout properties
 
-    static PropertyValue<SymbolPlacementType> getDefaultSymbolPlacement();
-    PropertyValue<SymbolPlacementType> getSymbolPlacement() const;
-    void setSymbolPlacement(PropertyValue<SymbolPlacementType>);
-
-    static PropertyValue<float> getDefaultSymbolSpacing();
-    PropertyValue<float> getSymbolSpacing() const;
-    void setSymbolSpacing(PropertyValue<float>);
-
-    static PropertyValue<bool> getDefaultSymbolAvoidEdges();
-    PropertyValue<bool> getSymbolAvoidEdges() const;
-    void setSymbolAvoidEdges(PropertyValue<bool>);
-
-    static PropertyValue<SymbolZOrderType> getDefaultSymbolZOrder();
-    PropertyValue<SymbolZOrderType> getSymbolZOrder() const;
-    void setSymbolZOrder(PropertyValue<SymbolZOrderType>);
-
     static PropertyValue<bool> getDefaultIconAllowOverlap();
-    PropertyValue<bool> getIconAllowOverlap() const;
-    void setIconAllowOverlap(PropertyValue<bool>);
-
-    static PropertyValue<bool> getDefaultIconIgnorePlacement();
-    PropertyValue<bool> getIconIgnorePlacement() const;
-    void setIconIgnorePlacement(PropertyValue<bool>);
-
-    static PropertyValue<bool> getDefaultIconOptional();
-    PropertyValue<bool> getIconOptional() const;
-    void setIconOptional(PropertyValue<bool>);
-
-    static PropertyValue<AlignmentType> getDefaultIconRotationAlignment();
-    PropertyValue<AlignmentType> getIconRotationAlignment() const;
-    void setIconRotationAlignment(PropertyValue<AlignmentType>);
-
-    static PropertyValue<float> getDefaultIconSize();
-    PropertyValue<float> getIconSize() const;
-    void setIconSize(PropertyValue<float>);
-
-    static PropertyValue<IconTextFitType> getDefaultIconTextFit();
-    PropertyValue<IconTextFitType> getIconTextFit() const;
-    void setIconTextFit(PropertyValue<IconTextFitType>);
-
-    static PropertyValue<std::array<float, 4>> getDefaultIconTextFitPadding();
-    PropertyValue<std::array<float, 4>> getIconTextFitPadding() const;
-    void setIconTextFitPadding(PropertyValue<std::array<float, 4>>);
-
-    static PropertyValue<std::string> getDefaultIconImage();
-    PropertyValue<std::string> getIconImage() const;
-    void setIconImage(PropertyValue<std::string>);
-
-    static PropertyValue<float> getDefaultIconRotate();
-    PropertyValue<float> getIconRotate() const;
-    void setIconRotate(PropertyValue<float>);
-
-    static PropertyValue<float> getDefaultIconPadding();
-    PropertyValue<float> getIconPadding() const;
-    void setIconPadding(PropertyValue<float>);
-
-    static PropertyValue<bool> getDefaultIconKeepUpright();
-    PropertyValue<bool> getIconKeepUpright() const;
-    void setIconKeepUpright(PropertyValue<bool>);
-
-    static PropertyValue<std::array<float, 2>> getDefaultIconOffset();
-    PropertyValue<std::array<float, 2>> getIconOffset() const;
-    void setIconOffset(PropertyValue<std::array<float, 2>>);
+    const PropertyValue<bool>& getIconAllowOverlap() const;
+    void setIconAllowOverlap(const PropertyValue<bool>&);
 
     static PropertyValue<SymbolAnchorType> getDefaultIconAnchor();
-    PropertyValue<SymbolAnchorType> getIconAnchor() const;
-    void setIconAnchor(PropertyValue<SymbolAnchorType>);
+    const PropertyValue<SymbolAnchorType>& getIconAnchor() const;
+    void setIconAnchor(const PropertyValue<SymbolAnchorType>&);
+
+    static PropertyValue<bool> getDefaultIconIgnorePlacement();
+    const PropertyValue<bool>& getIconIgnorePlacement() const;
+    void setIconIgnorePlacement(const PropertyValue<bool>&);
+
+    static PropertyValue<expression::Image> getDefaultIconImage();
+    const PropertyValue<expression::Image>& getIconImage() const;
+    void setIconImage(const PropertyValue<expression::Image>&);
+
+    static PropertyValue<bool> getDefaultIconKeepUpright();
+    const PropertyValue<bool>& getIconKeepUpright() const;
+    void setIconKeepUpright(const PropertyValue<bool>&);
+
+    static PropertyValue<std::array<float, 2>> getDefaultIconOffset();
+    const PropertyValue<std::array<float, 2>>& getIconOffset() const;
+    void setIconOffset(const PropertyValue<std::array<float, 2>>&);
+
+    static PropertyValue<bool> getDefaultIconOptional();
+    const PropertyValue<bool>& getIconOptional() const;
+    void setIconOptional(const PropertyValue<bool>&);
+
+    static PropertyValue<float> getDefaultIconPadding();
+    const PropertyValue<float>& getIconPadding() const;
+    void setIconPadding(const PropertyValue<float>&);
 
     static PropertyValue<AlignmentType> getDefaultIconPitchAlignment();
-    PropertyValue<AlignmentType> getIconPitchAlignment() const;
-    void setIconPitchAlignment(PropertyValue<AlignmentType>);
+    const PropertyValue<AlignmentType>& getIconPitchAlignment() const;
+    void setIconPitchAlignment(const PropertyValue<AlignmentType>&);
 
-    static PropertyValue<AlignmentType> getDefaultTextPitchAlignment();
-    PropertyValue<AlignmentType> getTextPitchAlignment() const;
-    void setTextPitchAlignment(PropertyValue<AlignmentType>);
+    static PropertyValue<float> getDefaultIconRotate();
+    const PropertyValue<float>& getIconRotate() const;
+    void setIconRotate(const PropertyValue<float>&);
 
-    static PropertyValue<AlignmentType> getDefaultTextRotationAlignment();
-    PropertyValue<AlignmentType> getTextRotationAlignment() const;
-    void setTextRotationAlignment(PropertyValue<AlignmentType>);
+    static PropertyValue<AlignmentType> getDefaultIconRotationAlignment();
+    const PropertyValue<AlignmentType>& getIconRotationAlignment() const;
+    void setIconRotationAlignment(const PropertyValue<AlignmentType>&);
 
-    static PropertyValue<expression::Formatted> getDefaultTextField();
-    PropertyValue<expression::Formatted> getTextField() const;
-    void setTextField(PropertyValue<expression::Formatted>);
+    static PropertyValue<float> getDefaultIconSize();
+    const PropertyValue<float>& getIconSize() const;
+    void setIconSize(const PropertyValue<float>&);
 
-    static PropertyValue<std::vector<std::string>> getDefaultTextFont();
-    PropertyValue<std::vector<std::string>> getTextFont() const;
-    void setTextFont(PropertyValue<std::vector<std::string>>);
+    static PropertyValue<IconTextFitType> getDefaultIconTextFit();
+    const PropertyValue<IconTextFitType>& getIconTextFit() const;
+    void setIconTextFit(const PropertyValue<IconTextFitType>&);
 
-    static PropertyValue<float> getDefaultTextSize();
-    PropertyValue<float> getTextSize() const;
-    void setTextSize(PropertyValue<float>);
+    static PropertyValue<std::array<float, 4>> getDefaultIconTextFitPadding();
+    const PropertyValue<std::array<float, 4>>& getIconTextFitPadding() const;
+    void setIconTextFitPadding(const PropertyValue<std::array<float, 4>>&);
 
-    static PropertyValue<float> getDefaultTextMaxWidth();
-    PropertyValue<float> getTextMaxWidth() const;
-    void setTextMaxWidth(PropertyValue<float>);
+    static PropertyValue<bool> getDefaultSymbolAvoidEdges();
+    const PropertyValue<bool>& getSymbolAvoidEdges() const;
+    void setSymbolAvoidEdges(const PropertyValue<bool>&);
 
-    static PropertyValue<float> getDefaultTextLineHeight();
-    PropertyValue<float> getTextLineHeight() const;
-    void setTextLineHeight(PropertyValue<float>);
+    static PropertyValue<SymbolPlacementType> getDefaultSymbolPlacement();
+    const PropertyValue<SymbolPlacementType>& getSymbolPlacement() const;
+    void setSymbolPlacement(const PropertyValue<SymbolPlacementType>&);
 
-    static PropertyValue<float> getDefaultTextLetterSpacing();
-    PropertyValue<float> getTextLetterSpacing() const;
-    void setTextLetterSpacing(PropertyValue<float>);
+    static PropertyValue<float> getDefaultSymbolSortKey();
+    const PropertyValue<float>& getSymbolSortKey() const;
+    void setSymbolSortKey(const PropertyValue<float>&);
 
-    static PropertyValue<TextJustifyType> getDefaultTextJustify();
-    PropertyValue<TextJustifyType> getTextJustify() const;
-    void setTextJustify(PropertyValue<TextJustifyType>);
+    static PropertyValue<float> getDefaultSymbolSpacing();
+    const PropertyValue<float>& getSymbolSpacing() const;
+    void setSymbolSpacing(const PropertyValue<float>&);
 
-    static PropertyValue<SymbolAnchorType> getDefaultTextAnchor();
-    PropertyValue<SymbolAnchorType> getTextAnchor() const;
-    void setTextAnchor(PropertyValue<SymbolAnchorType>);
-
-    static PropertyValue<float> getDefaultTextMaxAngle();
-    PropertyValue<float> getTextMaxAngle() const;
-    void setTextMaxAngle(PropertyValue<float>);
-
-    static PropertyValue<float> getDefaultTextRotate();
-    PropertyValue<float> getTextRotate() const;
-    void setTextRotate(PropertyValue<float>);
-
-    static PropertyValue<float> getDefaultTextPadding();
-    PropertyValue<float> getTextPadding() const;
-    void setTextPadding(PropertyValue<float>);
-
-    static PropertyValue<bool> getDefaultTextKeepUpright();
-    PropertyValue<bool> getTextKeepUpright() const;
-    void setTextKeepUpright(PropertyValue<bool>);
-
-    static PropertyValue<TextTransformType> getDefaultTextTransform();
-    PropertyValue<TextTransformType> getTextTransform() const;
-    void setTextTransform(PropertyValue<TextTransformType>);
-
-    static PropertyValue<std::array<float, 2>> getDefaultTextOffset();
-    PropertyValue<std::array<float, 2>> getTextOffset() const;
-    void setTextOffset(PropertyValue<std::array<float, 2>>);
+    static PropertyValue<SymbolZOrderType> getDefaultSymbolZOrder();
+    const PropertyValue<SymbolZOrderType>& getSymbolZOrder() const;
+    void setSymbolZOrder(const PropertyValue<SymbolZOrderType>&);
 
     static PropertyValue<bool> getDefaultTextAllowOverlap();
-    PropertyValue<bool> getTextAllowOverlap() const;
-    void setTextAllowOverlap(PropertyValue<bool>);
+    const PropertyValue<bool>& getTextAllowOverlap() const;
+    void setTextAllowOverlap(const PropertyValue<bool>&);
+
+    static PropertyValue<SymbolAnchorType> getDefaultTextAnchor();
+    const PropertyValue<SymbolAnchorType>& getTextAnchor() const;
+    void setTextAnchor(const PropertyValue<SymbolAnchorType>&);
+
+    static PropertyValue<expression::Formatted> getDefaultTextField();
+    const PropertyValue<expression::Formatted>& getTextField() const;
+    void setTextField(const PropertyValue<expression::Formatted>&);
+
+    static PropertyValue<std::vector<std::string>> getDefaultTextFont();
+    const PropertyValue<std::vector<std::string>>& getTextFont() const;
+    void setTextFont(const PropertyValue<std::vector<std::string>>&);
 
     static PropertyValue<bool> getDefaultTextIgnorePlacement();
-    PropertyValue<bool> getTextIgnorePlacement() const;
-    void setTextIgnorePlacement(PropertyValue<bool>);
+    const PropertyValue<bool>& getTextIgnorePlacement() const;
+    void setTextIgnorePlacement(const PropertyValue<bool>&);
+
+    static PropertyValue<TextJustifyType> getDefaultTextJustify();
+    const PropertyValue<TextJustifyType>& getTextJustify() const;
+    void setTextJustify(const PropertyValue<TextJustifyType>&);
+
+    static PropertyValue<bool> getDefaultTextKeepUpright();
+    const PropertyValue<bool>& getTextKeepUpright() const;
+    void setTextKeepUpright(const PropertyValue<bool>&);
+
+    static PropertyValue<float> getDefaultTextLetterSpacing();
+    const PropertyValue<float>& getTextLetterSpacing() const;
+    void setTextLetterSpacing(const PropertyValue<float>&);
+
+    static PropertyValue<float> getDefaultTextLineHeight();
+    const PropertyValue<float>& getTextLineHeight() const;
+    void setTextLineHeight(const PropertyValue<float>&);
+
+    static PropertyValue<float> getDefaultTextMaxAngle();
+    const PropertyValue<float>& getTextMaxAngle() const;
+    void setTextMaxAngle(const PropertyValue<float>&);
+
+    static PropertyValue<float> getDefaultTextMaxWidth();
+    const PropertyValue<float>& getTextMaxWidth() const;
+    void setTextMaxWidth(const PropertyValue<float>&);
+
+    static PropertyValue<std::array<float, 2>> getDefaultTextOffset();
+    const PropertyValue<std::array<float, 2>>& getTextOffset() const;
+    void setTextOffset(const PropertyValue<std::array<float, 2>>&);
 
     static PropertyValue<bool> getDefaultTextOptional();
-    PropertyValue<bool> getTextOptional() const;
-    void setTextOptional(PropertyValue<bool>);
+    const PropertyValue<bool>& getTextOptional() const;
+    void setTextOptional(const PropertyValue<bool>&);
+
+    static PropertyValue<float> getDefaultTextPadding();
+    const PropertyValue<float>& getTextPadding() const;
+    void setTextPadding(const PropertyValue<float>&);
+
+    static PropertyValue<AlignmentType> getDefaultTextPitchAlignment();
+    const PropertyValue<AlignmentType>& getTextPitchAlignment() const;
+    void setTextPitchAlignment(const PropertyValue<AlignmentType>&);
+
+    static PropertyValue<float> getDefaultTextRadialOffset();
+    const PropertyValue<float>& getTextRadialOffset() const;
+    void setTextRadialOffset(const PropertyValue<float>&);
+
+    static PropertyValue<float> getDefaultTextRotate();
+    const PropertyValue<float>& getTextRotate() const;
+    void setTextRotate(const PropertyValue<float>&);
+
+    static PropertyValue<AlignmentType> getDefaultTextRotationAlignment();
+    const PropertyValue<AlignmentType>& getTextRotationAlignment() const;
+    void setTextRotationAlignment(const PropertyValue<AlignmentType>&);
+
+    static PropertyValue<float> getDefaultTextSize();
+    const PropertyValue<float>& getTextSize() const;
+    void setTextSize(const PropertyValue<float>&);
+
+    static PropertyValue<TextTransformType> getDefaultTextTransform();
+    const PropertyValue<TextTransformType>& getTextTransform() const;
+    void setTextTransform(const PropertyValue<TextTransformType>&);
+
+    static PropertyValue<std::vector<TextVariableAnchorType>> getDefaultTextVariableAnchor();
+    const PropertyValue<std::vector<TextVariableAnchorType>>& getTextVariableAnchor() const;
+    void setTextVariableAnchor(const PropertyValue<std::vector<TextVariableAnchorType>>&);
+
+    static PropertyValue<std::vector<TextWritingModeType>> getDefaultTextWritingMode();
+    const PropertyValue<std::vector<TextWritingModeType>>& getTextWritingMode() const;
+    void setTextWritingMode(const PropertyValue<std::vector<TextWritingModeType>>&);
 
     // Paint properties
 
-    static PropertyValue<float> getDefaultIconOpacity();
-    PropertyValue<float> getIconOpacity() const;
-    void setIconOpacity(PropertyValue<float>);
-    void setIconOpacityTransition(const TransitionOptions&);
-    TransitionOptions getIconOpacityTransition() const;
-
     static PropertyValue<Color> getDefaultIconColor();
-    PropertyValue<Color> getIconColor() const;
-    void setIconColor(PropertyValue<Color>);
+    const PropertyValue<Color>& getIconColor() const;
+    void setIconColor(const PropertyValue<Color>&);
     void setIconColorTransition(const TransitionOptions&);
     TransitionOptions getIconColorTransition() const;
 
+    static PropertyValue<float> getDefaultIconHaloBlur();
+    const PropertyValue<float>& getIconHaloBlur() const;
+    void setIconHaloBlur(const PropertyValue<float>&);
+    void setIconHaloBlurTransition(const TransitionOptions&);
+    TransitionOptions getIconHaloBlurTransition() const;
+
     static PropertyValue<Color> getDefaultIconHaloColor();
-    PropertyValue<Color> getIconHaloColor() const;
-    void setIconHaloColor(PropertyValue<Color>);
+    const PropertyValue<Color>& getIconHaloColor() const;
+    void setIconHaloColor(const PropertyValue<Color>&);
     void setIconHaloColorTransition(const TransitionOptions&);
     TransitionOptions getIconHaloColorTransition() const;
 
     static PropertyValue<float> getDefaultIconHaloWidth();
-    PropertyValue<float> getIconHaloWidth() const;
-    void setIconHaloWidth(PropertyValue<float>);
+    const PropertyValue<float>& getIconHaloWidth() const;
+    void setIconHaloWidth(const PropertyValue<float>&);
     void setIconHaloWidthTransition(const TransitionOptions&);
     TransitionOptions getIconHaloWidthTransition() const;
 
-    static PropertyValue<float> getDefaultIconHaloBlur();
-    PropertyValue<float> getIconHaloBlur() const;
-    void setIconHaloBlur(PropertyValue<float>);
-    void setIconHaloBlurTransition(const TransitionOptions&);
-    TransitionOptions getIconHaloBlurTransition() const;
+    static PropertyValue<float> getDefaultIconOpacity();
+    const PropertyValue<float>& getIconOpacity() const;
+    void setIconOpacity(const PropertyValue<float>&);
+    void setIconOpacityTransition(const TransitionOptions&);
+    TransitionOptions getIconOpacityTransition() const;
 
     static PropertyValue<std::array<float, 2>> getDefaultIconTranslate();
-    PropertyValue<std::array<float, 2>> getIconTranslate() const;
-    void setIconTranslate(PropertyValue<std::array<float, 2>>);
+    const PropertyValue<std::array<float, 2>>& getIconTranslate() const;
+    void setIconTranslate(const PropertyValue<std::array<float, 2>>&);
     void setIconTranslateTransition(const TransitionOptions&);
     TransitionOptions getIconTranslateTransition() const;
 
     static PropertyValue<TranslateAnchorType> getDefaultIconTranslateAnchor();
-    PropertyValue<TranslateAnchorType> getIconTranslateAnchor() const;
-    void setIconTranslateAnchor(PropertyValue<TranslateAnchorType>);
+    const PropertyValue<TranslateAnchorType>& getIconTranslateAnchor() const;
+    void setIconTranslateAnchor(const PropertyValue<TranslateAnchorType>&);
     void setIconTranslateAnchorTransition(const TransitionOptions&);
     TransitionOptions getIconTranslateAnchorTransition() const;
 
-    static PropertyValue<float> getDefaultTextOpacity();
-    PropertyValue<float> getTextOpacity() const;
-    void setTextOpacity(PropertyValue<float>);
-    void setTextOpacityTransition(const TransitionOptions&);
-    TransitionOptions getTextOpacityTransition() const;
-
     static PropertyValue<Color> getDefaultTextColor();
-    PropertyValue<Color> getTextColor() const;
-    void setTextColor(PropertyValue<Color>);
+    const PropertyValue<Color>& getTextColor() const;
+    void setTextColor(const PropertyValue<Color>&);
     void setTextColorTransition(const TransitionOptions&);
     TransitionOptions getTextColorTransition() const;
 
+    static PropertyValue<float> getDefaultTextHaloBlur();
+    const PropertyValue<float>& getTextHaloBlur() const;
+    void setTextHaloBlur(const PropertyValue<float>&);
+    void setTextHaloBlurTransition(const TransitionOptions&);
+    TransitionOptions getTextHaloBlurTransition() const;
+
     static PropertyValue<Color> getDefaultTextHaloColor();
-    PropertyValue<Color> getTextHaloColor() const;
-    void setTextHaloColor(PropertyValue<Color>);
+    const PropertyValue<Color>& getTextHaloColor() const;
+    void setTextHaloColor(const PropertyValue<Color>&);
     void setTextHaloColorTransition(const TransitionOptions&);
     TransitionOptions getTextHaloColorTransition() const;
 
     static PropertyValue<float> getDefaultTextHaloWidth();
-    PropertyValue<float> getTextHaloWidth() const;
-    void setTextHaloWidth(PropertyValue<float>);
+    const PropertyValue<float>& getTextHaloWidth() const;
+    void setTextHaloWidth(const PropertyValue<float>&);
     void setTextHaloWidthTransition(const TransitionOptions&);
     TransitionOptions getTextHaloWidthTransition() const;
 
-    static PropertyValue<float> getDefaultTextHaloBlur();
-    PropertyValue<float> getTextHaloBlur() const;
-    void setTextHaloBlur(PropertyValue<float>);
-    void setTextHaloBlurTransition(const TransitionOptions&);
-    TransitionOptions getTextHaloBlurTransition() const;
+    static PropertyValue<float> getDefaultTextOpacity();
+    const PropertyValue<float>& getTextOpacity() const;
+    void setTextOpacity(const PropertyValue<float>&);
+    void setTextOpacityTransition(const TransitionOptions&);
+    TransitionOptions getTextOpacityTransition() const;
 
     static PropertyValue<std::array<float, 2>> getDefaultTextTranslate();
-    PropertyValue<std::array<float, 2>> getTextTranslate() const;
-    void setTextTranslate(PropertyValue<std::array<float, 2>>);
+    const PropertyValue<std::array<float, 2>>& getTextTranslate() const;
+    void setTextTranslate(const PropertyValue<std::array<float, 2>>&);
     void setTextTranslateTransition(const TransitionOptions&);
     TransitionOptions getTextTranslateTransition() const;
 
     static PropertyValue<TranslateAnchorType> getDefaultTextTranslateAnchor();
-    PropertyValue<TranslateAnchorType> getTextTranslateAnchor() const;
-    void setTextTranslateAnchor(PropertyValue<TranslateAnchorType>);
+    const PropertyValue<TranslateAnchorType>& getTextTranslateAnchor() const;
+    void setTextTranslateAnchor(const PropertyValue<TranslateAnchorType>&);
     void setTextTranslateAnchorTransition(const TransitionOptions&);
     TransitionOptions getTextTranslateAnchorTransition() const;
 
@@ -271,18 +284,16 @@ public:
     std::unique_ptr<Layer> cloneRef(const std::string& id) const final;
 
 protected:
+    // Dynamic properties
+    optional<conversion::Error> setPropertyInternal(const std::string& name, const conversion::Convertible& value) final;
+
+    StyleProperty getProperty(const std::string& name) const final;
+    Value serialize() const final;
+
     Mutable<Layer::Impl> mutableBaseImpl() const final;
-};
-
-class SymbolLayerFactory : public LayerFactory {
-public:
-    SymbolLayerFactory();
-    ~SymbolLayerFactory() override;
-
-    // LayerFactory overrides.
-    const LayerTypeInfo* getTypeInfo() const noexcept final;
-    std::unique_ptr<style::Layer> createLayer(const std::string& id, const conversion::Convertible& value) final;
 };
 
 } // namespace style
 } // namespace mbgl
+
+// clang-format on

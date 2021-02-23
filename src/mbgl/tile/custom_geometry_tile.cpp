@@ -9,20 +9,22 @@
 
 #include <mapbox/geojsonvt.hpp>
 
+#include <cassert>
+#include <utility>
+
 namespace mbgl {
 
 CustomGeometryTile::CustomGeometryTile(const OverscaledTileID& overscaledTileID,
-                         std::string sourceID_,
-                         const TileParameters& parameters,
-                         const style::CustomGeometrySource::TileOptions options_,
-                         ActorRef<style::CustomTileLoader> loader_)
-    : GeometryTile(overscaledTileID, sourceID_, parameters),
-    necessity(TileNecessity::Optional),
-    options(options_),
-    loader(loader_),
-    mailbox(std::make_shared<Mailbox>(*Scheduler::GetCurrent())),
-    actorRef(*this, mailbox) {
-}
+                                       std::string sourceID_,
+                                       const TileParameters& parameters,
+                                       Immutable<style::CustomGeometrySource::TileOptions> options_,
+                                       ActorRef<style::CustomTileLoader> loader_)
+    : GeometryTile(overscaledTileID, std::move(sourceID_), parameters),
+      necessity(TileNecessity::Optional),
+      options(std::move(options_)),
+      loader(std::move(loader_)),
+      mailbox(std::make_shared<Mailbox>(*Scheduler::GetCurrent())),
+      actorRef(*this, mailbox) {}
 
 CustomGeometryTile::~CustomGeometryTile() {
     loader.invoke(&style::CustomTileLoader::removeTile, id);
@@ -32,15 +34,17 @@ void CustomGeometryTile::setTileData(const GeoJSON& geoJSON) {
 
     auto featureData = mapbox::feature::feature_collection<int16_t>();
     if (geoJSON.is<FeatureCollection>() && !geoJSON.get<FeatureCollection>().empty()) {
-        const double scale = util::EXTENT / options.tileSize;
+        auto scale = util::EXTENT / options->tileSize;
+        assert(util::EXTENT % options->tileSize == 0);
 
         mapbox::geojsonvt::TileOptions vtOptions;
         vtOptions.extent = util::EXTENT;
-        vtOptions.buffer = ::round(scale * options.buffer);
-        vtOptions.tolerance = scale * options.tolerance;
-        featureData = mapbox::geojsonvt::geoJSONToTile(geoJSON,
-            id.canonical.z, id.canonical.x, id.canonical.y,
-            vtOptions, options.wrap, options.clip).features;
+        vtOptions.buffer = ::round(scale * options->buffer);
+        vtOptions.tolerance = scale * options->tolerance;
+        featureData =
+            mapbox::geojsonvt::geoJSONToTile(
+                geoJSON, id.canonical.z, id.canonical.x, id.canonical.y, vtOptions, options->wrap, options->clip)
+                .features;
     }
     setData(std::make_unique<GeoJSONTileData>(std::move(featureData)));
 }

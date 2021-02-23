@@ -4,11 +4,13 @@
 #include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/renderer/render_static_data.hpp>
 #include <mbgl/programs/programs.hpp>
-#include <mbgl/programs/heatmap_program.hpp>
 #include <mbgl/tile/tile.hpp>
 #include <mbgl/style/layers/heatmap_layer.hpp>
 #include <mbgl/style/layers/heatmap_layer_impl.hpp>
 #include <mbgl/geometry/feature_index.hpp>
+#include <mbgl/gfx/cull_face_mode.hpp>
+#include <mbgl/gfx/render_pass.hpp>
+#include <mbgl/gfx/context.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/intersection_tests.hpp>
 
@@ -16,29 +18,37 @@ namespace mbgl {
 
 using namespace style;
 
-RenderHeatmapLayer::RenderHeatmapLayer(Immutable<style::HeatmapLayer::Impl> _impl)
-    : RenderLayer(style::LayerType::Heatmap, _impl),
-    unevaluated(impl().paint.untransitioned()), colorRamp({256, 1}) {
+namespace {
+
+inline const HeatmapLayer::Impl& impl_cast(const Immutable<Layer::Impl>& impl) {
+    assert(impl->getTypeInfo() == HeatmapLayer::Impl::staticTypeInfo());
+    return static_cast<const HeatmapLayer::Impl&>(*impl);
 }
 
-const style::HeatmapLayer::Impl& RenderHeatmapLayer::impl() const {
-    return static_cast<const style::HeatmapLayer::Impl&>(*baseImpl);
-}
+} // namespace
 
-std::unique_ptr<Bucket> RenderHeatmapLayer::createBucket(const BucketParameters& parameters, const std::vector<const RenderLayer*>& layers) const {
-    return std::make_unique<HeatmapBucket>(parameters, layers);
-}
+RenderHeatmapLayer::RenderHeatmapLayer(Immutable<HeatmapLayer::Impl> _impl)
+    : RenderLayer(makeMutable<HeatmapLayerProperties>(std::move(_impl))),
+      unevaluated(impl_cast(baseImpl).paint.untransitioned()),
+      colorRamp({256, 1}) {}
+
+RenderHeatmapLayer::~RenderHeatmapLayer() = default;
 
 void RenderHeatmapLayer::transition(const TransitionParameters& parameters) {
-    unevaluated = impl().paint.transitioned(parameters, std::move(unevaluated));
+    unevaluated = impl_cast(baseImpl).paint.transitioned(parameters, std::move(unevaluated));
+    updateColorRamp();
 }
 
 void RenderHeatmapLayer::evaluate(const PropertyEvaluationParameters& parameters) {
-    evaluated = unevaluated.evaluate(parameters);
+    auto properties = makeMutable<HeatmapLayerProperties>(
+        staticImmutableCast<HeatmapLayer::Impl>(baseImpl),
+        unevaluated.evaluate(parameters));
 
-    passes = (evaluated.get<style::HeatmapOpacity>() > 0)
+    passes = (properties->evaluated.get<style::HeatmapOpacity>() > 0)
             ? (RenderPass::Translucent | RenderPass::Pass3D)
             : RenderPass::None;
+    properties->renderPasses = mbgl::underlying_type(passes);
+    evaluatedProperties = std::move(properties);
 }
 
 bool RenderHeatmapLayer::hasTransition() const {
@@ -49,7 +59,15 @@ bool RenderHeatmapLayer::hasCrossfade() const {
     return false;
 }
 
-void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
+void RenderHeatmapLayer::upload(gfx::UploadPass& uploadPass) {
+    if (!colorRampTexture) {
+        colorRampTexture =
+            uploadPass.createTexture(colorRamp, gfx::TextureChannelDataType::UnsignedByte);
+    }
+}
+
+void RenderHeatmapLayer::render(PaintParameters& parameters) {
+    assert(renderTiles);
     if (parameters.pass == RenderPass::Opaque) {
         return;
     }
@@ -58,135 +76,117 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
         const auto& viewportSize = parameters.staticData.backendSize;
         const auto size = Size{viewportSize.width / 4, viewportSize.height / 4};
 
-        if (!renderTexture || renderTexture->getSize() != size) {
-            if (parameters.context.supportsHalfFloatTextures) {
-                renderTexture = OffscreenTexture(parameters.context, size, gl::TextureType::HalfFloat);
+        assert(colorRampTexture);
 
-                try {
-                    renderTexture->bind();
-                } catch (const std::runtime_error& ex) {
+        if (!renderTexture || renderTexture->getSize() != size) {
+            renderTexture.reset();
+            if (parameters.context.supportsHalfFloatTextures) {
+                renderTexture = parameters.context.createOffscreenTexture(size, gfx::TextureChannelDataType::HalfFloat);
+
+                if (!renderTexture->isRenderable()) {
                     // can't render to a half-float texture; falling back to unsigned byte one
-                    renderTexture = nullopt;
+                    renderTexture.reset();
                     parameters.context.supportsHalfFloatTextures = false;
                 }
             }
 
-            if (!parameters.context.supportsHalfFloatTextures || !renderTexture) {
-                renderTexture = OffscreenTexture(parameters.context, size, gl::TextureType::UnsignedByte);
-                renderTexture->bind();
+            if (!renderTexture) {
+                renderTexture = parameters.context.createOffscreenTexture(size, gfx::TextureChannelDataType::UnsignedByte);
             }
-
-        } else {
-            renderTexture->bind();
         }
 
-        if (!colorRampTexture) {
-            colorRampTexture = parameters.context.createTexture(colorRamp, 1, gl::TextureType::UnsignedByte);
-        }
+        auto renderPass = parameters.encoder->createRenderPass(
+            "heatmap texture", { *renderTexture, Color{ 0.0f, 0.0f, 0.0f, 1.0f }, {}, {} });
 
-        parameters.context.clear(Color{ 0.0f, 0.0f, 0.0f, 1.0f }, {}, {});
-
-        for (const RenderTile& tile : renderTiles) {
-            auto bucket_ = tile.tile.getBucket<HeatmapBucket>(*baseImpl);
-            if (!bucket_) {
+        for (const RenderTile& tile : *renderTiles) {
+            const LayerRenderData* renderData = getRenderDataForPass(tile, parameters.pass);
+            if (!renderData) {
                 continue;
             }
-            HeatmapBucket& bucket = *bucket_;
+            auto& bucket = static_cast<HeatmapBucket&>(*renderData->bucket);
+            const auto& evaluated = getEvaluated<HeatmapLayerProperties>(renderData->layerProperties);
 
             const auto extrudeScale = tile.id.pixelsToTileUnits(1, parameters.state.getZoom());
 
-            const auto stencilMode = parameters.mapMode != MapMode::Continuous
-                ? parameters.stencilModeForClipping(tile.clip)
-                : gl::StencilMode::disabled();
-
             const auto& paintPropertyBinders = bucket.paintPropertyBinders.at(getID());
 
-            auto& programInstance = parameters.programs.heatmap.get(evaluated);
-       
-            const auto allUniformValues = programInstance.computeAllUniformValues(
-                HeatmapProgram::UniformValues {
-                    uniforms::u_intensity::Value( evaluated.get<style::HeatmapIntensity>() ),
-                    uniforms::u_matrix::Value( tile.matrix ),
-                    uniforms::heatmap::u_extrude_scale::Value( extrudeScale )
-                },
+            auto& programInstance = parameters.programs.getHeatmapLayerPrograms().heatmap;
+
+            const auto allUniformValues = HeatmapProgram::computeAllUniformValues(
+                HeatmapProgram::LayoutUniformValues{
+                    uniforms::intensity::Value(evaluated.get<style::HeatmapIntensity>()),
+                    uniforms::matrix::Value(tile.matrix),
+                    uniforms::heatmap::extrude_scale::Value(extrudeScale)},
                 paintPropertyBinders,
                 evaluated,
-                parameters.state.getZoom()
-            );
-            const auto allAttributeBindings = programInstance.computeAllAttributeBindings(
-                *bucket.vertexBuffer,
-                paintPropertyBinders,
-                evaluated
-            );
+                parameters.state.getZoom());
+            const auto allAttributeBindings =
+                HeatmapProgram::computeAllAttributeBindings(*bucket.vertexBuffer, paintPropertyBinders, evaluated);
 
-            checkRenderability(parameters, programInstance.activeBindingCount(allAttributeBindings));
+            checkRenderability(parameters, HeatmapProgram::activeBindingCount(allAttributeBindings));
 
-            programInstance.draw(
-                parameters.context,
-                gl::Triangles(),
-                parameters.depthModeForSublayer(0, gl::DepthMode::ReadOnly),
-                stencilMode,
-                gl::ColorMode::additive(),
-                gl::CullFaceMode::disabled(),
-                *bucket.indexBuffer,
-                bucket.segments,
-                allUniformValues,
-                allAttributeBindings,
-                getID()
-            );
+            programInstance.draw(parameters.context,
+                                 *renderPass,
+                                 gfx::Triangles(),
+                                 gfx::DepthMode::disabled(),
+                                 gfx::StencilMode::disabled(),
+                                 gfx::ColorMode::additive(),
+                                 gfx::CullFaceMode::disabled(),
+                                 *bucket.indexBuffer,
+                                 bucket.segments,
+                                 allUniformValues,
+                                 allAttributeBindings,
+                                 HeatmapProgram::TextureBindings{},
+                                 getID());
         }
 
     } else if (parameters.pass == RenderPass::Translucent) {
-        parameters.context.bindTexture(renderTexture->getTexture(), 0, gl::TextureFilter::Linear);
-        parameters.context.bindTexture(*colorRampTexture, 1, gl::TextureFilter::Linear);
-
         const auto& size = parameters.staticData.backendSize;
 
         mat4 viewportMat;
         matrix::ortho(viewportMat, 0, size.width, size.height, 0, 0, 1);
 
         const Properties<>::PossiblyEvaluated properties;
-        const HeatmapTextureProgram::PaintPropertyBinders paintAttributeData{ properties, 0 };
+        const HeatmapTextureProgram::Binders paintAttributeData{ properties, 0 };
 
-        auto& programInstance = parameters.programs.heatmapTexture;
+        auto& programInstance = parameters.programs.getHeatmapLayerPrograms().heatmapTexture;
 
-        const auto allUniformValues = programInstance.computeAllUniformValues(
-            HeatmapTextureProgram::UniformValues{
-                uniforms::u_matrix::Value( viewportMat ), uniforms::u_world::Value( size ),
-                uniforms::u_image::Value( 0 ),
-                uniforms::u_color_ramp::Value( 1 ),
-                uniforms::u_opacity::Value( evaluated.get<HeatmapOpacity>() )
-            },
+        const auto allUniformValues = HeatmapTextureProgram::computeAllUniformValues(
+            HeatmapTextureProgram::LayoutUniformValues{
+                uniforms::matrix::Value(viewportMat),
+                uniforms::world::Value(size),
+                uniforms::opacity::Value(
+                    getEvaluated<HeatmapLayerProperties>(evaluatedProperties).get<HeatmapOpacity>())},
             paintAttributeData,
             properties,
-            parameters.state.getZoom()
-        );
-        const auto allAttributeBindings = programInstance.computeAllAttributeBindings(
-            parameters.staticData.extrusionTextureVertexBuffer,
-            paintAttributeData,
-            properties
-        );
+            parameters.state.getZoom());
+        const auto allAttributeBindings = HeatmapTextureProgram::computeAllAttributeBindings(
+            *parameters.staticData.heatmapTextureVertexBuffer, paintAttributeData, properties);
 
-        checkRenderability(parameters, programInstance.activeBindingCount(allAttributeBindings));
+        checkRenderability(parameters, HeatmapTextureProgram::activeBindingCount(allAttributeBindings));
 
+        if (segments.empty()) {
+            // Copy over the segments so that we can create our own DrawScopes.
+            segments = RenderStaticData::heatmapTextureSegments();
+        }
         programInstance.draw(
             parameters.context,
-            gl::Triangles(),
-            gl::DepthMode::disabled(),
-            gl::StencilMode::disabled(),
+            *parameters.renderPass,
+            gfx::Triangles(),
+            gfx::DepthMode::disabled(),
+            gfx::StencilMode::disabled(),
             parameters.colorModeForRenderPass(),
-            gl::CullFaceMode::disabled(),
-            parameters.staticData.quadTriangleIndexBuffer,
-            parameters.staticData.extrusionTextureSegments,
+            gfx::CullFaceMode::disabled(),
+            *parameters.staticData.quadTriangleIndexBuffer,
+            segments,
             allUniformValues,
             allAttributeBindings,
-            getID()
-        );
+            HeatmapTextureProgram::TextureBindings{
+                textures::image::Value{renderTexture->getTexture().getResource(), gfx::TextureFilterType::Linear},
+                textures::color_ramp::Value{colorRampTexture->getResource(), gfx::TextureFilterType::Linear},
+            },
+            getID());
     }
-}
-
-void RenderHeatmapLayer::update() {
-    updateColorRamp();
 }
 
 void RenderHeatmapLayer::updateColorRamp() {
@@ -210,13 +210,10 @@ void RenderHeatmapLayer::updateColorRamp() {
     }
 }
 
-bool RenderHeatmapLayer::queryIntersectsFeature(
-        const GeometryCoordinates& queryGeometry,
-        const GeometryTileFeature& feature,
-        const float zoom,
-        const TransformState&,
-        const float pixelsToTileUnits,
-        const mat4&) const {
+bool RenderHeatmapLayer::queryIntersectsFeature(const GeometryCoordinates& queryGeometry,
+                                                const GeometryTileFeature& feature, const float zoom,
+                                                const TransformState&, const float pixelsToTileUnits, const mat4&,
+                                                const FeatureState&) const {
     (void) queryGeometry;
     (void) feature;
     (void) zoom;

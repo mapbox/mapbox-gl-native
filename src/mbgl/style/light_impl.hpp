@@ -21,6 +21,7 @@ public:
     using PossiblyEvaluatedType = T;
     using Type = T;
     static constexpr bool IsDataDriven = false;
+    static constexpr bool IsOverridable = false;
 };
 
 struct LightAnchor : LightProperty<LightAnchorType> {

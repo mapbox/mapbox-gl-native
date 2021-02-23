@@ -70,6 +70,7 @@ enum class SymbolPlacementType : uint8_t {
 };
     
 enum class SymbolZOrderType : uint8_t {
+    Auto,
     ViewportY,
     Source
 };
@@ -81,6 +82,7 @@ enum class AlignmentType : uint8_t {
 };
 
 enum class TextJustifyType : uint8_t {
+    Auto,
     Center,
     Left,
     Right
@@ -98,6 +100,8 @@ enum class SymbolAnchorType : uint8_t {
     BottomRight
 };
 
+using TextVariableAnchorType = SymbolAnchorType;
+
 enum class TextTransformType : uint8_t {
     None,
     Uppercase,
@@ -109,6 +113,11 @@ enum class IconTextFitType : uint8_t {
     Both,
     Width,
     Height
+};
+
+enum class TextWritingModeType : uint8_t {
+    Horizontal,
+    Vertical
 };
 
 enum class LightAnchorType: bool {

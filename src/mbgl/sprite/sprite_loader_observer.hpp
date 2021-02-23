@@ -1,7 +1,9 @@
 #pragma once
 
+#include <mbgl/style/image.hpp>
+#include <mbgl/util/immutable.hpp>
+
 #include <exception>
-#include <memory>
 #include <vector>
 
 namespace mbgl {
@@ -14,7 +16,9 @@ class SpriteLoaderObserver {
 public:
     virtual ~SpriteLoaderObserver() = default;
 
-    virtual void onSpriteLoaded(std::vector<std::unique_ptr<style::Image>>&&) {}
+    // NOLINTNEXTLINE(performance-unnecessary-value-param)
+    virtual void onSpriteLoaded(std::vector<Immutable<style::Image::Impl>>) {}
+
     virtual void onSpriteError(std::exception_ptr) {}
 };
 

@@ -1,11 +1,12 @@
 #pragma once
 
-#include <mbgl/tile/tile_id.hpp>
-#include <mbgl/tile/tile_observer.hpp>
+#include <mbgl/style/layer_properties.hpp>
+#include <mbgl/style/source_impl.hpp>
+#include <mbgl/style/types.hpp>
 #include <mbgl/tile/tile.hpp>
 #include <mbgl/tile/tile_cache.hpp>
-#include <mbgl/style/types.hpp>
-#include <mbgl/style/layer_impl.hpp>
+#include <mbgl/tile/tile_id.hpp>
+#include <mbgl/tile/tile_observer.hpp>
 
 #include <mbgl/util/mat4.hpp>
 #include <mbgl/util/feature.hpp>
@@ -20,11 +21,11 @@ namespace mbgl {
 
 class PaintParameters;
 class TransformState;
-class RenderTile;
 class RenderLayer;
 class RenderedQueryOptions;
 class SourceQueryOptions;
 class TileParameters;
+class SourcePrepareParameters;
 
 class TilePyramid {
 public:
@@ -33,30 +34,26 @@ public:
 
     bool isLoaded() const;
 
-    void update(const std::vector<Immutable<style::Layer::Impl>>&,
+    void update(const std::vector<Immutable<style::LayerProperties>>& visibleLayers,
                 bool needsRendering,
                 bool needsRelayout,
                 const TileParameters&,
-                style::SourceType type,
+                const style::Source::Impl&,
                 uint16_t tileSize,
                 Range<uint8_t> zoomRange,
                 optional<LatLngBounds> bounds,
-                std::function<std::unique_ptr<Tile> (const OverscaledTileID&)> createTile);
+                std::function<std::unique_ptr<Tile>(const OverscaledTileID&)> createTile);
 
-    void startRender(PaintParameters&);
-    void finishRender(PaintParameters&);
-
-    std::vector<std::reference_wrapper<RenderTile>> getRenderTiles();
+    const std::map<UnwrappedTileID, std::reference_wrapper<Tile>>& getRenderedTiles() const { return renderedTiles; }
     Tile* getTile(const OverscaledTileID&);
+    const Tile* getRenderedTile(const UnwrappedTileID&) const;
 
     void handleWrapJump(float lng);
 
-    std::unordered_map<std::string, std::vector<Feature>>
-    queryRenderedFeatures(const ScreenLineString& geometry,
-                          const TransformState& transformState,
-                          const std::vector<const RenderLayer*>&,
-                          const RenderedQueryOptions& options,
-                          const mat4& projMatrix) const;
+    std::unordered_map<std::string, std::vector<Feature>> queryRenderedFeatures(
+        const ScreenLineString& geometry, const TransformState& transformState,
+        const std::unordered_map<std::string, const RenderLayer*>&, const RenderedQueryOptions& options,
+        const mat4& projMatrix, const mbgl::SourceFeatureState& featureState) const;
 
     std::vector<Feature> querySourceFeatures(const SourceQueryOptions&) const;
 
@@ -66,16 +63,24 @@ public:
     void setObserver(TileObserver*);
     void dumpDebugLogs() const;
 
-    bool enabled = false;
+    const std::map<OverscaledTileID, std::unique_ptr<Tile>>& getTiles() const { return tiles; }
+    void clearAll();
+
+    void updateFadingTiles();
+    bool hasFadingTiles() const { return fadingTiles; }
+
+private:
+    void addRenderTile(const UnwrappedTileID& tileID, Tile& tile);
 
     std::map<OverscaledTileID, std::unique_ptr<Tile>> tiles;
     TileCache cache;
 
-    std::vector<RenderTile> renderTiles;
-
+    std::map<UnwrappedTileID, std::reference_wrapper<Tile>> renderedTiles; // Sorted by tile id.
     TileObserver* observer = nullptr;
 
     float prevLng = 0;
+
+    bool fadingTiles = false;
 };
 
 } // namespace mbgl

@@ -1,17 +1,24 @@
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
-
 #include <mbgl/util/logging.hpp>
 
 namespace mbgl {
 namespace style {
 
+bool SymbolLayer::Impl::hasFormatSectionOverrides() const {
+    if (!hasFormatSectionOverrides_) {
+        hasFormatSectionOverrides_ = SymbolLayerPaintPropertyOverrides::hasOverrides(layout.get<TextField>());
+    }
+    return *hasFormatSectionOverrides_;
+}
+
 bool SymbolLayer::Impl::hasLayoutDifference(const Layer::Impl& other) const {
-    assert(other.type == LayerType::Symbol);
+    assert(other.getTypeInfo() == getTypeInfo());
     const auto& impl = static_cast<const style::SymbolLayer::Impl&>(other);
     return filter     != impl.filter ||
            visibility != impl.visibility ||
            layout     != impl.layout ||
-           paint.hasDataDrivenPropertyDifference(impl.paint);
+           paint.hasDataDrivenPropertyDifference(impl.paint) ||
+           (hasFormatSectionOverrides() && SymbolLayerPaintPropertyOverrides::hasPaintPropertyDifference(paint, impl.paint));
 }
 
 void SymbolLayer::Impl::populateFontStack(std::set<FontStack>& fontStack) const {
@@ -20,13 +27,11 @@ void SymbolLayer::Impl::populateFontStack(std::set<FontStack>& fontStack) const 
     }
 
     layout.get<TextFont>().match(
-        [&] (Undefined) {
-            fontStack.insert({"Open Sans Regular", "Arial Unicode MS Regular"});
+        [&fontStack](Undefined) {
+            fontStack.insert({util::LAST_RESORT_ALPHABETIC_FONT, util::LAST_RESORT_PAN_UNICODE_FONT});
         },
-        [&] (const FontStack& constant) {
-            fontStack.insert(constant);
-        },
-        [&] (const auto& function) {
+        [&fontStack](const FontStack& constant) { fontStack.insert(constant); },
+        [&](const auto& function) {
             for (const auto& value : function.possibleOutputs()) {
                 if (value) {
                     fontStack.insert(*value);
@@ -35,8 +40,7 @@ void SymbolLayer::Impl::populateFontStack(std::set<FontStack>& fontStack) const 
                     break;
                 }
             }
-        }
-    );
+        });
 }
 
 } // namespace style

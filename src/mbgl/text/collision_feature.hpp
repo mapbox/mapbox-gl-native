@@ -9,16 +9,54 @@
 
 namespace mbgl {
 
+class ProjectedCollisionBox {
+public:
+    enum class Type : char {
+        Unknown,
+        Box,
+        Circle
+    };
+
+    ProjectedCollisionBox() = default;
+    ProjectedCollisionBox(float x1, float y1, float x2, float y2) : geometry(x1, y1, x2, y2), type(Type::Box) {}
+    ProjectedCollisionBox(float x, float y, float r) : geometry(x, y, r), type(Type::Circle) {}
+
+    const mapbox::geometry::box<float>& box() const {
+        assert(isBox());
+        return geometry.box;
+    }
+
+    const geometry::circle<float>& circle() const {
+        assert(isCircle());
+        return geometry.circle;
+    }
+
+    bool isCircle() const { return type == Type::Circle; }
+    bool isBox() const { return type == Type::Box; }
+
+private:
+    union Geometry {
+        // NOLINTNEXTLINE(modernize-use-equals-default)
+        Geometry() {}
+        Geometry(float x1, float y1, float x2, float y2) : box({x1, y1}, {x2, y2}) {}
+        Geometry(float x, float y, float r) : circle({x, y}, r) {}
+        mapbox::geometry::box<float> box;
+        geometry::circle<float> circle;
+    } geometry;
+    Type type = Type::Unknown;
+};
+
 class CollisionBox {
 public:
-    CollisionBox(Point<float> _anchor, Point<float> _offset, float _x1, float _y1, float _x2, float _y2, float _signedDistanceFromAnchor = 0, float _radius = 0) :
-        anchor(std::move(_anchor)), offset(_offset), x1(_x1), y1(_y1), x2(_x2), y2(_y2), used(true), signedDistanceFromAnchor(_signedDistanceFromAnchor), radius(_radius) {}
+    CollisionBox(Point<float> _anchor, float _x1, float _y1, float _x2, float _y2, float _signedDistanceFromAnchor = 0)
+        : anchor(_anchor), x1(_x1), y1(_y1), x2(_x2), y2(_y2), signedDistanceFromAnchor(_signedDistanceFromAnchor) {}
 
     // the box is centered around the anchor point
     Point<float> anchor;
-    
-    // the offset of the box from the label's anchor point
-    Point<float> offset;
+
+    // the offset of the box from the label's anchor point.
+    // TODO: might be needed for #13526
+    // Point<float> offset;
 
     // distances to the edges from the anchor
     float x1;
@@ -26,19 +64,7 @@ public:
     float x2;
     float y2;
 
-    // Projected box geometry: generated/updated at placement time
-    float px1;
-    float py1;
-    float px2;
-    float py2;
-    
-    // Projected circle geometry: generated/updated at placement time
-    float px;
-    float py;
-    bool used;
-
     float signedDistanceFromAnchor;
-    float radius;
 };
 
 class CollisionFeature {
@@ -54,7 +80,19 @@ public:
                      const IndexedSubfeature& indexedFeature_,
                      const float overscaling,
                      const float rotate)
-        : CollisionFeature(line, anchor, shapedText.top, shapedText.bottom, shapedText.left, shapedText.right, boxScale, padding, placement, indexedFeature_, overscaling, rotate) {}
+        : CollisionFeature(line,
+                           anchor,
+                           shapedText.top,
+                           shapedText.bottom,
+                           shapedText.left,
+                           shapedText.right,
+                           nullopt,
+                           boxScale,
+                           padding,
+                           placement,
+                           indexedFeature_,
+                           overscaling,
+                           rotate) {}
 
     // for icons
     // Icons collision features are always SymbolPlacementType::Point, which means the collision feature
@@ -69,36 +107,45 @@ public:
                      const float padding,
                      const IndexedSubfeature& indexedFeature_,
                      const float rotate)
-        : CollisionFeature(line, anchor,
+        : CollisionFeature(line,
+                           anchor,
                            (shapedIcon ? shapedIcon->top() : 0),
                            (shapedIcon ? shapedIcon->bottom() : 0),
                            (shapedIcon ? shapedIcon->left() : 0),
                            (shapedIcon ? shapedIcon->right() : 0),
+                           (shapedIcon ? shapedIcon->collisionPadding() : optional<Padding>{nullopt}),
                            boxScale,
                            padding,
                            style::SymbolPlacementType::Point,
-                           indexedFeature_, 1, rotate) {}
+                           indexedFeature_,
+                           1,
+                           rotate) {}
 
     CollisionFeature(const GeometryCoordinates& line,
                      const Anchor&,
-                     const float top,
-                     const float bottom,
-                     const float left,
-                     const float right,
-                     const float boxScale,
-                     const float padding,
-                     const style::SymbolPlacementType,
+                     float top,
+                     float bottom,
+                     float left,
+                     float right,
+                     const optional<Padding>& collisionPadding,
+                     float boxScale,
+                     float padding,
+                     style::SymbolPlacementType,
                      IndexedSubfeature,
-                     const float overscaling,
-                     const float rotate);
+                     float overscaling,
+                     float rotate);
 
     std::vector<CollisionBox> boxes;
     IndexedSubfeature indexedFeature;
     bool alongLine;
 
 private:
-    void bboxifyLabel(const GeometryCoordinates& line, GeometryCoordinate& anchorPoint,
-                      const int segment, const float length, const float height, const float overscaling);
+    void bboxifyLabel(const GeometryCoordinates& line,
+                      GeometryCoordinate& anchorPoint,
+                      std::size_t segment,
+                      float length,
+                      float boxSize,
+                      float overscaling);
 };
 
 } // namespace mbgl

@@ -86,7 +86,7 @@ ParseResult Case::parse(const Convertible& value, ParsingContext& ctx) {
             outputType = (*output)->getType();
         }
 
-        branches.push_back(std::make_pair(std::move(*test), std::move(*output)));
+        branches.emplace_back(std::move(*test), std::move(*output));
     }
 
     assert(outputType);

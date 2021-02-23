@@ -1,6 +1,5 @@
 #pragma once
 
-#include <mbgl/util/noncopyable.hpp>
 #include <mbgl/style/image.hpp>
 
 #include <string>
@@ -12,16 +11,16 @@
 
 namespace mbgl {
 
-class Scheduler;
 class FileSource;
 class SpriteLoaderObserver;
+class Scheduler;
 
-class SpriteLoader : public util::noncopyable {
+class SpriteLoader {
 public:
     SpriteLoader(float pixelRatio);
     ~SpriteLoader();
 
-    void load(const std::string& url, Scheduler&, FileSource&);
+    void load(const std::string& url, FileSource&);
 
     void setObserver(SpriteLoaderObserver*);
 
@@ -30,15 +29,15 @@ private:
 
     // Invoked by SpriteAtlasWorker
     friend class SpriteLoaderWorker;
-    void onParsed(std::vector<std::unique_ptr<style::Image>>&&);
-    void onError(std::exception_ptr);
 
     const float pixelRatio;
 
-    struct Loader;
-    std::unique_ptr<Loader> loader;
+    struct Data;
+    std::unique_ptr<Data> data;
 
     SpriteLoaderObserver* observer = nullptr;
+    std::shared_ptr<Scheduler> threadPool;
+    mapbox::base::WeakPtrFactory<SpriteLoader> weakFactory{this};
 };
 
 } // namespace mbgl

@@ -1,11 +1,23 @@
 #pragma once
 
+#include <mbgl/style/color_ramp_property_value.hpp>
 #include <mbgl/style/conversion.hpp>
-#include <mbgl/util/optional.hpp>
+#include <mbgl/style/expression/image.hpp>
+#include <mbgl/style/layer.hpp>
+#include <mbgl/style/property_value.hpp>
+#include <mbgl/style/rotation.hpp>
+#include <mbgl/style/transition_options.hpp>
 #include <mbgl/util/feature.hpp>
 #include <mbgl/util/geojson.hpp>
+#include <mbgl/util/optional.hpp>
+#include <mbgl/util/traits.hpp>
 
+#include <mapbox/compatibility/value.hpp>
+
+#include <array>
+#include <chrono>
 #include <string>
+#include <type_traits>
 
 namespace mbgl {
 namespace style {
@@ -84,34 +96,28 @@ class ConversionTraits;
 class Convertible {
 public:
     template <typename T>
+    // NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
     Convertible(T&& value) : vtable(vtableForType<std::decay_t<T>>()) {
         static_assert(sizeof(Storage) >= sizeof(std::decay_t<T>), "Storage must be large enough to hold value type");
         new (static_cast<void*>(&storage)) std::decay_t<T>(std::forward<T>(value));
     }
 
-    Convertible(Convertible&& v)
-        : vtable(v.vtable)
-    {
-        if (vtable) {
-            vtable->move(std::move(v.storage), this->storage);
-        }
+    Convertible(Convertible&& v) noexcept : vtable(v.vtable) {
+        // NOLINTNEXTLINE(performance-move-const-arg)
+        vtable->move(std::move(v.storage), storage);
     }
 
     ~Convertible() {
-        if (vtable) {
-            vtable->destroy(storage);
-        }
+        vtable->destroy(storage);
     }
 
-    Convertible& operator=(Convertible&& v) {
-        if (vtable) {
+    Convertible& operator=(Convertible&& v) noexcept {
+        if (this != &v) {
             vtable->destroy(storage);
+            vtable = v.vtable;
+            // NOLINTNEXTLINE(performance-move-const-arg)
+            vtable->move(std::move(v.storage), storage);
         }
-        vtable = v.vtable;
-        if (vtable) {
-            vtable->move(std::move(v.storage), this->storage);
-        }
-        v.vtable = nullptr;
         return *this;
     }
 
@@ -235,9 +241,7 @@ private:
         using Traits = ConversionTraits<T>;
         static VTable vtable = {
             [] (Storage&& src, Storage& dest) {
-                auto srcValue = reinterpret_cast<T&&>(src);
-                new (static_cast<void*>(&dest)) T(std::move(srcValue));
-                srcValue.~T();
+                new (static_cast<void*>(&dest)) T(reinterpret_cast<T&&>(src));
             },
             [] (Storage& s) {
                 reinterpret_cast<T&>(s).~T();
@@ -295,6 +299,84 @@ private:
 template <class T, class...Args>
 optional<T> convert(const Convertible& value, Error& error, Args&&...args) {
     return Converter<T>()(value, error, std::forward<Args>(args)...);
+}
+
+template <>
+struct ValueFactory<ColorRampPropertyValue> {
+    static Value make(const ColorRampPropertyValue& value) { return value.getExpression().serialize(); }
+};
+
+template <>
+struct ValueFactory<TransitionOptions> {
+    static Value make(const TransitionOptions& value) { return value.serialize(); }
+};
+
+template <>
+struct ValueFactory<Color> {
+    static Value make(const Color& color) { return color.serialize(); }
+};
+
+template <typename T>
+struct ValueFactory<T, typename std::enable_if<(!std::is_enum<T>::value && !is_linear_container<T>::value)>::type> {
+    static Value make(const T& arg) { return {arg}; }
+};
+
+template <typename T>
+struct ValueFactory<T, typename std::enable_if<std::is_enum<T>::value>::type> {
+    static Value make(T arg) { return {Enum<T>::toString(arg)}; }
+};
+
+template <typename T>
+struct ValueFactory<T, typename std::enable_if<is_linear_container<T>::value>::type> {
+    static Value make(const T& arg) {
+        mapbox::base::ValueArray result;
+        result.reserve(arg.size());
+        for (const auto& item : arg) {
+            result.emplace_back(ValueFactory<std::decay_t<decltype(item)>>::make(item));
+        }
+        return result;
+    }
+};
+
+template <>
+struct ValueFactory<Position> {
+    static Value make(const Position& position) {
+        return ValueFactory<std::array<float, 3>>::make(position.getSpherical());
+    }
+};
+
+template <>
+struct ValueFactory<Rotation> {
+    static Value make(const Rotation& rotation) { return {rotation.getAngle()}; }
+};
+
+template <typename T>
+Value makeValue(T&& arg) {
+    return ValueFactory<std::decay_t<T>>::make(std::forward<T>(arg));
+}
+
+template <typename T>
+StyleProperty makeStyleProperty(const PropertyValue<T>& value) {
+    return value.match([](const Undefined&) -> StyleProperty { return {}; },
+                       [](const Color& c) -> StyleProperty {
+                           return {makeValue(c), StyleProperty::Kind::Expression};
+                       },
+                       [](const PropertyExpression<T>& fn) -> StyleProperty {
+                           return {fn.getExpression().serialize(), StyleProperty::Kind::Expression};
+                       },
+                       [](const auto& t) -> StyleProperty {
+                           return {makeValue(t), StyleProperty::Kind::Constant};
+                       });
+}
+
+inline StyleProperty makeStyleProperty(const TransitionOptions& value) {
+    if (!value.isDefined()) return {};
+    return {makeValue(value), StyleProperty::Kind::Transition};
+}
+
+inline StyleProperty makeStyleProperty(const ColorRampPropertyValue& value) {
+    if (value.isUndefined()) return {};
+    return {makeValue(value), StyleProperty::Kind::Expression};
 }
 
 } // namespace conversion

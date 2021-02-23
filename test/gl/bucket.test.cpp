@@ -1,7 +1,7 @@
 #include <mbgl/test/util.hpp>
 #include <mbgl/test/stub_geometry_tile_feature.hpp>
 
-#include <mbgl/renderer/backend_scope.hpp>
+#include <mbgl/gfx/backend_scope.hpp>
 #include <mbgl/renderer/buckets/circle_bucket.hpp>
 #include <mbgl/renderer/buckets/fill_bucket.hpp>
 #include <mbgl/renderer/buckets/line_bucket.hpp>
@@ -22,16 +22,16 @@ bool operator==(const Segment<Attributes>& lhs, const Segment<Attributes>& rhs) 
            std::tie(rhs.vertexOffset, rhs.indexOffset, rhs.vertexLength, rhs.indexLength);
 }
 
-namespace gl {
+namespace gfx {
 namespace detail {
 
 template <class A1, class A2>
-bool operator==(const Vertex<A1, A2>& lhs, const Vertex<A1, A2>& rhs) {
+bool operator==(const VertexType<A1, A2>& lhs, const VertexType<A1, A2>& rhs) {
     return std::tie(lhs.a1, lhs.a2) == std::tie(rhs.a1, rhs.a2);
 }
 
 } // namespace detail
-} // namespace gl
+} // namespace gfx
 } // namespace mbgl
 
 using namespace mbgl;
@@ -43,89 +43,142 @@ PropertyMap properties;
 } // namespace
 
 TEST(Buckets, CircleBucket) {
-    HeadlessBackend backend({ 512, 256 });
-    BackendScope scope { backend };
+    gl::HeadlessBackend backend({ 512, 256 });
+    gfx::BackendScope scope { backend };
 
-    gl::Context context;
-    CircleBucket bucket { { {0, 0, 0}, MapMode::Static, 1.0 }, {} };
+    gl::Context context{ backend };
+    CircleBucket bucket{{}, MapMode::Static, 1.0};
     ASSERT_FALSE(bucket.hasData());
     ASSERT_FALSE(bucket.needsUpload());
 
+    // CircleBucket::addFeature() is a no-op.
     GeometryCollection point { { { 0, 0 } } };
-    bucket.addFeature(StubGeometryTileFeature { {}, FeatureType::Point, point, properties }, point, {}, PatternLayerMap());
+    bucket.addFeature(StubGeometryTileFeature{{}, FeatureType::Point, point, properties},
+                      point,
+                      {},
+                      PatternLayerMap(),
+                      0,
+                      CanonicalTileID(0, 0, 0));
+    ASSERT_FALSE(bucket.hasData());
+    ASSERT_FALSE(bucket.needsUpload());
+
+    bucket.segments.emplace_back(0, 0);
     ASSERT_TRUE(bucket.hasData());
     ASSERT_TRUE(bucket.needsUpload());
 
-    bucket.upload(context);
+    auto commandEncoder = context.createCommandEncoder();
+    auto uploadPass = commandEncoder->createUploadPass("upload");
+    bucket.upload(*uploadPass);
     ASSERT_TRUE(bucket.hasData());
     ASSERT_FALSE(bucket.needsUpload());
 }
 
 TEST(Buckets, FillBucket) {
-    HeadlessBackend backend({ 512, 256 });
-    BackendScope scope { backend };
-    style::Properties<>::PossiblyEvaluated layout;
+    gl::HeadlessBackend backend({ 512, 256 });
+    gfx::BackendScope scope { backend };
+    FillBucket::PossiblyEvaluatedLayoutProperties layout;
 
-    gl::Context context;
+    gl::Context context{ backend };
     FillBucket bucket { layout, {}, 5.0f, 1};
     ASSERT_FALSE(bucket.hasData());
     ASSERT_FALSE(bucket.needsUpload());
 
     GeometryCollection polygon { { { 0, 0 }, { 0, 1 }, { 1, 1 } } };
-    bucket.addFeature(StubGeometryTileFeature { {}, FeatureType::Polygon, polygon, properties }, polygon, {}, PatternLayerMap());
+    bucket.addFeature(StubGeometryTileFeature{{}, FeatureType::Polygon, polygon, properties},
+                      polygon,
+                      {},
+                      PatternLayerMap(),
+                      0,
+                      CanonicalTileID(0, 0, 0));
     ASSERT_TRUE(bucket.hasData());
     ASSERT_TRUE(bucket.needsUpload());
 
-    bucket.upload(context);
+    auto commandEncoder = context.createCommandEncoder();
+    auto uploadPass = commandEncoder->createUploadPass("upload");
+    bucket.upload(*uploadPass);
     ASSERT_FALSE(bucket.needsUpload());
 }
 
 TEST(Buckets, LineBucket) {
-    HeadlessBackend backend({ 512, 256 });
-    BackendScope scope { backend };
-    style::LineLayoutProperties::PossiblyEvaluated layout;
+    gl::HeadlessBackend backend({ 512, 256 });
+    gfx::BackendScope scope { backend };
+    LineBucket::PossiblyEvaluatedLayoutProperties layout;
 
-    gl::Context context;
+    gl::Context context{ backend };
     LineBucket bucket { layout, {}, 10.0f, 1 };
     ASSERT_FALSE(bucket.hasData());
     ASSERT_FALSE(bucket.needsUpload());
 
     // Ignore invalid feature type.
     GeometryCollection point { { { 0, 0 } } };
-    bucket.addFeature(StubGeometryTileFeature { {}, FeatureType::Point, point, properties }, point, {}, PatternLayerMap());
+    bucket.addFeature(StubGeometryTileFeature{{}, FeatureType::Point, point, properties},
+                      point,
+                      {},
+                      PatternLayerMap(),
+                      0,
+                      CanonicalTileID(0, 0, 0));
     ASSERT_FALSE(bucket.hasData());
 
     GeometryCollection line { { { 0, 0 }, { 1, 1 } } };
-    bucket.addFeature(StubGeometryTileFeature { {}, FeatureType::LineString, line, properties }, line, {}, PatternLayerMap());
+    bucket.addFeature(StubGeometryTileFeature{{}, FeatureType::LineString, line, properties},
+                      line,
+                      {},
+                      PatternLayerMap(),
+                      1,
+                      CanonicalTileID(0, 0, 0));
     ASSERT_TRUE(bucket.hasData());
     ASSERT_TRUE(bucket.needsUpload());
 
-    bucket.upload(context);
+    auto commandEncoder = context.createCommandEncoder();
+    auto uploadPass = commandEncoder->createUploadPass("upload");
+    bucket.upload(*uploadPass);
     ASSERT_FALSE(bucket.needsUpload());
 }
 
 TEST(Buckets, SymbolBucket) {
-    HeadlessBackend backend({ 512, 256 });
-    BackendScope scope { backend };
+    gl::HeadlessBackend backend({ 512, 256 });
+    gfx::BackendScope scope { backend };
 
-    style::SymbolLayoutProperties::PossiblyEvaluated layout;
-    bool sdfIcons = false;
+    auto layout = makeMutable<style::SymbolLayoutProperties::PossiblyEvaluated>();
     bool iconsNeedLinear = false;
     bool sortFeaturesByY = false;
     std::string bucketLeaderID = "test";
     std::vector<SymbolInstance> symbolInstances;
+    std::vector<SortKeyRange> symbolRanges;
 
-    gl::Context context;
-    SymbolBucket bucket { layout, {}, 16.0f, 1.0f, 0, sdfIcons, iconsNeedLinear, sortFeaturesByY, bucketLeaderID, std::move(symbolInstances) };
+    gl::Context context{ backend };
+    SymbolBucket bucket{std::move(layout),
+                        {},
+                        16.0f,
+                        1.0f,
+                        0,
+                        iconsNeedLinear,
+                        sortFeaturesByY,
+                        bucketLeaderID,
+                        std::move(symbolInstances),
+                        std::move(symbolRanges),
+                        1.0f,
+                        false,
+                        {},
+                        false /*iconsInText*/};
     ASSERT_FALSE(bucket.hasIconData());
+    ASSERT_FALSE(bucket.hasSdfIconData());
     ASSERT_FALSE(bucket.hasTextData());
-    ASSERT_FALSE(bucket.hasCollisionBoxData());
+    ASSERT_FALSE(bucket.hasIconCollisionBoxData());
+    ASSERT_FALSE(bucket.hasTextCollisionBoxData());
+    ASSERT_FALSE(bucket.hasIconCollisionCircleData());
+    ASSERT_FALSE(bucket.hasTextCollisionCircleData());
     ASSERT_FALSE(bucket.hasData());
     ASSERT_FALSE(bucket.needsUpload());
 
     // SymbolBucket::addFeature() is a no-op.
     GeometryCollection point { { { 0, 0 } } };
-    bucket.addFeature(StubGeometryTileFeature { {}, FeatureType::Point, point, properties }, point, {}, PatternLayerMap());
+    bucket.addFeature(StubGeometryTileFeature{{}, FeatureType::Point, std::move(point), properties},
+                      point,
+                      {},
+                      PatternLayerMap(),
+                      0,
+                      CanonicalTileID(0, 0, 0));
     ASSERT_FALSE(bucket.hasData());
     ASSERT_FALSE(bucket.needsUpload());
 
@@ -134,15 +187,17 @@ TEST(Buckets, SymbolBucket) {
     ASSERT_TRUE(bucket.hasData());
     ASSERT_TRUE(bucket.needsUpload());
 
-    bucket.upload(context);
+    auto commandEncoder = context.createCommandEncoder();
+    auto uploadPass = commandEncoder->createUploadPass("upload");
+    bucket.upload(*uploadPass);
     ASSERT_FALSE(bucket.needsUpload());
 }
 
 TEST(Buckets, RasterBucket) {
-    HeadlessBackend backend({ 512, 256 });
-    BackendScope scope { backend };
+    gl::HeadlessBackend backend({ 512, 256 });
+    gfx::BackendScope scope { backend };
 
-    gl::Context context;
+    gl::Context context{ backend };
     PremultipliedImage rgba({ 1, 1 });
 
     // RasterBucket::hasData() is always true.
@@ -150,7 +205,9 @@ TEST(Buckets, RasterBucket) {
     ASSERT_TRUE(bucket.hasData());
     ASSERT_TRUE(bucket.needsUpload());
 
-    bucket.upload(context);
+    auto commandEncoder = context.createCommandEncoder();
+    auto uploadPass = commandEncoder->createUploadPass("upload");
+    bucket.upload(*uploadPass);
     ASSERT_FALSE(bucket.needsUpload());
 
     bucket.clear();

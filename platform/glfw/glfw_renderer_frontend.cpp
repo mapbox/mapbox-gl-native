@@ -1,6 +1,7 @@
 #include "glfw_renderer_frontend.hpp"
 
 #include <mbgl/renderer/renderer.hpp>
+#include <mbgl/gfx/backend_scope.hpp>
 
 GLFWRendererFrontend::GLFWRendererFrontend(std::unique_ptr<mbgl::Renderer> renderer_, GLFWView& glfwView_)
     : glfwView(glfwView_)
@@ -30,9 +31,14 @@ void GLFWRendererFrontend::render() {
     
     if (!updateParameters) return;
     
-    mbgl::BackendScope guard { glfwView, mbgl::BackendScope::ScopeType::Implicit };
+    mbgl::gfx::BackendScope guard { glfwView.getRendererBackend(), mbgl::gfx::BackendScope::ScopeType::Implicit };
 
-    renderer->render(*updateParameters);
+    // onStyleImageMissing might be called during a render. The user implemented method
+    // could trigger a call to MGLRenderFrontend#update which overwrites `updateParameters`.
+    // Copy the shared pointer here so that the parameters aren't destroyed while `render(...)` is
+    // still using them.
+    auto updateParameters_ = updateParameters;
+    renderer->render(updateParameters_);
 }
 
 mbgl::Renderer* GLFWRendererFrontend::getRenderer() {

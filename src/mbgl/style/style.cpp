@@ -1,16 +1,16 @@
+#include <mbgl/style/image.hpp>
+#include <mbgl/style/image_impl.hpp>
+#include <mbgl/style/layer.hpp>
+#include <mbgl/style/light.hpp>
+#include <mbgl/style/source.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/style_impl.hpp>
-#include <mbgl/style/light.hpp>
-#include <mbgl/style/image.hpp>
-#include <mbgl/style/source.hpp>
-#include <mbgl/style/layer.hpp>
 
 namespace mbgl {
 namespace style {
 
-Style::Style(Scheduler& scheduler, FileSource& fileSource, float pixelRatio)
-    : impl(std::make_unique<Impl>(scheduler, fileSource, pixelRatio)) {
-}
+Style::Style(std::shared_ptr<FileSource> fileSource, float pixelRatio)
+    : impl(std::make_unique<Impl>(std::move(fileSource), pixelRatio)) {}
 
 Style::~Style() = default;
 
@@ -60,8 +60,10 @@ const Light* Style::getLight() const {
     return impl->getLight();
 }
 
-const Image* Style::getImage(const std::string& name) const {
-    return impl->getImage(name);
+optional<Image> Style::getImage(const std::string& name) const {
+    auto image = impl->getImage(name);
+    if (!image) return nullopt;
+    return style::Image(std::move(*image));
 }
 
 void Style::addImage(std::unique_ptr<Image> image) {

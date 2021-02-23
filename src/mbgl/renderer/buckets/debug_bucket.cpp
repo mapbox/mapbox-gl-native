@@ -1,5 +1,4 @@
 #include <mbgl/renderer/buckets/debug_bucket.hpp>
-#include <mbgl/programs/fill_program.hpp>
 #include <mbgl/geometry/debug_font_data.hpp>
 #include <mbgl/tile/tile_id.hpp>
 #include <mbgl/util/string.hpp>
@@ -15,17 +14,12 @@ DebugBucket::DebugBucket(const OverscaledTileID& id,
                          const bool complete_,
                          optional<Timestamp> modified_,
                          optional<Timestamp> expires_,
-                         MapDebugOptions debugMode_,
-                         gl::Context& context)
+                         MapDebugOptions debugMode_)
     : renderable(renderable_),
       complete(complete_),
       modified(std::move(modified_)),
       expires(std::move(expires_)),
       debugMode(debugMode_) {
-
-    gl::VertexVector<FillLayoutVertex> vertices;
-    gl::IndexVector<gl::Lines> indices;
-
     auto addText = [&] (const std::string& text, double left, double baseline, double scale) {
         for (uint8_t c : text) {
             if (c < 32 || c >= 127)
@@ -46,8 +40,8 @@ DebugBucket::DebugBucket(const OverscaledTileID& id,
                     vertices.emplace_back(FillProgram::layoutVertex(p));
 
                     if (prev) {
-                        indices.emplace_back(vertices.vertexSize() - 2,
-                                             vertices.vertexSize() - 1);
+                        indices.emplace_back(vertices.elements() - 2,
+                                             vertices.elements() - 1);
                     }
 
                     prev = p;
@@ -74,10 +68,19 @@ DebugBucket::DebugBucket(const OverscaledTileID& id,
         addText(expiresText, 50, baseline + 200, 5);
     }
 
-    segments.emplace_back(0, 0, vertices.vertexSize(), indices.indexSize());
+    segments.emplace_back(0, 0, vertices.elements(), indices.elements());
+}
 
-    vertexBuffer = context.createVertexBuffer(std::move(vertices));
-    indexBuffer = context.createIndexBuffer(std::move(indices));
+void DebugBucket::upload(gfx::UploadPass& uploadPass) {
+    if (!vertices.empty()) {
+        vertexBuffer = uploadPass.createVertexBuffer(std::move(vertices));
+        indexBuffer = uploadPass.createIndexBuffer(std::move(indices));
+    }
+    if (!texture) {
+        std::array<uint8_t, 4> data{{0, 0, 0, 0}};
+        static const PremultipliedImage emptyImage{Size(1, 1), data.data(), data.size()};
+        texture = uploadPass.createTexture(emptyImage);
+    }
 }
 
 } // namespace mbgl

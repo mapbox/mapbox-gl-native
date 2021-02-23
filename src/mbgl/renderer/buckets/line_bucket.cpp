@@ -5,49 +5,49 @@
 #include <mbgl/util/constants.hpp>
 
 #include <cassert>
+#include <utility>
 
 namespace mbgl {
 
 using namespace style;
 
-LineBucket::LineBucket(const style::LineLayoutProperties::PossiblyEvaluated layout_,
-                       std::map<std::string, RenderLinePaintProperties::PossiblyEvaluated> layerPaintProperties,
+LineBucket::LineBucket(LineBucket::PossiblyEvaluatedLayoutProperties layout_,
+                       const std::map<std::string, Immutable<LayerProperties>>& layerPaintProperties,
                        const float zoom_,
                        const uint32_t overscaling_)
-    : Bucket(LayerType::Line),
-      layout(layout_),
-      zoom(zoom_),
-      overscaling(overscaling_) {
-
+    : layout(std::move(layout_)), zoom(zoom_), overscaling(overscaling_) {
     for (const auto& pair : layerPaintProperties) {
         paintPropertyBinders.emplace(
             std::piecewise_construct,
             std::forward_as_tuple(pair.first),
             std::forward_as_tuple(
-                pair.second,
+                getEvaluated<LineLayerProperties>(pair.second),
                 zoom));
     }
 }
 
+LineBucket::~LineBucket() = default;
 
 void LineBucket::addFeature(const GeometryTileFeature& feature,
                             const GeometryCollection& geometryCollection,
                             const ImagePositions& patternPositions,
-                            const PatternLayerMap& patternDependencies) {
+                            const PatternLayerMap& patternDependencies,
+                            std::size_t index,
+                            const CanonicalTileID& canonical) {
     for (auto& line : geometryCollection) {
-        addGeometry(line, feature);
+        addGeometry(line, feature, canonical);
     }
 
     for (auto& pair : paintPropertyBinders) {
         const auto it = patternDependencies.find(pair.first);
         if (it != patternDependencies.end()){
-            pair.second.populateVertexVectors(feature, vertices.vertexSize(), patternPositions, it->second);
+            pair.second.populateVertexVectors(
+                feature, vertices.elements(), index, patternPositions, it->second, canonical);
         } else {
-            pair.second.populateVertexVectors(feature, vertices.vertexSize(), patternPositions, {});
+            pair.second.populateVertexVectors(feature, vertices.elements(), index, patternPositions, {}, canonical);
         }
     }
 }
-
 
 /*
  * Sharp corners cause dashed lines to tilt because the distance along the line
@@ -62,6 +62,9 @@ void LineBucket::addFeature(const GeometryTileFeature& feature,
  */
 const float COS_HALF_SHARP_CORNER = std::cos(75.0 / 2.0 * (M_PI / 180.0));
 const float SHARP_CORNER_OFFSET = 15.0f;
+
+// Angle per triangle for approximating round line joins.
+const float DEG_PER_TRIANGLE = 20.0f;
 
 // The number of bits that is used to store the line distance in the buffer.
 const int LINE_DISTANCE_BUFFER_BITS = 14;
@@ -95,7 +98,9 @@ private:
     double total;
 };
 
-void LineBucket::addGeometry(const GeometryCoordinates& coordinates, const GeometryTileFeature& feature) {
+void LineBucket::addGeometry(const GeometryCoordinates& coordinates,
+                             const GeometryTileFeature& feature,
+                             const CanonicalTileID& canonical) {
     const FeatureType type = feature.getType();
     const std::size_t len = [&coordinates] {
         std::size_t l = coordinates.size();
@@ -131,18 +136,19 @@ void LineBucket::addGeometry(const GeometryCoordinates& coordinates, const Geome
             total_length += util::dist<double>(coordinates[i], coordinates[i + 1]);
         }
 
-        lineDistances = Distances{*numericValue<double>(clip_start_it->second),
-                                  *numericValue<double>(clip_end_it->second),
-                                  total_length};
+        lineDistances = Distances{
+            *numericValue<double>(clip_start_it->second), *numericValue<double>(clip_end_it->second), total_length};
     }
 
-    const LineJoinType joinType = layout.evaluate<LineJoin>(zoom, feature);
+    const LineJoinType joinType = layout.evaluate<LineJoin>(zoom, feature, canonical);
 
     const float miterLimit = joinType == LineJoinType::Bevel ? 1.05f : float(layout.get<LineMiterLimit>());
 
-    const double sharpCornerOffset = overscaling == 0 ?
-                                    SHARP_CORNER_OFFSET * (float(util::EXTENT) / util::tileSize) :
-                                    SHARP_CORNER_OFFSET * (float(util::EXTENT) / (util::tileSize * overscaling));
+    const double sharpCornerOffset =
+        overscaling == 0
+            ? SHARP_CORNER_OFFSET * (float(util::EXTENT) / util::tileSize)
+            : (overscaling <= 16.0 ? SHARP_CORNER_OFFSET * (float(util::EXTENT) / (util::tileSize * overscaling))
+                                   : 0.0f);
 
     const GeometryCoordinate firstCoordinate = coordinates[first];
     const LineCapType beginCap = layout.get<LineCap>();
@@ -164,7 +170,7 @@ void LineBucket::addGeometry(const GeometryCoordinates& coordinates, const Geome
         nextNormal = util::perp(util::unit(convertPoint<double>(firstCoordinate - *currentCoordinate)));
     }
 
-    const std::size_t startVertex = vertices.vertexSize();
+    const std::size_t startVertex = vertices.elements();
     std::vector<TriangleElement> triangleStore;
 
     for (std::size_t i = first; i < len; ++i) {
@@ -226,12 +232,17 @@ void LineBucket::addGeometry(const GeometryCoordinates& coordinates, const Geome
          *
          */
 
-        // Calculate the length of the miter (the ratio of the miter to the width).
-        // Find the cosine of the angle between the next and join normals
-        // using dot product. The inverse of that is the miter length.
+        // Calculate cosines of the angle (and its half) using dot product.
+        const double cosAngle = prevNormal->x * nextNormal->x + prevNormal->y * nextNormal->y;
         const double cosHalfAngle = joinNormal.x * nextNormal->x + joinNormal.y * nextNormal->y;
+
+        // Calculate the length of the miter (the ratio of the miter to the width)
+        // as the inverse of cosine of the angle between next and join normals.
         const double miterLength =
             cosHalfAngle != 0 ? 1 / cosHalfAngle : std::numeric_limits<double>::infinity();
+
+        // Approximate angle from cosine.
+        const double approxAngle = 2 * std::sqrt(2 - 2 * cosHalfAngle);
 
         const bool isSharpCorner = cosHalfAngle < COS_HALF_SHARP_CORNER && prevCoordinate && nextCoordinate;
 
@@ -331,20 +342,20 @@ void LineBucket::addGeometry(const GeometryCoordinates& coordinates, const Geome
                 // Create a round join by adding multiple pie slices. The join isn't actually round, but
                 // it looks like it is at the sizes we render lines at.
 
-                // Add more triangles for sharper angles.
-                // This math is just a good enough approximation. It isn't "correct".
-                const int n = std::floor((0.5 - (cosHalfAngle - 0.5)) * 8);
+                // Pick the number of triangles for approximating round join by based on the angle between normals.
+                const unsigned n = ::round((approxAngle * 180 / M_PI) / DEG_PER_TRIANGLE);
 
-                for (int m = 0; m < n; m++) {
-                    auto approxFractionalJoinNormal = util::unit(*nextNormal * ((m + 1.0) / (n + 1.0)) + *prevNormal);
-                    addPieSliceVertex(*currentCoordinate, distance, approxFractionalJoinNormal, lineTurnsLeft, startVertex, triangleStore, lineDistances);
-                }
-
-                addPieSliceVertex(*currentCoordinate, distance, joinNormal, lineTurnsLeft, startVertex, triangleStore, lineDistances);
-
-                for (int k = n - 1; k >= 0; k--) {
-                    auto approxFractionalJoinNormal = util::unit(*prevNormal * ((k + 1.0) / (n + 1.0)) + *nextNormal);
-                    addPieSliceVertex(*currentCoordinate, distance, approxFractionalJoinNormal, lineTurnsLeft, startVertex, triangleStore, lineDistances);
+                for (unsigned m = 1; m < n; ++m) {
+                    double t = double(m) / n;
+                    if (t != 0.5) {
+                        // approximate spherical interpolation https://observablehq.com/@mourner/approximating-geometric-slerp
+                        const double t2 = t - 0.5;
+                        const double A = 1.0904 + cosAngle * (-3.2452 + cosAngle * (3.55645 - cosAngle * 1.43519));
+                        const double B = 0.848013 + cosAngle * (-1.06021 + cosAngle * 0.215638);
+                        t = t + t * t2 * (t - 1) * (A * t2 * t2 + B);
+                    }
+                    auto approxFractionalNormal = util::unit(*prevNormal * (1.0 - t) + *nextNormal * t);
+                    addPieSliceVertex(*currentCoordinate, distance, approxFractionalNormal, lineTurnsLeft, startVertex, triangleStore, lineDistances);
                 }
             }
 
@@ -421,11 +432,11 @@ void LineBucket::addGeometry(const GeometryCoordinates& coordinates, const Geome
         startOfLine = false;
     }
 
-    const std::size_t endVertex = vertices.vertexSize();
+    const std::size_t endVertex = vertices.elements();
     const std::size_t vertexCount = endVertex - startVertex;
 
     if (segments.empty() || segments.back().vertexLength + vertexCount > std::numeric_limits<uint16_t>::max()) {
-        segments.emplace_back(startVertex, triangles.indexSize());
+        segments.emplace_back(startVertex, triangles.elements());
     }
 
     auto& segment = segments.back();
@@ -455,7 +466,7 @@ void LineBucket::addCurrentVertex(const GeometryCoordinate& currentCoordinate,
     if (endLeft)
         extrude = extrude - (util::perp(normal) * endLeft);
     vertices.emplace_back(LineProgram::layoutVertex(currentCoordinate, extrude, round, false, endLeft, scaledDistance * LINE_DISTANCE_SCALE));
-    e3 = vertices.vertexSize() - 1 - startVertex;
+    e3 = vertices.elements() - 1 - startVertex;
     if (e1 >= 0 && e2 >= 0) {
         triangleStore.emplace_back(e1, e2, e3);
     }
@@ -466,7 +477,7 @@ void LineBucket::addCurrentVertex(const GeometryCoordinate& currentCoordinate,
     if (endRight)
         extrude = extrude - (util::perp(normal) * endRight);
     vertices.emplace_back(LineProgram::layoutVertex(currentCoordinate, extrude, round, true, -endRight, scaledDistance * LINE_DISTANCE_SCALE));
-    e3 = vertices.vertexSize() - 1 - startVertex;
+    e3 = vertices.elements() - 1 - startVertex;
     if (e1 >= 0 && e2 >= 0) {
         triangleStore.emplace_back(e1, e2, e3);
     }
@@ -496,7 +507,7 @@ void LineBucket::addPieSliceVertex(const GeometryCoordinate& currentVertex,
     }
 
     vertices.emplace_back(LineProgram::layoutVertex(currentVertex, flippedExtrude, false, lineTurnsLeft, 0, distance * LINE_DISTANCE_SCALE));
-    e3 = vertices.vertexSize() - 1 - startVertex;
+    e3 = vertices.elements() - 1 - startVertex;
     if (e1 >= 0 && e2 >= 0) {
         triangleStore.emplace_back(e1, e2, e3);
     }
@@ -508,12 +519,14 @@ void LineBucket::addPieSliceVertex(const GeometryCoordinate& currentVertex,
     }
 }
 
-void LineBucket::upload(gl::Context& context) {
-    vertexBuffer = context.createVertexBuffer(std::move(vertices));
-    indexBuffer = context.createIndexBuffer(std::move(triangles));
+void LineBucket::upload(gfx::UploadPass& uploadPass) {
+    if (!uploaded) {
+        vertexBuffer = uploadPass.createVertexBuffer(std::move(vertices));
+        indexBuffer = uploadPass.createIndexBuffer(std::move(triangles));
+    }
 
     for (auto& pair : paintPropertyBinders) {
-        pair.second.upload(context);
+        pair.second.upload(uploadPass);
     }
 
     uploaded = true;
@@ -524,31 +537,35 @@ bool LineBucket::hasData() const {
 }
 
 template <class Property>
-static float get(const RenderLineLayer& layer, const std::map<std::string, LineProgram::PaintPropertyBinders>& paintPropertyBinders) {
-    auto it = paintPropertyBinders.find(layer.getID());
+static float get(const LinePaintProperties::PossiblyEvaluated& evaluated, const std::string& id, const std::map<std::string, LineProgram::Binders>& paintPropertyBinders) {
+    auto it = paintPropertyBinders.find(id);
     if (it == paintPropertyBinders.end() || !it->second.statistics<Property>().max()) {
-        return layer.evaluated.get<Property>().constantOr(Property::defaultValue());
+        return evaluated.get<Property>().constantOr(Property::defaultValue());
     } else {
         return *it->second.statistics<Property>().max();
     }
 }
 
-float LineBucket::getLineWidth(const RenderLineLayer& layer) const {
-    float lineWidth = get<LineWidth>(layer, paintPropertyBinders);
-    float gapWidth = get<LineGapWidth>(layer, paintPropertyBinders);
-
+float LineBucket::getQueryRadius(const RenderLayer& layer) const {
+    const auto& evaluated = getEvaluated<LineLayerProperties>(layer.evaluatedProperties);
+    const std::array<float, 2>& translate = evaluated.get<LineTranslate>();
+    float offset = get<LineOffset>(evaluated, layer.getID(), paintPropertyBinders);
+    float lineWidth = get<LineWidth>(evaluated, layer.getID(), paintPropertyBinders);
+    float gapWidth = get<LineGapWidth>(evaluated, layer.getID(), paintPropertyBinders);
     if (gapWidth) {
-        return gapWidth + 2 * lineWidth;
-    } else {
-        return lineWidth;
+        lineWidth = gapWidth + 2 * lineWidth;
     }
+
+    return lineWidth / 2.0f + std::abs(offset) + util::length(translate[0], translate[1]);
 }
 
-float LineBucket::getQueryRadius(const RenderLayer& layer) const {
-    const RenderLineLayer* lineLayer = toRenderLineLayer(&layer);
-    const std::array<float, 2>& translate = lineLayer->evaluated.get<LineTranslate>();
-    float offset = get<LineOffset>(*lineLayer, paintPropertyBinders);
-    return getLineWidth(*lineLayer) / 2.0 + std::abs(offset) + util::length(translate[0], translate[1]);
+void LineBucket::update(const FeatureStates& states, const GeometryTileLayer& layer, const std::string& layerID,
+                        const ImagePositions& imagePositions) {
+    auto it = paintPropertyBinders.find(layerID);
+    if (it != paintPropertyBinders.end()) {
+        it->second.updateVertexVectors(states, layer, imagePositions);
+        uploaded = false;
+    }
 }
 
 } // namespace mbgl

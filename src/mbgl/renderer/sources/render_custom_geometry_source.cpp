@@ -3,15 +3,12 @@
 #include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/tile/custom_geometry_tile.hpp>
 
-#include <mbgl/algorithm/generate_clip_ids.hpp>
-#include <mbgl/algorithm/generate_clip_ids_impl.hpp>
-
 namespace mbgl {
 
 using namespace style;
 
 RenderCustomGeometrySource::RenderCustomGeometrySource(Immutable<style::CustomGeometrySource::Impl> impl_)
-    : RenderSource(impl_) {
+    : RenderTileSource(std::move(impl_)) {
     tilePyramid.setObserver(this);
 }
 
@@ -19,16 +16,22 @@ const style::CustomGeometrySource::Impl& RenderCustomGeometrySource::impl() cons
     return static_cast<const style::CustomGeometrySource::Impl&>(*baseImpl);
 }
 
-bool RenderCustomGeometrySource::isLoaded() const {
-    return tilePyramid.isLoaded();
-}
-
 void RenderCustomGeometrySource::update(Immutable<style::Source::Impl> baseImpl_,
-                                 const std::vector<Immutable<Layer::Impl>>& layers,
+                                 const std::vector<Immutable<style::LayerProperties>>& layers,
                                  const bool needsRendering,
                                  const bool needsRelayout,
                                  const TileParameters& parameters) {
-    std::swap(baseImpl, baseImpl_);
+    if (baseImpl != baseImpl_) {
+        std::swap(baseImpl, baseImpl_);
+
+        // Clear tile pyramid only if updated source has different tile options,
+        // zoom range or initialization state for a custom tile loader.
+        auto newImpl = staticImmutableCast<style::CustomGeometrySource::Impl>(baseImpl);
+        auto currentImpl = staticImmutableCast<style::CustomGeometrySource::Impl>(baseImpl_);
+        if (*newImpl != *currentImpl) {
+            tilePyramid.clearAll();
+        }
+    }
 
     enabled = needsRendering;
 
@@ -41,47 +44,14 @@ void RenderCustomGeometrySource::update(Immutable<style::Source::Impl> baseImpl_
                        needsRendering,
                        needsRelayout,
                        parameters,
-                       SourceType::CustomVector,
+                       *baseImpl,
                        util::tileSize,
                        impl().getZoomRange(),
                        {},
-                       [&] (const OverscaledTileID& tileID) {
-                           return std::make_unique<CustomGeometryTile>(tileID, impl().id, parameters, impl().getTileOptions(), *tileLoader);
+                       [&](const OverscaledTileID& tileID) {
+                           return std::make_unique<CustomGeometryTile>(
+                               tileID, impl().id, parameters, impl().getTileOptions(), *tileLoader);
                        });
-}
-
-void RenderCustomGeometrySource::startRender(PaintParameters& parameters) {
-    parameters.clipIDGenerator.update(tilePyramid.getRenderTiles());
-    tilePyramid.startRender(parameters);
-}
-
-void RenderCustomGeometrySource::finishRender(PaintParameters& parameters) {
-    tilePyramid.finishRender(parameters);
-}
-
-std::vector<std::reference_wrapper<RenderTile>> RenderCustomGeometrySource::getRenderTiles() {
-    return tilePyramid.getRenderTiles();
-}
-
-std::unordered_map<std::string, std::vector<Feature>>
-RenderCustomGeometrySource::queryRenderedFeatures(const ScreenLineString& geometry,
-                                           const TransformState& transformState,
-                                           const std::vector<const RenderLayer*>& layers,
-                                           const RenderedQueryOptions& options,
-                                           const mat4& projMatrix) const {
-   return tilePyramid.queryRenderedFeatures(geometry, transformState, layers, options, projMatrix);
-}
-
-std::vector<Feature> RenderCustomGeometrySource::querySourceFeatures(const SourceQueryOptions& options) const {
-    return tilePyramid.querySourceFeatures(options);
-}
-
-void RenderCustomGeometrySource::reduceMemoryUse() {
-    tilePyramid.reduceMemoryUse();
-}
-
-void RenderCustomGeometrySource::dumpDebugLogs() const {
-    tilePyramid.dumpDebugLogs();
 }
 
 } // namespace mbgl

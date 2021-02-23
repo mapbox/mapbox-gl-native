@@ -1,7 +1,7 @@
 #include <mbgl/test/util.hpp>
 #include <mbgl/test/fixture_log_observer.hpp>
 
-#include <sqlite3.hpp>
+#include <mbgl/storage/sqlite3.hpp>
 
 using namespace mbgl;
 

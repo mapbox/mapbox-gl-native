@@ -1,9 +1,10 @@
 #pragma once
 
+#include <mbgl/style/expression/value.hpp>
+#include <mbgl/style/position.hpp>
+#include <mbgl/style/rotation.hpp>
 #include <mbgl/util/color.hpp>
 #include <mbgl/util/range.hpp>
-#include <mbgl/style/position.hpp>
-#include <mbgl/style/expression/value.hpp>
 
 #include <array>
 #include <vector>
@@ -63,7 +64,7 @@ struct Interpolator<std::vector<style::expression::Value>> {
                                   const std::vector<style::expression::Value>& b,
                                   const double t) const {
         assert(a.size() == b.size());
-        if (a.size() == 0) return {};
+        if (a.empty()) return {};
         std::vector<style::expression::Value> result;
         for (std::size_t i = 0; i < a.size(); i++) {
             assert(a[i].template is<double>());
@@ -99,6 +100,27 @@ public:
             interpolate(a.b, b.b, t),
             interpolate(a.a, b.a, t)
         };
+    }
+};
+
+template <>
+struct Interpolator<style::Rotation> {
+public:
+    style::Rotation operator()(const style::Rotation& a, const style::Rotation& b, const double t) {
+        assert(a.period() == b.period());
+        auto period = a.period();
+        auto aAngle = std::fmod(a.getAngle(), period);
+        auto bAngle = std::fmod(b.getAngle(), period);
+
+        if (aAngle - bAngle > period * 0.5) {
+            return {std::fmod(aAngle * (1.0 - t) + (bAngle + period) * t, period)};
+        }
+
+        if (aAngle - bAngle < period * -0.5) {
+            return {std::fmod((aAngle + period) * (1.0 - t) + bAngle * t, period)};
+        }
+
+        return {aAngle * (1.0 - t) + bAngle * t};
     }
 };
 

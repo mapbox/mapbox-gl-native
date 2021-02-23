@@ -59,25 +59,26 @@ namespace style {
 class Layer;
 } // namespace style
 
-class RasterDEMTile : public Tile {
+class RasterDEMTile final : public Tile {
 public:
     RasterDEMTile(const OverscaledTileID&,
                    const TileParameters&,
                    const Tileset&);
     ~RasterDEMTile() override;
 
-    void setNecessity(TileNecessity) final;
+    std::unique_ptr<TileRenderData> createRenderData() override;
+    void setNecessity(TileNecessity) override;
+    void setUpdateParameters(const TileUpdateParameters&) override;
 
     void setError(std::exception_ptr);
     void setMetadata(optional<Timestamp> modified, optional<Timestamp> expires);
-    void setData(std::shared_ptr<const std::string> data);
+    void setData(const std::shared_ptr<const std::string>& data);
 
-    void upload(gl::Context&) override;
-    Bucket* getBucket(const style::Layer::Impl&) const override;
+    bool layerPropertiesUpdated(const Immutable<style::LayerProperties>& layerProperties) override;
 
     HillshadeBucket* getBucket() const;
-    void backfillBorder(const RasterDEMTile& borderTile, const DEMTileNeighbors mask);
-    
+    void backfillBorder(const RasterDEMTile& borderTile, DEMTileNeighbors mask);
+
     // neighboringTiles is a bitmask for which neighboring tiles have been backfilled
     // there are max 8 possible neighboring tiles, so each bit represents one neighbor
     DEMTileNeighbors neighboringTiles = DEMTileNeighbors::Empty;
@@ -98,7 +99,7 @@ private:
 
     // Contains the Bucket object for the tile. Buckets are render
     // objects and they get added by tile parsing operations.
-    std::unique_ptr<HillshadeBucket> bucket;
+    std::shared_ptr<HillshadeBucket> bucket;
 
 };
 

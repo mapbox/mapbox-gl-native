@@ -33,6 +33,7 @@ constexpr double EARTH_RADIUS_M = 6378137;
 constexpr double LATITUDE_MAX = 85.051128779806604;
 constexpr double LONGITUDE_MAX = 180;
 constexpr double DEGREES_MAX = 360;
+constexpr double PITCH_MIN = 0.0;
 constexpr double PITCH_MAX = M_PI / 3;
 constexpr double MIN_ZOOM = 0.0;
 constexpr double MAX_ZOOM = 25.5;
@@ -40,9 +41,16 @@ constexpr float  MIN_ZOOM_F = MIN_ZOOM;
 constexpr float  MAX_ZOOM_F = MAX_ZOOM;
 constexpr uint8_t DEFAULT_MAX_ZOOM = 22;
 
+// ONE_EM constant used to go between "em" units used in style spec and "points" used internally for layout.
+constexpr float ONE_EM = 24.0f;
+
 constexpr uint8_t DEFAULT_PREFETCH_ZOOM_DELTA = 4;
 
 constexpr uint64_t DEFAULT_MAX_CACHE_SIZE = 50 * 1024 * 1024;
+
+// Default ImageManager's cache size for images added via onStyleImageMissing API.
+// Average sprite size with 1.0 pixel ratio is ~2kB, 8kB for pixel ratio of 2.0.
+constexpr std::size_t DEFAULT_ON_DEMAND_IMAGES_CACHE_SIZE = 100 * 8192;
 
 constexpr Duration DEFAULT_TRANSITION_DURATION = Milliseconds(300);
 constexpr Seconds CLOCK_SKEW_RETRY_TIMEOUT { 30 };
@@ -52,6 +60,14 @@ constexpr UnitBezier DEFAULT_TRANSITION_EASE = { 0, 0, 0.25, 1 };
 constexpr int DEFAULT_RATE_LIMIT_TIMEOUT = 5;
 
 constexpr const char* API_BASE_URL = "https://api.mapbox.com";
+constexpr const char* ASSET_PROTOCOL = "asset://";
+constexpr const char* FILE_PROTOCOL = "file://";
+constexpr uint32_t DEFAULT_MAXIMUM_CONCURRENT_REQUESTS = 20;
+
+constexpr uint8_t TERRAIN_RGB_MAXZOOM = 15;
+
+constexpr const char* LAST_RESORT_ALPHABETIC_FONT = "Open Sans Regular";
+constexpr const char* LAST_RESORT_PAN_UNICODE_FONT = "Arial Unicode MS Regular";
 
 } // namespace util
 

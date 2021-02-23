@@ -53,7 +53,6 @@ rsync -rR $(git ls-files \
 
 echo ">> Copying vendored files..."
 rsync -rR $(git ls-files \
-    "vendor/expected" \
     "vendor/icu" \
     "vendor/nunicode" \
     "vendor/sqlite" \

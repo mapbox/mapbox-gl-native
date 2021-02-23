@@ -8,7 +8,7 @@ if [ -z ${WITH_COVERAGE} ] ; then
     exit 1
 fi
 
-directory=$1
+SOURCE_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/../"; pwd)
 
 function usage() {
     echo "Error: LCOV and genhtml are required for generating coverage reports."
@@ -23,16 +23,19 @@ function usage() {
 command -v lcov >/dev/null 2>&1 || usage
 command -v genhtml >/dev/null 2>&1 || usage
 
+# Build unit tests
+make test
+
 # Zero coverage counters
 lcov \
     --quiet \
     --zerocounters \
-    --directory "${directory}" \
-    --output-file "${directory}/coverage.info" \
+    --directory "${SOURCE_DIR}" \
+    --output-file "${SOURCE_DIR}/coverage.info" \
     >/dev/null 2>&1
 
 # Run all unit tests
-make
+make run-test
 
 # Collect coverage data and save it into coverage.info
 echo "Collecting coverage data..."
@@ -40,15 +43,22 @@ lcov \
     --quiet \
     --capture \
     --no-external \
-    --directory "src/mbgl" \
-    --directory "platform" \
-    --directory "include/mbgl" \
-    --directory "${directory}" \
-    --base-directory "${directory}" \
-    --output-file "${directory}/coverage.info" \
+    --directory "${SOURCE_DIR}" \
+    --output-file "${SOURCE_DIR}/coverage.info" \
     >/dev/null 2>&1
 
-# Generate HTML report based on coverage.info
+# Remove coverage data for unwanted files from a tracefile
+lcov \
+    --quiet \
+    --remove "${SOURCE_DIR}/coverage.info" \
+    "${SOURCE_DIR}/vendor/*" \
+    "${SOURCE_DIR}/mason/*" \
+    "${SOURCE_DIR}/test/*" \
+    "/usr/include/*" \
+    --output-file "${SOURCE_DIR}/total_coverage.info" \
+    >/dev/null 2>&1
+
+# Generate HTML report based on total_coverage.info
 echo "Generating HTML report..."
 genhtml \
     --quiet \
@@ -61,8 +71,8 @@ genhtml \
     --sort \
     --demangle-cpp \
     --prefix $(pwd -P) \
-    --output-directory "${directory}/coverage" \
-    "${directory}/coverage.info" \
+    --output-directory "${SOURCE_DIR}/coverage" \
+    "${SOURCE_DIR}/total_coverage.info" \
     >/dev/null 2>&1
 
-echo "Coverage report is now available in ${directory}/coverage/index.html"
+echo "Coverage report is now available in ${SOURCE_DIR}/coverage/index.html"

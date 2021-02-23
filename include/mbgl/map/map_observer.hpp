@@ -1,12 +1,19 @@
 #pragma once
 
 #include <mbgl/style/source.hpp>
+#include <mbgl/style/image.hpp>
 
 #include <cstdint>
-#include <exception>
 #include <string>
 
 namespace mbgl {
+
+enum class MapLoadError {
+    StyleParseError,
+    StyleLoadError,
+    NotFoundError,
+    UnknownError,
+};
 
 class MapObserver {
 public:
@@ -27,18 +34,29 @@ public:
         Full
     };
 
+    struct RenderFrameStatus {
+        RenderMode mode;
+        bool needsRepaint; // In continous mode, shows that there are ongoig transitions.
+        bool placementChanged;
+    };
+
     virtual void onCameraWillChange(CameraChangeMode) {}
     virtual void onCameraIsChanging() {}
     virtual void onCameraDidChange(CameraChangeMode) {}
     virtual void onWillStartLoadingMap() {}
     virtual void onDidFinishLoadingMap() {}
-    virtual void onDidFailLoadingMap(std::exception_ptr) {}
+    virtual void onDidFailLoadingMap(MapLoadError, const std::string&) {}
     virtual void onWillStartRenderingFrame() {}
-    virtual void onDidFinishRenderingFrame(RenderMode) {}
+    virtual void onDidFinishRenderingFrame(RenderFrameStatus) {}
     virtual void onWillStartRenderingMap() {}
     virtual void onDidFinishRenderingMap(RenderMode) {}
     virtual void onDidFinishLoadingStyle() {}
     virtual void onSourceChanged(style::Source&) {}
+    virtual void onDidBecomeIdle() {}
+    virtual void onStyleImageMissing(const std::string&) {}
+    // This method should return true if unused image can be removed,
+    // false otherwise. By default, unused image will be removed.
+    virtual bool onCanRemoveUnusedStyleImage(const std::string&) { return true; }
 };
 
 } // namespace mbgl

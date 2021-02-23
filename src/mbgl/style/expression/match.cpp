@@ -11,7 +11,7 @@ namespace expression {
 template <typename T>
 void Match<T>::eachChild(const std::function<void(const Expression&)>& visit) const {
     visit(*input);
-    for (const std::pair<T, std::shared_ptr<Expression>>& branch : branches) {
+    for (const auto& branch : branches) {
         visit(*branch.second);
     }
     visit(*otherwise);
@@ -287,7 +287,7 @@ ParseResult parseMatch(const Convertible& value, ParsingContext& ctx) {
             outputType = (*output)->getType();
         }
         
-        branches.push_back(std::make_pair(std::move(labels), std::move(*output)));
+        branches.emplace_back(std::move(labels), std::move(*output));
     }
 
     auto input = ctx.parse(arrayMember(value, 1), 1, {type::Value});

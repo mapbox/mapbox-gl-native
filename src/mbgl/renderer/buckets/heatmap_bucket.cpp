@@ -10,25 +10,26 @@ namespace mbgl {
 
 using namespace style;
 
-HeatmapBucket::HeatmapBucket(const BucketParameters& parameters, const std::vector<const RenderLayer*>& layers)
-    : Bucket(LayerType::Heatmap),
-      mode(parameters.mode) {
+HeatmapBucket::HeatmapBucket(const BucketParameters& parameters, const std::vector<Immutable<style::LayerProperties>>& layers)
+    : mode(parameters.mode) {
     for (const auto& layer : layers) {
         paintPropertyBinders.emplace(
             std::piecewise_construct,
-            std::forward_as_tuple(layer->getID()),
+            std::forward_as_tuple(layer->baseImpl->id),
             std::forward_as_tuple(
-                toRenderHeatmapLayer(layer)->evaluated,
+                getEvaluated<HeatmapLayerProperties>(layer),
                 parameters.tileID.overscaledZ));
     }
 }
 
-void HeatmapBucket::upload(gl::Context& context) {
-    vertexBuffer = context.createVertexBuffer(std::move(vertices));
-    indexBuffer = context.createIndexBuffer(std::move(triangles));
+HeatmapBucket::~HeatmapBucket() = default;
+
+void HeatmapBucket::upload(gfx::UploadPass& uploadPass) {
+    vertexBuffer = uploadPass.createVertexBuffer(std::move(vertices));
+    indexBuffer = uploadPass.createIndexBuffer(std::move(triangles));
 
     for (auto& pair : paintPropertyBinders) {
-        pair.second.upload(context);
+        pair.second.upload(uploadPass);
     }
 
     uploaded = true;
@@ -41,7 +42,9 @@ bool HeatmapBucket::hasData() const {
 void HeatmapBucket::addFeature(const GeometryTileFeature& feature,
                                const GeometryCollection& geometry,
                                const ImagePositions&,
-                               const PatternLayerMap&) {
+                               const PatternLayerMap&,
+                               std::size_t featureIndex,
+                               const CanonicalTileID& canonical) {
     constexpr const uint16_t vertexLength = 4;
 
     for (auto& points : geometry) {
@@ -50,14 +53,13 @@ void HeatmapBucket::addFeature(const GeometryTileFeature& feature,
             auto y = point.y;
 
             // Do not include points that are outside the tile boundaries.
-            // Include all points in Still mode. You need to include points from
-            // neighbouring tiles so that they are not clipped at tile boundaries.
-            if ((mode == MapMode::Continuous) &&
-                (x < 0 || x >= util::EXTENT || y < 0 || y >= util::EXTENT)) continue;
+            if (x < 0 || x >= util::EXTENT || y < 0 || y >= util::EXTENT) {
+                continue;
+            }
 
             if (segments.empty() || segments.back().vertexLength + vertexLength > std::numeric_limits<uint16_t>::max()) {
                 // Move to a new segments because the old one can't hold the geometry.
-                segments.emplace_back(vertices.vertexSize(), triangles.indexSize());
+                segments.emplace_back(vertices.elements(), triangles.elements());
             }
 
             // this geometry will be of the Point type, and we'll derive
@@ -89,7 +91,7 @@ void HeatmapBucket::addFeature(const GeometryTileFeature& feature,
     }
 
     for (auto& pair : paintPropertyBinders) {
-        pair.second.populateVertexVectors(feature, vertices.vertexSize(), {}, {});
+        pair.second.populateVertexVectors(feature, vertices.elements(), featureIndex, {}, {}, canonical);
     }
 }
 

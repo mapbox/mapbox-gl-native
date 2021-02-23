@@ -4,8 +4,7 @@
 namespace mbgl {
 
 ProgramParameters::ProgramParameters(const float pixelRatio,
-                                     const bool overdraw,
-                                     optional<std::string> cacheDir_)
+                                     const bool overdraw)
     : defines([&] {
           std::string result;
           result.reserve(32);
@@ -16,37 +15,11 @@ ProgramParameters::ProgramParameters(const float pixelRatio,
               result += "#define OVERDRAW_INSPECTOR\n";
           }
           return result;
-      }()),
-      cacheDir(std::move(cacheDir_)) {
+      }()) {
 }
 
 const std::string& ProgramParameters::getDefines() const {
     return defines;
-}
-
-optional<std::string> ProgramParameters::cachePath(const char* name) const {
-    if (!cacheDir) {
-        return {};
-    } else {
-        std::string result;
-        result.reserve(cacheDir->length() + 64);
-        result += *cacheDir;
-        result += "/com.mapbox.gl.shader.";
-        result += name;
-        result += '.';
-        result += util::toHex(std::hash<std::string>()(defines));
-        result += ".pbf";
-        return result;
-    }
-}
-
-ProgramParameters ProgramParameters::withAdditionalDefines(const std::vector<std::string>& additionalDefines) const {
-    ProgramParameters result(*this);
-    for (const auto& define : additionalDefines) {
-        result.defines += define;
-        result.defines += "\n";
-    }
-    return result;
 }
 
 } // namespace mbgl

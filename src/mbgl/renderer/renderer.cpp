@@ -1,48 +1,48 @@
 #include <mbgl/renderer/renderer.hpp>
+
+#include <mbgl/layermanager/layer_manager.hpp>
 #include <mbgl/renderer/renderer_impl.hpp>
-#include <mbgl/renderer/backend_scope.hpp>
+#include <mbgl/renderer/render_tree.hpp>
+#include <mbgl/gfx/backend_scope.hpp>
 #include <mbgl/annotation/annotation_manager.hpp>
 
 namespace mbgl {
 
-Renderer::Renderer(RendererBackend& backend,
-                   float pixelRatio_,
-                   FileSource& fileSource_,
-                   Scheduler& scheduler_,
-                   GLContextMode contextMode_,
-                   const optional<std::string> programCacheDir_,
-                   const optional<std::string> localFontFamily_)
-        : impl(std::make_unique<Impl>(backend, pixelRatio_, fileSource_, scheduler_,
-                                      contextMode_, std::move(programCacheDir_), std::move(localFontFamily_))) {
-}
+Renderer::Renderer(gfx::RendererBackend& backend, float pixelRatio_, const optional<std::string>& localFontFamily_)
+    : impl(std::make_unique<Impl>(backend, pixelRatio_, localFontFamily_)) {}
 
 Renderer::~Renderer() {
-    BackendScope guard { impl->backend };
+    gfx::BackendScope guard { impl->backend };
     impl.reset();
 }
 
 void Renderer::markContextLost() {
-    impl->markContextLost();
+    impl->orchestrator.markContextLost();
 }
 
 void Renderer::setObserver(RendererObserver* observer) {
     impl->setObserver(observer);
+    impl->orchestrator.setObserver(observer);
 }
 
-void Renderer::render(const UpdateParameters& updateParameters) {
-    impl->render(updateParameters);
+void Renderer::render(const std::shared_ptr<UpdateParameters>& updateParameters) {
+    assert(updateParameters);
+    if (auto renderTree = impl->orchestrator.createRenderTree(updateParameters)) {
+        renderTree->prepare();
+        impl->render(*renderTree);
+    }
 }
 
 std::vector<Feature> Renderer::queryRenderedFeatures(const ScreenLineString& geometry, const RenderedQueryOptions& options) const {
-    return impl->queryRenderedFeatures(geometry, options);
+    return impl->orchestrator.queryRenderedFeatures(geometry, options);
 }
 
 std::vector<Feature> Renderer::queryRenderedFeatures(const ScreenCoordinate& point, const RenderedQueryOptions& options) const {
-    return impl->queryRenderedFeatures({ point }, options);
+    return impl->orchestrator.queryRenderedFeatures({ point }, options);
 }
 
 std::vector<Feature> Renderer::queryRenderedFeatures(const ScreenBox& box, const RenderedQueryOptions& options) const {
-    return impl->queryRenderedFeatures(
+    return impl->orchestrator.queryRenderedFeatures(
             {
                     box.min,
                     {box.max.x, box.min.y},
@@ -55,6 +55,9 @@ std::vector<Feature> Renderer::queryRenderedFeatures(const ScreenBox& box, const
 }
 
 AnnotationIDs Renderer::queryPointAnnotations(const ScreenBox& box) const {
+    if (!LayerManager::annotationsEnabled) {
+        return {};
+    }
     RenderedQueryOptions options;
     options.layerIDs = {{ AnnotationManager::PointLayerID }};
     auto features = queryRenderedFeatures(box, options);
@@ -62,7 +65,10 @@ AnnotationIDs Renderer::queryPointAnnotations(const ScreenBox& box) const {
 }
 
 AnnotationIDs Renderer::queryShapeAnnotations(const ScreenBox& box) const {
-    auto features = impl->queryShapeAnnotations({
+    if (!LayerManager::annotationsEnabled) {
+        return {};
+    }
+    auto features = impl->orchestrator.queryShapeAnnotations({
         box.min,
         {box.max.x, box.min.y},
         box.max,
@@ -73,6 +79,9 @@ AnnotationIDs Renderer::queryShapeAnnotations(const ScreenBox& box) const {
 }
     
 AnnotationIDs Renderer::getAnnotationIDs(const std::vector<Feature>& features) const {
+    if (!LayerManager::annotationsEnabled) {
+        return {};
+    }
     std::set<AnnotationID> set;
     for (auto &feature : features) {
         assert(feature.id.is<uint64_t>());
@@ -86,16 +95,52 @@ AnnotationIDs Renderer::getAnnotationIDs(const std::vector<Feature>& features) c
 }
 
 std::vector<Feature> Renderer::querySourceFeatures(const std::string& sourceID, const SourceQueryOptions& options) const {
-    return impl->querySourceFeatures(sourceID, options);
+    return impl->orchestrator.querySourceFeatures(sourceID, options);
+}
+
+FeatureExtensionValue Renderer::queryFeatureExtensions(const std::string& sourceID,
+                                                       const Feature& feature,
+                                                       const std::string& extension,
+                                                       const std::string& extensionField,
+                                                       const optional<std::map<std::string, Value>>& args) const {
+    return impl->orchestrator.queryFeatureExtensions(sourceID, feature, extension, extensionField, args);
+}
+
+void Renderer::setFeatureState(const std::string& sourceID, const optional<std::string>& sourceLayerID,
+                               const std::string& featureID, const FeatureState& state) {
+    impl->orchestrator.setFeatureState(sourceID, sourceLayerID, featureID, state);
+}
+
+void Renderer::getFeatureState(FeatureState& state, const std::string& sourceID,
+                               const optional<std::string>& sourceLayerID, const std::string& featureID) const {
+    impl->orchestrator.getFeatureState(state, sourceID, sourceLayerID, featureID);
+}
+
+void Renderer::removeFeatureState(const std::string& sourceID, const optional<std::string>& sourceLayerID,
+                                  const optional<std::string>& featureID, const optional<std::string>& stateKey) {
+    impl->orchestrator.removeFeatureState(sourceID, sourceLayerID, featureID, stateKey);
 }
 
 void Renderer::dumpDebugLogs() {
-    impl->dumDebugLogs();
+    impl->orchestrator.dumpDebugLogs();
+}
+
+void Renderer::collectPlacedSymbolData(bool enable) {
+    impl->orchestrator.collectPlacedSymbolData(enable);
+}
+
+const std::vector<PlacedSymbolData>& Renderer::getPlacedSymbolsData() const {
+    return impl->orchestrator.getPlacedSymbolsData();
 }
 
 void Renderer::reduceMemoryUse() {
-    BackendScope guard { impl->backend };
+    gfx::BackendScope guard { impl->backend };
     impl->reduceMemoryUse();
+    impl->orchestrator.reduceMemoryUse();
+}
+
+void Renderer::clearData() {
+    impl->orchestrator.clearData();
 }
 
 } // namespace mbgl

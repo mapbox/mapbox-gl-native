@@ -3,46 +3,45 @@
 #include <mbgl/programs/program.hpp>
 #include <mbgl/programs/attributes.hpp>
 #include <mbgl/programs/uniforms.hpp>
-#include <mbgl/shaders/raster.hpp>
+#include <mbgl/programs/textures.hpp>
 #include <mbgl/util/geometry.hpp>
 #include <mbgl/style/layers/raster_layer_properties.hpp>
 
 namespace mbgl {
 
 namespace uniforms {
-MBGL_DEFINE_UNIFORM_SCALAR(gl::TextureUnit, u_image0);
-MBGL_DEFINE_UNIFORM_SCALAR(gl::TextureUnit, u_image1);
-MBGL_DEFINE_UNIFORM_SCALAR(float, u_fade_t);
-MBGL_DEFINE_UNIFORM_SCALAR(float, u_buffer_scale);
-MBGL_DEFINE_UNIFORM_SCALAR(float, u_brightness_low);
-MBGL_DEFINE_UNIFORM_SCALAR(float, u_brightness_high);
-MBGL_DEFINE_UNIFORM_SCALAR(float, u_saturation_factor);
-MBGL_DEFINE_UNIFORM_SCALAR(float, u_contrast_factor);
-MBGL_DEFINE_UNIFORM_SCALAR(float, u_scale_parent);
-MBGL_DEFINE_UNIFORM_VECTOR(float, 3, u_spin_weights);
-MBGL_DEFINE_UNIFORM_VECTOR(float, 2, u_tl_parent);
+MBGL_DEFINE_UNIFORM_SCALAR(float, fade_t);
+MBGL_DEFINE_UNIFORM_SCALAR(float, buffer_scale);
+MBGL_DEFINE_UNIFORM_SCALAR(float, brightness_low);
+MBGL_DEFINE_UNIFORM_SCALAR(float, brightness_high);
+MBGL_DEFINE_UNIFORM_SCALAR(float, saturation_factor);
+MBGL_DEFINE_UNIFORM_SCALAR(float, contrast_factor);
+MBGL_DEFINE_UNIFORM_SCALAR(float, scale_parent);
+MBGL_DEFINE_UNIFORM_VECTOR(float, 3, spin_weights);
+MBGL_DEFINE_UNIFORM_VECTOR(float, 2, tl_parent);
 } // namespace uniforms
 
 class RasterProgram : public Program<
-    shaders::raster,
-    gl::Triangle,
-    gl::Attributes<
-        attributes::a_pos,
-        attributes::a_texture_pos>,
-    gl::Uniforms<
-        uniforms::u_matrix,
-        uniforms::u_image0,
-        uniforms::u_image1,
-        uniforms::u_opacity,
-        uniforms::u_fade_t,
-        uniforms::u_brightness_low,
-        uniforms::u_brightness_high,
-        uniforms::u_saturation_factor,
-        uniforms::u_contrast_factor,
-        uniforms::u_spin_weights,
-        uniforms::u_buffer_scale,
-        uniforms::u_scale_parent,
-        uniforms::u_tl_parent>,
+    RasterProgram,
+    gfx::PrimitiveType::Triangle,
+    TypeList<
+        attributes::pos,
+        attributes::texture_pos>,
+    TypeList<
+        uniforms::matrix,
+        uniforms::opacity,
+        uniforms::fade_t,
+        uniforms::brightness_low,
+        uniforms::brightness_high,
+        uniforms::saturation_factor,
+        uniforms::contrast_factor,
+        uniforms::spin_weights,
+        uniforms::buffer_scale,
+        uniforms::scale_parent,
+        uniforms::tl_parent>,
+    TypeList<
+        textures::image0,
+        textures::image1>,
     style::RasterPaintProperties>
 {
 public:
@@ -63,6 +62,13 @@ public:
 };
 
 using RasterLayoutVertex = RasterProgram::LayoutVertex;
-using RasterAttributes = RasterProgram::Attributes;
+using RasterAttributes = RasterProgram::AttributeList;
+
+class RasterLayerPrograms final : public LayerTypePrograms {
+public:
+    RasterLayerPrograms(gfx::Context& context, const ProgramParameters& programParameters)
+        : raster(context, programParameters) {}
+    RasterProgram raster;
+};
 
 } // namespace mbgl

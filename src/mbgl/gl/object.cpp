@@ -18,8 +18,7 @@ void ShaderDeleter::operator()(ShaderID id) const {
 }
 
 void BufferDeleter::operator()(BufferID id) const {
-    assert(context);
-    context->abandonedBuffers.push_back(id);
+    context.abandonedBuffers.push_back(id);
 }
 
 void TextureDeleter::operator()(TextureID id) const {
@@ -29,6 +28,8 @@ void TextureDeleter::operator()(TextureID id) const {
     } else {
         context->pooledTextures.push_back(id);
     }
+    context->renderingStats().numActiveTextures--;
+    assert(context->renderingStats().numActiveTextures >= 0);
 }
 
 void VertexArrayDeleter::operator()(VertexArrayID id) const {

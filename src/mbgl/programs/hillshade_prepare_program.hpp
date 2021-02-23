@@ -3,28 +3,31 @@
 #include <mbgl/programs/program.hpp>
 #include <mbgl/programs/attributes.hpp>
 #include <mbgl/programs/uniforms.hpp>
-#include <mbgl/shaders/hillshade_prepare.hpp>
+#include <mbgl/programs/textures.hpp>
 #include <mbgl/util/geometry.hpp>
 
 namespace mbgl {
 
 namespace uniforms {
-MBGL_DEFINE_UNIFORM_VECTOR(uint16_t, 2, u_dimension);
-MBGL_DEFINE_UNIFORM_SCALAR(float, u_maxzoom);
+MBGL_DEFINE_UNIFORM_VECTOR(uint16_t, 2, dimension);
+MBGL_DEFINE_UNIFORM_SCALAR(float, maxzoom);
+MBGL_DEFINE_UNIFORM_VECTOR(float, 4, unpack);
 } // namespace uniforms
 
 class HillshadePrepareProgram : public Program<
-    shaders::hillshade_prepare,
-    gl::Triangle,
-    gl::Attributes<
-        attributes::a_pos,
-        attributes::a_texture_pos>,
-    gl::Uniforms<
-        uniforms::u_matrix,
-        uniforms::u_dimension,
-        uniforms::u_zoom,
-        uniforms::u_maxzoom,
-        uniforms::u_image>,
+    HillshadePrepareProgram,
+    gfx::PrimitiveType::Triangle,
+    TypeList<
+        attributes::pos,
+        attributes::texture_pos>,
+    TypeList<
+        uniforms::matrix,
+        uniforms::dimension,
+        uniforms::zoom,
+        uniforms::maxzoom,
+        uniforms::unpack>,
+    TypeList<
+        textures::image>,
     style::Properties<>> {
 public:
     using Program::Program;
@@ -44,6 +47,6 @@ public:
 };
 
 using HillshadePrepareLayoutVertex = HillshadePrepareProgram::LayoutVertex;
-using HillshadePrepareAttributes = HillshadePrepareProgram::Attributes;
+using HillshadePrepareAttributes = HillshadePrepareProgram::AttributeList;
 
 } // namespace mbgl

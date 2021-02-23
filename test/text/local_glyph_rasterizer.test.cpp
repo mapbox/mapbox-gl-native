@@ -1,12 +1,13 @@
 #include <mbgl/test/util.hpp>
 #include <mbgl/test/stub_file_source.hpp>
-#include <mbgl/map/map.hpp>
+#include <mbgl/test/map_adapter.hpp>
+
+#include <mbgl/map/map_options.hpp>
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/color.hpp>
 #include <mbgl/renderer/renderer.hpp>
-#include <mbgl/gl/headless_frontend.hpp>
-#include <mbgl/util/default_thread_pool.hpp>
+#include <mbgl/gfx/headless_frontend.hpp>
 #include <mbgl/style/style.hpp>
 
 /*
@@ -32,55 +33,133 @@ namespace {
 class LocalGlyphRasterizerTest {
 public:
     LocalGlyphRasterizerTest(const optional<std::string> fontFamily)
-        : frontend(pixelRatio, fileSource, threadPool, optional<std::string>(), GLContextMode::Unique, fontFamily)
-    {
-    }
+        : frontend(1, gfx::HeadlessBackend::SwapBehaviour::NoFlush, gfx::ContextMode::Unique, fontFamily) {}
 
     util::RunLoop loop;
-    StubFileSource fileSource;
-    ThreadPool threadPool { 4 };
-    float pixelRatio { 1 };
+    std::shared_ptr<StubFileSource> fileSource = std::make_shared<StubFileSource>();
     HeadlessFrontend frontend;
-    Map map { frontend, MapObserver::nullObserver(), frontend.getSize(), pixelRatio, fileSource,
-              threadPool, MapMode::Static};
+    MapAdapter map { frontend, MapObserver::nullObserver(), fileSource,
+                  MapOptions().withMapMode(MapMode::Static).withSize(frontend.getSize())};
 
-    void checkRendering(const char * name) {
+    void checkRendering(const char * name, double imageMatchPixelsThreshold = 0.015, double pixelMatchThreshold = 0.1) {
         test::checkImage(std::string("test/fixtures/local_glyphs/") + name,
-                         frontend.render(map), 0.05, 0.1);
+                         frontend.render(map).image,
+                         imageMatchPixelsThreshold,
+                         pixelMatchThreshold);
     }
 };
 
 } // end namespace
 
-#ifdef __APPLE__
+// Enabling Qt requires adding a CJK-compatible font in the CI image.
+#if defined(__APPLE__)
 
 TEST(LocalGlyphRasterizer, PingFang) {
-    LocalGlyphRasterizerTest test(std::string("PingFang"));
+    LocalGlyphRasterizerTest test(std::string("PingFang TC"));
 
-    test.fileSource.glyphsResponse = [&] (const Resource& resource) {
+    test.fileSource->glyphsResponse = [&] (const Resource& resource) {
         EXPECT_EQ(Resource::Kind::Glyphs, resource.kind);
         Response response;
         response.data = std::make_shared<std::string>(util::read_file("test/fixtures/resources/glyphs.pbf"));
         return response;
     };
     test.map.getStyle().loadJSON(util::read_file("test/fixtures/local_glyphs/mixed.json"));
-    test.checkRendering("ping_fang");
+#if defined(__APPLE__) && !defined(__QT__)
+    test.checkRendering("ping_fang", 0.0161);
+#elif defined(__QT__)
+    test.checkRendering("ping_fang_qt");
+#endif // defined(__APPLE__)
 }
 
-#endif
+#if !defined(__QT__)
+TEST(LocalGlyphRasterizer, PingFangSemibold) {
+    LocalGlyphRasterizerTest test(std::string("PingFang TC Semibold"));
+
+    test.fileSource->glyphsResponse = [&](const Resource& resource) {
+        EXPECT_EQ(Resource::Kind::Glyphs, resource.kind);
+        Response response;
+        response.data = std::make_shared<std::string>(util::read_file("test/fixtures/resources/glyphs.pbf"));
+        return response;
+    };
+    test.map.getStyle().loadJSON(util::read_file("test/fixtures/local_glyphs/mixed.json"));
+    test.checkRendering("ping_fang_semibold", 0.0161);
+}
+#endif // !defined(__QT__)
+
+#endif // defined(__APPLE__)
+
+#if defined(__linux__) && defined(__QT__)
+TEST(LocalGlyphRasterizer, NotoSansCJK) {
+    LocalGlyphRasterizerTest test(std::string("Noto Sans CJK KR Regular"));
+
+    test.fileSource->glyphsResponse = [&] (const Resource& resource) {
+        EXPECT_EQ(Resource::Kind::Glyphs, resource.kind);
+        Response response;
+        response.data = std::make_shared<std::string>(util::read_file("test/fixtures/resources/glyphs.pbf"));
+        return response;
+    };
+
+    test.map.getStyle().loadJSON(util::read_file("test/fixtures/local_glyphs/mixed.json"));
+    test.checkRendering("noto_sans_cjk_kr_regular_qt");
+}
+#endif // defined(__linux__) && defined(__QT__)
 
 TEST(LocalGlyphRasterizer, NoLocal) {
     // Expectation: without any local fonts set, and without any CJK glyphs provided,
     // the output should just contain basic latin characters.
     LocalGlyphRasterizerTest test({});
 
-    test.fileSource.glyphsResponse = [&] (const Resource& resource) {
+    test.fileSource->glyphsResponse = [&] (const Resource& resource) {
         EXPECT_EQ(Resource::Kind::Glyphs, resource.kind);
         Response response;
         response.data = std::make_shared<std::string>(util::read_file("test/fixtures/resources/glyphs.pbf"));
         return response;
     };
     test.map.getStyle().loadJSON(util::read_file("test/fixtures/local_glyphs/mixed.json"));
-    test.checkRendering("no_local");
+    test.checkRendering("no_local", 0.001, 0.1);
 }
 
+TEST(LocalGlyphRasterizer, NoLocalWithContentInsets) {
+    // Expectations: content insets imply rendering to offsetted viewport center.
+    // Rendered text should be on the same offset and keep the same size as
+    // with no offset.
+    LocalGlyphRasterizerTest test({});
+
+    test.fileSource->glyphsResponse = [&] (const Resource& resource) {
+        EXPECT_EQ(Resource::Kind::Glyphs, resource.kind);
+        Response response;
+        response.data = std::make_shared<std::string>(util::read_file("test/fixtures/resources/glyphs.pbf"));
+        return response;
+    };
+    auto viewSize = test.frontend.getSize();
+    test.map.getStyle().loadJSON(util::read_file("test/fixtures/local_glyphs/mixed.json"));
+
+    // Expected image was created using center offset as in the line below - content insets,
+    // with no pitch defined, should produce the same output.
+    // test.map.moveBy({ viewSize.width * 0.25, 0 });
+
+    test.map.jumpTo(CameraOptions().withPadding(EdgeInsets { 0, viewSize.width * 0.25 * 2, 0, 0 }));
+    test.checkRendering("no_local_with_content_insets", 0.001, 0.1);
+}
+
+TEST(LocalGlyphRasterizer, NoLocalWithContentInsetsAndPitch) {
+    // Expectations: content insets imply rendering to offsetted viewport center.
+    // Rendered text should be on the same offset and keep the same size as
+    // with no offset.
+    LocalGlyphRasterizerTest test({});
+
+    test.fileSource->glyphsResponse = [&] (const Resource& resource) {
+        EXPECT_EQ(Resource::Kind::Glyphs, resource.kind);
+        Response response;
+        response.data = std::make_shared<std::string>(util::read_file("test/fixtures/resources/glyphs.pbf"));
+        return response;
+    };
+    auto viewSize = test.frontend.getSize();
+    test.map.getStyle().loadJSON(util::read_file("test/fixtures/local_glyphs/mixed.json"));
+
+    // Expected image was verified using no-padding render, offsetted to right
+    // using bitmap editor.
+
+    test.map.jumpTo(CameraOptions().withPitch(45).withPadding(EdgeInsets { 0, viewSize.width * 0.4, 0, 0 }));
+    test.checkRendering("no_local_with_content_insets_and_pitch", 0.001, 0.1);
+}

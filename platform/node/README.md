@@ -9,7 +9,7 @@ Requires a modern C++ runtime that supports C++14.
 By default, installs binaries. On these platforms no additional dependencies are needed.
 
 - 64 bit macOS or 64 bit Linux
-- Node.js v4.x _(note: v5+ is known to have issues)_
+- Node.js v10.x
 
 Run:
 
@@ -82,7 +82,7 @@ The first argument passed to `map.render` is an options object, all keys are opt
 }
 ```
 
-When you are finished using a map object, you can call `map.release()` to permanently dispose the internal map resources. This is not necessary, but can be helpful to optimize resource usage (memory, file sockets) on a more granualar level than V8's garbage collector. Calling `map.release()` will prevent a map object from being used for any further render calls, but can be safely called as soon as the `map.render()` callback returns, as the returned pixel buffer will always be retained for the scope of the callback.
+When you are finished using a map object, you can call `map.release()` to permanently dispose the internal map resources. This is not necessary, but can be helpful to optimize resource usage (memory, file sockets) on a more granular level than V8's garbage collector. Calling `map.release()` will prevent a map object from being used for any further render calls, but can be safely called as soon as the `map.render()` callback returns, as the returned pixel buffer will always be retained for the scope of the callback.
 
 ## Implementing a file source
 
@@ -168,9 +168,9 @@ var map = new mbgl.Map({
                 if (res.headers.modified) { response.modified = new Date(res.headers.modified); }
                 if (res.headers.expires) { response.expires = new Date(res.headers.expires); }
                 if (res.headers.etag) { response.etag = res.headers.etag; }
-                
+
                 response.data = body;
-                
+
                 callback(null, response);
             } else {
                 callback(new Error(JSON.parse(body).message));

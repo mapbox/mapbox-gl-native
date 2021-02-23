@@ -17,7 +17,7 @@ class CanonicalTileID;
 
 class ShapeAnnotationImpl {
 public:
-    ShapeAnnotationImpl(const AnnotationID);
+    ShapeAnnotationImpl(AnnotationID);
     virtual ~ShapeAnnotationImpl() = default;
 
     virtual void updateStyle(style::Style::Impl&) const = 0;

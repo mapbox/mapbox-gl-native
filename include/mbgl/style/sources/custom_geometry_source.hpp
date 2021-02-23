@@ -12,6 +12,7 @@ class OverscaledTileID;
 class CanonicalTileID;
 template <class T>
 class Actor;
+class ThreadPool;
 
 namespace style {
 
@@ -19,7 +20,7 @@ using TileFunction = std::function<void(const CanonicalTileID&)>;
 
 class CustomTileLoader;
 
-class CustomGeometrySource : public Source {
+class CustomGeometrySource final : public Source {
 public:
     struct TileOptions {
         double tolerance = 0.375;
@@ -36,7 +37,7 @@ public:
         TileOptions tileOptions;
     };
 public:
-    CustomGeometrySource(std::string id, CustomGeometrySource::Options options);
+    CustomGeometrySource(std::string id, const CustomGeometrySource::Options& options);
     ~CustomGeometrySource() final;
     void loadDescription(FileSource&) final;
     void setTileData(const CanonicalTileID&, const GeoJSON&);
@@ -45,8 +46,18 @@ public:
     // Private implementation
     class Impl;
     const Impl& impl() const;
+    bool supportsLayerType(const mbgl::style::LayerTypeInfo*) const override;
+    mapbox::base::WeakPtr<Source> makeWeakPtr() override {
+        return weakFactory.makeWeakPtr();
+    }
+
+protected:
+    Mutable<Source::Impl> createMutable() const noexcept final;
+
 private:
+    std::shared_ptr<ThreadPool> threadPool;
     std::unique_ptr<Actor<CustomTileLoader>> loader;
+    mapbox::base::WeakPtrFactory<Source> weakFactory {this};
 };
 
 template <>

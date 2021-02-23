@@ -62,8 +62,7 @@ SourceDifference diffSources(const Immutable<std::vector<ImmutableSource>>& a,
 LayerDifference diffLayers(const Immutable<std::vector<ImmutableLayer>>& a,
                            const Immutable<std::vector<ImmutableLayer>>& b) {
     return diff(a, b, [] (const ImmutableLayer& lhs, const ImmutableLayer& rhs) {
-        return std::tie(lhs->id, lhs->type)
-            == std::tie(rhs->id, rhs->type);
+        return (lhs->id == rhs->id) && (lhs->getTypeInfo() == rhs->getTypeInfo());
     });
 }
 

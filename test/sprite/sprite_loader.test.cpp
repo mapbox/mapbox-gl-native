@@ -8,7 +8,6 @@
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/run_loop.hpp>
-#include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/util/string.hpp>
 
 #include <utility>
@@ -18,7 +17,7 @@ using namespace mbgl::style;
 
 class StubSpriteLoaderObserver : public SpriteLoaderObserver {
 public:
-    void onSpriteLoaded(std::vector<std::unique_ptr<style::Image>>&& images) override {
+    void onSpriteLoaded(std::vector<Immutable<style::Image::Impl>> images) override {
         if (spriteLoaded) spriteLoaded(std::move(images));
     }
 
@@ -26,7 +25,7 @@ public:
         if (spriteError) spriteError(error);
     }
 
-    std::function<void (std::vector<std::unique_ptr<style::Image>>&&)> spriteLoaded;
+    std::function<void(std::vector<Immutable<style::Image::Impl>>)> spriteLoaded;
     std::function<void (std::exception_ptr)> spriteError;
 };
 
@@ -37,7 +36,6 @@ public:
     util::RunLoop loop;
     StubFileSource fileSource;
     StubSpriteLoaderObserver observer;
-    ThreadPool threadPool { 1 };
     SpriteLoader spriteLoader{ 1 };
 
     void run() {
@@ -45,7 +43,7 @@ public:
         Log::setObserver(std::make_unique<Log::NullObserver>());
 
         spriteLoader.setObserver(&observer);
-        spriteLoader.load("test/fixtures/resources/sprite", threadPool, fileSource);
+        spriteLoader.load("test/fixtures/resources/sprite", fileSource);
 
         loop.run();
     }
@@ -94,7 +92,7 @@ TEST(SpriteLoader, LoadingSuccess) {
         test.end();
     };
 
-    test.observer.spriteLoaded = [&] (std::vector<std::unique_ptr<style::Image>>&& images) {
+    test.observer.spriteLoaded = [&](std::vector<Immutable<style::Image::Impl>> images) {
         EXPECT_EQ(images.size(), 367u);
         test.end();
     };
@@ -171,7 +169,7 @@ TEST(SpriteLoader, LoadingCancel) {
         return optional<Response>();
     };
 
-    test.observer.spriteLoaded = [&] (const std::vector<std::unique_ptr<style::Image>>&) {
+    test.observer.spriteLoaded = [&](std::vector<Immutable<style::Image::Impl>>) {
         FAIL() << "Should never be called";
     };
 

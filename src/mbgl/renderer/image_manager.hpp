@@ -1,43 +1,34 @@
 #pragma once
 
 #include <mbgl/style/image_impl.hpp>
-#include <mbgl/renderer/image_atlas.hpp>
-#include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/immutable.hpp>
-#include <mbgl/util/optional.hpp>
-#include <mbgl/gl/texture.hpp>
 
-#include <mapbox/shelf-pack.hpp>
-
-#include <set>
+#include <map>
 #include <string>
 
 namespace mbgl {
 
-namespace gl {
-class Context;
-} // namespace gl
+template <class T>
+class Actor;
 
-class ImageRequestor {
-public:
-    virtual ~ImageRequestor() = default;
-    virtual void onImagesAvailable(ImageMap icons, ImageMap patterns, uint64_t imageCorrelationID) = 0;
-};
+namespace gfx {
+class UploadPass;
+} // namespace gfx
 
-/*
-    ImageManager does two things:
+class ImageManagerObserver;
+class ImageRequestor;
 
-        1. Tracks requests for icon images from tile workers and sends responses when the requests are fulfilled.
-        2. Builds a texture atlas for pattern images.
-
-    These are disparate responsibilities and should eventually be handled by different classes. When we implement
-    data-driven support for `*-pattern`, we'll likely use per-bucket pattern atlases, and that would be a good time
-    to refactor this.
-*/
-class ImageManager : public util::noncopyable {
+/**
+ * @brief tracks requests for icon images from tile workers and sends responses when the requests are fulfilled.
+ */
+class ImageManager {
 public:
     ImageManager();
+    ImageManager(const ImageManager&) = delete;
+    ImageManager& operator=(const ImageManager&) = delete;
     ~ImageManager();
+
+    void setObserver(ImageManagerObserver*);
 
     void setLoaded(bool);
     bool isLoaded() const;
@@ -45,47 +36,57 @@ public:
     void dumpDebugLogs() const;
 
     const style::Image::Impl* getImage(const std::string&) const;
+    const Immutable<style::Image::Impl>* getSharedImage(const std::string&) const;
 
     void addImage(Immutable<style::Image::Impl>);
-    void updateImage(Immutable<style::Image::Impl>);
+    bool updateImage(Immutable<style::Image::Impl>);
     void removeImage(const std::string&);
 
     void getImages(ImageRequestor&, ImageRequestPair&&);
     void removeRequestor(ImageRequestor&);
+    void notifyIfMissingImageAdded();
+    void reduceMemoryUse();
+    void reduceMemoryUseIfCacheSizeExceedsLimit();
+    const std::set<std::string>& getAvailableImages() const;
+
+    ImageVersionMap updatedImageVersions;
+
+    void clear();
 
 private:
+    void checkMissingAndNotify(ImageRequestor&, const ImageRequestPair&);
     void notify(ImageRequestor&, const ImageRequestPair&) const;
+    void removePattern(const std::string&);
 
     bool loaded = false;
 
-    std::unordered_map<ImageRequestor*, ImageRequestPair> requestors;
+    std::map<ImageRequestor*, ImageRequestPair> requestors;
+    std::map<ImageRequestor*, ImageRequestPair> missingImageRequestors;
+    std::map<std::string, std::set<ImageRequestor*>> requestedImages;
+    std::size_t requestedImagesCacheSize = 0ul;
     ImageMap images;
+    // Mirror of 'ImageMap images;' keys.
+    std::set<std::string> availableImages;
 
-// Pattern stuff
+    ImageManagerObserver* observer = nullptr;
+};
+
+class ImageRequestor {
 public:
-    optional<ImagePosition> getPattern(const std::string& name);
+    explicit ImageRequestor(ImageManager&);
+    virtual ~ImageRequestor();
+    virtual void onImagesAvailable(ImageMap icons, ImageMap patterns, ImageVersionMap versionMap, uint64_t imageCorrelationID) = 0;
 
-    void bind(gl::Context&, gl::TextureUnit unit);
-    void upload(gl::Context&, gl::TextureUnit unit);
-
-    Size getPixelSize() const;
-
-    // Only for use in tests.
-    const PremultipliedImage& getAtlasImage() const {
-        return atlasImage;
-    }
+    void addPendingRequest(const std::string& imageId) { pendingRequests.insert(imageId); }
+    bool hasPendingRequest(const std::string& imageId) const { return pendingRequests.count(imageId); }
+    bool hasPendingRequests() const { return !pendingRequests.empty(); }
+    void removePendingRequest(const std::string& imageId) { pendingRequests.erase(imageId); }
 
 private:
-    struct Pattern {
-        mapbox::Bin* bin;
-        ImagePosition position;
-    };
+    ImageManager& imageManager;
 
-    mapbox::ShelfPack shelfPack;
-    std::unordered_map<std::string, Pattern> patterns;
-    PremultipliedImage atlasImage;
-    mbgl::optional<gl::Texture> atlasTexture;
-    bool dirty = true;
+    // Pending requests are image requests that are waiting to be dispatched to the client.
+    std::set<std::string> pendingRequests;
 };
 
 } // namespace mbgl

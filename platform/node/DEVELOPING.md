@@ -8,27 +8,28 @@ To develop these bindings, you’ll need to build them from source. Building req
 the [macOS](../macos/INSTALL.md#requirements) or [Linux](../linux/README.md#prerequisites) install documentation, depending
 on the target platform.
 
-To compile the Node.js bindings and install module dependencies, from the repository root directory, run:
+To compile the Node.js bindings and install module dependencies, from the repository root directory, first run:
 
-    npm install --build-from-source
+```
+make distclean
+```
 
-To recompile just the C++ code while developing, run `make node`.
+If you are rebuilding after time has passed.
 
-To create an Xcode project and use a GUI debugger in the case of a crash, run `make xnode`.
+Then do:
+
+```bash
+make node
+```
 
 ## Testing
 
 To test the Node.js bindings:
 
-```
+```bash
 npm test
 ```
 
-To run the visual render test suite:
-
-```
-npm run test-suite
-```
 
 ## Merging your pull request
 
@@ -43,7 +44,7 @@ To publish a new version of the package:
     - [ ] an updated version number in [`package.json`](../../package.json#L3)
     - [ ] an entry in [`platform/node/CHANGELOG.md`](CHANGELOG.md) describing the changes in the release
 - [ ] run `git tag node-v{VERSION}` where `{VERSION}` matches the version in `package.json`, e.g. `git tag node-v3.3.2`
-- [ ] run `git push && git push --gs`
+- [ ] run `git push && git push --tags`
 
 The CI builds for tag pushes will check if the tag matches the version listed in `package.json`, and if so, will run with `BUILDTYPE=Release` and publish a binary with `node-pre-gyp`.
 

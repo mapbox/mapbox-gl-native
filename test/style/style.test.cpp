@@ -9,7 +9,6 @@
 #include <mbgl/style/layers/line_layer.hpp>
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/run_loop.hpp>
-#include <mbgl/util/default_thread_pool.hpp>
 
 #include <memory>
 
@@ -19,9 +18,8 @@ using namespace mbgl::style;
 TEST(Style, Properties) {
     util::RunLoop loop;
 
-    ThreadPool threadPool{ 1 };
-    StubFileSource fileSource;
-    Style::Impl style { threadPool, fileSource, 1.0 };
+    auto fileSource = std::make_shared<StubFileSource>();
+    Style::Impl style { fileSource, 1.0 };
 
     style.loadJSON(R"STYLE({"name": "Test"})STYLE");
     ASSERT_EQ("Test", style.getName());
@@ -33,7 +31,7 @@ TEST(Style, Properties) {
     style.loadJSON(R"STYLE({"bearing": 24})STYLE");
     ASSERT_EQ("", style.getName());
     ASSERT_EQ(LatLng {}, *style.getDefaultCamera().center);
-    ASSERT_EQ(24, *style.getDefaultCamera().angle);
+    ASSERT_EQ(24, *style.getDefaultCamera().bearing);
 
     style.loadJSON(R"STYLE({"zoom": 13.3})STYLE");
     ASSERT_EQ("", style.getName());
@@ -55,16 +53,15 @@ TEST(Style, Properties) {
     ASSERT_EQ("", style.getName());
     ASSERT_EQ(LatLng {}, *style.getDefaultCamera().center);
     ASSERT_EQ(0, *style.getDefaultCamera().zoom);
-    ASSERT_EQ(0, *style.getDefaultCamera().angle);
+    ASSERT_EQ(0, *style.getDefaultCamera().bearing);
     ASSERT_EQ(0, *style.getDefaultCamera().pitch);
 }
 
 TEST(Style, DuplicateSource) {
     util::RunLoop loop;
 
-    ThreadPool threadPool{ 1 };
-    StubFileSource fileSource;
-    Style::Impl style { threadPool, fileSource, 1.0 };
+    auto fileSource = std::make_shared<StubFileSource>();
+    Style::Impl style { fileSource, 1.0 };
 
     style.loadJSON(util::read_file("test/fixtures/resources/style-unused-sources.json"));
 
@@ -84,9 +81,8 @@ TEST(Style, RemoveSourceInUse) {
     auto log = new FixtureLogObserver();
     Log::setObserver(std::unique_ptr<Log::Observer>(log));
 
-    ThreadPool threadPool{ 1 };
-    StubFileSource fileSource;
-    Style::Impl style { threadPool, fileSource, 1.0 };
+    auto fileSource = std::make_shared<StubFileSource>();
+    Style::Impl style { fileSource, 1.0 };
 
     style.loadJSON(util::read_file("test/fixtures/resources/style-unused-sources.json"));
 
@@ -106,4 +102,60 @@ TEST(Style, RemoveSourceInUse) {
     };
 
     EXPECT_EQ(log->count(logMessage), 1u);
+}
+
+TEST(Style, SourceImplsOrder) {
+    util::RunLoop loop;
+    auto fileSource = std::make_shared<StubFileSource>();
+    Style::Impl style{fileSource, 1.0};
+
+    style.addSource(std::make_unique<VectorSource>("c", "mapbox://mapbox.mapbox-terrain-v2"));
+    style.addSource(std::make_unique<VectorSource>("b", "mapbox://mapbox.mapbox-terrain-v2"));
+    style.addSource(std::make_unique<VectorSource>("a", "mapbox://mapbox.mapbox-terrain-v2"));
+
+    auto sources = style.getSources();
+    ASSERT_EQ(3u, sources.size());
+    EXPECT_EQ("c", sources[0]->getID());
+    EXPECT_EQ("b", sources[1]->getID());
+    EXPECT_EQ("a", sources[2]->getID());
+
+    const auto& sourceImpls = *style.getSourceImpls();
+    ASSERT_EQ(3u, sourceImpls.size());
+    EXPECT_EQ("a", sourceImpls[0]->id);
+    EXPECT_EQ("b", sourceImpls[1]->id);
+    EXPECT_EQ("c", sourceImpls[2]->id);
+}
+
+TEST(Style, AddRemoveImage) {
+    util::RunLoop loop;
+    auto fileSource = std::make_shared<StubFileSource>();
+    Style::Impl style{fileSource, 1.0};
+    style.addImage(std::make_unique<style::Image>("one", PremultipliedImage({16, 16}), 2));
+    style.addImage(std::make_unique<style::Image>("two", PremultipliedImage({16, 16}), 2));
+    style.addImage(std::make_unique<style::Image>("three", PremultipliedImage({16, 16}), 2));
+
+    style.removeImage("one");
+    style.removeImage("two");
+
+    EXPECT_TRUE(!!style.getImage("three"));
+    EXPECT_FALSE(!!style.getImage("two"));
+    EXPECT_FALSE(!!style.getImage("four"));
+}
+
+TEST(Style, AddRemoveRemoveImage) {
+    // regression test for https://github.com/mapbox/mapbox-gl-native/pull/16391
+    util::RunLoop loop;
+    auto fileSource = std::make_shared<StubFileSource>();
+    Style::Impl style{fileSource, 1.0};
+    style.addImage(std::make_unique<style::Image>("one", PremultipliedImage({16, 16}), 2));
+    style.addImage(std::make_unique<style::Image>("two", PremultipliedImage({16, 16}), 2));
+    style.addImage(std::make_unique<style::Image>("three", PremultipliedImage({16, 16}), 2));
+
+    style.removeImage("one");
+    style.removeImage("two");
+    style.removeImage("two");
+
+    EXPECT_TRUE(!!style.getImage("three"));
+    EXPECT_FALSE(!!style.getImage("two"));
+    EXPECT_FALSE(!!style.getImage("four"));
 }

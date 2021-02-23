@@ -18,8 +18,12 @@ std::vector<Glyph> parseGlyphPBF(const GlyphRange& glyphRange, const std::string
             Glyph glyph;
             protozero::data_view glyphData;
 
-            bool hasID = false, hasWidth = false, hasHeight = false, hasLeft = false,
-                 hasTop = false, hasAdvance = false;
+            bool hasID = false;
+            bool hasWidth = false;
+            bool hasHeight = false;
+            bool hasLeft = false;
+            bool hasTop = false;
+            bool hasAdvance = false;
 
             while (glyph_pbf.next()) {
                 switch (glyph_pbf.tag()) {

@@ -3,11 +3,13 @@
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/style/conversion/stringify.hpp>
 #include <mbgl/renderer/transition_parameters.hpp>
-#include <mbgl/renderer/paint_property_binder.hpp>
+#include <mbgl/renderer/possibly_evaluated_property_value.hpp>
 #include <mbgl/renderer/property_evaluation_parameters.hpp>
 #include <mbgl/renderer/transition_parameters.hpp>
 #include <mbgl/util/indexed_tuple.hpp>
 #include <mbgl/util/ignore.hpp>
+
+#include <bitset>
 
 namespace mbgl {
 
@@ -24,10 +26,7 @@ public:
         : value(std::move(value_)) {
     }
 
-    Transitioning(Value value_,
-                  Transitioning<Value> prior_,
-                  TransitionOptions transition,
-                  TimePoint now)
+    Transitioning(Value value_, Transitioning<Value> prior_, const TransitionOptions& transition, TimePoint now)
         : begin(now + transition.delay.value_or(Duration::zero())),
           end(begin + transition.duration.value_or(Duration::zero())),
           value(std::move(value_)) {
@@ -99,6 +98,25 @@ public:
 template <class P>
 struct IsDataDriven : std::integral_constant<bool, P::IsDataDriven> {};
 
+template <class P>
+struct IsOverridable : std::integral_constant<bool, P::IsOverridable> {};
+
+template <class Ps>
+struct ConstantsMask;
+
+template <class... Ps>
+struct ConstantsMask<TypeList<Ps...>> {
+    template <class Properties>
+    static unsigned long getMask(const Properties& properties) {
+        std::bitset<sizeof... (Ps)> result;
+        util::ignore({
+            result.set(TypeIndex<Ps, Ps...>::value,
+                       properties.template get<Ps>().isConstant())...
+        });
+        return result.to_ulong();
+    }
+};
+
 template <class... Ps>
 class Properties {
 public:
@@ -122,7 +140,7 @@ public:
     using         EvaluatedTypes = TypeList<typename Ps::Type...>;
 
     using DataDrivenProperties = FilteredTypeList<PropertyTypes, IsDataDriven>;
-    using Binders = PaintPropertyBinders<DataDrivenProperties>;
+    using OverridableProperties = FilteredTypeList<PropertyTypes, IsOverridable>;
 
     template <class TypeList>
     using Tuple = IndexedTuple<PropertyTypes, TypeList>;
@@ -148,8 +166,15 @@ public:
         }
 
         template <class T>
-        static T evaluate(float z, const GeometryTileFeature& feature,
-                          const PossiblyEvaluatedPropertyValue<T>& v, const T& defaultValue) {
+        static T evaluate(float, const GeometryTileFeature&, const CanonicalTileID&, const T& t, const T&) {
+            return t;
+        }
+
+        template <class T>
+        static T evaluate(float z,
+                          const GeometryTileFeature& feature,
+                          const PossiblyEvaluatedPropertyValue<T>& v,
+                          const T& defaultValue) {
             return v.match(
                 [&] (const T& t) {
                     return t;
@@ -159,15 +184,84 @@ public:
                 });
         }
 
+        template <class T>
+        static T evaluate(float z,
+                          const GeometryTileFeature& feature,
+                          const PossiblyEvaluatedPropertyValue<T>& v,
+                          const T& defaultValue,
+                          const std::set<std::string>& availableImages) {
+            return v.match(
+                [&](const T& t) { return t; },
+                [&](const PropertyExpression<T>& t) { return t.evaluate(z, feature, availableImages, defaultValue); });
+        }
+
+        template <class T>
+        static T evaluate(float z,
+                          const GeometryTileFeature& feature,
+                          const PossiblyEvaluatedPropertyValue<T>& v,
+                          const T& defaultValue,
+                          const std::set<std::string>& availableImages,
+                          const CanonicalTileID& canonical) {
+            return v.match([&](const T& t) { return t; },
+                           [&](const PropertyExpression<T>& t) {
+                               return t.evaluate(z, feature, availableImages, canonical, defaultValue);
+                           });
+        }
+
+        template <class T>
+        static T evaluate(float z,
+                          const GeometryTileFeature& feature,
+                          const CanonicalTileID& canonical,
+                          const PossiblyEvaluatedPropertyValue<T>& v,
+                          const T& defaultValue) {
+            return v.match(
+                [&](const T& t) { return t; },
+                [&](const PropertyExpression<T>& t) { return t.evaluate(z, feature, canonical, defaultValue); });
+        }
+
+        template <class T>
+        static T evaluate(float z, const GeometryTileFeature& feature, const FeatureState& state,
+                          const PossiblyEvaluatedPropertyValue<T>& v, const T& defaultValue) {
+            return v.match([&](const T& t) { return t; },
+                           [&](const PropertyExpression<T>& t) { return t.evaluate(z, feature, state, defaultValue); });
+        }
+
         template <class P>
         auto evaluate(float z, const GeometryTileFeature& feature) const {
             return evaluate(z, feature, this->template get<P>(), P::defaultValue());
+        }
+
+        template <class P>
+        auto evaluate(float z, const GeometryTileFeature& feature, const CanonicalTileID& canonical) const {
+            return evaluate(z, feature, canonical, this->template get<P>(), P::defaultValue());
+        }
+
+        template <class P>
+        auto evaluate(float z, const GeometryTileFeature& feature, const FeatureState& state) const {
+            return evaluate(z, feature, state, this->template get<P>(), P::defaultValue());
+        }
+
+        template <class P>
+        auto evaluate(float z, const GeometryTileFeature& feature, const std::set<std::string>& availableImages) const {
+            return evaluate(z, feature, this->template get<P>(), P::defaultValue(), availableImages);
+        }
+
+        template <class P>
+        auto evaluate(float z,
+                      const GeometryTileFeature& feature,
+                      const std::set<std::string>& availableImages,
+                      const CanonicalTileID& canonical) const {
+            return evaluate(z, feature, this->template get<P>(), P::defaultValue(), availableImages, canonical);
         }
 
         Evaluated evaluate(float z, const GeometryTileFeature& feature) const {
             return Evaluated {
                 evaluate<Ps>(z, feature)...
             };
+        }
+
+        unsigned long constantsMask() const {
+            return ConstantsMask<DataDrivenProperties>::getMask(*this);
         }
     };
 

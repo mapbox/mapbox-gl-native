@@ -2,9 +2,12 @@
 
 #include <mbgl/util/optional.hpp>
 
+#include <functional>
 #include <memory>
 #include <mutex>
 #include <queue>
+
+#include <mapbox/std/weak.hpp>
 
 namespace mbgl {
 
@@ -33,10 +36,11 @@ public:
     void push(std::unique_ptr<Message>);
     void receive();
 
-    static void maybeReceive(std::weak_ptr<Mailbox>);
+    static void maybeReceive(const std::weak_ptr<Mailbox>&);
+    static std::function<void()> makeClosure(std::weak_ptr<Mailbox>);
 
 private:
-    optional<Scheduler*> scheduler;
+    mapbox::base::WeakPtr<Scheduler> weakScheduler;
 
     std::recursive_mutex receivingMutex;
     std::mutex pushingMutex;

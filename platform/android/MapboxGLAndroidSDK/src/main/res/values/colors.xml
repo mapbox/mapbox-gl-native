@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <color name="mapbox_gray_dark">#5F5F5F</color>
-    <color name="mapbox_gray">#7D7F80</color>
-    <color name="mapbox_blue">#1E8CAB</color>
-
-    <color name="mapbox_location_layer_blue">#4A90E2</color>
-    <color name="mapbox_location_layer_gray">#A1B0C0</color>
-</resources>

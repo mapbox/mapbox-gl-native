@@ -23,7 +23,7 @@ static void Parse_Filter(benchmark::State& state) {
 static void Parse_EvaluateFilter(benchmark::State& state) {
     const style::Filter filter = parse(R"FILTER(["==", "foo", "bar"])FILTER");
     const StubGeometryTileFeature feature = { {}, FeatureType::Unknown , {},  {{ "foo", std::string("bar") }} };
-    const style::expression::EvaluationContext context = { &feature };
+    const style::expression::EvaluationContext context(&feature);
 
     while (state.KeepRunning()) {
         filter(context);

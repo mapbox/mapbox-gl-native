@@ -11,6 +11,8 @@ using GlyphRange = std::pair<uint16_t, uint16_t>;
 
 constexpr uint32_t GLYPHS_PER_GLYPH_RANGE = 256;
 constexpr uint32_t GLYPH_RANGES_PER_FONT_STACK = 256;
+// 256 - 126 ranges skipped w/ i18n::allowsFixedWidthGlyphGeneration
+constexpr uint32_t NON_IDEOGRAPH_GLYPH_RANGES_PER_FONT_STACK = 130;
 
 } // end namespace mbgl
 

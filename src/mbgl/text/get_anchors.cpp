@@ -40,7 +40,7 @@ static Anchors resample(const GeometryCoordinates& line,
 
     assert(spacing > 0.0);
 
-    int i = 0;
+    std::size_t i = 0u;
     for (auto it = line.begin(), end = line.end() - 1; it != end; it++, i++) {
         const GeometryCoordinate& a = *(it);
         const GeometryCoordinate& b = *(it + 1);
@@ -51,9 +51,9 @@ static Anchors resample(const GeometryCoordinates& line,
         while (markedDistance + spacing < distance + segmentDist) {
             markedDistance += spacing;
 
-            float t = (markedDistance - distance) / segmentDist,
-                  x = util::interpolate(float(a.x), float(b.x), t),
-                  y = util::interpolate(float(a.y), float(b.y), t);
+            float t = (markedDistance - distance) / segmentDist;
+            float x = util::interpolate(float(a.x), float(b.x), t);
+            float y = util::interpolate(float(a.y), float(b.y), t);
 
             // Check that the point is within the tile boundaries and that
             // the label would fit before the beginning and end of the line
@@ -61,7 +61,7 @@ static Anchors resample(const GeometryCoordinates& line,
             if (x >= 0 && x < util::EXTENT && y >= 0 && y < util::EXTENT &&
                     markedDistance - halfLabelLength >= 0.0f &&
                     markedDistance + halfLabelLength <= lineLength) {
-                Anchor anchor(::round(x), ::round(y), angle, 0.5f, i);
+                Anchor anchor(std::round(x), std::round(y), angle, i);
 
                 if (!angleWindowSize || checkMaxAngle(line, anchor, labelLength, angleWindowSize, maxAngle)) {
                     anchors.push_back(anchor);
@@ -104,7 +104,7 @@ Anchors getAnchors(const GeometryCoordinates& line,
 
     const float angleWindowSize = getAngleWindowSize(textLeft, textRight, glyphSize, boxScale);
 
-    const float shapedLabelLength = fmax(textRight - textLeft, iconRight - iconLeft);
+    const float shapedLabelLength = std::fmax(textRight - textLeft, iconRight - iconLeft);
     const float labelLength = shapedLabelLength * boxScale;
 
     // Is the line continued from outside the tile boundary?
@@ -143,12 +143,12 @@ optional<Anchor> getCenterAnchor(const GeometryCoordinates& line,
     }
     
     const float angleWindowSize = getAngleWindowSize(textLeft, textRight, glyphSize, boxScale);
-    const float labelLength = fmax(textRight - textLeft, iconRight - iconLeft) * boxScale;
-    
+    const float labelLength = std::fmax(textRight - textLeft, iconRight - iconLeft) * boxScale;
+
     float prevDistance = 0;
     const float centerDistance = getLineLength(line) / 2;
-    
-    int i = 0;
+
+    std::size_t i = 0u;
     for (auto it = line.begin(), end = line.end() - 1; it != end; it++, i++) {
         const GeometryCoordinate& a = *(it);
         const GeometryCoordinate& b = *(it + 1);
@@ -157,15 +157,17 @@ optional<Anchor> getCenterAnchor(const GeometryCoordinates& line,
         
         if (prevDistance + segmentDistance > centerDistance) {
             // The center is on this segment
-            float t = (centerDistance - prevDistance) / segmentDistance,
-                  x = util::interpolate(float(a.x), float(b.x), t),
-                  y = util::interpolate(float(a.y), float(b.y), t);
-            
-            Anchor anchor(::round(x), ::round(y), util::angle_to(b, a), 0.5f, i);
-            
+            float t = (centerDistance - prevDistance) / segmentDistance;
+            float x = util::interpolate(float(a.x), float(b.x), t);
+            float y = util::interpolate(float(a.y), float(b.y), t);
+
+            Anchor anchor(std::round(x), std::round(y), util::angle_to(b, a), i);
+
             if (!angleWindowSize || checkMaxAngle(line, anchor, labelLength, angleWindowSize, maxAngle)) {
                 return anchor;
             }
+
+            return nullopt;
         }
         
         prevDistance += segmentDistance;

@@ -3,9 +3,23 @@
 #include <mbgl/style/conversion/filter.hpp>
 #include <mbgl/style/conversion_impl.hpp>
 
+#include <mbgl/layermanager/layer_manager.hpp>
+
 namespace mbgl {
 namespace style {
 namespace conversion {
+
+namespace {
+bool setObjectMember(std::unique_ptr<Layer>& layer, const Convertible& value, const char* member, Error& error) {
+    if (auto memberValue = objectMember(value, member)) {
+        if (auto error_ = layer->setProperty(member, *memberValue)) {
+            error = *error_;
+            return false;
+        }
+    }
+    return true;
+}
+} // namespace
 
 optional<Error> setPaintProperties(Layer& layer, const Convertible& value) {
     auto paintValue = objectMember(value, "paint");
@@ -15,9 +29,7 @@ optional<Error> setPaintProperties(Layer& layer, const Convertible& value) {
     if (!isObject(*paintValue)) {
         return { { "paint must be an object" } };
     }
-    return eachMember(*paintValue, [&] (const std::string& k, const Convertible& v) {
-        return layer.setPaintProperty(k, v);
-    });
+    return eachMember(*paintValue, [&](const std::string& k, const Convertible& v) { return layer.setProperty(k, v); });
 }
 
 optional<std::unique_ptr<Layer>> Converter<std::unique_ptr<Layer>>::operator()(const Convertible& value, Error& error) const {
@@ -51,28 +63,13 @@ optional<std::unique_ptr<Layer>> Converter<std::unique_ptr<Layer>>::operator()(c
     }
 
     std::unique_ptr<Layer> layer = LayerManager::get()->createLayer(*type, *id, value, error);
-    if (!layer) {
-        return nullopt;
-    }
+    if (!layer) return nullopt;
 
-    auto minzoomValue = objectMember(value, "minzoom");
-    if (minzoomValue) {
-        optional<float> minzoom = toNumber(*minzoomValue);
-        if (!minzoom) {
-            error.message = "minzoom must be numeric";
-            return nullopt;
-        }
-        layer->setMinZoom(*minzoom);
-    }
-
-    auto maxzoomValue = objectMember(value, "maxzoom");
-    if (maxzoomValue) {
-        optional<float> maxzoom = toNumber(*maxzoomValue);
-        if (!maxzoom) {
-            error.message = "maxzoom must be numeric";
-            return nullopt;
-        }
-        layer->setMaxZoom(*maxzoom);
+    if (!setObjectMember(layer, value, "minzoom", error)) return nullopt;
+    if (!setObjectMember(layer, value, "maxzoom", error)) return nullopt;
+    if (!setObjectMember(layer, value, "filter", error)) return nullopt;
+    if (layer->getTypeInfo()->source == LayerTypeInfo::Source::Required) {
+        if (!setObjectMember(layer, value, "source-layer", error)) return nullopt;
     }
 
     auto layoutValue = objectMember(value, "layout");
@@ -81,9 +78,8 @@ optional<std::unique_ptr<Layer>> Converter<std::unique_ptr<Layer>>::operator()(c
             error.message = "layout must be an object";
             return nullopt;
         }
-        optional<Error> error_ = eachMember(*layoutValue, [&] (const std::string& k, const Convertible& v) {
-            return layer->setLayoutProperty(k, v);
-        });
+        optional<Error> error_ = eachMember(
+            *layoutValue, [&](const std::string& k, const Convertible& v) { return layer->setProperty(k, v); });
         if (error_) {
             error = *error_;
             return nullopt;
@@ -96,7 +92,7 @@ optional<std::unique_ptr<Layer>> Converter<std::unique_ptr<Layer>>::operator()(c
         return nullopt;
     }
 
-    return std::move(layer);
+    return layer;
 }
 
 } // namespace conversion

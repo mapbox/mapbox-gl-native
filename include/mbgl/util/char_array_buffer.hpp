@@ -43,7 +43,7 @@ private:
         if (dir == std::ios_base::beg) current_ = std::min(begin_ + off, end_);
         else if (dir == std::ios_base::cur) current_ = std::min(current_ + off, end_);
         else current_ = std::max(end_ - off, begin_); // dir == std::ios_base::end
-        return pos_type(off_type(current_ - begin_));
+        return {off_type(current_ - begin_)};
     }
 
     char const * const begin_;

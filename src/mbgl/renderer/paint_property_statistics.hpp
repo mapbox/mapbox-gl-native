@@ -2,6 +2,8 @@
 
 #include <mbgl/util/optional.hpp>
 
+#include <algorithm>
+
 namespace mbgl {
 
 template <class T>

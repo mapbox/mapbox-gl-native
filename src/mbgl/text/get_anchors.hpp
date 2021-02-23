@@ -8,23 +8,22 @@ namespace mbgl {
 
 Anchors getAnchors(const GeometryCoordinates& line,
                    float spacing,
-                   const float maxAngle,
-                   const float textLeft,
-                   const float textRight,
-                   const float iconLeft,
-                   const float iconRight,
-                   const float glyphSize,
-                   const float boxScale,
-                   const float overscaling);
+                   float maxAngle,
+                   float textLeft,
+                   float textRight,
+                   float iconLeft,
+                   float iconRight,
+                   float glyphSize,
+                   float boxScale,
+                   float overscaling);
 
 optional<Anchor> getCenterAnchor(const GeometryCoordinates& line,
-                                 const float maxAngle,
-                                 const float textLeft,
-                                 const float textRight,
-                                 const float iconLeft,
-                                 const float iconRight,
-                                 const float glyphSize,
-                                 const float boxScale);
-    
+                                 float maxAngle,
+                                 float textLeft,
+                                 float textRight,
+                                 float iconLeft,
+                                 float iconRight,
+                                 float glyphSize,
+                                 float boxScale);
 
 } // namespace mbgl

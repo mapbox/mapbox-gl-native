@@ -1,9 +1,10 @@
+#include <mbgl/actor/actor_ref.hpp>
 #include <mbgl/storage/asset_file_source.hpp>
-#include <mbgl/util/platform.hpp>
+#include <mbgl/storage/resource.hpp>
 #include <mbgl/util/chrono.hpp>
+#include <mbgl/util/platform.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/thread.hpp>
-#include <mbgl/actor/actor_ref.hpp>
 
 #include <gtest/gtest.h>
 #include <atomic>
@@ -70,12 +71,13 @@ TEST(AssetFileSource, Load) {
 }
 
 TEST(AssetFileSource, AcceptsURL) {
-    EXPECT_TRUE(AssetFileSource::acceptsURL("asset://empty"));
-    EXPECT_TRUE(AssetFileSource::acceptsURL("asset:///test"));
-    EXPECT_FALSE(AssetFileSource::acceptsURL("assds://foo"));
-    EXPECT_FALSE(AssetFileSource::acceptsURL("asset:"));
-    EXPECT_FALSE(AssetFileSource::acceptsURL("style.json"));
-    EXPECT_FALSE(AssetFileSource::acceptsURL(""));
+    AssetFileSource fs("test/fixtures/storage/assets");
+    EXPECT_TRUE(fs.canRequest(Resource::style("asset://empty")));
+    EXPECT_TRUE(fs.canRequest(Resource::style("asset:///test")));
+    EXPECT_FALSE(fs.canRequest(Resource::style("assds://foo")));
+    EXPECT_FALSE(fs.canRequest(Resource::style("asset:")));
+    EXPECT_FALSE(fs.canRequest(Resource::style("style.json")));
+    EXPECT_FALSE(fs.canRequest(Resource::style("")));
 }
 
 TEST(AssetFileSource, EmptyFile) {

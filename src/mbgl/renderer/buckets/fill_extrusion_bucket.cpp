@@ -34,26 +34,28 @@ using namespace style;
 
 struct GeometryTooLongException : std::exception {};
 
-FillExtrusionBucket::FillExtrusionBucket(const FillExtrusionBucket::PossiblyEvaluatedLayoutProperties,
-                       std::map<std::string, FillExtrusionBucket::PossiblyEvaluatedPaintProperties> layerPaintProperties,
+FillExtrusionBucket::FillExtrusionBucket(const FillExtrusionBucket::PossiblyEvaluatedLayoutProperties&,
+                       const std::map<std::string, Immutable<style::LayerProperties>>& layerPaintProperties,
                        const float zoom,
-                       const uint32_t)
-    : Bucket(LayerType::FillExtrusion) {
-
+                       const uint32_t) {
     for (const auto& pair : layerPaintProperties) {
         paintPropertyBinders.emplace(
             std::piecewise_construct,
             std::forward_as_tuple(pair.first),
             std::forward_as_tuple(
-                pair.second,
+                getEvaluated<FillExtrusionLayerProperties>(pair.second),
                 zoom));
     }
 }
 
+FillExtrusionBucket::~FillExtrusionBucket() = default;
+
 void FillExtrusionBucket::addFeature(const GeometryTileFeature& feature,
                                      const GeometryCollection& geometry,
                                      const ImagePositions& patternPositions,
-                                     const PatternLayerMap& patternDependencies) {
+                                     const PatternLayerMap& patternDependencies,
+                                     std::size_t index,
+                                     const CanonicalTileID& canonical) {
     for (auto& polygon : classifyRings(geometry)) {
         // Optimize polygons with many interior rings for earcut tesselation.
         limitHoles(polygon, 500);
@@ -71,12 +73,12 @@ void FillExtrusionBucket::addFeature(const GeometryTileFeature& feature,
         std::vector<uint32_t> flatIndices;
         flatIndices.reserve(totalVertices);
 
-        std::size_t startVertices = vertices.vertexSize();
+        std::size_t startVertices = vertices.elements();
 
         if (triangleSegments.empty() ||
             triangleSegments.back().vertexLength + (5 * (totalVertices - 1) + 1) >
                 std::numeric_limits<uint16_t>::max()) {
-            triangleSegments.emplace_back(startVertices, triangles.indexSize());
+            triangleSegments.emplace_back(startVertices, triangles.elements());
         }
 
         auto& triangleSegment = triangleSegments.back();
@@ -94,7 +96,7 @@ void FillExtrusionBucket::addFeature(const GeometryTileFeature& feature,
 
             std::size_t edgeDistance = 0;
 
-            for (uint32_t i = 0; i < nVertices; i++) {
+            for (std::size_t i = 0; i < nVertices; i++) {
                 const auto& p1 = ring[i];
 
                 vertices.emplace_back(
@@ -145,7 +147,7 @@ void FillExtrusionBucket::addFeature(const GeometryTileFeature& feature,
         std::size_t nIndices = indices.size();
         assert(nIndices % 3 == 0);
 
-        for (uint32_t i = 0; i < nIndices; i += 3) {
+        for (std::size_t i = 0; i < nIndices; i += 3) {
             // Counter-Clockwise winding order.
             triangles.emplace_back(flatIndices[indices[i]], flatIndices[indices[i + 2]],
                                    flatIndices[indices[i + 1]]);
@@ -158,19 +160,22 @@ void FillExtrusionBucket::addFeature(const GeometryTileFeature& feature,
     for (auto& pair : paintPropertyBinders) {
         const auto it = patternDependencies.find(pair.first);
         if (it != patternDependencies.end()){
-            pair.second.populateVertexVectors(feature, vertices.vertexSize(), patternPositions, it->second);
+            pair.second.populateVertexVectors(
+                feature, vertices.elements(), index, patternPositions, it->second, canonical);
         } else {
-            pair.second.populateVertexVectors(feature, vertices.vertexSize(), patternPositions, {});
+            pair.second.populateVertexVectors(feature, vertices.elements(), index, patternPositions, {}, canonical);
         }
     }
 }
 
-void FillExtrusionBucket::upload(gl::Context& context) {
-    vertexBuffer = context.createVertexBuffer(std::move(vertices));
-    indexBuffer = context.createIndexBuffer(std::move(triangles));
+void FillExtrusionBucket::upload(gfx::UploadPass& uploadPass) {
+    if (!uploaded) {
+        vertexBuffer = uploadPass.createVertexBuffer(std::move(vertices));
+        indexBuffer = uploadPass.createIndexBuffer(std::move(triangles));
+    }
 
     for (auto& pair : paintPropertyBinders) {
-        pair.second.upload(context);
+        pair.second.upload(uploadPass);
     }
 
     uploaded = true;
@@ -181,9 +186,18 @@ bool FillExtrusionBucket::hasData() const {
 }
 
 float FillExtrusionBucket::getQueryRadius(const RenderLayer& layer) const {
-    const RenderFillExtrusionLayer* fillExtrusionLayer = toRenderFillExtrusionLayer(&layer);
-    const std::array<float, 2>& translate = fillExtrusionLayer->evaluated.get<FillExtrusionTranslate>();
+    const auto& evaluated = getEvaluated<FillExtrusionLayerProperties>(layer.evaluatedProperties);
+    const std::array<float, 2>& translate = evaluated.get<FillExtrusionTranslate>();
     return util::length(translate[0], translate[1]);
+}
+
+void FillExtrusionBucket::update(const FeatureStates& states, const GeometryTileLayer& layer,
+                                 const std::string& layerID, const ImagePositions& imagePositions) {
+    auto it = paintPropertyBinders.find(layerID);
+    if (it != paintPropertyBinders.end()) {
+        it->second.updateVertexVectors(states, layer, imagePositions);
+        uploaded = false;
+    }
 }
 
 } // namespace mbgl

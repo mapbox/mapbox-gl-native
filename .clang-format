@@ -1,18 +1,11 @@
-Standard: Cpp11
-IndentWidth: 4
+---
+Language: Cpp
+BasedOnStyle: Google
 AccessModifierOffset: -4
-UseTab: Never
+AllowShortFunctionsOnASingleLine: Inline
+BinPackArguments: false
 BinPackParameters: false
-AllowShortIfStatementsOnASingleLine: false
-AllowShortLoopsOnASingleLine: false
-AllowShortBlocksOnASingleLine: false
-AllowShortFunctionsOnASingleLine: false
-ConstructorInitializerAllOnOneLineOrOnePerLine: true
-AlwaysBreakTemplateDeclarations: true
-NamespaceIndentation: None
-PointerBindsToType: true
-SpacesInParentheses: false
-BreakBeforeBraces: Attach
-ColumnLimit: 100
-Cpp11BracedListStyle: false
+ColumnLimit: 120
+IndentWidth: 4
 SpacesBeforeTrailingComments: 1
+...

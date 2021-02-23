@@ -1,0 +1,19 @@
+{
+    "file-size": [
+        [
+            "mbgl-glfw",
+            "/tmp/attach/install/macos-xcode11-release/bin/mbgl-glfw",
+            5243480
+        ],
+        [
+            "mbgl-offline",
+            "/tmp/attach/install/macos-xcode11-release/bin/mbgl-offline",
+            4475952
+        ],
+        [
+            "mbgl-render",
+            "/tmp/attach/install/macos-xcode11-release/bin/mbgl-render",
+            5089824
+        ]
+    ]
+}

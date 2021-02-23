@@ -1,7 +1,7 @@
 #pragma once
 
 #include <mbgl/gl/extension.hpp>
-#include <mbgl/gl/gl.hpp>
+#include <mbgl/platform/gl_functions.hpp>
 
 #define GL_DEBUG_OUTPUT_SYNCHRONOUS       0x8242
 #define GL_DEBUG_NEXT_LOGGED_MESSAGE_LENGTH 0x8243
@@ -50,6 +50,8 @@
 namespace mbgl {
 namespace gl {
 namespace extension {
+
+using namespace platform;
 
 class Debugging {
 public:

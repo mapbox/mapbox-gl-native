@@ -1,5 +1,6 @@
 #include <mbgl/util/http_header.hpp>
 
+#include <mbgl/util/chrono.hpp>
 #include <mbgl/util/string.hpp>
 
 #include <boost/spirit/include/qi.hpp>
@@ -31,7 +32,7 @@ optional<Timestamp> parseRetryHeaders(const optional<std::string>& retryAfter,
     if (retryAfter) {
         try {
             auto secs = std::chrono::seconds(std::stoi(*retryAfter));
-            return std::chrono::time_point_cast<Seconds>(std::chrono::system_clock::now() + secs);
+            return std::chrono::time_point_cast<Seconds>(util::now() + secs);
         } catch (...) {
             return util::parseTimestamp((*retryAfter).c_str());
         }

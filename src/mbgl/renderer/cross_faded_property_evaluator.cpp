@@ -1,4 +1,5 @@
 #include <mbgl/renderer/cross_faded_property_evaluator.hpp>
+#include <mbgl/style/expression/image.hpp>
 #include <mbgl/util/chrono.hpp>
 
 #include <cmath>
@@ -30,7 +31,7 @@ Faded<T> CrossFadedPropertyEvaluator<T>::calculate(const T& min, const T& mid, c
         : Faded<T> { max, mid };
 }
 
-template class CrossFadedPropertyEvaluator<std::string>;
+template class CrossFadedPropertyEvaluator<style::expression::Image>;
 template class CrossFadedPropertyEvaluator<std::vector<float>>;
 
 } // namespace mbgl

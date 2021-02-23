@@ -19,11 +19,11 @@ static constexpr const size_t stubBitmapLength = 900;
 
 class StubLocalGlyphRasterizer : public LocalGlyphRasterizer {
 public:
-    bool canRasterizeGlyph(const FontStack&, GlyphID glyphID) {
-        return util::i18n::allowsIdeographicBreaking(glyphID);
+    bool canRasterizeGlyph(const FontStack&, GlyphID glyphID) override {
+        return util::i18n::allowsFixedWidthGlyphGeneration(glyphID);
     }
 
-    Glyph rasterizeGlyph(const FontStack&, GlyphID glyphID) {
+    Glyph rasterizeGlyph(const FontStack&, GlyphID glyphID) override {
         Glyph stub;
         stub.id = glyphID;
         
@@ -68,7 +68,7 @@ public:
     StubFileSource fileSource;
     StubGlyphManagerObserver observer;
     StubGlyphRequestor requestor;
-    GlyphManager glyphManager{ fileSource, std::make_unique<StubLocalGlyphRasterizer>() };
+    GlyphManager glyphManager{ std::make_unique<StubLocalGlyphRasterizer>() };
 
     void run(const std::string& url, GlyphDependencies dependencies) {
         // Squelch logging.
@@ -76,7 +76,7 @@ public:
 
         glyphManager.setURL(url);
         glyphManager.setObserver(&observer);
-        glyphManager.getGlyphs(requestor, std::move(dependencies));
+        glyphManager.getGlyphs(requestor, std::move(dependencies), fileSource);
 
         loop.run();
     }
@@ -253,6 +253,57 @@ TEST(GlyphManager, LoadLocalCJKGlyph) {
         });
 }
 
+TEST(GlyphManager, LoadLocalCJKGlyphAfterLoadingRangeFromURL) {
+    GlyphManagerTest test;
+    int firstGlyphResponse = false;
+
+    test.fileSource.glyphsResponse = [&] (const Resource&) {
+        firstGlyphResponse = true;
+        Response response;
+        response.data = std::make_shared<std::string>(util::read_file("test/fixtures/resources/glyphs-12244-12543.pbf"));
+        return response;
+
+    };
+    
+    test.requestor.glyphsAvailable = [&] (GlyphMap glyphs) {
+        const auto& testPositions = glyphs.at(FontStackHasher()({{"Test Stack"}}));
+
+        if (firstGlyphResponse == true) {
+            firstGlyphResponse = false;
+            ASSERT_EQ(testPositions.size(), 1u);
+            ASSERT_EQ(testPositions.count(u'々'), 1u);
+
+            //Katakana letter te, should be locally rasterized
+            // instead of using the glyph recieved from the range
+            // for the ideagraphic mark
+            test.glyphManager.getGlyphs(test.requestor,
+                GlyphDependencies {
+                    {{{"Test Stack"}}, {u'テ'}} // 0x30c6
+                },
+                test.fileSource);
+        } else {
+            ASSERT_EQ(testPositions.size(), 1u);
+            ASSERT_EQ(testPositions.count(u'テ'), 1u);
+
+            Immutable<Glyph> glyph = *testPositions.at(u'テ');
+            EXPECT_EQ(glyph->id, u'テ');
+            EXPECT_EQ(glyph->metrics.width, 24ul);
+            EXPECT_EQ(glyph->metrics.height, 24ul);
+            EXPECT_EQ(glyph->metrics.left, 0);
+            EXPECT_EQ(glyph->metrics.top, -8);
+            EXPECT_EQ(glyph->metrics.advance, 24ul);
+            EXPECT_EQ(glyph->bitmap.size, Size(30, 30));
+
+            test.end();
+        }
+    };
+
+    test.run(
+        "test/fixtures/resources/glyphs-12244-12543.pbf",
+        GlyphDependencies {
+            {{{"Test Stack"}}, {u'々'}} //0x3005
+        });
+}
 
 TEST(GlyphManager, LoadingInvalid) {
     GlyphManagerTest test;
@@ -298,7 +349,7 @@ TEST(GlyphManager, ImmediateFileSource) {
         StubFileSource fileSource = { StubFileSource::ResponseType::Synchronous };
         StubGlyphManagerObserver observer;
         StubGlyphRequestor requestor;
-        GlyphManager glyphManager { fileSource };
+        GlyphManager glyphManager;
 
         void run(const std::string& url, GlyphDependencies dependencies) {
             // Squelch logging.
@@ -306,7 +357,7 @@ TEST(GlyphManager, ImmediateFileSource) {
 
             glyphManager.setURL(url);
             glyphManager.setObserver(&observer);
-            glyphManager.getGlyphs(requestor, std::move(dependencies));
+            glyphManager.getGlyphs(requestor, std::move(dependencies), fileSource);
 
             loop.run();
         }

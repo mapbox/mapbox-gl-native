@@ -3,10 +3,7 @@
 #include <mbgl/programs/program.hpp>
 #include <mbgl/programs/attributes.hpp>
 #include <mbgl/programs/uniforms.hpp>
-#include <mbgl/shaders/fill.hpp>
-#include <mbgl/shaders/fill_pattern.hpp>
-#include <mbgl/shaders/fill_outline.hpp>
-#include <mbgl/shaders/fill_outline_pattern.hpp>
+#include <mbgl/programs/textures.hpp>
 #include <mbgl/util/geometry.hpp>
 #include <mbgl/util/mat4.hpp>
 #include <mbgl/util/size.hpp>
@@ -23,35 +20,25 @@ template <class> class Faded;
 
 using FillLayoutAttributes = PositionOnlyLayoutAttributes;
 
-struct FillUniforms : gl::Uniforms<
-    uniforms::u_matrix,
-    uniforms::u_world>
-{};
+using FillUniforms = TypeList<
+    uniforms::matrix,
+    uniforms::world>;
 
-struct FillPatternUniforms : gl::Uniforms<
-    uniforms::u_matrix,
-    uniforms::u_world,
-    uniforms::u_texsize,
-    uniforms::u_scale,
-    uniforms::u_fade,
-    uniforms::u_image,
-    uniforms::u_pixel_coord_upper,
-    uniforms::u_pixel_coord_lower>
-{
-    static Values values(mat4 matrix,
-                         Size framebufferSize,
-                         Size atlasSize,
-                         const CrossfadeParameters& crossfade,
-                         const UnwrappedTileID&,
-                         const TransformState&,
-                         const float pixelRatio);
-};
+using FillPatternUniforms = TypeList<
+    uniforms::matrix,
+    uniforms::world,
+    uniforms::texsize,
+    uniforms::scale,
+    uniforms::fade,
+    uniforms::pixel_coord_upper,
+    uniforms::pixel_coord_lower>;
 
 class FillProgram : public Program<
-    shaders::fill,
-    gl::Triangle,
+    FillProgram,
+    gfx::PrimitiveType::Triangle,
     FillLayoutAttributes,
     FillUniforms,
+    TypeList<>,
     style::FillPaintProperties>
 {
 public:
@@ -68,21 +55,32 @@ public:
 };
 
 class FillPatternProgram : public Program<
-    shaders::fill_pattern,
-    gl::Triangle,
+    FillPatternProgram,
+    gfx::PrimitiveType::Triangle,
     FillLayoutAttributes,
     FillPatternUniforms,
+    TypeList<
+        textures::image>,
     style::FillPaintProperties>
 {
 public:
     using Program::Program;
+
+    static LayoutUniformValues layoutUniformValues(mat4 matrix,
+                                                   Size framebufferSize,
+                                                   Size atlasSize,
+                                                   const CrossfadeParameters& crossfade,
+                                                   const UnwrappedTileID&,
+                                                   const TransformState&,
+                                                   float pixelRatio);
 };
 
 class FillOutlineProgram : public Program<
-    shaders::fill_outline,
-    gl::Line,
+    FillOutlineProgram,
+    gfx::PrimitiveType::Line,
     FillLayoutAttributes,
     FillUniforms,
+    TypeList<>,
     style::FillPaintProperties>
 {
 public:
@@ -90,10 +88,12 @@ public:
 };
 
 class FillOutlinePatternProgram : public Program<
-    shaders::fill_outline_pattern,
-    gl::Line,
+    FillOutlinePatternProgram,
+    gfx::PrimitiveType::Line,
     FillLayoutAttributes,
     FillPatternUniforms,
+    TypeList<
+        textures::image>,
     style::FillPaintProperties>
 {
 public:
@@ -101,6 +101,19 @@ public:
 };
 
 using FillLayoutVertex = FillProgram::LayoutVertex;
-using FillAttributes = FillProgram::Attributes;
+using FillAttributes = FillProgram::AttributeList;
+
+class FillLayerPrograms final : public LayerTypePrograms {
+public:
+    FillLayerPrograms(gfx::Context& context, const ProgramParameters& programParameters)
+        : fill(context, programParameters),
+          fillPattern(context, programParameters),
+          fillOutline(context, programParameters),
+          fillOutlinePattern(context, programParameters) {}
+    FillProgram fill;
+    FillPatternProgram fillPattern;
+    FillOutlineProgram fillOutline;
+    FillOutlinePatternProgram fillOutlinePattern;
+};
 
 } // namespace mbgl

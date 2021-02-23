@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 
 const jwt = require('jsonwebtoken');
-const github = require('@octokit/rest')();
+const github = require('@octokit/rest').plugin(require('@octokit/plugin-retry'))({
+    retry: { doNotRetry: [ /* Empty — retry on any error code. */ ] }
+})
 const zlib = require('zlib');
 const AWS = require('aws-sdk');
 
@@ -33,13 +35,16 @@ github.authenticate({type: 'app', token});
 const platforms = [
     { 'platform': 'iOS', 'arch': 'armv7' },
     { 'platform': 'iOS', 'arch': 'arm64' },
+    { 'platform': 'iOS', 'arch': 'Dynamic' },
     { 'platform': 'Android', 'arch': 'arm-v7' },
     { 'platform': 'Android', 'arch': 'arm-v8' },
     { 'platform': 'Android', 'arch': 'x86' },
     { 'platform': 'Android', 'arch': 'x86_64' }
 ];
 
+const sizeCheckInfo = [];
 const rows = [];
+const date = new Date().toISOString().substring(0, 19);
 
 function query(after) {
     return github.request({
@@ -84,6 +89,7 @@ function query(after) {
               }
             }`
     }).then((result) => {
+        
         const history = result.data.data.repository.ref.target.history;
 
         for (const edge of history.edges) {
@@ -92,42 +98,81 @@ function query(after) {
 
             if (!suite)
                 continue;
-
-            const runs = commit.checkSuites.nodes[0].checkRuns.nodes;
+            const allRuns = commit.checkSuites.nodes[0].checkRuns.nodes;
+            
+            const sizeCheckRuns = allRuns.filter(function (run) {
+              return run.name.match(/Size - (\w+) ([\w-]+)/);
+            });
+            
             const row = [`${commit.oid.slice(0, 7)} - ${commit.messageHeadline}`];
 
             for (let i = 0; i < platforms.length; i++) {
                 const {platform, arch} = platforms[i];
 
-                const run = runs.find((run) => {
+                const run = sizeCheckRuns.find((run) => {
                     const [, p, a] = run.name.match(/Size - (\w+) ([\w-]+)/);
                     return platform === p && arch === a;
                 });
-
+                
                 row[i + 1] = run ? +run.summary.match(/is (\d+) bytes/)[1] : undefined;
             }
-
             rows.push(row);
         }
 
         if (history.pageInfo.hasNextPage) {
             return query(history.pageInfo.endCursor);
         } else {
-            return new AWS.S3({region: 'us-east-1'}).putObject({
-                Body: zlib.gzipSync(JSON.stringify(rows.reverse())),
-                Bucket: 'mapbox',
-                Key: 'mapbox-gl-native/metrics/binary-size/data.json',
-                ACL: 'public-read',
-                CacheControl: 'max-age=300',
-                ContentEncoding: 'gzip',
-                ContentType: 'application/json'
-            }).promise();
+          const latestRun = rows[0]
+          const runSizeMeasurements = latestRun.slice(1)
+
+          for (let i = 0; i < platforms.length; i++) {
+              const {platform, arch} = platforms[i];
+
+              sizeCheckInfo.push(JSON.stringify({
+                  'sdk': 'maps',
+                  'platform' : platform,
+                  'arch': arch,
+                  'size' : runSizeMeasurements[i],
+                  'created_at': date
+              }));
+          }
         }
     });
 }
 
 github.apps.createInstallationToken({installation_id: SIZE_CHECK_APP_INSTALLATION_ID})
     .then(({data}) => {
-        github.authenticate({type: 'token', token: data.token});
-        return query();
-    });
+      github.authenticate({type: 'token', token: data.token});
+
+      return query().then(function() {
+        // Uploads to data source used by 
+        // http://mapbox.github.io/mapbox-gl-native/metrics/binary-size/
+        var firstPromise = new AWS.S3({region: 'us-east-1'}).putObject({
+            Body: zlib.gzipSync(JSON.stringify(rows.reverse())),
+            Bucket: 'mapbox',
+            Key: 'mapbox-gl-native/metrics/binary-size/data.json',
+            ACL: 'public-read',
+            CacheControl: 'max-age=300',
+            ContentEncoding: 'gzip',
+            ContentType: 'application/json'
+        }).promise();
+        // Uploads to data source used by Mapbox internal metrics dashboards
+        var secondPromise = new AWS.S3({region: 'us-east-1'}).putObject({
+            Body: zlib.gzipSync(sizeCheckInfo.join('\n')),
+            Bucket: 'mapbox-loading-dock',
+            Key: `raw/mobile.binarysize/${date.substring(0,10)}/mapbox-maps-ios-android-${process.env['CIRCLE_SHA1']}.json.gz`,
+            CacheControl: 'max-age=300',
+            ContentEncoding: 'gzip',
+            ContentType: 'application/json'
+        }).promise();
+        
+        return Promise.all([firstPromise, secondPromise]).then(data => {
+          return console.log("Successfully uploaded all binary size metrics to S3");
+        }).catch(err => {
+          console.log("Error uploading binary size metrics to S3 " + err.message);
+          return err;
+        });
+      });
+});
+
+  

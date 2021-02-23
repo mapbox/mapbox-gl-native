@@ -1,0 +1,10 @@
+deb http://fi.archive.ubuntu.com/ubuntu/ eoan main restricted
+deb http://fi.archive.ubuntu.com/ubuntu/ eoan-updates main restricted
+deb http://fi.archive.ubuntu.com/ubuntu/ eoan universe
+deb http://fi.archive.ubuntu.com/ubuntu/ eoan-updates universe
+deb http://fi.archive.ubuntu.com/ubuntu/ eoan multiverse
+deb http://fi.archive.ubuntu.com/ubuntu/ eoan-updates multiverse
+deb http://fi.archive.ubuntu.com/ubuntu/ eoan-backports main restricted universe multiverse
+deb http://security.ubuntu.com/ubuntu/ eoan-security main restricted
+deb http://security.ubuntu.com/ubuntu/ eoan-security universe
+deb http://security.ubuntu.com/ubuntu/ eoan-security multiverse

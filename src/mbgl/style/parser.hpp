@@ -52,7 +52,6 @@ private:
     void parseLayers(const JSValue&);
     void parseLayer(const std::string& id, const JSValue&, std::unique_ptr<Layer>&);
 
-    std::unordered_map<std::string, const Source*> sourcesMap;
     std::unordered_map<std::string, std::pair<const JSValue&, std::unique_ptr<Layer>>> layersMap;
 
     // Store a stack of layer IDs we're parsing right now. This is to prevent reference cycles.

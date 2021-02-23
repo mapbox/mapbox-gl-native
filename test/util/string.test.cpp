@@ -21,9 +21,9 @@ TEST(ToString, FloatingPoint) {
 
 TEST(ToHex, SIZE_T) {
 #if INTPTR_MAX == INT32_MAX
-    EXPECT_EQ("a715b247", util::toHex((size_t)0xa715b247));
+    EXPECT_EQ("a715b247", util::toHex((uint32_t)0xa715b247));
 #elif INTPTR_MAX == INT64_MAX
-    EXPECT_EQ("a715b247df38cc29", util::toHex((size_t)0xa715b247df38cc29));
+    EXPECT_EQ("a715b247df38cc29", util::toHex((uint64_t)0xa715b247df38cc29));
 #endif
 
 }

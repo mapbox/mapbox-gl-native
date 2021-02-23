@@ -1,3 +1,4 @@
+#include <cstdint>
 #include <mbgl/util/convert.hpp>
 
 namespace mbgl {

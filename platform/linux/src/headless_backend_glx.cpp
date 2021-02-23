@@ -7,6 +7,7 @@
 #include <GL/glx.h>
 
 namespace mbgl {
+namespace gl {
 
 // This class provides a singleton that contains information about the configuration used for
 // instantiating new headless rendering contexts.
@@ -16,7 +17,7 @@ private:
     struct Key { explicit Key() = default; };
 
 public:
-    GLXDisplayConfig(Key) {
+    explicit GLXDisplayConfig(Key) {
         if (!XInitThreads()) {
             throw std::runtime_error("Failed to XInitThreads.");
         }
@@ -70,7 +71,7 @@ public:
     GLXFBConfig* fbConfigs = nullptr;
 };
 
-class GLXBackendImpl : public HeadlessBackend::Impl {
+class GLXBackendImpl final : public HeadlessBackend::Impl {
 public:
     GLXBackendImpl() {
         // Try to create a legacy context.
@@ -127,4 +128,5 @@ void HeadlessBackend::createImpl() {
     impl = std::make_unique<GLXBackendImpl>();
 }
 
+} // namespace gl
 } // namespace mbgl
