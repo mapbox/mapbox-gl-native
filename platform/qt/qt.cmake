@@ -145,8 +145,9 @@ target_include_directories(
 )
 
 target_include_directories(
-    qmapboxgl
-    PUBLIC ${PROJECT_SOURCE_DIR}/platform/qt/include
+    qmapboxgl PUBLIC
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/platform/qt/include>
+    $<INSTALL_INTERFACE:include>
 )
 
 target_compile_definitions(
@@ -172,7 +173,8 @@ install(
 
 install(
     TARGETS qmapboxgl
-    LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}" COMPONENT shared NAMELINK_SKIP
+    EXPORT QMapboxGLTargets
+    LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}" COMPONENT shared
     ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}" COMPONENT development
 )
 
@@ -185,6 +187,34 @@ install(
     DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/qt5"
     COMPONENT development
 )
+
+set_target_properties(qmapboxgl PROPERTIES
+	EXPORT_NAME QMapboxGL
+	SOVERSION ${PROJECT_VERSION_MAJOR}
+	VERSION ${PROJECT_VERSION})
+
+include(CMakePackageConfigHelpers)
+set(CMAKECONFIG_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR}/cmake/qmapboxgl/)
+
+configure_package_config_file(
+	"platform/qt/QMapboxGLConfig.cmake.in"
+	"${CMAKE_CURRENT_BINARY_DIR}/QMapboxGLConfig.cmake"
+	INSTALL_DESTINATION ${CMAKECONFIG_INSTALL_DIR}
+	PATH_VARS CMAKE_INSTALL_PREFIX CMAKE_INSTALL_INCLUDEDIR
+	CMAKE_INSTALL_LIBDIR NO_CHECK_REQUIRED_COMPONENTS_MACRO)
+write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/QMapboxGLConfigVersion.cmake
+	VERSION ${qmapboxgl_VERSION}
+	COMPATIBILITY AnyNewerVersion)
+
+install(EXPORT QMapboxGLTargets
+	DESTINATION ${CMAKECONFIG_INSTALL_DIR}
+	COMPONENT development)
+
+install(FILES
+	"${CMAKE_CURRENT_BINARY_DIR}/QMapboxGLConfig.cmake"
+	"${CMAKE_CURRENT_BINARY_DIR}/QMapboxGLConfigVersion.cmake"
+	DESTINATION ${CMAKECONFIG_INSTALL_DIR}
+	COMPONENT development)
 
 # stop here if only library is requested
 if(MBGL_WITH_QT_LIB_ONLY)
