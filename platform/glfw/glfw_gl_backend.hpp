@@ -17,16 +17,14 @@ public:
     void swap();
 
     // GLFWRendererBackend implementation
-public:
-    mbgl::gfx::RendererBackend& getRendererBackend() override {
+    auto getRendererBackend() -> mbgl::gfx::RendererBackend& override {
         return *this;
     }
-    mbgl::Size getSize() const override;
+    auto getSize() const -> mbgl::Size override;
     void setSize(mbgl::Size) override;
 
     // mbgl::gfx::RendererBackend implementation
-public:
-    mbgl::gfx::Renderable& getDefaultRenderable() override {
+    auto getDefaultRenderable() -> mbgl::gfx::Renderable& override {
         return *this;
     }
 
@@ -35,8 +33,7 @@ protected:
     void deactivate() override;
 
     // mbgl::gl::RendererBackend implementation
-protected:
-    mbgl::gl::ProcAddress getExtensionFunctionPointer(const char*) override;
+    auto getExtensionFunctionPointer(const char*) -> mbgl::gl::ProcAddress override;
     void updateAssumedState() override;
 
 private:

@@ -15,14 +15,14 @@ public:
     TestWriter();
     ~TestWriter();
 
-    TestWriter& withCameraOptions(const mbgl::CameraOptions&);
-    TestWriter& withStyle(const mbgl::style::Style&);
-    TestWriter& withInitialSize(const mbgl::Size&);
+    auto withCameraOptions(const mbgl::CameraOptions&) -> TestWriter&;
+    auto withStyle(const mbgl::style::Style&) -> TestWriter&;
+    auto withInitialSize(const mbgl::Size&) -> TestWriter&;
 
-    bool write(const std::string& dir) const;
+    auto write(const std::string& dir) const -> bool;
 
 private:
-    std::string serialize() const;
+    auto serialize() const -> std::string;
 
     std::vector<std::unique_ptr<TestOperationSerializer>> operations;
     std::unique_ptr<TestOperationSerializer> initialSize;

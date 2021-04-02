@@ -3,6 +3,15 @@ find_package(PkgConfig REQUIRED)
 
 pkg_search_module(GLFW glfw3 REQUIRED)
 
+# build glfw3 with GLFW_USE_WAYLAND=ON
+if(CMAKE_SYSTEM_NAME STREQUAL Linux)
+    pkg_check_modules(WAYLAND
+            wayland-client>=0.2.7
+            wayland-cursor>=0.2.7
+            wayland-egl>=0.2.7
+            xkbcommon)
+endif()
+
 add_executable(
     mbgl-glfw
     ${PROJECT_SOURCE_DIR}/platform/glfw/main.cpp
@@ -53,12 +62,27 @@ target_link_libraries(
         Mapbox::Map
         mbgl-compiler-options
         Mapbox::Base::cheap-ruler-cpp
+        ${WAYLAND_LINK_LIBRARIES}
 )
 
 if(MBGL_WITH_OPENGL)
     target_link_libraries(
         mbgl-glfw
         PRIVATE OpenGL::GL
+    )
+endif()
+
+if(MBGL_WITH_GLES2)
+    target_compile_definitions(
+        mbgl-glfw
+        PRIVATE MBGL_WITH_EGL
+    )
+endif()
+
+if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+    target_compile_definitions(
+        mbgl-glfw
+        PRIVATE DEBUG
     )
 endif()
 

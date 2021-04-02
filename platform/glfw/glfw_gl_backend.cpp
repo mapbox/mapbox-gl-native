@@ -52,7 +52,7 @@ void GLFWGLBackend::deactivate() {
     glfwMakeContextCurrent(nullptr);
 }
 
-mbgl::gl::ProcAddress GLFWGLBackend::getExtensionFunctionPointer(const char* name) {
+auto GLFWGLBackend::getExtensionFunctionPointer(const char* name) -> mbgl::gl::ProcAddress {
     return glfwGetProcAddress(name);
 }
 
@@ -61,7 +61,7 @@ void GLFWGLBackend::updateAssumedState() {
     setViewport(0, 0, size);
 }
 
-mbgl::Size GLFWGLBackend::getSize() const {
+auto GLFWGLBackend::getSize() const -> mbgl::Size {
     return size;
 }
 
@@ -77,8 +77,8 @@ namespace mbgl {
 namespace gfx {
 
 template <>
-std::unique_ptr<GLFWBackend>
-Backend::Create<mbgl::gfx::Backend::Type::OpenGL>(GLFWwindow* window, bool capFrameRate) {
+auto
+Backend::Create<mbgl::gfx::Backend::Type::OpenGL>(GLFWwindow* window, bool capFrameRate) -> std::unique_ptr<GLFWBackend> {
     return std::make_unique<GLFWGLBackend>(window, capFrameRate);
 }
 

@@ -41,7 +41,7 @@ void GLFWRendererFrontend::render() {
     renderer->render(updateParameters_);
 }
 
-mbgl::Renderer* GLFWRendererFrontend::getRenderer() {
+auto GLFWRendererFrontend::getRenderer() -> mbgl::Renderer* {
     assert(renderer);
     return renderer.get();
 }

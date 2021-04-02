@@ -9,17 +9,13 @@
 #include <mbgl/style/style.hpp>
 #include <mbgl/util/default_styles.hpp>
 #include <mbgl/util/logging.hpp>
-#include <mbgl/util/platform.hpp>
 #include <mbgl/util/string.hpp>
 
 #include <args.hxx>
 
 #include <csignal>
-#include <fstream>
 #include <iostream>
 #include <cstdlib>
-#include <cstdio>
-#include <array>
 
 namespace {
 
@@ -36,7 +32,7 @@ void quit_handler(int) {
     }
 }
 
-int main(int argc, char *argv[]) {
+auto main(int argc, char *argv[]) -> int {
     args::ArgumentParser argumentParser("Mapbox GL GLFW example");
     args::HelpFlag helpFlag(argumentParser, "help", "Display this help menu", {'h', "help"});
 
@@ -79,8 +75,8 @@ int main(int argc, char *argv[]) {
     if (bearingValue) settings.bearing = args::get(bearingValue);
     if (pitchValue) settings.pitch = args::get(pitchValue);
 
-    const bool fullscreen = fullscreenFlag ? args::get(fullscreenFlag) : false;
-    const bool benchmark = benchmarkFlag ? args::get(benchmarkFlag) : false;
+    const bool fullscreen = fullscreenFlag && args::get(fullscreenFlag);
+    const bool benchmark = benchmarkFlag && args::get(benchmarkFlag);
     std::string style = styleValue ? args::get(styleValue) : "";
     const std::string cacheDB = cacheDBValue ? args::get(cacheDBValue) : "/tmp/mbgl-cache.db";
 

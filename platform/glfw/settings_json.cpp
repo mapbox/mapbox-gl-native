@@ -18,7 +18,7 @@ void Settings_JSON::load() {
     }
 }
 
-void Settings_JSON::save() {
+void Settings_JSON::save() const {
     std::ofstream file("/tmp/mbgl-native.cfg");
     if (file) {
         file << longitude << std::endl;

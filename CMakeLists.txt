@@ -22,6 +22,11 @@ option(MBGL_WITH_SANITIZER "Use [address|thread|undefined] here" OFF)
 option(MBGL_WITH_RTTI "Compile with runtime type information" OFF)
 option(MBGL_WITH_OPENGL "Build with OpenGL renderer" ON)
 option(MBGL_WITH_WERROR "Make all compilation warnings errors" ON)
+option(MBGL_WITH_GLES2 "Build with GLES2" OFF)
+
+if(MBGL_WITH_GLES2)
+    add_compile_definitions(MBGL_USE_GLES2)
+endif()
 
 add_library(
     mbgl-compiler-options INTERFACE
@@ -57,6 +62,7 @@ target_compile_options(
         $<$<CXX_COMPILER_ID:GNU>:-Wno-error=maybe-uninitialized>
         $<$<CXX_COMPILER_ID:GNU>:-Wno-error=return-type>
         $<$<CXX_COMPILER_ID:GNU>:-Wno-error=unknown-pragmas>
+        $<$<CXX_COMPILER_ID:GNU>:-Wno-error=type-limits>
         $<$<CXX_COMPILER_ID:AppleClang>:-Wno-error=deprecated-declarations>
         $<$<CXX_COMPILER_ID:AppleClang>:-Wno-error=unused-parameter>
         $<$<CXX_COMPILER_ID:AppleClang>:-Wno-error=unused-property-ivar>

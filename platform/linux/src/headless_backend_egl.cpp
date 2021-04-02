@@ -24,7 +24,9 @@ public:
             throw std::runtime_error("Failed to obtain a valid EGL display.\n");
         }
 
-        EGLint major, minor, numConfigs;
+        EGLint major;
+        EGLint minor;
+        EGLint numConfigs;
         if (!eglInitialize(display, &major, &minor)) {
             throw std::runtime_error("eglInitialize() failed.\n");
         }
@@ -54,7 +56,7 @@ public:
         eglTerminate(display);
     }
 
-    static std::shared_ptr<const EGLDisplayConfig> create() {
+    static auto create() -> std::shared_ptr<const EGLDisplayConfig> {
         static std::weak_ptr<const EGLDisplayConfig> instance;
         auto shared = instance.lock();
         if (!shared) {
@@ -63,9 +65,8 @@ public:
         return shared;
     }
 
-public:
     EGLDisplay display = EGL_NO_DISPLAY;
-    EGLConfig config = 0;
+    EGLConfig config = nullptr;
 };
 
 class EGLBackendImpl : public HeadlessBackend::Impl {
@@ -116,9 +117,7 @@ public:
         }
     }
 
-    gl::ProcAddress getExtensionFunctionPointer(const char* name) final {
-        return eglGetProcAddress(name);
-    }
+    auto getExtensionFunctionPointer(const char* name) -> gl::ProcAddress final;
 
     void activateContext() final {
         if (!eglMakeCurrent(eglDisplay->display, eglSurface, eglSurface, eglContext)) {
@@ -137,6 +136,10 @@ private:
     EGLContext eglContext = EGL_NO_CONTEXT;
     EGLSurface eglSurface = EGL_NO_SURFACE;
 };
+
+auto EGLBackendImpl::getExtensionFunctionPointer(const char* name) -> gl::ProcAddress {
+    return eglGetProcAddress(name);
+}
 
 void HeadlessBackend::createImpl() {
     assert(!impl);

@@ -1,3 +1,6 @@
+
+option(MBGL_WITH_GLX "Build with OpenGLX" OFF)
+
 find_package(CURL REQUIRED)
 find_package(ICU OPTIONAL_COMPONENTS i18n)
 find_package(ICU OPTIONAL_COMPONENTS uc)
@@ -5,7 +8,7 @@ find_package(JPEG REQUIRED)
 find_package(OpenGL REQUIRED GLX)
 find_package(PNG REQUIRED)
 find_package(PkgConfig REQUIRED)
-find_package(X11 REQUIRED)
+find_package(Threads REQUIRED)
 
 pkg_search_module(LIBUV libuv REQUIRED)
 
@@ -49,8 +52,24 @@ target_sources(
         ${PROJECT_SOURCE_DIR}/platform/default/src/mbgl/util/timer.cpp
         ${PROJECT_SOURCE_DIR}/platform/default/src/mbgl/util/utf.cpp
         ${PROJECT_SOURCE_DIR}/platform/linux/src/gl_functions.cpp
-        ${PROJECT_SOURCE_DIR}/platform/linux/src/headless_backend_glx.cpp
 )
+
+if (MBGL_WITH_GLX)
+    find_package(OpenGL REQUIRED GLX)
+    find_package(X11 REQUIRED)
+    target_sources(
+            mbgl-core
+            PRIVATE
+            ${PROJECT_SOURCE_DIR}/platform/linux/src/headless_backend_glx.cpp
+    )
+elseif (MBGL_WITH_GLES2)
+    pkg_check_modules(EGL REQUIRED egl glesv2)
+    target_sources(
+            mbgl-core
+            PRIVATE
+            ${PROJECT_SOURCE_DIR}/platform/linux/src/headless_backend_egl.cpp
+    )
+endif ()
 
 # FIXME: Should not be needed, but now needed by node because of the headless frontend.
 target_include_directories(
@@ -60,6 +79,7 @@ target_include_directories(
         ${CURL_INCLUDE_DIRS}
         ${JPEG_INCLUDE_DIRS}
         ${LIBUV_INCLUDE_DIRS}
+        ${EGL_INCLUDE_DIRS}
         ${X11_INCLUDE_DIRS}
 )
 
@@ -87,14 +107,22 @@ target_link_libraries(
         ${JPEG_LIBRARIES}
         ${LIBUV_LIBRARIES}
         ${X11_LIBRARIES}
+        ${EGL_LIBRARIES}
         $<$<NOT:$<BOOL:${MBGL_USE_BUILTIN_ICU}>>:ICU::i18n>
         $<$<NOT:$<BOOL:${MBGL_USE_BUILTIN_ICU}>>:ICU::uc>
         $<$<BOOL:${MBGL_USE_BUILTIN_ICU}>:mbgl-vendor-icu>
-        OpenGL::GLX
+        Threads::Threads
         PNG::PNG
         mbgl-vendor-nunicode
         mbgl-vendor-sqlite
 )
+if(MBGL_WITH_GLX)
+    target_link_libraries(
+            mbgl-core
+            PRIVATE
+            OpenGL::GLX
+    )
+endif()
 
 add_subdirectory(${PROJECT_SOURCE_DIR}/bin)
 add_subdirectory(${PROJECT_SOURCE_DIR}/expression-test)
