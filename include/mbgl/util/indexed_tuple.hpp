@@ -30,12 +30,12 @@ public:
 
     template <class I>
     auto& get() {
-        return std::get<TypeIndex<I, Is...>::value, Ts...>(*this);
+        return std::get<TypeIndex<I, Is...>::value>(*this);
     }
 
     template <class I>
     const auto& get() const {
-        return std::get<TypeIndex<I, Is...>::value, Ts...>(*this);
+        return std::get<TypeIndex<I, Is...>::value>(*this);
     }
 
     template <class... Us>
