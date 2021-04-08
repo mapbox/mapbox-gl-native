@@ -191,8 +191,7 @@ workflows:
 executors:
   ubuntu-eoan:
     docker:
-      # FIXME: Move the image to mbgl/
-      - image: tmpsantos/mbgl_ci:1.9
+      - image: mbxci/gl-native:db227b323be5dbe284b4cc2a875e63b7e81e0b15
     resource_class: xlarge
     working_directory: /src
     environment:
