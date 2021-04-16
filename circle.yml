@@ -337,10 +337,6 @@ commands:
         command: |
           cd build
           find . -type f -iname *.gcda -exec gcov -p -b {} \;
-    - run:
-        name: Upload coverage results to codecov.io
-        command: |
-          bash <(curl -sSfL https://codecov.io/bash) -X gcov || echo 'Codecov failed to upload'
   publish-coverage-metrics:
     steps:
     - run:
