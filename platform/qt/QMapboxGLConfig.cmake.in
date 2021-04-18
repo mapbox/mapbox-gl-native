@@ -1,0 +1,12 @@
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+find_dependency(Qt5Gui @REQUIRED_QT_VERSION@)
+find_dependency(Qt5Network @REQUIRED_QT_VERSION@)
+
+if(@MBGL_WITH_QT_HEADLESS@ OR NOT @MBGL_WITH_QT_LIB_ONLY@)
+	find_dependency(Qt5OpenGL @REQUIRED_QT_VERSION@)
+endif()
+
+include("${CMAKE_CURRENT_LIST_DIR}/QMapboxGLTargets.cmake")
+@PACKAGE_INCLUDE_QCHTARGETS@

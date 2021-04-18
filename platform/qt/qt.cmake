@@ -1,9 +1,16 @@
 # Note: Using Sqlite instead of QSqlDatabase for better compatibility.
 
+option(MBGL_WITH_QT_LIB_ONLY "Build only qmapboxgl library" OFF)
+option(MBGL_WITH_QT_HEADLESS "Build Mapbox GL Qt with headless support" ON)
+
+include(GNUInstallDirs)
 find_package(Qt5Gui REQUIRED)
 find_package(Qt5Network REQUIRED)
-find_package(Qt5OpenGL REQUIRED)
-find_package(Qt5Widgets REQUIRED)
+
+if(MBGL_WITH_QT_HEADLESS OR NOT MBGL_WITH_QT_LIB_ONLY)
+    find_package(Qt5OpenGL REQUIRED)
+    find_package(Qt5Widgets REQUIRED)
+endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     add_definitions("-DQT_COMPILING_QIMAGE_COMPAT_CPP")
@@ -50,7 +57,6 @@ target_sources(
         ${PROJECT_SOURCE_DIR}/platform/qt/src/async_task_impl.hpp
         ${PROJECT_SOURCE_DIR}/platform/qt/src/number_format.cpp
         ${PROJECT_SOURCE_DIR}/platform/qt/src/gl_functions.cpp
-        ${PROJECT_SOURCE_DIR}/platform/qt/src/headless_backend_qt.cpp
         $<$<BOOL:${MBGL_PUBLIC_BUILD}>:${PROJECT_SOURCE_DIR}/platform/qt/src/http_file_source.cpp>
         $<$<BOOL:${MBGL_PUBLIC_BUILD}>:${PROJECT_SOURCE_DIR}/platform/qt/src/http_file_source.hpp>
         $<$<BOOL:${MBGL_PUBLIC_BUILD}>:${PROJECT_SOURCE_DIR}/platform/qt/src/http_request.cpp>
@@ -67,6 +73,15 @@ target_sources(
         ${PROJECT_SOURCE_DIR}/platform/qt/src/timer_impl.hpp
         ${PROJECT_SOURCE_DIR}/platform/qt/src/utf.cpp
 )
+
+if(MBGL_WITH_QT_HEADLESS OR NOT MBGL_WITH_QT_LIB_ONLY)
+    target_sources(
+        mbgl-core
+        PRIVATE
+            ${PROJECT_SOURCE_DIR}/platform/qt/src/headless_backend_qt.cpp
+    )
+endif()
+
 
 target_compile_definitions(
     mbgl-core
@@ -91,10 +106,17 @@ target_link_libraries(
         Qt5::Core
         Qt5::Gui
         Qt5::Network
-        Qt5::OpenGL
         mbgl-vendor-nunicode
         mbgl-vendor-sqlite
 )
+
+if(MBGL_WITH_QT_HEADLESS)
+    target_link_libraries(
+        mbgl-core
+        PRIVATE
+            Qt5::OpenGL
+    )
+endif()
 
 add_library(
     qmapboxgl SHARED
@@ -123,8 +145,9 @@ target_include_directories(
 )
 
 target_include_directories(
-    qmapboxgl
-    PUBLIC ${PROJECT_SOURCE_DIR}/platform/qt/include
+    qmapboxgl PUBLIC
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/platform/qt/include>
+    $<INSTALL_INTERFACE:include>
 )
 
 target_compile_definitions(
@@ -140,6 +163,63 @@ target_link_libraries(
         mbgl-compiler-options
         mbgl-core
 )
+
+# install library and headers
+install(
+    DIRECTORY include/mbgl
+    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+    COMPONENT development
+)
+
+install(
+    TARGETS qmapboxgl
+    EXPORT QMapboxGLTargets
+    LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}" COMPONENT shared
+    ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}" COMPONENT development
+)
+
+install(
+    FILES
+        platform/qt/include/QMapbox
+        platform/qt/include/QMapboxGL
+        platform/qt/include/qmapbox.hpp
+        platform/qt/include/qmapboxgl.hpp
+    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/qt5"
+    COMPONENT development
+)
+
+set_target_properties(qmapboxgl PROPERTIES
+	EXPORT_NAME QMapboxGL
+	SOVERSION ${PROJECT_VERSION_MAJOR}
+	VERSION ${PROJECT_VERSION})
+
+include(CMakePackageConfigHelpers)
+set(CMAKECONFIG_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR}/cmake/qmapboxgl/)
+
+configure_package_config_file(
+	"platform/qt/QMapboxGLConfig.cmake.in"
+	"${CMAKE_CURRENT_BINARY_DIR}/QMapboxGLConfig.cmake"
+	INSTALL_DESTINATION ${CMAKECONFIG_INSTALL_DIR}
+	PATH_VARS CMAKE_INSTALL_PREFIX CMAKE_INSTALL_INCLUDEDIR
+	CMAKE_INSTALL_LIBDIR NO_CHECK_REQUIRED_COMPONENTS_MACRO)
+write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/QMapboxGLConfigVersion.cmake
+	VERSION ${qmapboxgl_VERSION}
+	COMPATIBILITY AnyNewerVersion)
+
+install(EXPORT QMapboxGLTargets
+	DESTINATION ${CMAKECONFIG_INSTALL_DIR}
+	COMPONENT development)
+
+install(FILES
+	"${CMAKE_CURRENT_BINARY_DIR}/QMapboxGLConfig.cmake"
+	"${CMAKE_CURRENT_BINARY_DIR}/QMapboxGLConfigVersion.cmake"
+	DESTINATION ${CMAKECONFIG_INSTALL_DIR}
+	COMPONENT development)
+
+# stop here if only library is requested
+if(MBGL_WITH_QT_LIB_ONLY)
+    return()
+endif()
 
 add_executable(
     mbgl-qt

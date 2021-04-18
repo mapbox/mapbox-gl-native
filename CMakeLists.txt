@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10 FATAL_ERROR)
-project("Mapbox GL Native" LANGUAGES CXX C)
+project("Mapbox GL Native" LANGUAGES CXX C VERSION 1.6.0)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER Core)
