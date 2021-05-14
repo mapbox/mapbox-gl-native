@@ -3,6 +3,7 @@
 #include <string>
 #include <cstdlib>
 #include <type_traits>
+#include <exception>
 
 // Polyfill needed by Qt when building for Android with GCC
 #if defined(__ANDROID__) && defined(__GLIBCXX__)
