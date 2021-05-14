@@ -973,6 +973,8 @@ include(${PROJECT_SOURCE_DIR}/vendor/unique_resource.cmake)
 include(${PROJECT_SOURCE_DIR}/vendor/vector-tile.cmake)
 include(${PROJECT_SOURCE_DIR}/vendor/wagyu.cmake)
 
+find_package(Threads REQUIRED)
+
 target_link_libraries(
     mbgl-core
     PRIVATE
@@ -992,6 +994,7 @@ target_link_libraries(
         mbgl-vendor-unique_resource
         mbgl-vendor-vector-tile
         mbgl-vendor-wagyu
+        Threads::Threads
     PUBLIC
         Mapbox::Base
         Mapbox::Base::Extras::expected-lite
