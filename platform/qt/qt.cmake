@@ -1,9 +1,9 @@
 # Note: Using Sqlite instead of QSqlDatabase for better compatibility.
 
-find_package(Qt5Gui REQUIRED)
-find_package(Qt5Network REQUIRED)
-find_package(Qt5OpenGL REQUIRED)
-find_package(Qt5Widgets REQUIRED)
+find_package(Qt6Gui REQUIRED)
+find_package(Qt6Network REQUIRED)
+find_package(Qt6OpenGL REQUIRED)
+find_package(Qt6Widgets REQUIRED)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     add_definitions("-DQT_COMPILING_QIMAGE_COMPAT_CPP")
@@ -88,10 +88,10 @@ target_link_libraries(
     PRIVATE
         $<$<NOT:$<PLATFORM_ID:Windows>>:z>
         $<$<NOT:$<PLATFORM_ID:Windows>>:mbgl-vendor-icu>
-        Qt5::Core
-        Qt5::Gui
-        Qt5::Network
-        Qt5::OpenGL
+        Qt6::Core
+        Qt6::Gui
+        Qt6::Network
+        Qt6::OpenGL
         mbgl-vendor-nunicode
         mbgl-vendor-sqlite
 )
@@ -135,8 +135,8 @@ target_compile_definitions(
 target_link_libraries(
     qmapboxgl
     PRIVATE
-        Qt5::Core
-        Qt5::Gui
+        Qt6::Core
+        Qt6::Gui
         mbgl-compiler-options
         mbgl-core
 )
@@ -155,8 +155,8 @@ set_property(TARGET mbgl-qt PROPERTY CXX_STANDARD 98)
 target_link_libraries(
     mbgl-qt
     PRIVATE
-        Qt5::Widgets
-        Qt5::Gui
+        Qt6::Widgets
+        Qt6::Gui
         mbgl-compiler-options
         qmapboxgl
 )
@@ -179,8 +179,8 @@ target_compile_definitions(
 target_link_libraries(
     mbgl-test-runner
     PRIVATE
-        Qt5::Gui
-        Qt5::OpenGL
+        Qt6::Gui
+        Qt6::OpenGL
         mbgl-compiler-options
         pthread
 )

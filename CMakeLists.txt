@@ -86,7 +86,7 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
 
 if(MBGL_WITH_QT)
-    find_package(Qt5Core REQUIRED)
+    find_package(Qt6Core REQUIRED)
     set(CMAKE_AUTOMOC ON)
     set(CMAKE_AUTORCC ON)
 endif()
