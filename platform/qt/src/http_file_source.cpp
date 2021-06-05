@@ -32,7 +32,7 @@ void HTTPFileSource::Impl::request(HTTPRequest* req)
 
     data.first = m_manager->get(networkRequest);
     connect(data.first, SIGNAL(finished()), this, SLOT(onReplyFinished()));
-    connect(data.first, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(onReplyFinished()));
+    connect(data.first, SIGNAL(errorOccurred(QNetworkReply::NetworkError)), this, SLOT(onReplyFinished()));
 }
 
 void HTTPFileSource::Impl::cancel(HTTPRequest* req)
