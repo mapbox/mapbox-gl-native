@@ -1,6 +1,6 @@
 #include <mbgl/gl/headless_backend.hpp>
 
-#include <QOpenGLWidget>
+#include <QOffscreenSurface>
 #include <QOpenGLContext>
 
 #include <cassert>
@@ -10,6 +10,12 @@ namespace gl {
 
 class QtBackendImpl final : public HeadlessBackend::Impl {
 public:
+    QtBackendImpl() {
+        // QtBackendImpl must be created in the main/GUI thread on platforms
+        // that have a QWindow-based QOffscreenSurface.
+        surface.create();
+        context.create();
+    }
     ~QtBackendImpl() = default;
 
     gl::ProcAddress getExtensionFunctionPointer(const char* name) {
@@ -18,15 +24,16 @@ public:
     }
 
     void activateContext() {
-        widget.makeCurrent();
+        context.makeCurrent(&surface);
     }
 
     void deactivateContext() {
-        widget.doneCurrent();
+        context.doneCurrent();
     }
 
 private:
-    QOpenGLWidget widget;
+    QOpenGLContext context;
+    QOffscreenSurface surface;
 };
 
 void HeadlessBackend::createImpl() {
