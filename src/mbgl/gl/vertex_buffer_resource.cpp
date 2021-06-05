@@ -4,7 +4,7 @@
 namespace mbgl {
 namespace gl {
 
-VertexBufferResource::~VertexBufferResource() {
+VertexBufferResource::~VertexBufferResource() noexcept {
     auto& stats = buffer.get_deleter().context.renderingStats();
     stats.memVertexBuffers -= byteSize;
     assert(stats.memVertexBuffers >= 0);

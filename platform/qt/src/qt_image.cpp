@@ -45,8 +45,8 @@ PremultipliedImage decodeImage(const std::string& string) {
         throw std::runtime_error("Unsupported image type");
     }
 
-    auto img = std::make_unique<uint8_t[]>(image.byteCount());
-    memcpy(img.get(), image.constBits(), image.byteCount());
+    auto img = std::make_unique<uint8_t[]>(image.sizeInBytes());
+    memcpy(img.get(), image.constBits(), image.sizeInBytes());
 
     return { { static_cast<uint32_t>(image.width()), static_cast<uint32_t>(image.height()) },
              std::move(img) };

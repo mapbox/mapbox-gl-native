@@ -15,6 +15,8 @@ public:
         assert(!size.isEmpty());
     }
 
+    ~OffscreenTextureResource() noexcept override = default;
+
     void bind() override {
         if (!framebuffer) {
             assert(!texture);

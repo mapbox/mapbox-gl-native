@@ -4,7 +4,7 @@
 namespace mbgl {
 namespace gl {
 
-IndexBufferResource::~IndexBufferResource() {
+IndexBufferResource::~IndexBufferResource() noexcept {
     auto& stats = buffer.get_deleter().context.renderingStats();
     stats.memIndexBuffers -= byteSize;
     assert(stats.memIndexBuffers >= 0);

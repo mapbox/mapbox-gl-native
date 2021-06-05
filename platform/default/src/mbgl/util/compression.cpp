@@ -10,8 +10,14 @@
 #include <cstring>
 #include <stdexcept>
 
+#if defined(__GNUC__)
+#define MBGL_UNUSED __attribute__((unused))
+#else
+#define MBGL_UNUSED
+#endif
+
 // Check zlib library version.
-const static bool zlibVersionCheck __attribute__((unused)) = []() {
+const static bool zlibVersionCheck MBGL_UNUSED = []() {
     const char *const version = zlibVersion();
     if (version[0] != ZLIB_VERSION[0]) {
         char message[96];

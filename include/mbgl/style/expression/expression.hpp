@@ -78,6 +78,9 @@ public:
     
     Result() = default;
 
+    template <typename U>
+    VARIANT_INLINE Result(U&& val) : variant<EvaluationError, T>(val) {}
+    
     explicit operator bool () const {
         return this->template is<T>();
     }

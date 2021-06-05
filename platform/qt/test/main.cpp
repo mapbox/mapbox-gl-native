@@ -1,10 +1,15 @@
 #include <QApplication>
 
 #include <mbgl/test.hpp>
-#include <unistd.h>
 #include <cstring>
 #include <cerrno>
 #include <cstdio>
+
+#if defined(_MSC_VER) && !defined(__clang__)
+#include <direct.h>
+#else
+#include <unistd.h>
+#endif
 
 #define xstr(s) str(s)
 #define str(s) #s

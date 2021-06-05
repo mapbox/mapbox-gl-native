@@ -34,6 +34,9 @@ using ValueBase = variant<NullValue,
 struct Value : ValueBase {
     using ValueBase::ValueBase;
     
+    template <typename T>
+    VARIANT_INLINE Value(T&& val) : ValueBase(val) {}
+    
     // Javascript's Number.MAX_SAFE_INTEGER
     static uint64_t maxSafeInteger() { return 9007199254740991ULL; }
     

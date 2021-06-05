@@ -33,7 +33,9 @@ target_compile_definitions(
         _REENTRANT
 )
 
-target_compile_options(mbgl-vendor-icu PRIVATE -Wno-error -Wno-shorten-64-to-32)
+if(NOT MSVC)
+    target_compile_options(mbgl-vendor-icu PRIVATE -Wno-error -Wno-shorten-64-to-32)
+endif()
 
 target_include_directories(
     mbgl-vendor-icu SYSTEM

@@ -9,7 +9,7 @@ namespace gl {
 class TextureResource : public gfx::TextureResource {
 public:
     TextureResource(UniqueTexture&& texture_, int byteSize_) : texture(std::move(texture_)), byteSize(byteSize_) {}
-    ~TextureResource() override;
+    ~TextureResource() noexcept override;
 
     static int getStorageSize(const Size& size, gfx::TexturePixelType format, gfx::TextureChannelDataType type);
 

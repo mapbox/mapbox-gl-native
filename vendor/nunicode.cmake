@@ -18,7 +18,9 @@ target_compile_definitions(
     PRIVATE NU_BUILD_STATIC
 )
 
-target_compile_options(mbgl-vendor-nunicode PRIVATE -Wno-error)
+if(NOT MSVC)
+    target_compile_options(mbgl-vendor-nunicode PRIVATE -Wno-error)
+endif()
 
 target_include_directories(
     mbgl-vendor-nunicode SYSTEM

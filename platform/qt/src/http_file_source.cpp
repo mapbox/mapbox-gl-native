@@ -29,7 +29,6 @@ void HTTPFileSource::Impl::request(HTTPRequest* req)
     }
 
     QNetworkRequest networkRequest = req->networkRequest();
-    networkRequest.setAttribute(QNetworkRequest::FollowRedirectsAttribute, true);
 
     data.first = m_manager->get(networkRequest);
     connect(data.first, SIGNAL(finished()), this, SLOT(onReplyFinished()));

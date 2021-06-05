@@ -108,8 +108,8 @@ std::unique_ptr<mbgl::style::Image> toStyleImage(const QString &id, const QImage
         .rgbSwapped()
         .convertToFormat(QImage::Format_ARGB32_Premultiplied);
 
-    auto img = std::make_unique<uint8_t[]>(swapped.byteCount());
-    memcpy(img.get(), swapped.constBits(), swapped.byteCount());
+    auto img = std::make_unique<uint8_t[]>(swapped.sizeInBytes());
+    memcpy(img.get(), swapped.constBits(), swapped.sizeInBytes());
 
     return std::make_unique<mbgl::style::Image>(
         id.toStdString(),

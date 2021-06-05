@@ -1,6 +1,6 @@
 #include <mbgl/gl/headless_backend.hpp>
 
-#include <QGLWidget>
+#include <QOpenGLWidget>
 #include <QOpenGLContext>
 
 #include <cassert>
@@ -26,7 +26,7 @@ public:
     }
 
 private:
-    QGLWidget widget;
+    QOpenGLWidget widget;
 };
 
 void HeadlessBackend::createImpl() {

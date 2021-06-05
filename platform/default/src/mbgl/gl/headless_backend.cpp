@@ -19,6 +19,8 @@ public:
           depthStencil(context.createRenderbuffer<gfx::RenderbufferPixelType::DepthStencil>(size_)),
           framebuffer(context.createFramebuffer(color, depthStencil)) {}
 
+    ~HeadlessRenderableResource() noexcept override = default;
+
     void bind() override {
         context.bindFramebuffer = framebuffer.framebuffer;
         context.scissorTest = false;

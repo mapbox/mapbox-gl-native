@@ -3,9 +3,13 @@
 find_package(Qt6Gui REQUIRED)
 find_package(Qt6Network REQUIRED)
 find_package(Qt6OpenGL REQUIRED)
+find_package(Qt6OpenGLWidgets REQUIRED)
 find_package(Qt6Widgets REQUIRED)
 
-if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+if(MSVC)
+    add_definitions("/DQT_COMPILING_QIMAGE_COMPAT_CPP")
+    add_definitions("/D_USE_MATH_DEFINES")
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     add_definitions("-DQT_COMPILING_QIMAGE_COMPAT_CPP")
     add_definitions("-D_USE_MATH_DEFINES")
     add_definitions("-Wno-deprecated-declarations")
@@ -92,6 +96,7 @@ target_link_libraries(
         Qt6::Gui
         Qt6::Network
         Qt6::OpenGL
+        Qt6::OpenGLWidgets
         mbgl-vendor-nunicode
         mbgl-vendor-sqlite
 )
@@ -157,6 +162,7 @@ target_link_libraries(
     PRIVATE
         Qt6::Widgets
         Qt6::Gui
+        Qt6::OpenGLWidgets
         mbgl-compiler-options
         qmapboxgl
 )
@@ -179,6 +185,7 @@ target_compile_definitions(
 target_link_libraries(
     mbgl-test-runner
     PRIVATE
+        Qt6::Widgets
         Qt6::Gui
         Qt6::OpenGL
         mbgl-compiler-options
