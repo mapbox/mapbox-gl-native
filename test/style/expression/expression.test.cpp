@@ -9,7 +9,10 @@
 
 #include <iostream>
 #include <fstream>
+
+#if !defined(_MSC_VER) || defined(__clang__)
 #include <dirent.h>
+#endif
 
 
 using namespace mbgl;
@@ -79,6 +82,8 @@ TEST_P(ExpressionEqualityTest, ExpressionEquality) {
     EXPECT_TRUE(*expression_a1 != *expression_b);
 }
 
+// TODO: Microsoft Visual Studio complains about lambda in declaration
+#if !defined(_MSC_VER) || defined(__clang__)
 INSTANTIATE_TEST_SUITE_P(Expression, ExpressionEqualityTest, ::testing::ValuesIn([] {
                              std::vector<std::string> names;
                              const std::string ending = ".a.json";
@@ -105,3 +110,4 @@ INSTANTIATE_TEST_SUITE_P(Expression, ExpressionEqualityTest, ::testing::ValuesIn
                              EXPECT_GT(names.size(), 0u);
                              return names;
                          }()));
+#endif

@@ -13,7 +13,9 @@
 #include <fstream>
 #include <set>
 
+#if !defined(_MSC_VER) || defined(__clang__)
 #include <dirent.h>
+#endif
 
 using namespace mbgl;
 
@@ -74,6 +76,8 @@ TEST_P(StyleParserTest, ParseStyle) {
     }
 }
 
+// TODO: Microsoft Visual Studio complains about lambda in declaration
+#if !defined(_MSC_VER) || defined(__clang__)
 INSTANTIATE_TEST_SUITE_P(StyleParser, StyleParserTest, ::testing::ValuesIn([] {
                              std::vector<std::string> names;
                              const std::string ending = ".info.json";
@@ -94,6 +98,7 @@ INSTANTIATE_TEST_SUITE_P(StyleParser, StyleParserTest, ::testing::ValuesIn([] {
                              EXPECT_GT(names.size(), 0u);
                              return names;
                          }()));
+#endif
 
 TEST(StyleParser, FontStacks) {
     style::Parser parser;

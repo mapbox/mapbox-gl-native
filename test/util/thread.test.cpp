@@ -9,6 +9,10 @@
 #include <atomic>
 #include <memory>
 
+#if defined(WIN32)
+#include <Windows.h>
+#endif
+
 using namespace mbgl;
 using namespace mbgl::util;
 
@@ -198,7 +202,11 @@ TEST(Thread, ReferenceCanOutliveThread) {
         worker.invoke(&TestWorker::send, [&] { ADD_FAILURE() << "Should never happen"; });
     }
 
+#if defined(WIN32)
+    Sleep(10);
+#else
     usleep(10000);
+#endif
 }
 
 TEST(Thread, DeletePausedThread) {

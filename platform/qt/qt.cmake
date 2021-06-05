@@ -182,15 +182,26 @@ target_compile_definitions(
     PRIVATE WORK_DIRECTORY=${PROJECT_SOURCE_DIR}
 )
 
-target_link_libraries(
-    mbgl-test-runner
-    PRIVATE
-        Qt6::Widgets
-        Qt6::Gui
-        Qt6::OpenGL
-        mbgl-compiler-options
-        pthread
-)
+if (MSVC)
+    target_link_libraries(
+        mbgl-test-runner
+        PRIVATE
+            Qt6::Widgets
+            Qt6::Gui
+            Qt6::OpenGL
+            mbgl-compiler-options
+    )
+else()
+    target_link_libraries(
+        mbgl-test-runner
+        PRIVATE
+            Qt6::Widgets
+            Qt6::Gui
+            Qt6::OpenGL
+            mbgl-compiler-options
+            pthread
+    )
+endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL Darwin)
     target_link_libraries(
