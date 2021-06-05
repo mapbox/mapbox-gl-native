@@ -208,6 +208,15 @@ if(CMAKE_SYSTEM_NAME STREQUAL Darwin)
         mbgl-test-runner
         PRIVATE -Wl,-force_load mbgl-test
     )
+elseif(MSVC)
+    target_link_options(
+        mbgl-test-runner
+        PRIVATE /WHOLEARCHIVE:../../lib/mbgl-test.lib
+    )
+    target_link_libraries(
+        mbgl-test-runner
+        PRIVATE mbgl-test
+    )
 else()
     target_link_libraries(
         mbgl-test-runner
