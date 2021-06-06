@@ -44,7 +44,7 @@ The Windows build will assume you have installed and on the default path:
 - Microsoft Visual Studio 2015
 - [CMake 3.10.1+](https://cmake.org/download/)
 - [LLVM 5.0.0+](https://releases.llvm.org/download.html)
-- [Qt 5+](https://www.qt.io/download) with "msvc2015" support.
+- [Qt 5.4+](https://www.qt.io/download) with "msvc2015" (or later) support.
 
 At runtime, you will also need installed:
 

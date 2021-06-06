@@ -457,7 +457,12 @@ void MapWindow::wheelEvent(QWheelEvent *ev)
         factor = factor > -1 ? factor : 1 / factor;
     }
 
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
     m_map->scaleBy(1 + factor, ev->position());
+#else
+    m_map->scaleBy(1 + factor, ev->pos());
+#endif
+
     ev->accept();
 }
 
