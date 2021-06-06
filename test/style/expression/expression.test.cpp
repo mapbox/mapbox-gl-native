@@ -10,7 +10,12 @@
 #include <iostream>
 #include <fstream>
 
-#if !defined(_MSC_VER) || defined(__clang__)
+#if defined(_MSC_VER) && !defined(__clang__)
+#include <Windows.h>
+#ifdef GetObject
+#undef GetObject
+#endif
+#else
 #include <dirent.h>
 #endif
 
@@ -82,32 +87,50 @@ TEST_P(ExpressionEqualityTest, ExpressionEquality) {
     EXPECT_TRUE(*expression_a1 != *expression_b);
 }
 
-// TODO: Microsoft Visual Studio complains about lambda in declaration
-#if !defined(_MSC_VER) || defined(__clang__)
+static void populateNames(std::vector<std::string>& names) {
+    const std::string ending = ".a.json";
+
+    std::string style_directory = "test/fixtures/expression_equality";
+
+    auto testName = [&](const std::string& name) {
+        if (name.length() >= ending.length() &&
+            name.compare(name.length() - ending.length(), ending.length(), ending) == 0) {
+            names.push_back(name.substr(0, name.length() - ending.length()));
+        }
+    };
+
+#if defined(_MSC_VER) && !defined(__clang__)
+    style_directory += "/*";
+    WIN32_FIND_DATA ffd;
+    HANDLE hFind = FindFirstFile(style_directory.c_str(), &ffd);
+    if (hFind != INVALID_HANDLE_VALUE) {
+        do {
+            const std::string name = ffd.cFileName;
+            testName(name);
+        } while (FindNextFile(hFind, &ffd) != 0);
+        FindClose(hFind);
+    }
+#else
+    DIR* dir = opendir(style_directory.c_str());
+    if (dir != nullptr) {
+        for (dirent* dp = nullptr; (dp = readdir(dir)) != nullptr;) {
+            const std::string name = dp->d_name;
+#if ANDROID
+            // Android unit test uses number-format stub implementation so skip the tests
+            if (name.find("number-format") != std::string::npos) {
+                continue;
+            }
+#endif
+            testName(name);
+        }
+        closedir(dir);
+    }
+#endif
+}
+
 INSTANTIATE_TEST_SUITE_P(Expression, ExpressionEqualityTest, ::testing::ValuesIn([] {
                              std::vector<std::string> names;
-                             const std::string ending = ".a.json";
-
-                             const std::string style_directory = "test/fixtures/expression_equality";
-                             DIR* dir = opendir(style_directory.c_str());
-                             if (dir != nullptr) {
-                                 for (dirent* dp = nullptr; (dp = readdir(dir)) != nullptr;) {
-                                     const std::string name = dp->d_name;
-#if ANDROID
-                                     // Android unit test uses number-format stub implementation so skip the tests
-                                     if (name.find("number-format") != std::string::npos) {
-                                         continue;
-                                     }
-#endif
-                                     if (name.length() >= ending.length() &&
-                                         name.compare(name.length() - ending.length(), ending.length(), ending) == 0) {
-                                         names.push_back(name.substr(0, name.length() - ending.length()));
-                                     }
-                                 }
-                                 closedir(dir);
-                             }
-
+                             populateNames(names);
                              EXPECT_GT(names.size(), 0u);
                              return names;
                          }()));
-#endif
