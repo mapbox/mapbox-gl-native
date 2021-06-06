@@ -51,13 +51,15 @@ public:
             return fakeRequest->resource.kind == kind;
         });
 
-        if (it != requests.end()) {
+        const bool requestFound = (it != requests.end());
+
+        if (requestFound) {
             // Copy the callback, in case calling it deallocates the AsyncRequest.
             Callback callback_ = (*it)->callback;
             callback_(response);
         }
 
-        return it != requests.end();
+        return requestFound;
     }
 
     std::list<FakeFileRequest*> requests;

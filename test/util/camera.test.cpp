@@ -10,7 +10,7 @@ using namespace mbgl;
 
 static const double abs_double_error = 1e-7;
 
-MATCHER_P(Vec3NearEquals, vec, "") {
+MATCHER_P(Vec3NearEquals1E7, vec, "") {
     return std::fabs(vec[0] - arg[0]) <= abs_double_error && std::fabs(vec[1] - arg[1]) <= abs_double_error &&
            std::fabs(vec[2] - arg[2]) <= abs_double_error;
 }
@@ -20,21 +20,21 @@ TEST(FreeCameraOptions, SetLocation) {
 
     options.setLocation({{0.0, 0.0}, util::EARTH_RADIUS_M * M_PI});
     ASSERT_TRUE(options.position);
-    ASSERT_THAT(options.position.value(), Vec3NearEquals(vec3{{0.5, 0.5, 0.5}}));
+    ASSERT_THAT(options.position.value(), Vec3NearEquals1E7(vec3{{0.5, 0.5, 0.5}}));
 
     options.setLocation({{25.0, -180.0}, 1000.0});
     ASSERT_TRUE(options.position);
-    ASSERT_THAT(options.position.value(), Vec3NearEquals(vec3{{0.0, 0.4282409625, 0.000027532812465}}));
+    ASSERT_THAT(options.position.value(), Vec3NearEquals1E7(vec3{{0.0, 0.4282409625, 0.000027532812465}}));
 
     options.setLocation(
         {{util::LATITUDE_MAX, 0.0}, util::EARTH_RADIUS_M * M_PI * std::cos(util::LATITUDE_MAX * util::DEG2RAD)});
     ASSERT_TRUE(options.position);
-    ASSERT_THAT(options.position.value(), Vec3NearEquals(vec3{{0.5, 0.0, 0.5}}));
+    ASSERT_THAT(options.position.value(), Vec3NearEquals1E7(vec3{{0.5, 0.0, 0.5}}));
 
     options.setLocation(
         {{-util::LATITUDE_MAX, 0.0}, util::EARTH_RADIUS_M * M_PI * std::cos(-util::LATITUDE_MAX * util::DEG2RAD)});
     ASSERT_TRUE(options.position);
-    ASSERT_THAT(options.position.value(), Vec3NearEquals(vec3{{0.5, 1.0, 0.5}}));
+    ASSERT_THAT(options.position.value(), Vec3NearEquals1E7(vec3{{0.5, 1.0, 0.5}}));
 }
 
 TEST(FreeCameraOptions, SetLocationNegativeAltitude) {
@@ -49,7 +49,7 @@ TEST(FreeCameraOptions, SetLocationUnwrappedLocation) {
 
     options.setLocation({{0.0, -540.0}, 0.0});
     ASSERT_TRUE(options.position);
-    ASSERT_THAT(options.position.value(), Vec3NearEquals(vec3{{-1.0, 0.5, 0.0}}));
+    ASSERT_THAT(options.position.value(), Vec3NearEquals1E7(vec3{{-1.0, 0.5, 0.0}}));
 }
 
 TEST(FreeCameraOptions, GetLocation) {
@@ -126,9 +126,9 @@ TEST(FreeCameraOptions, LookAtPoint) {
     ASSERT_TRUE(options.orientation);
     std::tie(right, up, forward) = rotatedFrame(options.orientation.value());
 
-    ASSERT_THAT(right, Vec3NearEquals(vec3{{1.0, 0.0, 0.0}}));
-    ASSERT_THAT(up, Vec3NearEquals(vec3{{0.0, -cosPi4, cosPi4}}));
-    ASSERT_THAT(forward, Vec3NearEquals(vec3{{0.0, -cosPi4, -cosPi4}}));
+    ASSERT_THAT(right, Vec3NearEquals1E7(vec3{{1.0, 0.0, 0.0}}));
+    ASSERT_THAT(up, Vec3NearEquals1E7(vec3{{0.0, -cosPi4, cosPi4}}));
+    ASSERT_THAT(forward, Vec3NearEquals1E7(vec3{{0.0, -cosPi4, -cosPi4}}));
 
     // Look directly to east
     options.position = vec3{{0.5, 0.5, 0.0}};
@@ -136,9 +136,9 @@ TEST(FreeCameraOptions, LookAtPoint) {
     ASSERT_TRUE(options.orientation);
     std::tie(right, up, forward) = rotatedFrame(options.orientation.value());
 
-    ASSERT_THAT(right, Vec3NearEquals(vec3{{0.0, 1.0, 0.0}}));
-    ASSERT_THAT(up, Vec3NearEquals(vec3{{0.0, 0.0, 1.0}}));
-    ASSERT_THAT(forward, Vec3NearEquals(vec3{{1.0, 0.0, 0.0}}));
+    ASSERT_THAT(right, Vec3NearEquals1E7(vec3{{0.0, 1.0, 0.0}}));
+    ASSERT_THAT(up, Vec3NearEquals1E7(vec3{{0.0, 0.0, 1.0}}));
+    ASSERT_THAT(forward, Vec3NearEquals1E7(vec3{{1.0, 0.0, 0.0}}));
 
     // Pitch: 0, bearing: 0
     options.setLocation({{60.1699, 24.9384}, 100.0});
@@ -146,9 +146,9 @@ TEST(FreeCameraOptions, LookAtPoint) {
     ASSERT_TRUE(options.orientation);
     std::tie(right, up, forward) = rotatedFrame(options.orientation.value());
 
-    ASSERT_THAT(right, Vec3NearEquals(vec3{{1.0, 0.0, 0.0}}));
-    ASSERT_THAT(up, Vec3NearEquals(vec3{{0.0, -1.0, 0.0}}));
-    ASSERT_THAT(forward, Vec3NearEquals(vec3{{0.0, 0.0, -1.0}}));
+    ASSERT_THAT(right, Vec3NearEquals1E7(vec3{{1.0, 0.0, 0.0}}));
+    ASSERT_THAT(up, Vec3NearEquals1E7(vec3{{0.0, -1.0, 0.0}}));
+    ASSERT_THAT(forward, Vec3NearEquals1E7(vec3{{0.0, 0.0, -1.0}}));
 
     // Pitch: 0, bearing: 45
     options.setLocation({{60.1699, 24.9384}, 100.0});
@@ -156,9 +156,9 @@ TEST(FreeCameraOptions, LookAtPoint) {
     ASSERT_TRUE(options.orientation);
     std::tie(right, up, forward) = rotatedFrame(options.orientation.value());
 
-    ASSERT_THAT(right, Vec3NearEquals(vec3{{cosPi4, -cosPi4, 0.0}}));
-    ASSERT_THAT(up, Vec3NearEquals(vec3{{-cosPi4, -cosPi4, 0.0}}));
-    ASSERT_THAT(forward, Vec3NearEquals(vec3{{0.0, 0.0, -1.0}}));
+    ASSERT_THAT(right, Vec3NearEquals1E7(vec3{{cosPi4, -cosPi4, 0.0}}));
+    ASSERT_THAT(up, Vec3NearEquals1E7(vec3{{-cosPi4, -cosPi4, 0.0}}));
+    ASSERT_THAT(forward, Vec3NearEquals1E7(vec3{{0.0, 0.0, -1.0}}));
 
     // Looking south, up vector almost same as forward vector
     options.setLocation({{37.7749, 122.4194}, 0.0});
@@ -166,9 +166,9 @@ TEST(FreeCameraOptions, LookAtPoint) {
     ASSERT_TRUE(options.orientation);
     std::tie(right, up, forward) = rotatedFrame(options.orientation.value());
 
-    ASSERT_THAT(right, Vec3NearEquals(vec3{{-1.0, 0.0, 0.0}}));
-    ASSERT_THAT(up, Vec3NearEquals(vec3{{0.0, 0.0, 1.0}}));
-    ASSERT_THAT(forward, Vec3NearEquals(vec3{{0.0, 1.0, 0.0}}));
+    ASSERT_THAT(right, Vec3NearEquals1E7(vec3{{-1.0, 0.0, 0.0}}));
+    ASSERT_THAT(up, Vec3NearEquals1E7(vec3{{0.0, 0.0, 1.0}}));
+    ASSERT_THAT(forward, Vec3NearEquals1E7(vec3{{0.0, 1.0, 0.0}}));
 
     // Orientation with roll-component
     options.setLocation({{-33.8688, 151.2093}, 0.0});
@@ -176,9 +176,9 @@ TEST(FreeCameraOptions, LookAtPoint) {
     ASSERT_TRUE(options.orientation);
     std::tie(right, up, forward) = rotatedFrame(options.orientation.value());
 
-    ASSERT_THAT(right, Vec3NearEquals(vec3{{0.0, 1.0, 0.0}}));
-    ASSERT_THAT(up, Vec3NearEquals(vec3{{0.0, 0.0, 1.0}}));
-    ASSERT_THAT(forward, Vec3NearEquals(vec3{{1.0, 0.0, 0.0}}));
+    ASSERT_THAT(right, Vec3NearEquals1E7(vec3{{0.0, 1.0, 0.0}}));
+    ASSERT_THAT(up, Vec3NearEquals1E7(vec3{{0.0, 0.0, 1.0}}));
+    ASSERT_THAT(forward, Vec3NearEquals1E7(vec3{{1.0, 0.0, 0.0}}));
 
     // Up vector pointing downwards
     options.position = vec3{{0.5, 0.5, 0.5}};
@@ -186,9 +186,9 @@ TEST(FreeCameraOptions, LookAtPoint) {
     ASSERT_TRUE(options.orientation);
     std::tie(right, up, forward) = rotatedFrame(options.orientation.value());
 
-    ASSERT_THAT(right, Vec3NearEquals(vec3{{1.0, 0.0, 0.0}}));
-    ASSERT_THAT(up, Vec3NearEquals(vec3{{0.0, -cosPi4, cosPi4}}));
-    ASSERT_THAT(forward, Vec3NearEquals(vec3{{0.0, -cosPi4, -cosPi4}}));
+    ASSERT_THAT(right, Vec3NearEquals1E7(vec3{{1.0, 0.0, 0.0}}));
+    ASSERT_THAT(up, Vec3NearEquals1E7(vec3{{0.0, -cosPi4, cosPi4}}));
+    ASSERT_THAT(forward, Vec3NearEquals1E7(vec3{{0.0, -cosPi4, -cosPi4}}));
 }
 
 TEST(FreeCameraOptions, LookAtPointInvalidInput) {
@@ -229,16 +229,16 @@ TEST(FreeCameraOptions, SetPitchBearing) {
     options.setPitchBearing(0.0, 0.0);
     ASSERT_TRUE(options.orientation);
     std::tie(right, up, forward) = rotatedFrame(options.orientation.value());
-    ASSERT_THAT(right, Vec3NearEquals(vec3{{1.0, 0.0, 0.0}}));
-    ASSERT_THAT(up, Vec3NearEquals(vec3{{0.0, -1.0, 0.0}}));
-    ASSERT_THAT(forward, Vec3NearEquals(vec3{{0.0, 0.0, -1.0}}));
+    ASSERT_THAT(right, Vec3NearEquals1E7(vec3{{1.0, 0.0, 0.0}}));
+    ASSERT_THAT(up, Vec3NearEquals1E7(vec3{{0.0, -1.0, 0.0}}));
+    ASSERT_THAT(forward, Vec3NearEquals1E7(vec3{{0.0, 0.0, -1.0}}));
 
     options.setPitchBearing(0.0, 180.0);
     ASSERT_TRUE(options.orientation);
     std::tie(right, up, forward) = rotatedFrame(options.orientation.value());
-    ASSERT_THAT(right, Vec3NearEquals(vec3{{-1.0, 0.0, 0.0}}));
-    ASSERT_THAT(up, Vec3NearEquals(vec3{{0.0, 1.0, 0.0}}));
-    ASSERT_THAT(forward, Vec3NearEquals(vec3{{0.0, 0.0, -1.0}}));
+    ASSERT_THAT(right, Vec3NearEquals1E7(vec3{{-1.0, 0.0, 0.0}}));
+    ASSERT_THAT(up, Vec3NearEquals1E7(vec3{{0.0, 1.0, 0.0}}));
+    ASSERT_THAT(forward, Vec3NearEquals1E7(vec3{{0.0, 0.0, -1.0}}));
 
     const double cos60 = std::cos(60.0 * util::DEG2RAD);
     const double sin60 = std::sin(60.0 * util::DEG2RAD);
@@ -246,14 +246,14 @@ TEST(FreeCameraOptions, SetPitchBearing) {
     options.setPitchBearing(60.0, 0.0);
     ASSERT_TRUE(options.orientation);
     std::tie(right, up, forward) = rotatedFrame(options.orientation.value());
-    ASSERT_THAT(right, Vec3NearEquals(vec3{{1.0, 0.0, 0.0}}));
-    ASSERT_THAT(up, Vec3NearEquals(vec3{{0.0, -cos60, sin60}}));
-    ASSERT_THAT(forward, Vec3NearEquals(vec3{{0.0, -sin60, -cos60}}));
+    ASSERT_THAT(right, Vec3NearEquals1E7(vec3{{1.0, 0.0, 0.0}}));
+    ASSERT_THAT(up, Vec3NearEquals1E7(vec3{{0.0, -cos60, sin60}}));
+    ASSERT_THAT(forward, Vec3NearEquals1E7(vec3{{0.0, -sin60, -cos60}}));
 
     options.setPitchBearing(60.0, -450);
     ASSERT_TRUE(options.orientation);
     std::tie(right, up, forward) = rotatedFrame(options.orientation.value());
-    ASSERT_THAT(right, Vec3NearEquals(vec3{{0.0, 1.0, 0.0}}));
-    ASSERT_THAT(up, Vec3NearEquals(vec3{{cos60, 0.0, sin60}}));
-    ASSERT_THAT(forward, Vec3NearEquals(vec3{{sin60, 0.0, -cos60}}));
+    ASSERT_THAT(right, Vec3NearEquals1E7(vec3{{0.0, 1.0, 0.0}}));
+    ASSERT_THAT(up, Vec3NearEquals1E7(vec3{{cos60, 0.0, sin60}}));
+    ASSERT_THAT(forward, Vec3NearEquals1E7(vec3{{sin60, 0.0, -cos60}}));
 }

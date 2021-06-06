@@ -59,7 +59,7 @@ add_library(
     ${PROJECT_SOURCE_DIR}/test/style/style_image.test.cpp
     ${PROJECT_SOURCE_DIR}/test/style/style_layer.test.cpp
     ${PROJECT_SOURCE_DIR}/test/style/style_parser.test.cpp
-    ${PROJECT_SOURCE_DIR}/test/text/bidi.test.cpp
+    $<$<NOT:$<PLATFORM_ID:Windows>>:${PROJECT_SOURCE_DIR}/test/text/bidi.test.cpp>
     ${PROJECT_SOURCE_DIR}/test/text/calculate_tile_distances.test.cpp
     ${PROJECT_SOURCE_DIR}/test/text/cross_tile_symbol_index.test.cpp
     ${PROJECT_SOURCE_DIR}/test/text/formatted.test.cpp
