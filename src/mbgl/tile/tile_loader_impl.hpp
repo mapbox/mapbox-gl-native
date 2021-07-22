@@ -22,7 +22,7 @@ TileLoader<T>::TileLoader(T& tile_,
     : tile(tile_),
       necessity(TileNecessity::Optional),
       resource(Resource::tile(
-        tileset.tiles.at(0),
+        tileset.tiles.at((id.canonical.x + id.canonical.y) % tileset.tiles.size()),
         parameters.pixelRatio,
         id.canonical.x,
         id.canonical.y,
