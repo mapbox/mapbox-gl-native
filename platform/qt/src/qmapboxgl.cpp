@@ -16,6 +16,7 @@
 #include <mbgl/math/log2.hpp>
 #include <mbgl/math/minmax.hpp>
 #include <mbgl/renderer/renderer.hpp>
+#include <mbgl/renderer/query.hpp>
 #include <mbgl/storage/file_source_manager.hpp>
 #include <mbgl/storage/network_status.hpp>
 #include <mbgl/storage/online_file_source.hpp>
@@ -60,9 +61,11 @@
 #include <QVariantList>
 #include <QVariantMap>
 #include <QColor>
+#include <QtConcurrent>
+#include <QFutureWatcher>
 
 #include <functional>
-#include <memory>
+//#include <memory>
 #include <sstream>
 
 using namespace QMapbox;
@@ -581,6 +584,14 @@ QMapboxGL::QMapboxGL(QObject *parent_, const QMapboxGLSettings &settings, const 
 QMapboxGL::~QMapboxGL()
 {
     delete d_ptr;
+}
+
+/*!
+    Requests map to shrink its memory footprint.
+*/
+void QMapboxGL::reduceMemoryUse()
+{
+    d_ptr->m_mapRenderer->getRenderer()->reduceMemoryUse();
 }
 
 /*!
@@ -1276,6 +1287,20 @@ void QMapboxGL::addSource(const QString &id, const QVariantMap &params)
     d_ptr->mapObj->getStyle().addSource(std::move(*source));
 }
 
+void QMapboxGL::addSource(const QString &sourceID, const QMapbox::QFeatureCollection &data)
+{
+    using namespace mbgl::style;
+    using namespace mbgl::style::conversion;
+
+    qCritical() << Q_FUNC_INFO << sourceID << data.size();
+
+    auto source = std::make_unique<GeoJSONSource>(sourceID.toStdString());
+    auto geojson_data = mbgl::GeoJSON{data};
+    source->setGeoJSON(geojson_data);
+
+    d_ptr->mapObj->getStyle().addSource(std::move(source));
+}
+
 /*!
     Returns true if the layer with given \a sourceID exists, false otherwise.
 */
@@ -1319,6 +1344,45 @@ void QMapboxGL::updateSource(const QString &id, const QVariantMap &params)
     }
 }
 
+void QMapboxGL::updateSource(const QString &sourceID, const QMapbox::QFeatureCollection &data)
+{
+    using namespace mbgl::style;
+    using namespace mbgl::style::conversion;
+
+    qCritical() << Q_FUNC_INFO << sourceID << "data size" << data.size();
+
+    auto source = d_ptr->mapObj->getStyle().getSource(sourceID.toStdString());
+    if (source == nullptr) {
+        addSource(sourceID, data);
+        return;
+    }
+
+   auto watcher = new QFutureWatcher<std::shared_ptr<GeoJSONData>>(this);
+   connect(watcher, &QFutureWatcher<std::shared_ptr<GeoJSONData>>::finished, this, [this, watcher, sourceID] {
+       watcher->deleteLater();
+
+       auto styleSource = d_ptr->mapObj->getStyle().getSource(sourceID.toStdString());
+       if (styleSource == nullptr) {
+           qWarning() << Q_FUNC_INFO << "Unable to update source: style source is NULL";
+           return;
+       }
+
+       auto sourceGeoJSON = styleSource->as<GeoJSONSource>();
+       if (sourceGeoJSON == nullptr) {
+           qWarning() << Q_FUNC_INFO << "Unable to update source: only GeoJSON sources are mutable.";
+           return;
+       }
+
+       sourceGeoJSON->setGeoJSONData(watcher->result());
+   });
+
+    const auto geoJSON = mbgl::GeoJSON{data};
+
+    watcher->setFuture(QtConcurrent::run([geoJSON]() -> std::shared_ptr<GeoJSONData> {
+        return GeoJSONData::create(geoJSON);
+    }));
+}
+
 /*!
     Removes the source \a id.
 
@@ -1331,6 +1395,89 @@ void QMapboxGL::removeSource(const QString& id)
     if (d_ptr->mapObj->getStyle().getSource(sourceIDStdString)) {
         d_ptr->mapObj->getStyle().removeSource(sourceIDStdString);
     }
+}
+
+inline std::vector<std::string> toVector(const QVector<QString>&  array) {
+    std::vector<std::string> vector;
+    int len = array.size();
+    vector.reserve(len);
+
+    for (int i = 0; i < len; i++) {
+        vector.push_back(array.at(i).toStdString());
+    }
+
+    return vector;
+}
+
+
+std::vector<QMapbox::QFeature> QMapboxGL::queryRenderedFeatures(const QPointF & point, const QVector<QString>& layerIDs)
+{
+    mbgl::RenderedQueryOptions options;
+    mbgl::ScreenCoordinate coordinate(point.x(), point.y());
+    mbgl::optional<std::vector<std::string>> layers;
+    if( layerIDs.size() )
+    {
+        layers = toVector(layerIDs);
+    }
+    options.layerIDs = layers;
+
+    //Convert from std::vector<mbgl::Feature> to std::vector<QMapbox::QFeature>
+    std::vector<QMapbox::QFeature> result;
+    const std::vector<mbgl::Feature> features = d_ptr->m_mapRenderer->getRenderer()->queryRenderedFeatures(coordinate, options);
+    for (const auto &feature: features) {
+        result.push_back(feature);
+    }
+
+    return result;
+}
+
+mapbox::geojson::geojson QMapboxGL::featureCollectionToGeoJson(const QMapbox::QFeatureCollection& featureCollection) {
+    return mbgl::GeoJSON{featureCollection};
+}
+
+std::shared_ptr<mbgl::style::GeoJSONData> QMapboxGL::geoJsonToGeoJsonData(const mapbox::geojson::geojson& geoJson) {
+    return mbgl::style::GeoJSONData::create(geoJson);
+}
+
+void QMapboxGL::updateSource(const QString &sourceID, std::shared_ptr<mbgl::style::GeoJSONData> data) {
+    qCritical() << Q_FUNC_INFO << sourceID;
+
+    auto source = d_ptr->mapObj->getStyle().getSource(sourceID.toStdString());
+    if (source == nullptr) {
+        auto source = std::make_unique<mbgl::style::GeoJSONSource>(sourceID.toStdString());
+        auto sourceGeoJSON = source->as<mbgl::style::GeoJSONSource>();
+        sourceGeoJSON->setGeoJSONData(data);
+        d_ptr->mapObj->getStyle().addSource(std::move(source));
+        return;
+    }
+
+    auto sourceGeoJSON = source->as<mbgl::style::GeoJSONSource>();
+    sourceGeoJSON->setGeoJSONData(data);
+}
+
+
+std::vector<QMapbox::QFeature>  QMapboxGL::queryRenderedFeatures(const QRectF& rect, const QVector<QString>& layerIDs)
+{
+    mbgl::RenderedQueryOptions options;
+    mbgl::ScreenBox box = {
+        { rect.left(), rect.top() },
+        { rect.right(), rect.bottom() },
+        };
+    mbgl::optional<std::vector<std::string>> layers;
+    if( layerIDs.size() )
+    {
+        layers = toVector(layerIDs);
+    }
+    options.layerIDs = layers;
+
+    //Convert from std::vector<mbgl::Feature> to std::vector<QMapbox::QFeature>
+    std::vector<QMapbox::QFeature> result;
+    const std::vector<mbgl::Feature> features = d_ptr->m_mapRenderer->getRenderer()->queryRenderedFeatures(box, options);
+    for (const auto &feature: features) {
+        result.push_back(feature);
+    }
+
+    return result;
 }
 
 /*!

@@ -12,8 +12,16 @@
 
 #include <functional>
 
+#include <memory>
+
+
 class QMapboxGLPrivate;
 
+namespace mbgl {
+namespace style {
+    class GeoJSONData;
+}
+}
 // This header follows the Qt coding style: https://wiki.qt.io/Qt_Coding_Style
 
 class Q_MAPBOXGL_EXPORT QMapboxGLSettings
@@ -153,6 +161,8 @@ public:
               qreal pixelRatio = 1);
     virtual ~QMapboxGL();
 
+    void reduceMemoryUse();
+
     QString styleJson() const;
     QString styleUrl() const;
 
@@ -225,9 +235,15 @@ public:
     QMargins margins() const;
 
     void addSource(const QString &sourceID, const QVariantMap& params);
+    void addSource(const QString &sourceID, const QMapbox::QFeatureCollection &data);
     bool sourceExists(const QString &sourceID);
     void updateSource(const QString &sourceID, const QVariantMap& params);
+    void updateSource(const QString &sourceID, const QMapbox::QFeatureCollection &data);
     void removeSource(const QString &sourceID);
+
+    // Feature queries - might want to move result to QVector to be more Qt like
+    std::vector<QMapbox::QFeature> queryRenderedFeatures(const QPointF &, const QVector<QString>& layerIDs = {});
+    std::vector<QMapbox::QFeature> queryRenderedFeatures(const QRectF&,   const QVector<QString>& layerIDs = {});
 
     void addImage(const QString &name, const QImage &sprite);
     void removeImage(const QString &name);
@@ -248,6 +264,10 @@ public:
     void createRenderer();
     void destroyRenderer();
     void setFramebufferObject(quint32 fbo, const QSize &size);
+
+    static mapbox::geojson::geojson featureCollectionToGeoJson(const QMapbox::QFeatureCollection& featureCollection);
+    static std::shared_ptr<mbgl::style::GeoJSONData> geoJsonToGeoJsonData(const mapbox::geojson::geojson& geoJson);
+    void updateSource(const QString &sourceID, std::shared_ptr<mbgl::style::GeoJSONData> data);
 
 public slots:
     void render();
