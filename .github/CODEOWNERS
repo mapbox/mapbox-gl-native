@@ -1,6 +1,1 @@
 * @mapbox/gl-native
-
-# Apple
-/platform/ios/ @mapbox/maps-ios-reviewers
-/platform/macos/ @mapbox/maps-ios-reviewers
-/platform/darwin/ @mapbox/maps-ios-reviewers
