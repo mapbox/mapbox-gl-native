@@ -4,6 +4,7 @@
 #include <string>
 #include <cassert>
 #include <cstdlib>
+#include <cstdint>
 #include <exception>
 
 // Polyfill needed by Qt when building for Android with GCC
