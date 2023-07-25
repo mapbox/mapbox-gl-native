@@ -3,6 +3,7 @@
 #include <typeinfo>
 #include <type_traits>
 #include <stdexcept>
+#include <utility>
 namespace mbgl {
 namespace util {
 
