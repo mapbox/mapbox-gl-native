@@ -1,3 +1,5 @@
+#define NOMINMAX
+
 #include <mbgl/test/stub_file_source.hpp>
 #include <mbgl/test/getrss.hpp>
 #include <mbgl/test/util.hpp>
@@ -18,7 +20,10 @@
 #include <memory>
 
 #include <cstdlib>
+
+#if !defined(_MSC_VER) || defined(__clang__)
 #include <unistd.h>
+#endif
 
 using namespace mbgl;
 using namespace std::literals::string_literals;

@@ -6,6 +6,7 @@
 #include <cassert>
 #include <climits>
 #include <algorithm>
+#include <iterator>
 
 namespace mbgl {
 namespace util {

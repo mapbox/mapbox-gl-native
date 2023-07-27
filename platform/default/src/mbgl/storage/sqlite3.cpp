@@ -11,6 +11,11 @@
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/optional.hpp>
 
+#define MBGL_CONSTRUCTOR(f) \
+    static void f(void); \
+    struct f##_t_ { f##_t_(void) { f(); } }; static f##_t_ f##_; \
+    static void f(void)
+
 namespace mapbox {
 namespace sqlite {
 
@@ -102,8 +107,7 @@ void logSqlMessage(void *, const int err, const char *msg) {
 }
 #endif
 
-__attribute__((constructor))
-static void initalize() {
+MBGL_CONSTRUCTOR(initialize) {
     if (sqlite3_libversion_number() / 1000000 != SQLITE_VERSION_NUMBER / 1000000) {
         char message[96];
         snprintf(message, 96,

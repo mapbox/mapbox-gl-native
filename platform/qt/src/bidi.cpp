@@ -39,10 +39,12 @@ std::vector<StyledText> BiDi::processStyledText(const StyledText& input, std::se
     std::vector<StyledText> transformedLines;
     std::size_t start = 0;
     for (std::size_t lineBreakPoint : lineBreakPoints) {
-        transformedLines.emplace_back(
-            input.first.substr(start, lineBreakPoint - start),
-            std::vector<uint8_t>(input.second.begin() + start, input.second.begin() + lineBreakPoint));
-        start = lineBreakPoint;
+        if (lineBreakPoint <= input.second.size()) {
+            transformedLines.emplace_back(
+                input.first.substr(start, lineBreakPoint - start),
+                std::vector<uint8_t>(input.second.begin() + start, input.second.begin() + lineBreakPoint));
+            start = lineBreakPoint;
+        }
     }
 
     return transformedLines;

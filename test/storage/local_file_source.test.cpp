@@ -3,9 +3,17 @@
 #include <mbgl/util/platform.hpp>
 #include <mbgl/util/run_loop.hpp>
 
-#include <unistd.h>
 #include <climits>
 #include <gtest/gtest.h>
+
+#if defined(WIN32)
+#include <Windows.h>
+#ifndef PATH_MAX
+#define PATH_MAX MAX_PATH
+#endif /* PATH_MAX */
+#else
+#include <unistd.h>
+#endif
 
 namespace {
 
@@ -135,15 +143,22 @@ TEST(LocalFileSource, URLLimit) {
 
     size_t length = PATH_MAX - toAbsoluteURL("").size();
     LocalFileSource fs;
-    char filename[length];
+    char* filename = new char[length];
     memset(filename, 'x', length);
 
     std::string url(filename, length);
 
+    delete[] filename;
+
     std::unique_ptr<AsyncRequest> req = fs.request({ Resource::Unknown, toAbsoluteURL(url) }, [&](Response res) {
         req.reset();
         ASSERT_NE(nullptr, res.error);
+#if defined(_MSC_VER) && !defined(__clang__)
+        // Microsoft Visual Studio defines PATH_MAX as 260, less than the limit to trigger an error with reason "Other"
+        EXPECT_EQ(Response::Error::Reason::NotFound, res.error->reason);
+#else
         EXPECT_EQ(Response::Error::Reason::Other, res.error->reason);
+#endif
         ASSERT_FALSE(res.data.get());
         loop.stop();
     });

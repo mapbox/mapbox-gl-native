@@ -874,7 +874,7 @@ TEST(Transform, MinMaxPitch) {
 
 static const double abs_double_error = 1e-5;
 
-MATCHER_P(Vec3NearEquals, vec, "") {
+MATCHER_P(Vec3NearEquals1E5, vec, "") {
     return std::fabs(vec[0] - arg[0]) <= abs_double_error && std::fabs(vec[1] - arg[1]) <= abs_double_error &&
            std::fabs(vec[2] - arg[2]) <= abs_double_error;
 }
@@ -895,7 +895,7 @@ TEST(Transform, FreeCameraOptionsInvalidSize) {
     EXPECT_DOUBLE_EQ(0.0, updatedOrientation[2]);
     EXPECT_DOUBLE_EQ(1.0, updatedOrientation[3]);
 
-    EXPECT_THAT(updatedPosition, Vec3NearEquals(vec3{{0.0, 0.0, 0.0}}));
+    EXPECT_THAT(updatedPosition, Vec3NearEquals1E5(vec3{{0.0, 0.0, 0.0}}));
 }
 
 TEST(Transform, FreeCameraOptionsNanInput) {
@@ -914,7 +914,7 @@ TEST(Transform, FreeCameraOptionsNanInput) {
     options.position = vec3{{0.3, 0.1, 0.2}};
     options.orientation = vec4{{NAN, 0.0, NAN, 0.0}};
     transform.setFreeCameraOptions(options);
-    EXPECT_THAT(transform.getFreeCameraOptions().position.value(), Vec3NearEquals(vec3{{0.3, 0.1, 0.2}}));
+    EXPECT_THAT(transform.getFreeCameraOptions().position.value(), Vec3NearEquals1E5(vec3{{0.3, 0.1, 0.2}}));
     EXPECT_EQ(Quaternion::identity.m, transform.getFreeCameraOptions().orientation.value());
 }
 
@@ -1008,9 +1008,9 @@ TEST(Transform, FreeCameraOptionsClampPitch) {
     transform.setFreeCameraOptions(options);
     EXPECT_DOUBLE_EQ(util::PITCH_MAX, transform.getState().getPitch());
     std::tie(right, up, forward) = rotatedFrame(transform.getFreeCameraOptions().orientation.value());
-    EXPECT_THAT(right, Vec3NearEquals(vec3{{1.0, 0.0, 0.0}}));
-    EXPECT_THAT(up, Vec3NearEquals(vec3{{0, -0.5, 0.866025}}));
-    EXPECT_THAT(forward, Vec3NearEquals(vec3{{0, -0.866025, -0.5}}));
+    EXPECT_THAT(right, Vec3NearEquals1E5(vec3{{1.0, 0.0, 0.0}}));
+    EXPECT_THAT(up, Vec3NearEquals1E5(vec3{{0, -0.5, 0.866025}}));
+    EXPECT_THAT(forward, Vec3NearEquals1E5(vec3{{0, -0.866025, -0.5}}));
 }
 
 TEST(Transform, FreeCameraOptionsClampToBounds) {
@@ -1034,10 +1034,10 @@ TEST(Transform, FreeCameraOptionsClampToBounds) {
     vec3 right, up, forward;
     std::tie(right, up, forward) = rotatedFrame(transform.getFreeCameraOptions().orientation.value());
     EXPECT_THAT(transform.getFreeCameraOptions().position.value(),
-                Vec3NearEquals(vec3{{0.0976562, 0.304816, 0.20716}}));
-    EXPECT_THAT(right, Vec3NearEquals(vec3{{1.0, 0.0, 0.0}}));
-    EXPECT_THAT(up, Vec3NearEquals(vec3{{0, -0.707107, 0.707107}}));
-    EXPECT_THAT(forward, Vec3NearEquals(vec3{{0, -0.707107, -0.707107}}));
+                Vec3NearEquals1E5(vec3{{0.0976562, 0.304816, 0.20716}}));
+    EXPECT_THAT(right, Vec3NearEquals1E5(vec3{{1.0, 0.0, 0.0}}));
+    EXPECT_THAT(up, Vec3NearEquals1E5(vec3{{0, -0.707107, 0.707107}}));
+    EXPECT_THAT(forward, Vec3NearEquals1E5(vec3{{0, -0.707107, -0.707107}}));
 }
 
 TEST(Transform, FreeCameraOptionsInvalidState) {
@@ -1050,7 +1050,7 @@ TEST(Transform, FreeCameraOptionsInvalidState) {
     EXPECT_DOUBLE_EQ(0.0, transform.getState().getPitch());
 
     const auto options = transform.getFreeCameraOptions();
-    EXPECT_THAT(options.position.value(), Vec3NearEquals(vec3{{0.0, 0.0, 0.0}}));
+    EXPECT_THAT(options.position.value(), Vec3NearEquals1E5(vec3{{0.0, 0.0, 0.0}}));
 }
 
 TEST(Transform, FreeCameraOptionsOrientationRoll) {
@@ -1083,31 +1083,31 @@ TEST(Transform, FreeCameraOptionsStateSynchronization) {
 
     transform.jumpTo(CameraOptions().withPitch(0.0).withBearing(0.0));
     std::tie(right, up, forward) = rotatedFrame(transform.getFreeCameraOptions().orientation.value());
-    EXPECT_THAT(transform.getFreeCameraOptions().position.value(), Vec3NearEquals(vec3{{0.5, 0.5, 0.29296875}}));
-    EXPECT_THAT(right, Vec3NearEquals(vec3{{1.0, 0.0, 0.0}}));
-    EXPECT_THAT(up, Vec3NearEquals(vec3{{0.0, -1.0, 0.0}}));
-    EXPECT_THAT(forward, Vec3NearEquals(vec3{{0.0, 0.0, -1.0}}));
+    EXPECT_THAT(transform.getFreeCameraOptions().position.value(), Vec3NearEquals1E5(vec3{{0.5, 0.5, 0.29296875}}));
+    EXPECT_THAT(right, Vec3NearEquals1E5(vec3{{1.0, 0.0, 0.0}}));
+    EXPECT_THAT(up, Vec3NearEquals1E5(vec3{{0.0, -1.0, 0.0}}));
+    EXPECT_THAT(forward, Vec3NearEquals1E5(vec3{{0.0, 0.0, -1.0}}));
 
     transform.jumpTo(CameraOptions().withCenter(LatLng{60.1699, 24.9384}));
     EXPECT_THAT(transform.getFreeCameraOptions().position.value(),
-                Vec3NearEquals(vec3{{0.569273, 0.289453, 0.292969}}));
+                Vec3NearEquals1E5(vec3{{0.569273, 0.289453, 0.292969}}));
 
     transform.jumpTo(CameraOptions().withPitch(20.0).withBearing(77.0).withCenter(LatLng{-20.0, 20.0}));
-    EXPECT_THAT(transform.getFreeCameraOptions().position.value(), Vec3NearEquals(vec3{{0.457922, 0.57926, 0.275301}}));
+    EXPECT_THAT(transform.getFreeCameraOptions().position.value(), Vec3NearEquals1E5(vec3{{0.457922, 0.57926, 0.275301}}));
 
     // Invalid pitch
     transform.jumpTo(CameraOptions().withPitch(-10.0).withBearing(0.0));
     std::tie(right, up, forward) = rotatedFrame(transform.getFreeCameraOptions().orientation.value());
     EXPECT_THAT(transform.getFreeCameraOptions().position.value(),
-                Vec3NearEquals(vec3{{0.555556, 0.556719, 0.292969}}));
-    EXPECT_THAT(right, Vec3NearEquals(vec3{{1.0, 0.0, 0.0}}));
-    EXPECT_THAT(up, Vec3NearEquals(vec3{{0.0, -1.0, 0.0}}));
-    EXPECT_THAT(forward, Vec3NearEquals(vec3{{0.0, 0.0, -1.0}}));
+                Vec3NearEquals1E5(vec3{{0.555556, 0.556719, 0.292969}}));
+    EXPECT_THAT(right, Vec3NearEquals1E5(vec3{{1.0, 0.0, 0.0}}));
+    EXPECT_THAT(up, Vec3NearEquals1E5(vec3{{0.0, -1.0, 0.0}}));
+    EXPECT_THAT(forward, Vec3NearEquals1E5(vec3{{0.0, 0.0, -1.0}}));
 
     transform.jumpTo(CameraOptions().withPitch(85.0).withBearing(0.0).withCenter(LatLng{-80.0, 0.0}));
     std::tie(right, up, forward) = rotatedFrame(transform.getFreeCameraOptions().orientation.value());
-    EXPECT_THAT(transform.getFreeCameraOptions().position.value(), Vec3NearEquals(vec3{{0.5, 1.14146, 0.146484}}));
-    EXPECT_THAT(right, Vec3NearEquals(vec3{{1.0, 0.0, 0.0}}));
-    EXPECT_THAT(up, Vec3NearEquals(vec3{{0, -0.5, 0.866025}}));
-    EXPECT_THAT(forward, Vec3NearEquals(vec3{{0, -0.866025, -0.5}}));
+    EXPECT_THAT(transform.getFreeCameraOptions().position.value(), Vec3NearEquals1E5(vec3{{0.5, 1.14146, 0.146484}}));
+    EXPECT_THAT(right, Vec3NearEquals1E5(vec3{{1.0, 0.0, 0.0}}));
+    EXPECT_THAT(up, Vec3NearEquals1E5(vec3{{0, -0.5, 0.866025}}));
+    EXPECT_THAT(forward, Vec3NearEquals1E5(vec3{{0, -0.866025, -0.5}}));
 }

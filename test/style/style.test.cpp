@@ -12,6 +12,10 @@
 
 #include <memory>
 
+#ifdef WIN32
+#include <Windows.h>
+#endif
+
 using namespace mbgl;
 using namespace mbgl::style;
 
@@ -100,6 +104,10 @@ TEST(Style, RemoveSourceInUse) {
             int64_t(-1),
             "Source 'sourceId' is in use, cannot remove",
     };
+
+#if defined(WIN32)
+    Sleep(1000);
+#endif
 
     EXPECT_EQ(log->count(logMessage), 1u);
 }

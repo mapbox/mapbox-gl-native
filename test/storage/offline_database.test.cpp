@@ -12,6 +12,12 @@
 #include <thread>
 #include <random>
 
+#if defined(__GNUC__)
+#define MBGL_UNUSED __attribute__((unused))
+#else
+#define MBGL_UNUSED
+#endif
+
 using namespace std::literals::string_literals;
 using namespace mbgl;
 using mapbox::sqlite::ResultCode;
@@ -44,7 +50,7 @@ static FixtureLog::Message error(ResultCode code, const char* message) {
     return { EventSeverity::Error, Event::Database, static_cast<int64_t>(code), message };
 }
 
-static __attribute__((unused)) FixtureLog::Message warning(ResultCode code, const char* message) {
+static MBGL_UNUSED FixtureLog::Message warning(ResultCode code, const char* message) {
     return { EventSeverity::Warning, Event::Database, static_cast<int64_t>(code), message };
 }
 
@@ -1845,6 +1851,7 @@ TEST(OfflineDatabase, MergeDatabaseWithSingleRegionTooManyExistingTiles) {
     EXPECT_EQ(0u, log.uncheckedCount());
 }
 
+#ifndef WIN32 // Windows cannot copy a folder as a file
 TEST(OfflineDatabase, MergeDatabaseWithInvalidPath) {
     FixtureLog log;
 
@@ -1859,6 +1866,7 @@ TEST(OfflineDatabase, MergeDatabaseWithInvalidPath) {
     EXPECT_EQ(1u, log.count({ EventSeverity::Error, Event::Database, -1, "Merge database has incorrect user_version" }));
     EXPECT_EQ(0u, log.uncheckedCount());
 }
+#endif
 
 TEST(OfflineDatabase, MergeDatabaseWithInvalidDb) {
     FixtureLog log;
@@ -1902,7 +1910,9 @@ TEST(OfflineDatabase, ChangePath) {
     OfflineDatabase db(":memory:");
     db.changePath(newPath);
     mapbox::sqlite::Database::open(newPath, mapbox::sqlite::ReadOnly);
+#ifndef WIN32 // Windows will fail to delete an open file
     util::deleteFile(newPath);
+#endif WIN32
 }
 
 TEST(OfflineDatabase, ResetDatabase) {

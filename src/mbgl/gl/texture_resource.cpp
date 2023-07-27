@@ -31,7 +31,7 @@ static int channelStorageSize(gfx::TextureChannelDataType type) {
     }
 }
 
-TextureResource::~TextureResource() {
+TextureResource::~TextureResource() noexcept {
     auto& stats = texture.get_deleter().context->renderingStats();
     stats.memTextures -= byteSize;
     assert(stats.memTextures >= 0);

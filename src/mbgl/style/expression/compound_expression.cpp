@@ -225,7 +225,7 @@ Value featureIdAsExpressionValue(const EvaluationContext& params) {
 optional<Value> featurePropertyAsExpressionValue(const EvaluationContext& params, const std::string& key) {
     assert(params.feature);
     auto property = params.feature->getValue(key);
-    return property ? toExpressionValue(*property) : optional<Value>();
+    return property ? optional<Value>(toExpressionValue(*property)) : optional<Value>();
 };
 
 optional<std::string> featureTypeAsString(FeatureType type) {

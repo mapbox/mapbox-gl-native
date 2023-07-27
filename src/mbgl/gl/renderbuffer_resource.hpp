@@ -12,6 +12,8 @@ public:
         : renderbuffer(std::move(renderbuffer_)) {
     }
 
+    ~RenderbufferResource() noexcept override = default;
+
     UniqueRenderbuffer renderbuffer;
 };
 

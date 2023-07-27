@@ -37,7 +37,7 @@ class Debugging;
 class Context final : public gfx::Context {
 public:
     Context(RendererBackend&);
-    ~Context() override;
+    ~Context() noexcept override;
     Context(const Context&) = delete;
     Context& operator=(const Context& other) = delete;
 
@@ -149,7 +149,7 @@ public:
     State<value::BindVertexBuffer> vertexBuffer;
 
     State<value::BindVertexArray, const Context&> bindVertexArray { *this };
-    VertexArrayState globalVertexArrayState { UniqueVertexArray(0, { this }) };
+    VertexArrayState globalVertexArrayState { UniqueVertexArray(0, { const_cast<Context*>(this) }) };
 
     State<value::PixelStorePack> pixelStorePack;
     State<value::PixelStoreUnpack> pixelStoreUnpack;
