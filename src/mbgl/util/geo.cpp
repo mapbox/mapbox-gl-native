@@ -54,7 +54,7 @@ bool LatLngBounds::contains(const LatLngBounds& area, LatLng::WrapMode wrap /*= 
     } else if (wrap == LatLng::Wrapped) {
         LatLngBounds wrapped(sw.wrapped(), ne.wrapped());
         LatLngBounds other(area.sw.wrapped(), area.ne.wrapped());
-        if (crossesAntimeridian() & !area.crossesAntimeridian()) {
+        if (crossesAntimeridian() && !area.crossesAntimeridian()) {
             return (other.east() <= util::LONGITUDE_MAX && other.west() >= wrapped.west()) ||
                    (other.east() <= wrapped.east() && other.west() >= -util::LONGITUDE_MAX);
         } else {
