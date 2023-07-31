@@ -28,13 +28,13 @@ public:
     GLFWView(bool fullscreen, bool benchmark, const mbgl::ResourceOptions &options);
     ~GLFWView() override;
 
-    float getPixelRatio() const;
+    auto getPixelRatio() const -> float;
 
     void setMap(mbgl::Map*);
     
     void setRenderFrontend(GLFWRendererFrontend*);
 
-    mbgl::gfx::RendererBackend& getRendererBackend();
+    auto getRendererBackend() -> mbgl::gfx::RendererBackend&;
 
     void setTestDirectory(std::string dir) { testDirectory = std::move(dir); };
 
@@ -56,7 +56,7 @@ public:
     
     void invalidate();
 
-    mbgl::Size getSize() const;
+    auto getSize() const -> mbgl::Size;
 
     // mbgl::MapObserver implementation
     void onDidFinishLoadingStyle() override;
@@ -78,9 +78,9 @@ private:
     // Internal
     void report(float duration);
 
-    mbgl::Color makeRandomColor() const;
-    mbgl::Point<double> makeRandomPoint() const;
-    static std::unique_ptr<mbgl::style::Image> makeImage(const std::string& id, int width, int height, float pixelRatio);
+    static auto makeRandomColor() -> mbgl::Color ;
+    auto makeRandomPoint() const -> mbgl::Point<double>;
+    static auto makeImage(const std::string& id, int width, int height, float pixelRatio) -> std::unique_ptr<mbgl::style::Image>;
 
     void nextOrientation();
 
@@ -106,7 +106,6 @@ private:
     mbgl::AnnotationIDs animatedAnnotationIDs;
     std::vector<double> animatedAnnotationAddedTimes;
 
-private:
     void toggle3DExtrusions(bool visible);
 
     mbgl::Map* map = nullptr;

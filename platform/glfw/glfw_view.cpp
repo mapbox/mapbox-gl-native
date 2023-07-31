@@ -23,7 +23,6 @@
 #include <mbgl/util/interpolate.hpp>
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/logging.hpp>
-#include <mbgl/util/platform.hpp>
 #include <mbgl/util/string.hpp>
 
 #include <mapbox/cheap_ruler.hpp>
@@ -31,16 +30,14 @@
 #include <mapbox/geojson.hpp>
 
 #if MBGL_USE_GLES2
-#define GLFW_INCLUDE_ES2
+#define GLFW_INCLUDE_ES3
 #endif // MBGL_USE_GLES2
 
 #define GL_GLEXT_PROTOTYPES
 #include <GLFW/glfw3.h>
 
-#include <cassert>
 #include <cstdlib>
 #include <fstream>
-#include <iostream>
 #include <utility>
 
 #if defined(MBGL_RENDER_BACKEND_OPENGL) && !defined(MBGL_LAYER_LOCATION_INDICATOR_DISABLE_ALL)
@@ -49,14 +46,14 @@
 namespace {
 const std::string mbglPuckAssetsPath{MAPBOX_PUCK_ASSETS_PATH};
 
-mbgl::Color premultiply(mbgl::Color c) {
+auto premultiply(mbgl::Color c) -> mbgl::Color {
     c.r *= c.a;
     c.g *= c.a;
     c.b *= c.a;
     return c;
 }
 
-std::array<double, 3> toArray(const mbgl::LatLng &crd) {
+auto toArray(const mbgl::LatLng &crd) -> std::array<double, 3> {
     return {crd.latitude(), crd.longitude(), 0};
 }
 } // namespace
@@ -83,24 +80,24 @@ void addFillExtrusionLayer(mbgl::style::Style &style, bool visible) {
         return;
     }
 
-    if (auto layer = style.getLayer("3d-buildings")) {
+    if (auto *layer = style.getLayer("3d-buildings")) {
         layer->setVisibility(VisibilityType(!visible));
         return;
     }
 
     auto extrusionLayer = std::make_unique<FillExtrusionLayer>("3d-buildings", "composite");
     extrusionLayer->setSourceLayer("building");
-    extrusionLayer->setMinZoom(15.0f);
+    extrusionLayer->setMinZoom(15.0F);
     extrusionLayer->setFilter(Filter(eq(get("extrude"), literal("true"))));
     extrusionLayer->setFillExtrusionColor(PropertyExpression<mbgl::Color>(interpolate(linear(),
                                                                                       number(get("height")),
-                                                                                      0.f,
+                                                                                      0.F,
                                                                                       toColor(literal("#160e23")),
-                                                                                      50.f,
+                                                                                      50.F,
                                                                                       toColor(literal("#00615f")),
-                                                                                      100.f,
+                                                                                      100.F,
                                                                                       toColor(literal("#55e9ff")))));
-    extrusionLayer->setFillExtrusionOpacity(0.6f);
+    extrusionLayer->setFillExtrusionOpacity(0.6F);
     extrusionLayer->setFillExtrusionHeight(PropertyExpression<float>(get("height")));
     extrusionLayer->setFillExtrusionBase(PropertyExpression<float>(get("min_height")));
     style.addLayer(std::move(extrusionLayer));
@@ -109,7 +106,7 @@ void addFillExtrusionLayer(mbgl::style::Style &style, bool visible) {
 
 void glfwError(int error, const char *description) {
     mbgl::Log::Error(mbgl::Event::OpenGL, "GLFW error (%i): %s", error, description);
-    assert(false);
+//    assert(false);
 }
 
 GLFWView::GLFWView(bool fullscreen_, bool benchmark_, const mbgl::ResourceOptions &options)
@@ -119,7 +116,7 @@ GLFWView::GLFWView(bool fullscreen_, bool benchmark_, const mbgl::ResourceOption
       mapResourceOptions(options.clone()) {
     glfwSetErrorCallback(glfwError);
 
-    std::srand(static_cast<unsigned int>(std::time(nullptr)));
+    std::srand(std::clock());
 
     if (!glfwInit()) {
         mbgl::Log::Error(mbgl::Event::OpenGL, "failed to initialize glfw");
@@ -129,7 +126,7 @@ GLFWView::GLFWView(bool fullscreen_, bool benchmark_, const mbgl::ResourceOption
     GLFWmonitor *monitor = nullptr;
     if (fullscreen) {
         monitor = glfwGetPrimaryMonitor();
-        auto videoMode = glfwGetVideoMode(monitor);
+        const auto *videoMode = glfwGetVideoMode(monitor);
         width = videoMode->width;
         height = videoMode->height;
     }
@@ -148,8 +145,7 @@ GLFWView::GLFWView(bool fullscreen_, bool benchmark_, const mbgl::ResourceOption
 
 #if MBGL_USE_GLES2
     glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 #endif
 
     if (mbgl::gfx::Backend::GetType() != mbgl::gfx::Backend::Type::OpenGL) {
@@ -200,7 +196,9 @@ GLFWView::GLFWView(bool fullscreen_, bool benchmark_, const mbgl::ResourceOption
     printf("- Press `X` to cycle through the viewport modes\n");
     printf("- Press `I` to delete existing database and re-initialize\n");
     printf("- Press `A` to cycle through Mapbox offices in the world + dateline monument\n");
+#ifndef MBGL_USE_GLES2
     printf("- Press `B` to cycle through the color, stencil, and depth buffer\n");
+#endif
     printf("- Press `D` to cycle through camera bounds: inside, crossing IDL at left, crossing IDL at right, and disabled\n");
     printf("- Press `T` to add custom geometry source\n");
     printf("- Press `F` to enable feature-state demo\n");
@@ -244,7 +242,7 @@ void GLFWView::setRenderFrontend(GLFWRendererFrontend* rendererFrontend_) {
     rendererFrontend = rendererFrontend_;
 }
 
-mbgl::gfx::RendererBackend &GLFWView::getRendererBackend() {
+auto GLFWView::getRendererBackend() -> mbgl::gfx::RendererBackend & {
     return backend->getRendererBackend();
 }
 
@@ -376,7 +374,7 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
                 mbgl::LatLngBounds::hull(mbgl::LatLng{-45.0, -200.0}, mbgl::LatLng{45.0, -160.0}), // left IDL
                 mbgl::LatLngBounds::hull(mbgl::LatLng{-45.0, 160.0}, mbgl::LatLng{45.0, 200.0}),   // right IDL
                 mbgl::LatLngBounds()};
-            static size_t nextBound = 0u;
+            static size_t nextBound = 0U;
             static mbgl::AnnotationID boundAnnotationID = std::numeric_limits<mbgl::AnnotationID>::max();
 
             mbgl::LatLngBounds bound = bounds[nextBound++];
@@ -396,7 +394,7 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
                     mbgl::Point<double>{ bound.west(), bound.south() },
                 });
 
-                auto boundAnnotation = mbgl::FillAnnotation { rect, 0.5f, { view->makeRandomColor() }, { view->makeRandomColor() } };
+                auto boundAnnotation = mbgl::FillAnnotation { rect, 0.5F, { GLFWView::makeRandomColor() }, { GLFWView::makeRandomColor() } };
 
                 if (boundAnnotationID == std::numeric_limits<mbgl::AnnotationID>::max()) {
                     boundAnnotationID = view->map->addAnnotation(boundAnnotation);
@@ -428,7 +426,7 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
                 view->map->jumpTo(cameraOptions);
             }
 
-            auto layer = style.getLayer("state-fills");
+            auto *layer = style.getLayer("state-fills");
             if (!layer) {
                 auto fillLayer = std::make_unique<FillLayer>("state-fills", "states");
                 fillLayer->setFillColor(mbgl::Color{0.0, 0.0, 1.0, 0.5});
@@ -520,7 +518,7 @@ namespace util {
 
 template <>
 struct Interpolator<mbgl::LatLng> {
-    mbgl::LatLng operator()(const mbgl::LatLng &a, const mbgl::LatLng &b, const double t) {
+    auto operator()(const mbgl::LatLng &a, const mbgl::LatLng &b, const double t) -> mbgl::LatLng {
         return {
             interpolate<double>(a.latitude(), b.latitude(), t),
             interpolate<double>(a.longitude(), b.longitude(), t),
@@ -561,22 +559,22 @@ void GLFWView::updateFreeCameraDemo() {
     }
 }
 
-mbgl::Color GLFWView::makeRandomColor() const {
-    const float r = 1.0f * float(std::rand()) / float(RAND_MAX);
-    const float g = 1.0f * float(std::rand()) / float(RAND_MAX);
-    const float b = 1.0f * float(std::rand()) / float(RAND_MAX);
-    return { r, g, b, 1.0f };
+auto GLFWView::makeRandomColor() -> mbgl::Color {
+    const float r = 1.0F * float(std::rand()) / float(RAND_MAX);
+    const float g = 1.0F * float(std::rand()) / float(RAND_MAX);
+    const float b = 1.0F * float(std::rand()) / float(RAND_MAX);
+    return { r, g, b, 1.0F };
 }
 
-mbgl::Point<double> GLFWView::makeRandomPoint() const {
+auto GLFWView::makeRandomPoint() const -> mbgl::Point<double> {
     const double x = width * double(std::rand()) / RAND_MAX;
     const double y = height * double(std::rand()) / RAND_MAX;
     mbgl::LatLng latLng = map->latLngForPixel({ x, y });
     return { latLng.longitude(), latLng.latitude() };
 }
 
-std::unique_ptr<mbgl::style::Image>
-GLFWView::makeImage(const std::string& id, int width, int height, float pixelRatio) {
+auto
+GLFWView::makeImage(const std::string& id, int width, int height, float pixelRatio) -> std::unique_ptr<mbgl::style::Image> {
     const int r = 255 * (double(std::rand()) / RAND_MAX);
     const int g = 255 * (double(std::rand()) / RAND_MAX);
     const int b = 255 * (double(std::rand()) / RAND_MAX);
@@ -585,7 +583,7 @@ GLFWView::makeImage(const std::string& id, int width, int height, float pixelRat
     const int h = std::ceil(pixelRatio * height);
 
     mbgl::PremultipliedImage image({ static_cast<uint32_t>(w), static_cast<uint32_t>(h) });
-    auto data = reinterpret_cast<uint32_t*>(image.data.get());
+    auto *data = reinterpret_cast<uint32_t*>(image.data.get());
     const int dist = (w / 2) * (w / 2);
     for (int y = 0; y < h; y++) {
         for (int x = 0; x < w; x++) {
@@ -636,7 +634,7 @@ void GLFWView::addRandomLineAnnotations(int count) {
         for (int j = 0; j < 3; ++j) {
             lineString.push_back(makeRandomPoint());
         }
-        annotationIDs.push_back(map->addAnnotation(mbgl::LineAnnotation { lineString, 1.0f, 2.0f, { makeRandomColor() } }));
+        annotationIDs.push_back(map->addAnnotation(mbgl::LineAnnotation { lineString, 1.0F, 2.0F, { makeRandomColor() } }));
     }
 }
 
@@ -644,7 +642,7 @@ void GLFWView::addRandomShapeAnnotations(int count) {
     for (int i = 0; i < count; ++i) {
         mbgl::Polygon<double> triangle;
         triangle.push_back({ makeRandomPoint(), makeRandomPoint(), makeRandomPoint() });
-        annotationIDs.push_back(map->addAnnotation(mbgl::FillAnnotation { triangle, 0.5f, { makeRandomColor() }, { makeRandomColor() } }));
+        annotationIDs.push_back(map->addAnnotation(mbgl::FillAnnotation { triangle, 0.5F, { makeRandomColor() }, { makeRandomColor() } }));
     }
 }
 
@@ -932,11 +930,11 @@ void GLFWView::run() {
 #endif
 }
 
-float GLFWView::getPixelRatio() const {
+auto GLFWView::getPixelRatio() const -> float {
     return pixelRatio;
 }
 
-mbgl::Size GLFWView::getSize() const {
+auto GLFWView::getSize() const -> mbgl::Size {
     return { static_cast<uint32_t>(width), static_cast<uint32_t>(height) };
 }
 
@@ -1012,7 +1010,7 @@ void GLFWView::toggleCustomSource() {
 
                 features.emplace_back(gridLine);
             }
-            auto source = static_cast<mbgl::style::CustomGeometrySource *>(map->getStyle().getSource("custom"));
+            auto *source = static_cast<mbgl::style::CustomGeometrySource *>(map->getStyle().getSource("custom"));
             if (source) {
                 source->setTileData(tileID, features);
                 source->invalidateTile(tileID);
@@ -1055,7 +1053,7 @@ void GLFWView::toggleLocationIndicatorLayer() {
         puckLayer->setTopImageSize(0.18);
         puckLayer->setBearingImageSize(0.26);
         puckLayer->setShadowImageSize(0.2);
-        puckLayer->setImageTiltDisplacement(7.0f); // set to 0 for a "flat" puck
+        puckLayer->setImageTiltDisplacement(7.0F); // set to 0 for a "flat" puck
         puckLayer->setPerspectiveCompensation(0.9);
 
         map->getStyle().addImage(std::make_unique<mbgl::style::Image>(
@@ -1092,8 +1090,6 @@ void GLFWView::toggleLocationIndicatorLayer() {
     }
 #endif
 }
-
-using Nanoseconds = std::chrono::nanoseconds;
 
 void GLFWView::onWillStartRenderingFrame() {
 #if defined(MBGL_RENDER_BACKEND_OPENGL) && !defined(MBGL_LAYER_LOCATION_INDICATOR_DISABLE_ALL)

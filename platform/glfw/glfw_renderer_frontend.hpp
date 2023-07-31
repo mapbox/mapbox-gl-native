@@ -20,7 +20,7 @@ public:
     void update(std::shared_ptr<mbgl::UpdateParameters>) override;
     void render();
     
-    mbgl::Renderer* getRenderer();
+    auto getRenderer() -> mbgl::Renderer*;
 
 private:
     GLFWView& glfwView;

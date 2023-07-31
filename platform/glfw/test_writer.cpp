@@ -2,7 +2,6 @@
 
 #include <rapidjson/prettywriter.h>
 #include <rapidjson/stringbuffer.h>
-#include <rapidjson/writer.h>
 #include <ghc/filesystem.hpp>
 
 #include <cmath>
@@ -93,26 +92,26 @@ TestWriter::TestWriter() = default;
 
 TestWriter::~TestWriter() = default;
 
-TestWriter& TestWriter::withCameraOptions(const mbgl::CameraOptions& camera) {
+auto TestWriter::withCameraOptions(const mbgl::CameraOptions& camera) -> TestWriter& {
     operations.emplace_back(std::make_unique<SetCamera>(camera));
 
     return *this;
 }
 
-TestWriter& TestWriter::withStyle(const mbgl::style::Style& style) {
+auto TestWriter::withStyle(const mbgl::style::Style& style) -> TestWriter& {
     operations.emplace_back(std::make_unique<SetStyle>(style));
 
     return *this;
 }
 
-TestWriter& TestWriter::withInitialSize(const mbgl::Size& size) {
+auto TestWriter::withInitialSize(const mbgl::Size& size) -> TestWriter& {
     assert(initialSize == nullptr);
     initialSize = std::make_unique<SetInitialSize>(size);
 
     return *this;
 }
 
-bool TestWriter::write(const std::string& dir) const {
+auto TestWriter::write(const std::string& dir) const -> bool {
     namespace fs = ghc::filesystem;
 
     fs::path rootDir(dir);
@@ -144,7 +143,7 @@ bool TestWriter::write(const std::string& dir) const {
     return out.is_open() && out.good();
 }
 
-std::string TestWriter::serialize() const {
+auto TestWriter::serialize() const -> std::string {
     rapidjson::StringBuffer s;
     Writer writer(s);
 
