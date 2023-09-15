@@ -198,7 +198,7 @@ GeometryCollection convertGeometry(const Feature::geometry_type& geometryTileFea
         [&](const MultiPoint<double>& points) -> GeometryCollection {
             MultiPoint<int16_t> result;
             result.reserve(points.size());
-            for (const auto p : points) {
+            for (const auto& p : points) {
                 result.emplace_back(latLonToTileCoodinates(p));
             }
             return {std::move(result)};
@@ -206,7 +206,7 @@ GeometryCollection convertGeometry(const Feature::geometry_type& geometryTileFea
         [&](const LineString<double>& lineString) -> GeometryCollection {
             LineString<int16_t> result;
             result.reserve(lineString.size());
-            for (const auto p : lineString) {
+            for (const auto& p : lineString) {
                 result.emplace_back(latLonToTileCoodinates(p));
             }
             return {std::move(result)};
@@ -217,7 +217,7 @@ GeometryCollection convertGeometry(const Feature::geometry_type& geometryTileFea
             for (const auto& line : lineStrings) {
                 LineString<int16_t> temp;
                 temp.reserve(line.size());
-                for (const auto p : line) {
+                for (const auto& p : line) {
                     temp.emplace_back(latLonToTileCoodinates(p));
                 }
                 result.emplace_back(temp);
@@ -230,7 +230,7 @@ GeometryCollection convertGeometry(const Feature::geometry_type& geometryTileFea
             for (const auto& ring : polygon) {
                 LinearRing<int16_t> temp;
                 temp.reserve(ring.size());
-                for (const auto p : ring) {
+                for (const auto& p : ring) {
                     temp.emplace_back(latLonToTileCoodinates(p));
                 }
                 result.emplace_back(temp);
@@ -244,7 +244,7 @@ GeometryCollection convertGeometry(const Feature::geometry_type& geometryTileFea
                 for (const auto& r : pg) {
                     LinearRing<int16_t> ring;
                     ring.reserve(r.size());
-                    for (const auto p : r) {
+                    for (const auto& p : r) {
                         ring.emplace_back(latLonToTileCoodinates(p));
                     }
                     result.emplace_back(ring);
