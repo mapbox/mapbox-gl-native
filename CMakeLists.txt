@@ -57,6 +57,7 @@ target_compile_options(
         $<$<CXX_COMPILER_ID:GNU>:-Wno-error=maybe-uninitialized>
         $<$<CXX_COMPILER_ID:GNU>:-Wno-error=return-type>
         $<$<CXX_COMPILER_ID:GNU>:-Wno-error=unknown-pragmas>
+        $<$<CXX_COMPILER_ID:GNU>:-Wno-error=type-limits>
         $<$<CXX_COMPILER_ID:AppleClang>:-Wno-error=deprecated-declarations>
         $<$<CXX_COMPILER_ID:AppleClang>:-Wno-error=unused-parameter>
         $<$<CXX_COMPILER_ID:AppleClang>:-Wno-error=unused-property-ivar>
@@ -972,6 +973,8 @@ include(${PROJECT_SOURCE_DIR}/vendor/unique_resource.cmake)
 include(${PROJECT_SOURCE_DIR}/vendor/vector-tile.cmake)
 include(${PROJECT_SOURCE_DIR}/vendor/wagyu.cmake)
 
+find_package(Threads REQUIRED)
+
 target_link_libraries(
     mbgl-core
     PRIVATE
@@ -991,6 +994,7 @@ target_link_libraries(
         mbgl-vendor-unique_resource
         mbgl-vendor-vector-tile
         mbgl-vendor-wagyu
+        Threads::Threads
     PUBLIC
         Mapbox::Base
         Mapbox::Base::Extras::expected-lite
